@@ -16,7 +16,7 @@ stages:
   - build
 
 lint:
-    image: golangci/golangci-lint-action:v1.57.2
+    image: golangci/golangci-lint:v1.57.2
     stage: lint
     extends: .go-cache
     allow_failure: false
