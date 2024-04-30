@@ -1,0 +1,41 @@
+image: golang:1.22.2
+
+.go-cache:
+    variables:
+        GOPATH: $CI_PROJECT_DIR/.go
+    cache:
+      paths:
+        - .go/pkg/mod/
+
+variables:
+  OUTPUT_NAME: __bin__/$CI_PROJECT_NAME
+
+stages:
+  - lint
+  - test
+  - build
+
+lint:
+    image: golangci/golangci-lint:1.57.2
+    stage: lint
+    extends: .go-cache
+    allow_failure: false
+    script:
+      - golangci-lint run -v
+
+test:
+  stage: test
+  script:
+    - go fmt $(go list ./... | grep -v /vendor/)
+    - go vet $(go list ./... | grep -v /vendor/)
+    - go test -race $(go list ./... | grep -v /vendor/)
+
+build:
+  stage: build
+  script:
+    - mkdir -p $OUTPUT_NAME
+    - go build -o $OUTPUT_NAME ./...
+  artifacts:
+    paths:
+      - $OUTPUT_NAME
+
