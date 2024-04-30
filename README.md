@@ -4,6 +4,9 @@
 
 ## Getting started
 
+Ensure that the Go binary is in your system PATH variable.
+Ensure that the the system GOPATH variable points at the alexandria-backend directory.
+
 **Linting**: Install golangci-lint by running 
 ```
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
