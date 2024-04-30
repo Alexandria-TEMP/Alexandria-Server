@@ -3,3 +3,6 @@ pkg/
 
 # VSCode Setting
 .vscode/
+
+# Built project
+.exe
