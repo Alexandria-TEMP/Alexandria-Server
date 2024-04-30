@@ -59,4 +59,7 @@ linters:
 run:
   issues-exit-code: 1
   timeout: 5m
+
+issues:
+  fix: false
   
