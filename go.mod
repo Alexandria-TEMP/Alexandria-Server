@@ -2,10 +2,7 @@ module gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/al
 
 go 1.22.2
 
-require (
-	github.com/gin-gonic/gin v1.9.1
-	golang.org/x/example/hello v0.0.0-20240205180059-32022caedd6a
-)
+require github.com/gin-gonic/gin v1.9.1
 
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect

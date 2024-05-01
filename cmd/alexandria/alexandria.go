@@ -1,19 +1,22 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/example/hello/reverse"
 )
 
 func main() {
-	fmt.Println(reverse.String("Hello World!"))
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
-	r.Run() // listen and serve on 0.0.0.0:8080
+
+	err := r.Run() // listen and serve on 0.0.0.0:8080
+	if err != nil {
+		log.Fatalf("impossible to start server: %s", err)
+	}
 }
