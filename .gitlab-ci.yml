@@ -23,14 +23,12 @@ lint:
     extends: .go-cache
     allow_failure: false
     script:
-      - golangci-lint run -v
+      - golangci-lint run -vc .golangci.yml
 
 test:
   stage: test
   script:
-    - go fmt $(go list ./... | grep -v /vendor/)
-    - go vet $(go list ./... | grep -v /vendor/)
-    - go test -race $(go list ./... | grep -v /vendor/)
+    - go test ./... -v --cover
 
 build:
   stage: build

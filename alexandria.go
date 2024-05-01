@@ -15,7 +15,7 @@ func main() {
 		})
 	})
 
-	err := r.Run() // listen and serve on 0.0.0.0:8080
+	err := r.Run(":8080") // listen and serve on 0.0.0.0:8080
 	if err != nil {
 		log.Fatalf("impossible to start server: %s", err)
 	}

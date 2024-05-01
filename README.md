@@ -20,13 +20,18 @@ Then in the VSCode workspace settings:
  - add ```--config=${workspaceFolder}/.golangci.yml``` as a *Lint Flag*
 
 ### Go CLI Commands
- - To get all dependencies run ```go mod tidy``` in this directory.    
- - To run main run ```go run ./...``` or ```go run ./cmd/alexandria/alexandria.go```     
+ - To get all dependencies run ```go mod download``` in this directory.    
+ - To run main run ```go run``` or ```go run alexandria.go```     
  - To run all tests run ```go test ./...``` or ```go test ./test```
- - To build the application run ```go build ./cmd/alexandria/alexandria.go``` or ```go build ./...```
+ - To build the application run ```go build``` or ```go build alexandria.go```
 
 ### Deployment
 SSH into ```ssh [NetID]@student-linux.tudelft.nl``` and when prompted enter your SSO password.
+
+### Docker
+ - To build the go docker container run ```docker build -t alexandria-backend .```
+ - To start the container run ```docker run alexandria-backend```
+ - To check if the container is running with the server run ```docker ps```
 
 ## Default readme info to review and consider
 
