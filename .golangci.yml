@@ -17,6 +17,12 @@ linters-settings:
     shadow: true
     enable:
       - fieldalignment
+  depguard:
+    rules:
+      main:
+        allow:
+        - $gostd
+        - github.com/gin-gonic/gin
   nolintlint:
     require-explanation: true
     require-specific: true

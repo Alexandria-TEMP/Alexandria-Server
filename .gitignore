@@ -5,4 +5,4 @@ pkg/
 .vscode/
 
 # Built project
-.exe
+*.exe
