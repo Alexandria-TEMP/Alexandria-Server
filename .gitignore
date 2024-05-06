@@ -6,3 +6,7 @@ pkg/
 
 # Built project
 *.exe
+
+# Testing
+coverage
+coverage.*

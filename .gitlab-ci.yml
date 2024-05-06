@@ -29,12 +29,12 @@ test:
   stage: test
   script:
     - go test ./... -v
-  coverage: '/Branches\s*:\s*(\d+.?\d*)%/'
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage.xml
+    - go install github.com/rillig/gobco@v1.3.4
+    - output=$(gobco -branch | grep -Po '(?<=Branch coverage: ).*$')
+    - numerator=$(echo "$output" | grep -Po '^[0-9]+')
+    - denominator=$(echo "$output" | grep -Po '(?<=\/)[0-9]+')
+    - echo $(( ($numerator * 10000)  / $denominator )) | printf '%04d' | sed 's/..$/.&/' | awk '{print "Branch Coverage: "$1"%"}' 
+  coverage: 'Branch coverage: (\d+.?\d*)'
 
 build:
   stage: build
