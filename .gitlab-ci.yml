@@ -28,7 +28,13 @@ lint:
 test:
   stage: test
   script:
-    - go test ./... -v --cover
+    - go test ./... -v
+  coverage: '/Branches\s*:\s*(\d+.?\d*)%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
 
 build:
   stage: build
