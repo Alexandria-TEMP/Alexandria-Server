@@ -22,7 +22,7 @@ linters-settings:
       - performance
       - style
   gofmt:
-    simplify: false
+    simplify: true
   govet:
     shadow: true
     enable:
