@@ -33,7 +33,8 @@ test:
     - output=$(gobco -branch | grep -Po '(?<=Branch coverage: ).*$')
     - numerator=$(echo "$output" | grep -Po '^[0-9]+')
     - denominator=$(echo "$output" | grep -Po '(?<=\/)[0-9]+')
-    - echo$(( ($numerator * 10000)  / $denominator )) | printf "%04d" | sed "s/..$/.&/" | awk "{print "Branch Coverage: "$1}"
+    - | 
+      echo$(( ($numerator * 10000)  / $denominator )) | printf "%04d" | sed "s/..$/.&/" | awk "{print "Branch Coverage: "$1}"
   coverage: 'Branch coverage: (\d+.?\d*)'
 
 build:
