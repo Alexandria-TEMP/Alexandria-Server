@@ -1,0 +1,12 @@
+# External packages
+pkg/
+
+# VSCode Setting
+.vscode/
+
+# Built project
+*.exe
+
+# Testing
+coverage
+coverage.*

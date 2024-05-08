@@ -1,0 +1,56 @@
+image: golang:1.22.2
+
+.go-cache:
+    variables:
+      GOPATH: $CI_PROJECT_DIR/.go
+    before_script:
+      - mkdir -p .go
+    cache:
+      paths:
+        - .go/pkg/mod/
+
+variables:
+  OUTPUT_NAME: __bin__/$CI_PROJECT_NAME
+
+stages:
+  - lint
+  - test
+  - build
+
+lint:
+    image: golangci/golangci-lint:v1.57.2
+    stage: lint
+    extends: .go-cache
+    allow_failure: false
+    script:
+      - golangci-lint run -vc .golangci.yml
+
+test:
+  stage: test
+  script:
+    - go test ./... -v
+    - go install github.com/rillig/gobco@v1.3.4
+    - 'output=$(gobco -branch | grep -Po "(?<=Branch coverage: ).*$")'
+    - numerator=$(echo "$output" | grep -Po '^[0-9]+')
+    - denominator=$(echo "$output" | grep -Po '(?<=\/)[0-9]+')
+    - percent=$(echo $(( ($numerator * 10000)  / $denominator )) | printf "%04d" | sed "s/..$/.&/")
+    - echo "Branch coverage - $percent%"
+  coverage: '/Branch coverage - (\d+.?\d*)/'
+
+# go test ./... -v
+# go install github.com/rillig/gobco@v1.3.4
+# 'output=$(gobco -branch | grep -Po "(?<=Branch coverage: ).*$")'
+# numerator=$(echo "$output" | grep -Po '^[0-9]+')
+# denominator=$(echo "$output" | grep -Po '(?<=\/)[0-9]+')
+# percent=$(echo$(( ($numerator * 10000)  / $denominator )) | printf "%04d" | sed "s/..$/.&/")
+# echo "Branch coverage - $percent"
+
+build:
+  stage: build
+  script:
+    - mkdir -p $OUTPUT_NAME
+    - go build -o $OUTPUT_NAME ./...
+  artifacts:
+    paths:
+      - $OUTPUT_NAME
+
