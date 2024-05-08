@@ -46,7 +46,6 @@ linters:
     - errorlint
     - exportloopref
     - exhaustive
-    - fieldalignment
     - funlen
     - gocognit
     - goconst
