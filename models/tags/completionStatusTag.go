@@ -8,4 +8,14 @@ const (
 	Completed
 )
 
-type CompletionStatusTag struct{}
+type CompletionStatusTag struct {
+	label string
+}
+
+func (tag *CompletionStatusTag) GetLabel() string {
+	return tag.label
+}
+
+func (tag *CompletionStatusTag) GetType() TagType {
+	return CompletionStatusType
+}

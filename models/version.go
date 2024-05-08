@@ -1,3 +1,6 @@
 package models
 
-type Version struct{}
+type Version struct {
+	Repository
+	Discussions []Discussion
+}

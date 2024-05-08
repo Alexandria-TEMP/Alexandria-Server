@@ -1,3 +1,8 @@
 package models
 
-type ProjectPost struct{}
+type ProjectPost struct {
+	Post
+	ProjectMetadata
+	OpenMergeRequests   []MergeRequest
+	ClosedMergeRequests []ClosedMergeRequest
+}

@@ -1,3 +1,9 @@
 package models
 
-type Repository struct{}
+import (
+	"mime/multipart"
+)
+
+type Repository struct {
+	QuartoProject multipart.File
+}

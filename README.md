@@ -7,8 +7,7 @@
 ### Installing Go
 Install go version 1.22.2 from https://go.dev/dl/ and then set your environment variables as follows:
  - Add the go binary directory to PATH 
- - Add the go installation directory to GOROOT
- - Add the alexandria-backend parent directory (ie the directory above this README) as GOPATH
+ - Add the go installation directory to GOROOT and GOPATH
 
 ### Setting up the Linter in VSCode
 In order to lint locally install golangci-lint by running the following command in the root directory:
@@ -20,7 +19,7 @@ Then in the VSCode workspace settings:
  - add ```--config=${workspaceFolder}/.golangci.yml``` as a *Lint Flag*
 
 ### Go CLI Commands
- - To get all dependencies run ```go mod tidy``` in this directory.    
+ - To get and update all dependencies run ```go mod tidy``` in this directory.    
  - To run main run ```go run .``` or ```go run alexandria.go```     
  - To run all tests run ```go test ./...``` or ```go test ./test```
  - To build the application run ```go build .``` or ```go build alexandria.go```
@@ -28,16 +27,12 @@ Then in the VSCode workspace settings:
 ### Deployment
 SSH into ```ssh [NetID]@student-linux.tudelft.nl``` and when prompted enter your SSO password.
 
-### Docker
- - To build the go docker container run ```docker build --tag alexandria-backend:alpha .```
- - To start the container run ```docker run -dp 8080:8080 alexandria-backend:alpha```
- - To check if the container is running with the server run ```docker ps```
+### Using Docker
+ - Install [Docker](https://www.docker.com/products/docker-desktop/)
+ - To start the container run ```docker-compose up builder```. In the event that this command results in the error on windows```Error response from daemon: Ports are not available``` try running ```net stop winnat```.
 
 ## Default readme info to review and consider
 
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
 - [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
 - [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
 - [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)

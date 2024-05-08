@@ -8,4 +8,7 @@ const (
 	Reviewer
 )
 
-type Collaborator struct{}
+type Collaborator struct {
+	Member
+	CollaborationType
+}

@@ -8,4 +8,14 @@ const (
 	Reviewed
 )
 
-type PostReviewStatusTag struct{}
+type PostReviewStatusTag struct {
+	label string
+}
+
+func (tag *PostReviewStatusTag) GetLabel() string {
+	return tag.label
+}
+
+func (tag *PostReviewStatusTag) GetType() TagType {
+	return PostReviewStatusType
+}

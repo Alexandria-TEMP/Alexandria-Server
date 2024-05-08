@@ -7,4 +7,7 @@ const (
 	Approved
 )
 
-type MergeRequestReview struct{}
+type MergeRequestReview struct {
+	MergeRequestDecision
+	Feedback string
+}

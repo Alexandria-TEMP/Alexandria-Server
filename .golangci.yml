@@ -5,6 +5,7 @@ linters-settings:
         allow:
         - $gostd
         - github.com/gin-gonic/gin
+        - gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend
   errcheck:
     check-type-assertions: true
   funlen:
@@ -45,6 +46,7 @@ linters:
     - errorlint
     - exportloopref
     - exhaustive
+    - fieldalignment
     - funlen
     - gocognit
     - goconst

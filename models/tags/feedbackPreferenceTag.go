@@ -7,4 +7,14 @@ const (
 	FormalFeedback
 )
 
-type FeedbackPreferenceTag struct{}
+type FeedbackPreferenceTag struct {
+	label string
+}
+
+func (tag *FeedbackPreferenceTag) GetLabel() string {
+	return tag.label
+}
+
+func (tag *FeedbackPreferenceTag) GetType() TagType {
+	return FeedbackPreferenceType
+}

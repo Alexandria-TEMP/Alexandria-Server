@@ -10,4 +10,7 @@ const (
 	PostTypeType
 )
 
-type Tag interface{}
+type Tag interface {
+	GetLabel() string
+	GetType() TagType
+}

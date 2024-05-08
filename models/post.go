@@ -1,3 +1,6 @@
 package models
 
-type Post struct{}
+type Post struct {
+	PostMetadata
+	CurrentVersion Version
+}
