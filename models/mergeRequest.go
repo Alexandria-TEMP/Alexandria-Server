@@ -7,13 +7,11 @@ import (
 )
 
 type MergeRequest struct {
-	NewVersion    Version
-	Reviews       []MergeRequestReview
-	Anonymous     bool
-	CreatedAt     time.Time
-	Collaborators []Collaborator
-	// If this is nil (the defualt value) it means that there is no update
+	CreatedAt               time.Time
 	UpdatedCompletionStatus tags.CompletionStatusTag
-	// If this is nil (the defualt value) it means that there is no update
 	UpdatedScientificFields tags.ScientificFieldTag
+	NewVersion              Version
+	Reviews                 []MergeRequestReview
+	Collaborators           []Collaborator
+	Anonymous               bool
 }

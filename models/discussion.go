@@ -5,12 +5,12 @@ import (
 )
 
 type Discussion struct {
-	Text      string
-	Author    Member
-	Deleted   bool
-	Anonymous bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
+	Text      string
+	Author    Member
 	Replies   []Discussion
+	Deleted   bool
+	Anonymous bool
 }

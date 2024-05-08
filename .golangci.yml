@@ -26,8 +26,8 @@ linters-settings:
     simplify: true
   govet:
     shadow: true
-    enable:
-      - fieldalignment
+    # enable:
+    #   - fieldalignment
   nolintlint:
     require-explanation: true
     require-specific: true
@@ -51,7 +51,7 @@ linters:
     - goconst
     - gocritic
     - gofmt
-    - gomnd
+    - mnd
     - gocyclo
     - gosec
     - gosimple

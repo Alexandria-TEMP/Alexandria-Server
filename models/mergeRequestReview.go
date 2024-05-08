@@ -8,6 +8,6 @@ const (
 )
 
 type MergeRequestReview struct {
-	MergeRequestDecision
 	Feedback string
+	MergeRequestDecision
 }

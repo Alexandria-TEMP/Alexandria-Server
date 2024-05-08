@@ -3,8 +3,8 @@ package models
 import "time"
 
 type ClosedMergeRequest struct {
+	CreatedAt time.Time
 	MergeRequest
-	MergeRequestDecision
 	MainVersionWhenClosed Version
-	CreatedAt             time.Time
+	MergeRequestDecision
 }
