@@ -11,10 +11,10 @@ RUN go mod download
 COPY . ./
 
 # Build binary
-RUN go build -o /usr/bin/alexandria-backend -v ./
+# RUN go build -o /usr/bin/alexandria-backend -v ./
 
 # Expose port
 EXPOSE 8080
 
 # Start server on run
-ENTRYPOINT /usr/bin/alexandria-backend
+# ENTRYPOINT /usr/bin/alexandria-backend
