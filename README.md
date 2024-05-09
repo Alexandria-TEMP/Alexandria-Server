@@ -29,7 +29,8 @@ SSH into ```ssh [NetID]@student-linux.tudelft.nl``` and when prompted enter your
 
 ### Using Docker
  - Install [Docker](https://www.docker.com/products/docker-desktop/)
- - To start the container run ```docker-compose up builder```. In the event that this command results in the error on windows```Error response from daemon: Ports are not available``` try running ```net stop winnat```.
+ - To start the container run ```docker-compose up```. In the event that this command results in the error on windows```Error response from daemon: Ports are not available``` try running ```net stop winnat```.
+ - If you've made changes, run ```docker-compose up --build``` instead.
 
 ## Default readme info to review and consider
 
