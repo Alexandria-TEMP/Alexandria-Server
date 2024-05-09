@@ -10,6 +10,9 @@ services:
       - ./:/app
     ports:
       - 8080:8080
+    depends_on:
+      database:
+        condition: service_healthy
 
   database:
     image: mariadb
@@ -21,6 +24,18 @@ services:
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      interval: 3s
+      retries: 100
+      test:
+        [
+          "CMD",
+          "healthcheck.sh",
+          "--su-mysql",
+          "--connect",
+          "--innodb_initialized"
+        ]
+      timeout: 30s
 
 volumes:
   db_data:
