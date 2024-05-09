@@ -10,3 +10,6 @@ pkg/
 # Testing
 coverage
 coverage.*
+
+# Secrets
+.env

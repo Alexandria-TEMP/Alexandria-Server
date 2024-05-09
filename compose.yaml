@@ -1,5 +1,5 @@
 services:
-  builder:
+  backend:
     build:
       context: .
       target: builder
@@ -10,3 +10,12 @@ services:
       - ./:/app
     ports:
       - 8080:8080
+
+  database:
+    image: mariadb
+    restart: unless-stopped
+    environment:
+      - MARIADB_DATABASE="Alexandria"
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
