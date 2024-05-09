@@ -4,6 +4,9 @@ services:
       context: .
       target: builder
       dockerfile: Dockerfile
+      args: 
+        - GOPKG=${GOROOT}\pkg
+        - GOBIN=${GOROOT}\bin
     stdin_open: true
     tty: true
     volumes:

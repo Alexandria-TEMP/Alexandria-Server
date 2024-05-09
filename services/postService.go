@@ -4,4 +4,4 @@ type PostService struct {
 	// repo interface here
 }
 
-func (PostService *PostService) 
+// func (PostService *PostService) 

@@ -38,7 +38,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 		return
 	}
 
-	fmt.Printf("GET /post/%v\n", versionID)
+	fmt.Printf("GET /post/%v/%v\n", versionID, postID)
 
 	// Get post from database here. For now just send this to test.
 	post := new(models.Post)
