@@ -11,6 +11,14 @@ const (
 
 type MergeRequestReview struct {
 	gorm.Model
-	Feedback string
+
+	// MergeRequest has many MergeRequestReview
+	MergeRequestID uint
+
+	// MergeRequestReview belongs to Member
+	Member   Member
+	MemberID uint
+
 	MergeRequestDecision
+	Feedback string
 }

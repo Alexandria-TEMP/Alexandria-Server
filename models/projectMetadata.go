@@ -7,8 +7,14 @@ import (
 
 type ProjectMetadata struct {
 	gorm.Model
+
+	// ProjectPost has one ProjectMetadata
+	ProjectPostID uint
+
+	// TODO why is ForkedFrom a ClosedMergeRequest?
+	// ForkedFrom          ClosedMergeRequest
+
 	CompletionStatus    tags.CompletionStatus
 	FeedbackPreference  tags.FeedbackPreference
 	PostReviewStatusTag tags.PostReviewStatus
-	ForkedFrom          ClosedMergeRequest
 }

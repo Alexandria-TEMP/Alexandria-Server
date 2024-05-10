@@ -9,11 +9,22 @@ import (
 
 type MergeRequest struct {
 	gorm.Model
+
+	// MergeRequest belongs to Version
+	NewVersion   Version
+	NewVersionID uint
+
+	// MergeRequest has many MergeRequestCollaborator
+	Collaborators []MergeRequestCollaborator
+
+	// MergeRequest has many MergeRequestReview
+	Reviews []MergeRequestReview
+
+	// ProjectPost has many MergeRequest
+	ProjectPostID uint
+
 	CreatedAt               time.Time
 	UpdatedCompletionStatus tags.CompletionStatus
 	UpdatedScientificFields tags.ScientificField
-	NewVersion              Version
-	Reviews                 []MergeRequestReview
-	Collaborators           []Collaborator
 	Anonymous               bool
 }

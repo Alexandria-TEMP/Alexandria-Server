@@ -4,6 +4,11 @@ import "gorm.io/gorm"
 
 type Post struct {
 	gorm.Model
-	PostMetadata
-	CurrentVersion Version
+
+	// Post has one PostMetadata
+	PostMetadata PostMetadata
+
+	// Post belongs to Version
+	CurrentVersion   Version
+	CurrentVersionID uint
 }

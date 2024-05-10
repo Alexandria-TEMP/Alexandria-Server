@@ -7,10 +7,10 @@ import (
 
 // Changes to the models require database migrations. All models should be migrated here.
 func AutoMigrateAllModels(db *gorm.DB) error {
-	// Listed in alphabetical order
 	return db.AutoMigrate(
 		&models.ClosedMergeRequest{},
-		&models.Collaborator{},
+		&models.PostCollaborator{},
+		&models.MergeRequestCollaborator{},
 		&models.Discussion{},
 		&models.Member{},
 		&models.MergeRequest{},

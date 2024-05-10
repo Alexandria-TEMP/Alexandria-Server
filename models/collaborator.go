@@ -10,8 +10,30 @@ const (
 	Reviewer
 )
 
-type Collaborator struct {
+// A member that has collaborated on a post.
+type PostCollaborator struct {
 	gorm.Model
-	Member
-	CollaborationType
+
+	// Belongs to Member
+	Member   Member
+	MemberID uint
+
+	// PostMetadata has many PostCollaborator
+	PostCollaboratorID uint
+
+	CollaborationType CollaborationType
+}
+
+// A member that has collaborated on a merge request.
+type MergeRequestCollaborator struct {
+	gorm.Model
+
+	// Belongs to Member
+	Member   Member
+	MemberID uint
+
+	// MergeRequest has many MergeRequestCollaborator
+	MergeRequestID uint
+
+	CollaborationType CollaborationType
 }

@@ -9,7 +9,13 @@ import (
 
 type PostMetadata struct {
 	gorm.Model
-	Collaborators       []Collaborator
+
+	// PostMetadata has many PostCollaborator
+	Collaborators []PostCollaborator
+
+	// Post has one PostMetadata
+	PostID uint
+
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 	PostType            tags.PostType
