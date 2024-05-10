@@ -5,5 +5,5 @@ import (
 )
 
 type Repository struct {
-	QuartoProject multipart.File
+	QuartoProject multipart.File `swaggerignore:"true"`
 }

@@ -1,0 +1,159 @@
+definitions:
+  models.Collaborator:
+    properties:
+      CollaborationType:
+        enum:
+        - 0
+        - 1
+        - 2
+        type: integer
+        x-enum-varnames:
+        - Author
+        - Contributor
+        - Reviewer
+      discussions:
+        items:
+          $ref: '#/definitions/models.Discussion'
+        type: array
+      email:
+        type: string
+      firstName:
+        type: string
+      institution:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+      posts:
+        items:
+          $ref: '#/definitions/models.Post'
+        type: array
+      reviews:
+        items:
+          $ref: '#/definitions/models.MergeRequestReview'
+        type: array
+    type: object
+  models.Discussion:
+    properties:
+      anonymous:
+        type: boolean
+      author:
+        $ref: '#/definitions/models.Member'
+      createdAt:
+        type: string
+      deleted:
+        type: boolean
+      deletedAt:
+        type: string
+      replies:
+        items:
+          $ref: '#/definitions/models.Discussion'
+        type: array
+      text:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.Member:
+    properties:
+      discussions:
+        items:
+          $ref: '#/definitions/models.Discussion'
+        type: array
+      email:
+        type: string
+      firstName:
+        type: string
+      institution:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+      posts:
+        items:
+          $ref: '#/definitions/models.Post'
+        type: array
+      reviews:
+        items:
+          $ref: '#/definitions/models.MergeRequestReview'
+        type: array
+    type: object
+  models.MergeRequestReview:
+    properties:
+      MergeRequestDecision:
+        enum:
+        - 0
+        - 1
+        type: integer
+        x-enum-varnames:
+        - Rejected
+        - Approved
+      feedback:
+        type: string
+    type: object
+  models.Post:
+    properties:
+      collaborators:
+        items:
+          $ref: '#/definitions/models.Collaborator'
+        type: array
+      createdAt:
+        type: string
+      currentVersion:
+        $ref: '#/definitions/models.Version'
+      postType:
+        $ref: '#/definitions/tags.PostTypeTag'
+      scientificFieldTags:
+        items:
+          $ref: '#/definitions/tags.ScientificFieldTag'
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  models.Version:
+    properties:
+      discussions:
+        items:
+          $ref: '#/definitions/models.Discussion'
+        type: array
+    type: object
+  tags.PostTypeTag:
+    type: object
+  tags.ScientificFieldTag:
+    type: object
+  utils.HTTPError:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /post/{postID}:
+    get:
+      consumes:
+      - application/json
+      description: Get post by post ID
+      parameters:
+      - description: postID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Post'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get post
+swagger: "2.0"

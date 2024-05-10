@@ -11,10 +11,21 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
+// @BasePath /api/v1
+
 type PostController struct {
 	PostService services.PostService
 }
 
+// GetPost godoc
+// @Summary Get post
+// @Description Get post by post ID
+// @Accept  	json
+// @Param		postID	path	string	true	"postID"
+// @Produce		json
+// @Success 	200 {object} models.Post
+// @Failure		400 {object} utils.HTTPError
+// @Router 		/post/{postID} [get]
 func (postController *PostController) GetPost(c *gin.Context) {
 	// extract postID
 	postIDStr := c.Param("postID")
@@ -22,7 +33,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err)
-		utils.HTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr))
+		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr))
 
 		return
 	}
@@ -33,16 +44,22 @@ func (postController *PostController) GetPost(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err)
-		utils.HTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid version ID, cannot interpret as integer, id=%s ", versionIDStr))
+		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid version ID, cannot interpret as integer, id=%s ", versionIDStr))
 
 		return
 	}
 
 	fmt.Printf("GET /post/%v/%v\n", versionID, postID)
 
-	// Get post from database here. For now just send this to test.
+	// get post from database here. For now just do this to test.
 	post := new(models.Post)
 
+	// response
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, post)
 }
+
+// // CreatePost godoc
+// func (postController *PostController) CreatePost(c *gin.Context) {
+
+// }
