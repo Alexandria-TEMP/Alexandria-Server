@@ -16,10 +16,9 @@ type Discussion struct {
 	Member   Member `gorm:"foreignKey:MemberID"`
 	MemberID uint
 
-	// Discussion (optionally) belongs to Discussion
-	// TODO
-	// Parent   *Discussion `gorm:"foreignKey:ParentID"`
-	// ParentID uint
+	// Discussion optionally has many Discussion
+	Replies  []Discussion `gorm:"foreignKey:ParentID"`
+	ParentID *uint
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
