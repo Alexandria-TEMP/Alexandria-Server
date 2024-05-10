@@ -7,8 +7,8 @@ import (
 
 type ProjectMetadata struct {
 	gorm.Model
-	CompletionStatus    tags.CompletionStatusTag
-	FeedbackPreference  tags.FeedbackPreferenceTag
-	PostReviewStatusTag tags.PostReviewStatusTag
+	CompletionStatus    tags.CompletionStatus
+	FeedbackPreference  tags.FeedbackPreference
+	PostReviewStatusTag tags.PostReviewStatus
 	ForkedFrom          ClosedMergeRequest
 }

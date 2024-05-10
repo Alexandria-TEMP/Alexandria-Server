@@ -3,17 +3,18 @@ package tags
 type ScientificField int16
 
 const (
-	Maf ScientificField = iota
+	Mathematics ScientificField = iota
 )
 
-type ScientificFieldTag struct {
-	label string
+func (tag *ScientificField) GetLabel() string {
+	switch *tag {
+	case Mathematics:
+		return "Mathematics"
+	default:
+		panic("could not convert tag to string") // TODO better cleanup?
+	}
 }
 
-func (tag *ScientificFieldTag) GetLabel() string {
-	return tag.label
-}
-
-func (tag *ScientificFieldTag) GetType() TagType {
+func (tag *ScientificField) GetType() TagType {
 	return ScientificFieldType
 }

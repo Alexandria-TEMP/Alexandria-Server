@@ -8,14 +8,19 @@ const (
 	Reviewed
 )
 
-type PostReviewStatusTag struct {
-	label string
+func (tag *PostReviewStatus) GetLabel() string {
+	switch *tag {
+	case Open:
+		return "Open"
+	case RevisionNeeded:
+		return "Revision Needed"
+	case Reviewed:
+		return "Reviewed"
+	default:
+		panic("could not convert tag to string") // TODO better cleanup?
+	}
 }
 
-func (tag *PostReviewStatusTag) GetLabel() string {
-	return tag.label
-}
-
-func (tag *PostReviewStatusTag) GetType() TagType {
+func (tag *PostReviewStatus) GetType() TagType {
 	return PostReviewStatusType
 }

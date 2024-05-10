@@ -8,14 +8,19 @@ const (
 	Completed
 )
 
-type CompletionStatusTag struct {
-	label string
+func (tag *CompletionStatus) GetLabel() string {
+	switch *tag {
+	case Idea:
+		return "Idea"
+	case Ongoing:
+		return "Ongoing"
+	case Completed:
+		return "Completed"
+	default:
+		panic("could not convert tag to string") // TODO better cleanup?
+	}
 }
 
-func (tag *CompletionStatusTag) GetLabel() string {
-	return tag.label
-}
-
-func (tag *CompletionStatusTag) GetType() TagType {
+func (tag *CompletionStatus) GetType() TagType {
 	return CompletionStatusType
 }

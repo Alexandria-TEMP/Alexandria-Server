@@ -12,6 +12,6 @@ type PostMetadata struct {
 	Collaborators       []Collaborator
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
-	PostType            tags.PostTypeTag
-	ScientificFieldTags []tags.ScientificFieldTag
+	PostType            tags.PostType
+	ScientificFieldTags []tags.ScientificField
 }

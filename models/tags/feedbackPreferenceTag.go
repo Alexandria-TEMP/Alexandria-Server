@@ -7,14 +7,17 @@ const (
 	FormalFeedback
 )
 
-type FeedbackPreferenceTag struct {
-	label string
+func (tag *FeedbackPreference) GetLabel() string {
+	switch *tag {
+	case Discussion:
+		return "Discussion"
+	case FormalFeedback:
+		return "Formal Feedback"
+	default:
+		panic("could not convert tag to string") // TODO better cleanup?
+	}
 }
 
-func (tag *FeedbackPreferenceTag) GetLabel() string {
-	return tag.label
-}
-
-func (tag *FeedbackPreferenceTag) GetType() TagType {
+func (tag *FeedbackPreference) GetType() TagType {
 	return FeedbackPreferenceType
 }

@@ -10,8 +10,8 @@ import (
 type MergeRequest struct {
 	gorm.Model
 	CreatedAt               time.Time
-	UpdatedCompletionStatus tags.CompletionStatusTag
-	UpdatedScientificFields tags.ScientificFieldTag
+	UpdatedCompletionStatus tags.CompletionStatus
+	UpdatedScientificFields tags.ScientificField
 	NewVersion              Version
 	Reviews                 []MergeRequestReview
 	Collaborators           []Collaborator
