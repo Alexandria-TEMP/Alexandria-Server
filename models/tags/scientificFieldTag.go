@@ -1,18 +1,13 @@
 package tags
 
-type ScientificField int16
+type ScientificField string
 
 const (
-	Mathematics ScientificField = iota
+	Mathematics ScientificField = "mathematics"
 )
 
 func (tag *ScientificField) GetLabel() string {
-	switch *tag {
-	case Mathematics:
-		return "Mathematics"
-	default:
-		panic("could not convert tag to string") // TODO better cleanup?
-	}
+	return string(*tag)
 }
 
 func (tag *ScientificField) GetType() TagType {

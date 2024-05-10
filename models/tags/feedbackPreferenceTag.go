@@ -1,21 +1,14 @@
 package tags
 
-type FeedbackPreference int16
+type FeedbackPreference string
 
 const (
-	Discussion FeedbackPreference = iota
-	FormalFeedback
+	Discussion     FeedbackPreference = "discussion"
+	FormalFeedback FeedbackPreference = "formal feedback"
 )
 
 func (tag *FeedbackPreference) GetLabel() string {
-	switch *tag {
-	case Discussion:
-		return "Discussion"
-	case FormalFeedback:
-		return "Formal Feedback"
-	default:
-		panic("could not convert tag to string") // TODO better cleanup?
-	}
+	return string(*tag)
 }
 
 func (tag *FeedbackPreference) GetType() TagType {

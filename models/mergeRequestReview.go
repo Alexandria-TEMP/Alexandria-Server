@@ -2,11 +2,11 @@ package models
 
 import "gorm.io/gorm"
 
-type MergeRequestDecision int16
+type MergeRequestDecision string
 
 const (
-	Rejected MergeRequestDecision = iota
-	Approved
+	Rejected MergeRequestDecision = "rejected"
+	Approved MergeRequestDecision = "approved"
 )
 
 type MergeRequestReview struct {
@@ -16,9 +16,9 @@ type MergeRequestReview struct {
 	MergeRequestID uint
 
 	// MergeRequestReview belongs to Member
-	Member   Member
+	Member   Member `gorm:"foreignKey:MemberID"`
 	MemberID uint
 
-	MergeRequestDecision
-	Feedback string
+	MergeRequestDecision MergeRequestDecision `gorm:"serializer:json"`
+	Feedback             string
 }

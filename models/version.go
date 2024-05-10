@@ -6,8 +6,8 @@ type Version struct {
 	gorm.Model
 
 	// Version has one Repository
-	Repository Repository
+	Repository Repository `gorm:"foreignKey:VersionID"`
 
 	// Version has many Discussion
-	Discussions []Discussion
+	Discussions []Discussion `gorm:"foreignKey:VersionID"`
 }

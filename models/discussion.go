@@ -13,12 +13,13 @@ type Discussion struct {
 	VersionID uint
 
 	// Discussion belongs to Member
-	Member   Member
+	Member   Member `gorm:"foreignKey:MemberID"`
 	MemberID uint
 
 	// Discussion (optionally) belongs to Discussion
-	Parent   *Discussion
-	ParentID uint
+	// TODO
+	// Parent   *Discussion `gorm:"foreignKey:ParentID"`
+	// ParentID uint
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

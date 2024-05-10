@@ -11,20 +11,20 @@ type MergeRequest struct {
 	gorm.Model
 
 	// MergeRequest belongs to Version
-	NewVersion   Version
+	NewVersion   Version `gorm:"foreignKey:NewVersionID"`
 	NewVersionID uint
 
 	// MergeRequest has many MergeRequestCollaborator
-	Collaborators []MergeRequestCollaborator
+	Collaborators []MergeRequestCollaborator `gorm:"foreignKey:MergeRequestID"`
 
 	// MergeRequest has many MergeRequestReview
-	Reviews []MergeRequestReview
+	Reviews []MergeRequestReview `gorm:"foreignKey:MergeRequestID"`
 
 	// ProjectPost has many MergeRequest
 	ProjectPostID uint
 
 	CreatedAt               time.Time
-	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields tags.ScientificField
+	UpdatedCompletionStatus tags.CompletionStatus `gorm:"serializer:json"`
+	UpdatedScientificFields tags.ScientificField  `gorm:"serializer:json"`
 	Anonymous               bool
 }

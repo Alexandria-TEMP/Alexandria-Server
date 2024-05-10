@@ -6,9 +6,9 @@ type Post struct {
 	gorm.Model
 
 	// Post has one PostMetadata
-	PostMetadata PostMetadata
+	PostMetadata PostMetadata `gorm:"foreignKey:PostID"`
 
 	// Post belongs to Version
-	CurrentVersion   Version
+	CurrentVersion   Version `gorm:"foreignKey:CurrentVersionID"`
 	CurrentVersionID uint
 }

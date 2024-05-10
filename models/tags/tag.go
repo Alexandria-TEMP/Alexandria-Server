@@ -1,6 +1,6 @@
 package tags
 
-type TagType int16
+type TagType int
 
 const (
 	CompletionStatusType TagType = iota

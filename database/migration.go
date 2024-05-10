@@ -7,19 +7,29 @@ import (
 
 // Changes to the models require database migrations. All models should be migrated here.
 func AutoMigrateAllModels(db *gorm.DB) error {
+	/*
+		NOTE FOR FUTURE CHANGES: the order of migrations matters!
+
+		Foreign keys (e.g. uint) have to be initialized AFTER the
+		model that is being pointed to has been migrated.
+		For example, if "Foo has one Bar" (meaning Foo holds "Bar",
+		and Bar holds "FooID uint"), Foo should be migrated before Bar.
+
+		If this is not upheld, foreign key constraint errors will be thrown.
+	*/
 	return db.AutoMigrate(
-		&models.ClosedMergeRequest{},
-		&models.PostCollaborator{},
-		&models.MergeRequestCollaborator{},
-		&models.Discussion{},
-		&models.Member{},
-		&models.MergeRequest{},
-		&models.MergeRequestReview{},
-		&models.Post{},
-		&models.PostMetadata{},
-		&models.ProjectMetadata{},
-		&models.ProjectPost{},
-		&models.Repository{},
-		&models.Version{},
+		&models.Version{},                  //
+		&models.Repository{},               // FK to Version
+		&models.Post{},                     // FK to Version
+		&models.PostMetadata{},             // FK to Post
+		&models.ProjectPost{},              // FK to Post
+		&models.ProjectMetadata{},          // FK to ProjectPost
+		&models.MergeRequest{},             // FK to Version, ProjectPost
+		&models.ClosedMergeRequest{},       // FK to MergeRequest, Version, ProjectPost
+		&models.Member{},                   //
+		&models.PostCollaborator{},         // FK to Member, PostMetadata
+		&models.MergeRequestCollaborator{}, // FK to Member, MergeRequest
+		&models.Discussion{},               // FK to Version, Member
+		&models.MergeRequestReview{},       // FK to MergeRequest, Member
 	)
 }

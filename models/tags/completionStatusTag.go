@@ -1,24 +1,15 @@
 package tags
 
-type CompletionStatus int16
+type CompletionStatus string
 
 const (
-	Idea CompletionStatus = iota
-	Ongoing
-	Completed
+	Idea      CompletionStatus = "idea"
+	Ongoing   CompletionStatus = "ongoing"
+	Completed CompletionStatus = "completed"
 )
 
 func (tag *CompletionStatus) GetLabel() string {
-	switch *tag {
-	case Idea:
-		return "Idea"
-	case Ongoing:
-		return "Ongoing"
-	case Completed:
-		return "Completed"
-	default:
-		panic("could not convert tag to string") // TODO better cleanup?
-	}
+	return string(*tag)
 }
 
 func (tag *CompletionStatus) GetType() TagType {

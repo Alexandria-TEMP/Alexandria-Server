@@ -11,13 +11,13 @@ type PostMetadata struct {
 	gorm.Model
 
 	// PostMetadata has many PostCollaborator
-	Collaborators []PostCollaborator
+	Collaborators []PostCollaborator `gorm:"foreignKey:PostMetadataID"`
 
 	// Post has one PostMetadata
 	PostID uint
 
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
-	PostType            tags.PostType
-	ScientificFieldTags []tags.ScientificField
+	PostType            tags.PostType          `gorm:"serializer:json"`
+	ScientificFieldTags []tags.ScientificField `gorm:"serializer:json"`
 }

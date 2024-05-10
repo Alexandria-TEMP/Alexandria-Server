@@ -14,7 +14,7 @@ type ProjectMetadata struct {
 	// TODO why is ForkedFrom a ClosedMergeRequest?
 	// ForkedFrom          ClosedMergeRequest
 
-	CompletionStatus    tags.CompletionStatus
-	FeedbackPreference  tags.FeedbackPreference
-	PostReviewStatusTag tags.PostReviewStatus
+	CompletionStatus    tags.CompletionStatus   `gorm:"serializer:json"`
+	FeedbackPreference  tags.FeedbackPreference `gorm:"serializer:json"`
+	PostReviewStatusTag tags.PostReviewStatus   `gorm:"serializer:json"`
 }

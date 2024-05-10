@@ -1,24 +1,15 @@
 package tags
 
-type PostReviewStatus int16
+type PostReviewStatus string
 
 const (
-	Open PostReviewStatus = iota
-	RevisionNeeded
-	Reviewed
+	Open           PostReviewStatus = "open"
+	RevisionNeeded PostReviewStatus = "revision needed"
+	Reviewed       PostReviewStatus = "reviewed"
 )
 
 func (tag *PostReviewStatus) GetLabel() string {
-	switch *tag {
-	case Open:
-		return "Open"
-	case RevisionNeeded:
-		return "Revision Needed"
-	case Reviewed:
-		return "Reviewed"
-	default:
-		panic("could not convert tag to string") // TODO better cleanup?
-	}
+	return string(*tag)
 }
 
 func (tag *PostReviewStatus) GetType() TagType {
