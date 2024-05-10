@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// A merge request that is no longer open, including merged and non-merged.
 type ClosedMergeRequest struct {
 	gorm.Model
 
