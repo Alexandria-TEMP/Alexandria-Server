@@ -8,8 +8,15 @@ services:
     tty: true
     volumes:
       - ./:/app
-    ports:
+    ports: 
       - 8080:8080
+    # This is only good for a prototype. Database credentials should not
+    # be kept in memory/environment variables in a production context.
+    environment: 
+      - ALEXANDRIA_DB_HOST=${ALEXANDRIA_DB_HOST}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
     depends_on:
       database:
         condition: service_healthy
@@ -18,7 +25,7 @@ services:
     image: mariadb
     restart: unless-stopped
     environment:
-      - MARIADB_DATABASE="Alexandria"
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
       - MARIADB_USER=${MARIADB_USER}
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
