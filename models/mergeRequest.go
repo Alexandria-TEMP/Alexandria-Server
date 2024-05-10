@@ -24,7 +24,7 @@ type MergeRequest struct {
 	ProjectPostID uint
 
 	CreatedAt               time.Time
-	UpdatedCompletionStatus tags.CompletionStatus `gorm:"serializer:json"`
-	UpdatedScientificFields tags.ScientificField  `gorm:"serializer:json"`
+	UpdatedCompletionStatus tags.CompletionStatus
+	UpdatedScientificFields tags.ScientificField `gorm:"serializer:json"`
 	Anonymous               bool
 }

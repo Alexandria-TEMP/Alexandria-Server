@@ -18,6 +18,6 @@ type PostMetadata struct {
 
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
-	PostType            tags.PostType          `gorm:"serializer:json"`
+	PostType            tags.PostType
 	ScientificFieldTags []tags.ScientificField `gorm:"serializer:json"`
 }

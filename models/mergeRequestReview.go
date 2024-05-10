@@ -19,6 +19,6 @@ type MergeRequestReview struct {
 	Member   Member `gorm:"foreignKey:MemberID"`
 	MemberID uint
 
-	MergeRequestDecision MergeRequestDecision `gorm:"serializer:json"`
+	MergeRequestDecision MergeRequestDecision
 	Feedback             string
 }

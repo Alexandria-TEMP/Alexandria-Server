@@ -21,5 +21,5 @@ type ClosedMergeRequest struct {
 	ProjectPostID uint
 
 	CreatedAt            time.Time
-	MergeRequestDecision MergeRequestDecision `gorm:"serializer:json"`
+	MergeRequestDecision MergeRequestDecision
 }

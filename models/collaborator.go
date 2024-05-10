@@ -21,7 +21,7 @@ type PostCollaborator struct {
 	// PostMetadata has many PostCollaborator
 	PostMetadataID uint
 
-	CollaborationType CollaborationType `gorm:"serializer:json"`
+	CollaborationType CollaborationType
 }
 
 // A member that has collaborated on a merge request.
@@ -35,5 +35,5 @@ type MergeRequestCollaborator struct {
 	// MergeRequest has many MergeRequestCollaborator
 	MergeRequestID uint
 
-	CollaborationType CollaborationType `gorm:"serializer:json"`
+	CollaborationType CollaborationType
 }
