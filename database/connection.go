@@ -15,6 +15,7 @@ func ConnectToDatabase() (*gorm.DB, error) {
 
 	connectionString := getConnectionString(info)
 	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
+
 	if err != nil {
 		return nil, err
 	}
