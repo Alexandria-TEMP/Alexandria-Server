@@ -11,6 +11,7 @@ COPY . ./
 
 # Copy ssh key
 COPY ./.devcontainer/id_rs[a] /root/.ssh/id_rsa
+RUN chmod 600 /root/.ssh/id_rsa
 
 # Build binary
 # RUN go build -o /usr/bin/alexandria-backend -v ./

@@ -12,7 +12,7 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 		return nil
 	}
 
-	router.GET("/post/:postID/:versionID", controllers.postController.GetPost)
+	router.GET("/post/:postID", controllers.postController.GetPost)
 
 	return router
 }
