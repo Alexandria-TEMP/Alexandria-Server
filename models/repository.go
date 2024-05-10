@@ -10,6 +10,6 @@ type Repository struct {
 	// Version has one Repository
 	VersionID uint
 
-	// TODO
+	// TODO write serialization/deserialization, OR use a filesystem instead
 	// QuartoProject multipart.File
 }

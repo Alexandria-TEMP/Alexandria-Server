@@ -6,9 +6,6 @@ import "gorm.io/gorm"
 type Member struct {
 	gorm.Model
 
-	// TODO can a Post be owned by multiple members? UML is not clear
-	// Posts []Post
-
 	FirstName   string
 	LastName    string
 	Email       string
