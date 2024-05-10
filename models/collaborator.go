@@ -1,5 +1,7 @@
 package models
 
+import "gorm.io/gorm"
+
 type CollaborationType int16
 
 const (
@@ -9,6 +11,7 @@ const (
 )
 
 type Collaborator struct {
+	gorm.Model
 	Member
 	CollaborationType
 }

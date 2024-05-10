@@ -10,7 +10,7 @@ services:
       - ./:/app
     ports: 
       - 8080:8080
-    # This is only good for a prototype. Database credentials should not
+    # TODO This is only good for a prototype. Database credentials should not
     # be kept in memory/environment variables in a production context.
     environment: 
       - ALEXANDRIA_DB_HOST=${ALEXANDRIA_DB_HOST}
@@ -29,6 +29,10 @@ services:
       - MARIADB_USER=${MARIADB_USER}
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    # TODO Once we have a separate prod compose.yaml, this port should not be exposed.
+    # This port is exposed so that you can inspect the database from your host machine.
+    ports:
+      - 3306:3306
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:

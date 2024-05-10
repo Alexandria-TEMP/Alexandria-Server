@@ -10,16 +10,15 @@ import (
 
 func main() {
 	// If DB connection fails, terminate
-	_, err := database.ConnectToDatabase()
+	db, err := database.ConnectToDatabase()
 	if err != nil {
 		log.Fatalf("could not connect to database: %s", err)
 	}
 
-	// This will be used to migrate models, once those are annotated.
-	// err = db.AutoMigrate(?)
-	// if err != nil {
-	// 	log.Fatalf("could not migrate models: %s", err)
-	// }
+	err = database.AutoMigrateAllModels(db)
+	if err != nil {
+		log.Fatalf("could not migrate models: %s", err)
+	}
 
 	router := gin.Default()
 	router.GET("/ping", func(c *gin.Context) {
