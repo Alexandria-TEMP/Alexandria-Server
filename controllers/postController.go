@@ -27,6 +27,7 @@ type PostController struct {
 // @Produce		json
 // @Success 	200 		{object}	models.Post
 // @Failure		400 		{object} 	utils.HTTPError
+// @Failure		410 		{object} 	utils.HTTPError
 // @Router 		/post/{postID}	[get]
 func (postController *PostController) GetPost(c *gin.Context) {
 	// extract postID
@@ -41,7 +42,14 @@ func (postController *PostController) GetPost(c *gin.Context) {
 	}
 
 	// retrieve post
-	post := postController.PostService.GetPost(postID)
+	post, err := postController.PostService.GetPost(postID)
+
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot get post because no post with this ID exists"))
+
+		return
+	}
 
 	// response
 	c.Header("Content-Type", "application/json")
@@ -83,7 +91,7 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 // @Accept  	json
 // @Param		post	body		models.Post		true	"Updated Post"
 // @Produce		json
-// @Success 	200 	"Success"
+// @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		410 	{object} 	utils.HTTPError
 // @Router 		/ 		[put]
@@ -122,6 +130,7 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 // @Produce		json
 // @Success 	200 		{object}	models.ProjectPost
 // @Failure		400 		{object} 	utils.HTTPError
+// @Failure		410 		{object} 	utils.HTTPError
 // @Router 		/projectPost/{postID}	[get]
 func (postController *PostController) GetProjectPost(c *gin.Context) {
 	// extract postID
@@ -135,7 +144,14 @@ func (postController *PostController) GetProjectPost(c *gin.Context) {
 		return
 	}
 
-	post := postController.PostService.GetProjectPost(uint64(postID))
+	post, err := postController.PostService.GetProjectPost(uint64(postID))
+
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot get project post because no post with this ID exists"))
+
+		return
+	}
 
 	// response
 	c.Header("Content-Type", "application/json")
@@ -177,7 +193,7 @@ func (postController *PostController) CreateProjectPost(c *gin.Context) {
 // @Accept  	json
 // @Param		post	body		models.ProjectPost		true	"Updated Project Post"
 // @Produce		json
-// @Success 	200 	"Success"
+// @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		410 	{object} 	utils.HTTPError
 // @Router 		/ 		[put]

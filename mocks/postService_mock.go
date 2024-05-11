@@ -64,11 +64,12 @@ func (mr *MockPostServiceMockRecorder) CreateProjectPost(form interface{}) *gomo
 }
 
 // GetPost mocks base method.
-func (m *MockPostService) GetPost(postID uint64) *models.Post {
+func (m *MockPostService) GetPost(postID uint64) (*models.Post, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPost", postID)
 	ret0, _ := ret[0].(*models.Post)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetPost indicates an expected call of GetPost.
@@ -78,11 +79,12 @@ func (mr *MockPostServiceMockRecorder) GetPost(postID interface{}) *gomock.Call 
 }
 
 // GetProjectPost mocks base method.
-func (m *MockPostService) GetProjectPost(postID uint64) *models.ProjectPost {
+func (m *MockPostService) GetProjectPost(postID uint64) (*models.ProjectPost, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProjectPost", postID)
 	ret0, _ := ret[0].(*models.ProjectPost)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetProjectPost indicates an expected call of GetProjectPost.
