@@ -43,10 +43,9 @@ test:
   coverage: '/coverage: (\d+.?\d*)% of statements in .\/.../'
 
   artifacts:
-    when: always
-    reports:
-      paths: 
-        - coverage.xml
+    name: "$CI_JOB_NAME"
+    paths: 
+      - coverage.xml
 
 # go test ./... -v
 # go install github.com/rillig/gobco@v1.3.4
