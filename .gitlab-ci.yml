@@ -28,7 +28,7 @@ lint:
 test:
   stage: test
   script:
-    - go test ./... -coverprofile=coverage.txt -covermode count
+    - go test -coverpkg=./... -coverprofile=coverage.out -covermode count ./...
     - go get github.com/boumenot/gocover-cobertura
     - go run github.com/boumenot/gocover-cobertura < coverage.txt > coverage.xml
     
@@ -39,14 +39,14 @@ test:
     # - denominator=$(echo "$output" | grep -Po '(?<=\/)[0-9]+')
     # - percent=$(echo $(( ($numerator * 10000)  / $denominator )) | printf "%04d" | sed "s/..$/.&/")
     # - echo "Branch coverage - $percent%"
-    
-  # coverage: '/coverage: (\d+.?\d*)%/'
+
+  coverage: '/coverage: (\d+.?\d*)% of statements in .\/.../'
 
   artifacts:
+    when: always
     reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage.xml
+      paths: 
+        - coverage.xml
 
 # go test ./... -v
 # go install github.com/rillig/gobco@v1.3.4
