@@ -1,11 +1,4 @@
 linters-settings:
-  depguard:
-    rules:
-      main:
-        allow:
-        - $gostd
-        - github.com/gin-gonic/gin
-        - gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend
   errcheck:
     check-type-assertions: true
   funlen:
@@ -37,9 +30,7 @@ linters:
   enable:
     - asciicheck 
     - bidichk
-    - bodyclose
     - decorder
-    - depguard
     - dogsled
     - dupl
     - errcheck
@@ -84,4 +75,4 @@ issues:
 
 output:
   print-issued-lines: true
-  print-linter-name: false
+  print-linter-name: true

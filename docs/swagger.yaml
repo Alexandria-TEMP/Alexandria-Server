@@ -1,4 +1,92 @@
 definitions:
+  forms.PostCreationForm:
+    properties:
+      collaborators:
+        items:
+          $ref: '#/definitions/models.Collaborator'
+        type: array
+      createdAt:
+        type: string
+      currentVersion:
+        $ref: '#/definitions/models.Version'
+      postType:
+        $ref: '#/definitions/tags.PostTypeTag'
+      scientificFieldTags:
+        items:
+          $ref: '#/definitions/tags.ScientificFieldTag'
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  forms.ProjectPostCreationForm:
+    properties:
+      closedMergeRequests:
+        items:
+          $ref: '#/definitions/models.ClosedMergeRequest'
+        type: array
+      collaborators:
+        items:
+          $ref: '#/definitions/models.Collaborator'
+        type: array
+      completionStatus:
+        $ref: '#/definitions/tags.CompletionStatusTag'
+      createdAt:
+        type: string
+      currentVersion:
+        $ref: '#/definitions/models.Version'
+      feedbackPreference:
+        $ref: '#/definitions/tags.FeedbackPreferenceTag'
+      forkedFrom:
+        $ref: '#/definitions/models.ClosedMergeRequest'
+      id:
+        description: place holder until we make standardzied uuid system
+        type: integer
+      openMergeRequests:
+        items:
+          $ref: '#/definitions/models.MergeRequest'
+        type: array
+      postReviewStatusTag:
+        $ref: '#/definitions/tags.PostReviewStatusTag'
+      postType:
+        $ref: '#/definitions/tags.PostTypeTag'
+      scientificFieldTags:
+        items:
+          $ref: '#/definitions/tags.ScientificFieldTag'
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  models.ClosedMergeRequest:
+    properties:
+      MergeRequestDecision:
+        enum:
+        - 0
+        - 1
+        type: integer
+        x-enum-varnames:
+        - Rejected
+        - Approved
+      anonymous:
+        type: boolean
+      collaborators:
+        items:
+          $ref: '#/definitions/models.Collaborator'
+        type: array
+      createdAt:
+        type: string
+      mainVersionWhenClosed:
+        $ref: '#/definitions/models.Version'
+      newVersion:
+        $ref: '#/definitions/models.Version'
+      reviews:
+        items:
+          $ref: '#/definitions/models.MergeRequestReview'
+        type: array
+      updatedCompletionStatus:
+        $ref: '#/definitions/tags.CompletionStatusTag'
+      updatedScientificFields:
+        $ref: '#/definitions/tags.ScientificFieldTag'
+    type: object
   models.Collaborator:
     properties:
       CollaborationType:
@@ -80,6 +168,27 @@ definitions:
           $ref: '#/definitions/models.MergeRequestReview'
         type: array
     type: object
+  models.MergeRequest:
+    properties:
+      anonymous:
+        type: boolean
+      collaborators:
+        items:
+          $ref: '#/definitions/models.Collaborator'
+        type: array
+      createdAt:
+        type: string
+      newVersion:
+        $ref: '#/definitions/models.Version'
+      reviews:
+        items:
+          $ref: '#/definitions/models.MergeRequestReview'
+        type: array
+      updatedCompletionStatus:
+        $ref: '#/definitions/tags.CompletionStatusTag'
+      updatedScientificFields:
+        $ref: '#/definitions/tags.ScientificFieldTag'
+    type: object
   models.MergeRequestReview:
     properties:
       MergeRequestDecision:
@@ -103,6 +212,47 @@ definitions:
         type: string
       currentVersion:
         $ref: '#/definitions/models.Version'
+      id:
+        description: place holder until we make standardzied uuid system
+        type: integer
+      postType:
+        $ref: '#/definitions/tags.PostTypeTag'
+      scientificFieldTags:
+        items:
+          $ref: '#/definitions/tags.ScientificFieldTag'
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  models.ProjectPost:
+    properties:
+      closedMergeRequests:
+        items:
+          $ref: '#/definitions/models.ClosedMergeRequest'
+        type: array
+      collaborators:
+        items:
+          $ref: '#/definitions/models.Collaborator'
+        type: array
+      completionStatus:
+        $ref: '#/definitions/tags.CompletionStatusTag'
+      createdAt:
+        type: string
+      currentVersion:
+        $ref: '#/definitions/models.Version'
+      feedbackPreference:
+        $ref: '#/definitions/tags.FeedbackPreferenceTag'
+      forkedFrom:
+        $ref: '#/definitions/models.ClosedMergeRequest'
+      id:
+        description: place holder until we make standardzied uuid system
+        type: integer
+      openMergeRequests:
+        items:
+          $ref: '#/definitions/models.MergeRequest'
+        type: array
+      postReviewStatusTag:
+        $ref: '#/definitions/tags.PostReviewStatusTag'
       postType:
         $ref: '#/definitions/tags.PostTypeTag'
       scientificFieldTags:
@@ -119,6 +269,12 @@ definitions:
           $ref: '#/definitions/models.Discussion'
         type: array
     type: object
+  tags.CompletionStatusTag:
+    type: object
+  tags.FeedbackPreferenceTag:
+    type: object
+  tags.PostReviewStatusTag:
+    type: object
   tags.PostTypeTag:
     type: object
   tags.ScientificFieldTag:
@@ -133,13 +289,37 @@ definitions:
 info:
   contact: {}
 paths:
+  /post:
+    post:
+      consumes:
+      - application/json
+      description: Create a new question or discussion post
+      parameters:
+      - description: Post Creation Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.PostCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Post'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Create new post
   /post/{postID}:
     get:
       consumes:
       - application/json
-      description: Get post by post ID
+      description: Get a post by post ID
       parameters:
-      - description: postID
+      - description: Post ID
         in: path
         name: postID
         required: true
@@ -156,4 +336,51 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get post
+  /projectPost:
+    post:
+      consumes:
+      - application/json
+      description: Create a new project post
+      parameters:
+      - description: Project Post Creation Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.ProjectPostCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ProjectPost'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Create new project post
+  /projectPost/{postID}:
+    get:
+      consumes:
+      - application/json
+      description: Get a project post by post ID
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ProjectPost'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get project post
 swagger: "2.0"

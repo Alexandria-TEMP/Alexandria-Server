@@ -8,6 +8,7 @@ import (
 )
 
 func SetUpRouter(controllers ControllerEnv) *gin.Engine {
+	// Get router
 	router := gin.Default()
 	err := router.SetTrustedProxies(nil)
 
@@ -17,17 +18,19 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 
 	// Setup swagger documentation
 	docs.SwaggerInfo.BasePath = "/api/v1"
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	// Setup routing
 	v1 := router.Group("/api/v1")
-	{
-		postRouter := v1.Group("/post")
-		{
-			postRouter.GET("/:postID", controllers.postController.GetPost)
-		}
-	}
 
-	// router.POST("/api/v1/post", controllers.postController.CreatePost)
+	postRouter := v1.Group("/post")
+	postRouter.GET("/:postID", controllers.postController.GetPost)
+	postRouter.POST("/", controllers.postController.CreatePost)
+
+	projectPostRouter := v1.Group("/projectPost")
+	projectPostRouter.GET("/:postID", controllers.postController.GetProjectPost)
+	projectPostRouter.POST("/", controllers.postController.CreateProjectPost)
 
 	return router
 }

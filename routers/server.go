@@ -21,7 +21,7 @@ func initServiceEnv() ServiceEnv {
 
 func initControllerEnv(serviceEnv ServiceEnv) ControllerEnv {
 	return ControllerEnv{
-		postController: controllers.PostController{PostService: serviceEnv.postService},
+		postController: controllers.PostController{PostService: &serviceEnv.postService},
 	}
 }
 
