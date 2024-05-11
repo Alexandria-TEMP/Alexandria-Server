@@ -27,10 +27,11 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	postRouter := v1.Group("/post")
 	postRouter.GET("/:postID", controllers.postController.GetPost)
 	postRouter.POST("/", controllers.postController.CreatePost)
+	postRouter.PUT("/", controllers.postController.UpdatePost)
 
 	projectPostRouter := v1.Group("/projectPost")
 	projectPostRouter.GET("/:postID", controllers.postController.GetProjectPost)
-	projectPostRouter.POST("/", controllers.postController.CreateProjectPost)
+	projectPostRouter.POST("", controllers.postController.CreateProjectPost)
 
 	return router
 }

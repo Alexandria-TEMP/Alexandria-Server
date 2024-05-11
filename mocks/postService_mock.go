@@ -90,3 +90,31 @@ func (mr *MockPostServiceMockRecorder) GetProjectPost(postID interface{}) *gomoc
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectPost", reflect.TypeOf((*MockPostService)(nil).GetProjectPost), postID)
 }
+
+// UpdatePost mocks base method.
+func (m *MockPostService) UpdatePost(updatedPost *models.Post) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePost", updatedPost)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdatePost indicates an expected call of UpdatePost.
+func (mr *MockPostServiceMockRecorder) UpdatePost(updatedPost interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePost", reflect.TypeOf((*MockPostService)(nil).UpdatePost), updatedPost)
+}
+
+// UpdateProjectPost mocks base method.
+func (m *MockPostService) UpdateProjectPost(updatedPost *models.ProjectPost) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateProjectPost", updatedPost)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateProjectPost indicates an expected call of UpdateProjectPost.
+func (mr *MockPostServiceMockRecorder) UpdateProjectPost(updatedPost interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProjectPost", reflect.TypeOf((*MockPostService)(nil).UpdateProjectPost), updatedPost)
+}

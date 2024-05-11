@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
@@ -76,6 +77,43 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 	c.JSON(http.StatusOK, &post)
 }
 
+// UpdatePost godoc
+// @Summary 	Update post
+// @Description Update any number of the aspects of a question or discussion post
+// @Accept  	json
+// @Param		post	body		models.Post		true	"Updated Post"
+// @Produce		json
+// @Success 	200 	"Success"
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		410 	{object} 	utils.HTTPError
+// @Router 		/ 		[put]
+func (postController *PostController) UpdatePost(c *gin.Context) {
+	// extract post
+	updatedPost := models.Post{}
+	err := c.BindJSON(&updatedPost)
+
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind updated Post from request body"))
+
+		return
+	}
+
+	// Update and add post to database here. For now just do this to test.
+	err = postController.PostService.UpdatePost(&updatedPost)
+
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update post because no post with this ID exists"))
+
+		return
+	}
+
+	// response
+	c.Header("Content-Type", "application/json")
+	c.Status(http.StatusOK)
+}
+
 // GetProjectPost godoc
 // @Summary 	Get project post
 // @Description Get a project post by post ID
@@ -131,4 +169,41 @@ func (postController *PostController) CreateProjectPost(c *gin.Context) {
 	// response
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, &post)
+}
+
+// UpdateProjectPost godoc
+// @Summary 	Update project post
+// @Description Update any number of the aspects of project post
+// @Accept  	json
+// @Param		post	body		models.ProjectPost		true	"Updated Project Post"
+// @Produce		json
+// @Success 	200 	"Success"
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		410 	{object} 	utils.HTTPError
+// @Router 		/ 		[put]
+func (postController *PostController) UpdateProjectPost(c *gin.Context) {
+	// extract post
+	updatedProjectPost := models.ProjectPost{}
+	err := c.BindJSON(&updatedProjectPost)
+
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind updated ProjectPost from request body"))
+
+		return
+	}
+
+	// Update and add post to database here. For now just do this to test.
+	err = postController.PostService.UpdateProjectPost(&updatedProjectPost)
+
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update post because no ProjectPost with this ID exists"))
+
+		return
+	}
+
+	// response
+	c.Header("Content-Type", "application/json")
+	c.Status(http.StatusOK)
 }

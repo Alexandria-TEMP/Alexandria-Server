@@ -10,6 +10,9 @@ import (
 type PostService interface {
 	GetPost(postID uint64) *models.Post
 	CreatePost(form *forms.PostCreationForm) *models.Post
+	UpdatePost(updatedPost *models.Post) error
+
 	GetProjectPost(postID uint64) *models.ProjectPost
 	CreateProjectPost(form *forms.ProjectPostCreationForm) *models.ProjectPost
+	UpdateProjectPost(updatedPost *models.ProjectPost) error
 }

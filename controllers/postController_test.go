@@ -3,6 +3,7 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -40,11 +41,17 @@ func TestMain(m *testing.M) {
 	router.POST("/api/v1/post", func(c *gin.Context) {
 		postController.CreatePost(c)
 	})
+	router.PUT("/api/v1/post", func(c *gin.Context) {
+		postController.UpdatePost(c)
+	})
 	router.GET("/api/v1/projectPost/:postID", func(c *gin.Context) {
 		postController.GetProjectPost(c)
 	})
 	router.POST("/api/v1/projectPost", func(c *gin.Context) {
 		postController.CreateProjectPost(c)
+	})
+	router.PUT("/api/v1/projectPost", func(c *gin.Context) {
+		postController.UpdateProjectPost(c)
 	})
 
 	// Setup object
@@ -130,6 +137,48 @@ func TestCreatePost400(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
+func TestUpdatePost200(t *testing.T) {
+	beforeEach(t)
+
+	mockPostService.EXPECT().UpdatePost(&examplePost).Return(nil).Times(1)
+
+	examplePostJSON, _ := json.Marshal(examplePost)
+	req, _ := http.NewRequest("PUT", "/api/v1/post", bytes.NewBuffer(examplePostJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+}
+
+func TestUpdatePost400(t *testing.T) {
+	beforeEach(t)
+
+	mockPostService.EXPECT().UpdatePost(&examplePost).Return(nil).Times(0)
+
+	examplePostJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
+	req, _ := http.NewRequest("PUT", "/api/v1/post", bytes.NewBuffer(examplePostJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestUpdatePost410(t *testing.T) {
+	beforeEach(t)
+
+	mockPostService.EXPECT().UpdatePost(gomock.Any()).Return(errors.New("some error")).Times(1)
+
+	examplePostJSON, _ := json.Marshal(examplePost)
+	req, _ := http.NewRequest("PUT", "/api/v1/post", bytes.NewBuffer(examplePostJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusGone, responseRecorder.Result().StatusCode)
+}
+
 func TestGetProjectPost200(t *testing.T) {
 	beforeEach(t)
 
@@ -192,4 +241,46 @@ func TestCreateProjectPost400(t *testing.T) {
 	defer responseRecorder.Result().Body.Close()
 
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestUpdateProjectPost200(t *testing.T) {
+	beforeEach(t)
+
+	mockPostService.EXPECT().UpdateProjectPost(&exampleProjectPost).Return(nil).Times(1)
+
+	exampleProjectPostJSON, _ := json.Marshal(exampleProjectPost)
+	req, _ := http.NewRequest("PUT", "/api/v1/projectPost", bytes.NewBuffer(exampleProjectPostJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+}
+
+func TestUpdateProjectPost400(t *testing.T) {
+	beforeEach(t)
+
+	mockPostService.EXPECT().UpdateProjectPost(gomock.Any()).Return(nil).Times(0)
+
+	exampleProjectPostJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
+	req, _ := http.NewRequest("PUT", "/api/v1/projectPost", bytes.NewBuffer(exampleProjectPostJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestUpdateProjectPost410(t *testing.T) {
+	beforeEach(t)
+
+	mockPostService.EXPECT().UpdateProjectPost(&exampleProjectPost).Return(errors.New("some error")).Times(1)
+
+	exampleProjectPostJSON, _ := json.Marshal(exampleProjectPost)
+	req, _ := http.NewRequest("PUT", "/api/v1/projectPost", bytes.NewBuffer(exampleProjectPostJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusGone, responseRecorder.Result().StatusCode)
 }

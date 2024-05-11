@@ -26,6 +26,11 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) *models
 	return post
 }
 
+func (postService *PostService) UpdatePost(_ *models.Post) error {
+	// TODO: Access repo to update post here
+	return nil
+}
+
 func (postService *PostService) GetProjectPost(_ uint64) *models.ProjectPost {
 	// TODO: Access repo to get post
 	return new(models.ProjectPost)
@@ -42,4 +47,9 @@ func (postService *PostService) CreateProjectPost(form *forms.ProjectPostCreatio
 	// TODO: Add post to repo here
 
 	return post
+}
+
+func (postService *PostService) UpdateProjectPost(_ *models.ProjectPost) error {
+	// TODO: Access repo to update post here
+	return nil
 }
