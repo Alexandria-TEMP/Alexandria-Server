@@ -289,6 +289,32 @@ definitions:
 info:
   contact: {}
 paths:
+  /:
+    put:
+      consumes:
+      - application/json
+      description: Update any number of the aspects of project post
+      parameters:
+      - description: Updated Project Post
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProjectPost'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "410":
+          description: Gone
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Update project post
   /post:
     post:
       consumes:
