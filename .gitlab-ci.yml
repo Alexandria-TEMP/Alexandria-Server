@@ -29,7 +29,7 @@ test:
   stage: test
   script:
     - go test -coverpkg=./... -coverprofile=coverage.txt -covermode count ./...
-    - go install github.com/boumenot/gocover-cobertura
+    - go get github.com/boumenot/gocover-cobertura
     - go run github.com/boumenot/gocover-cobertura < coverage.txt > coverage.xml
     - go-coverage -f coverage.txt
     
