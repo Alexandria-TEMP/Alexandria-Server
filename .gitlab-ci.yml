@@ -31,6 +31,7 @@ test:
     - go test -coverpkg=./... -coverprofile=coverage.txt -covermode count ./...
     - go get github.com/boumenot/gocover-cobertura
     - go run github.com/boumenot/gocover-cobertura < coverage.txt > coverage.xml
+    - go install github.com/gojekfarm/go-coverage@v0.0.1  
     - go-coverage -f coverage.txt
     
     # - go test ./... -v -cover
