@@ -13,15 +13,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 )
 
 var (
-	mockPostService        *mock_interfaces.MockPostService
-	postController         *PostController
-	router                 *gin.Engine
+	mockPostService *mock_interfaces.MockPostService
+	postController  *controllers.PostController
+	router          *gin.Engine
+
 	responseRecorder       *httptest.ResponseRecorder
 	examplePost            models.Post
 	exampleProjectPost     models.ProjectPost
@@ -70,7 +72,7 @@ func beforeEach(t *testing.T) {
 	responseRecorder = httptest.NewRecorder()
 
 	mockPostService = mock_interfaces.NewMockPostService(mockCtrl)
-	postController = &PostController{PostService: mockPostService}
+	postController = &controllers.PostController{PostService: mockPostService}
 }
 
 func TestGetPost200(t *testing.T) {
