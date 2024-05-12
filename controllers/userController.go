@@ -96,7 +96,7 @@ func (userController *UserController) CreateMember(c *gin.Context) {
 // @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		410 	{object} 	utils.HTTPError
-// @Router 		/ 		[put]
+// @Router 		/member 		[put]
 func (userController *UserController) UpdateMember(c *gin.Context) {
 	// get the new member object
 	updatedMember := models.Member{}
@@ -204,7 +204,7 @@ func (userController *UserController) CreateCollaborator(c *gin.Context) {
 // @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		410 	{object} 	utils.HTTPError
-// @Router 		/ 		[put]
+// @Router 		/collaborator 		[put]
 func (userController *UserController) UpdateCollaborator(c *gin.Context) {
 	// extract the collaborator from the param
 	updatedCollaborator := models.Collaborator{}
