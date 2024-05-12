@@ -5,11 +5,12 @@ import (
 )
 
 type MemberCreationForm struct {
+	UserID uint64
 	FirstName string
 	LastName string
 	Email string
-	//making the password just a string for now
-	//TODO: some hashing or semblance of security
+	// making the password just a string for now
+	// TODO: some hashing or semblance of security
 	Password string
 	Institution string
 	Posts []models.Post
