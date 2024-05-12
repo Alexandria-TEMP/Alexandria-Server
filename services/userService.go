@@ -9,17 +9,17 @@ import (
 
 type UserService struct {
 	// dont know how to do database connections?
-	//but i think they go in here
+	// but i think they go in here
 }
 
 func (userService *UserService) GetMember(_ uint64) (*models.Member, error) {
-	//TODO: database interaction?
+	// TODO: database interaction?
 	return new(models.Member), nil
 }
 
 func (userService *UserService) CreateMember(form *forms.MemberCreationForm) *models.Member {
-	//creating a member
-	//:= is declaration + assignment
+	// creating a member
+	// := is declaration + assignment
 	member := &models.Member{
 		UserID:      rand.Uint64(),
 		FirstName:   form.FirstName,
@@ -32,17 +32,17 @@ func (userService *UserService) CreateMember(form *forms.MemberCreationForm) *mo
 		Reviews:     form.Reviews,
 	}
 
-	//TODO: add new member to repository
+	// TODO: add new member to repository
 
 	return member
 
 }
 func (userService *UserService) UpdateMember (_ *models.Member) error {
-	//TODO: database call to update 
+	// TODO: database call to update 
 	return nil
 }
 func (userService *UserService) GetCollaborator(_ uint64) (*models.Collaborator, error) {
-	//TODO: actually get from database based on UUID
+	// TODO: actually get from database based on UUID
 	return new(models.Collaborator), nil
 }
 
@@ -50,18 +50,18 @@ func (userService *UserService) CreateCollaborator(form *forms.CollaboratorCreat
 	collaborator := &models.Collaborator{
 		CollaboratorID:		rand.Uint64(),
 		Member:				form.Member,
-		//TODO: is this correct? will it assign the right thing?
-		//honestly have no clue yet
+		// TODO: is this correct? will it assign the right thing?
+		// honestly have no clue yet
 		CollaborationType:	models.CollaborationType(form.CollaborationType),
 	}
 
-	//TODO: add this one to the database as well
+	// TODO: add this one to the database as well
 
 	return collaborator
 }
 
 func (userService *UserService) UpdateCollaborator(_ *models.Collaborator) error {
-	//TODO: update data in database
+	// TODO: update data in database
 
 	return nil
 }
