@@ -5,12 +5,14 @@ import (
 )
 
 type MemberCreationForm struct {
-	models.FirstName
-	models.LastName
-	models.Email
-	models.Password
-	models.Institution
-	Posts models.[]Post
-	Discussions models.[]Discussion
-	Reviews models.[]MergeRequestReview
+	FirstName string
+	LastName string
+	Email string
+	//making the password just a string for now
+	//TODO: some hashing or semblance of security
+	Password string
+	Institution string
+	Posts []models.Post
+	Discussions []models.Discussion
+	Reviews []models.MergeRequestReview
 }
