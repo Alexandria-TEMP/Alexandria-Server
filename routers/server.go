@@ -7,21 +7,25 @@ import (
 
 type ServiceEnv struct {
 	postService services.PostService
+	userService services.UserService
 }
 
 type ControllerEnv struct {
 	postController controllers.PostController
+	userController controllers.UserController
 }
 
 func initServiceEnv() ServiceEnv {
 	return ServiceEnv{
 		postService: services.PostService{},
+		userService: services.UserService{},
 	}
 }
 
 func initControllerEnv(serviceEnv ServiceEnv) ControllerEnv {
 	return ControllerEnv{
 		postController: controllers.PostController{PostService: &serviceEnv.postService},
+		userController: controllers.UserController{UserService: &serviceEnv.userService},
 	}
 }
 
