@@ -9,7 +9,7 @@ const (
 )
 
 type Collaborator struct {
-	collaboratorID uint64
+	CollaboratorID uint64
 	Member
 	CollaborationType
 }

@@ -5,7 +5,6 @@ import (
 )
 
 type MemberCreationForm struct {
-	UserID uint64
 	FirstName string
 	LastName string
 	Email string

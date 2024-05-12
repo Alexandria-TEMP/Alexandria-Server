@@ -6,7 +6,6 @@ import (
 type CollaborationType int16
 
 type CollaboratorCreationForm struct {
-	collaboratorID uint64
 	models.Member
 	CollaborationType
 }
