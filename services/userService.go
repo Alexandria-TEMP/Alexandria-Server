@@ -35,10 +35,10 @@ func (userService *UserService) CreateMember(form *forms.MemberCreationForm) *mo
 	// TODO: add new member to repository
 
 	return member
-
 }
-func (userService *UserService) UpdateMember (_ *models.Member) error {
-	// TODO: database call to update 
+
+func (userService *UserService) UpdateMember(_ *models.Member) error {
+	// TODO: database call to update
 	return nil
 }
 func (userService *UserService) GetCollaborator(_ uint64) (*models.Collaborator, error) {
@@ -48,11 +48,11 @@ func (userService *UserService) GetCollaborator(_ uint64) (*models.Collaborator,
 
 func (userService *UserService) CreateCollaborator(form *forms.CollaboratorCreationForm) *models.Collaborator {
 	collaborator := &models.Collaborator{
-		CollaboratorID:		rand.Uint64(),
-		Member:				form.Member,
+		CollaboratorID: rand.Uint64(),
+		Member:         form.Member,
 		// TODO: is this correct? will it assign the right thing?
 		// honestly have no clue yet
-		CollaborationType:	models.CollaborationType(form.CollaborationType),
+		CollaborationType: models.CollaborationType(form.CollaborationType),
 	}
 
 	// TODO: add this one to the database as well
@@ -62,6 +62,5 @@ func (userService *UserService) CreateCollaborator(form *forms.CollaboratorCreat
 
 func (userService *UserService) UpdateCollaborator(_ *models.Collaborator) error {
 	// TODO: update data in database
-
 	return nil
 }

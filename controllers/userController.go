@@ -71,7 +71,7 @@ func (userController *UserController) CreateMember(c *gin.Context) {
 	// bind the fields of the param to the JSON of the model
 	err := c.BindJSON(&form)
 
-	// check for errors 
+	// check for errors
 	if err != nil {
 		fmt.Println(err)
 		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind userCreationForm from request body"))
@@ -79,7 +79,7 @@ func (userController *UserController) CreateMember(c *gin.Context) {
 		return
 	}
 
-	//create and add to database(not done yet) through the userService
+	// create and add to database(not done yet) through the userService
 	member := userController.UserService.CreateMember(&form)
 
 	// send back a positive response with the created member
@@ -110,7 +110,7 @@ func (userController *UserController) UpdateMember(c *gin.Context) {
 		return
 	}
 
-	//update and add the member to the database
+	// update and add the member to the database
 	err = userController.UserService.UpdateMember(&updatedMember)
 
 	// check for errors again
@@ -141,7 +141,7 @@ func (userController *UserController) GetCollaborator(c *gin.Context) {
 	userIDStr := c.Param("userID")
 	userID, err := strconv.ParseInt(userIDStr, 10, 64)
 
-	// check for errors 
+	// check for errors
 	if err != nil {
 		fmt.Println(err)
 		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr))
@@ -152,7 +152,7 @@ func (userController *UserController) GetCollaborator(c *gin.Context) {
 	// get the collaborator from the database
 	collaborator, err := userController.UserService.GetCollaborator(uint64(userID))
 
-	// check if collaborator found and returned successfully 
+	// check if collaborator found and returned successfully
 	if err != nil {
 		fmt.Println(err)
 		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot get project user because no user with this ID exists"))

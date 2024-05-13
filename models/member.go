@@ -1,7 +1,7 @@
 package models
 
 type Member struct {
-	//for lack of UUID for now
+	// for lack of UUID for now
 	UserID      uint64
 	FirstName   string
 	LastName    string
