@@ -6,7 +6,7 @@ import (
 )
 
 // Changes to the models require database migrations. All models should be migrated here.
-func AutoMigrateAllModels(db *gorm.DB) error {
+func autoMigrateAllModels(db *gorm.DB) error {
 	/*
 		NOTE FOR FUTURE CHANGES: the order of migrations matters!
 

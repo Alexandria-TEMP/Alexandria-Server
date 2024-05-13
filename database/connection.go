@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func ConnectToDatabase() (*gorm.DB, error) {
+func connectToDatabase() (*gorm.DB, error) {
 	info, err := readDatabaseCredentials()
 	if err != nil {
 		return nil, err
