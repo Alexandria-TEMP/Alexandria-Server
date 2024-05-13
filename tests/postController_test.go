@@ -10,6 +10,8 @@ import (
 	"os"
 	"testing"
 
+	"gorm.io/gorm"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -57,8 +59,8 @@ func TestMain(m *testing.M) {
 	})
 
 	// Setup object
-	examplePost = models.Post{ID: 1}
-	exampleProjectPost = models.ProjectPost{ID: 2}
+	examplePost = models.Post{Model: gorm.Model{ID: 1}}
+	exampleProjectPost = models.ProjectPost{Model: gorm.Model{ID: 2}}
 
 	os.Exit(m.Run())
 }

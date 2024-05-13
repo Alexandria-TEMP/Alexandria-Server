@@ -16,7 +16,6 @@ func (postService *PostService) GetPost(_ uint64) (*models.Post, error) {
 
 func (postService *PostService) CreatePost(form *forms.PostCreationForm) *models.Post {
 	post := &models.Post{
-		ID:             0, // Generate uuid here
 		PostMetadata:   form.PostMetadata,
 		CurrentVersion: form.CurrentVersion,
 	}
@@ -38,7 +37,6 @@ func (postService *PostService) GetProjectPost(_ uint64) (*models.ProjectPost, e
 
 func (postService *PostService) CreateProjectPost(form *forms.ProjectPostCreationForm) *models.ProjectPost {
 	post := &models.ProjectPost{
-		ID:                  0, // Generate uuid herePost
 		ProjectMetadata:     form.ProjectMetadata,
 		OpenMergeRequests:   form.OpenMergeRequests,
 		ClosedMergeRequests: form.ClosedMergeRequests,
