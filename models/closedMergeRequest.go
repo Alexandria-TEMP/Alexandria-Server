@@ -1,10 +1,26 @@
 package models
 
-import "time"
+import (
+	"time"
 
+	"gorm.io/gorm"
+)
+
+// A merge request that is no longer open, including merged and non-merged.
 type ClosedMergeRequest struct {
-	CreatedAt time.Time
-	MergeRequest
-	MainVersionWhenClosed Version
-	MergeRequestDecision
+	gorm.Model
+
+	// ClosedMergeRequest belongs to MergeRequest
+	MergeRequest   MergeRequest `gorm:"foreignKey:MergeRequestID"`
+	MergeRequestID uint
+
+	// ClosedMergeRequest belongs to Version
+	MainVersionWhenClosed   Version `gorm:"foreignKey:MainVersionWhenClosedID"`
+	MainVersionWhenClosedID uint
+
+	// ProjectPost has many ClosedMergeRequest
+	ProjectPostID uint
+
+	CreatedAt            time.Time
+	MergeRequestDecision MergeRequestDecision
 }
