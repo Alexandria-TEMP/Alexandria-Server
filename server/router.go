@@ -33,5 +33,8 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	projectPostRouter.GET("/:postID", controllers.postController.GetProjectPost)
 	projectPostRouter.POST("", controllers.postController.CreateProjectPost)
 
+	versionRouter := v1.Group("/version")
+	versionRouter.POST("/:postID", controllers.versionController.CreateVersion)
+
 	return router
 }

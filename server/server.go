@@ -5,26 +5,33 @@ import (
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
 )
 
 type ServiceEnv struct {
-	postService services.PostService
+	postService    services.PostService
+	versionService services.VersionService
 }
 
 type ControllerEnv struct {
-	postController controllers.PostController
+	postController    controllers.PostController
+	versionController controllers.VersionController
 }
 
 func initServiceEnv() ServiceEnv {
+	fs := filesystem.InitFilesystem()
+
 	return ServiceEnv{
-		postService: services.PostService{},
+		postService:    services.PostService{},
+		versionService: services.VersionService{Filesystem: fs},
 	}
 }
 
 func initControllerEnv(serviceEnv ServiceEnv) ControllerEnv {
 	return ControllerEnv{
-		postController: controllers.PostController{PostService: &serviceEnv.postService},
+		postController:    controllers.PostController{PostService: &serviceEnv.postService},
+		versionController: controllers.VersionController{VersionService: &serviceEnv.versionService},
 	}
 }
 

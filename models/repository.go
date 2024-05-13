@@ -1,14 +1,11 @@
 package models
 
 import (
-	"gorm.io/gorm"
+	"mime/multipart"
 )
 
 type Repository struct {
-	gorm.Model
-
-	// Version has one Repository
-	VersionID uint
+	File *multipart.FileHeader `form:"file"`
 
 	// TODO write serialization/deserialization, OR use a filesystem instead
 	// QuartoProject multipart.File `swaggerignore:"true"`
