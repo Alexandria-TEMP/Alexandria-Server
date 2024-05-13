@@ -2,17 +2,20 @@ package database
 
 import (
 	"fmt"
+
+	"gorm.io/gorm"
 )
 
-func InitializeDatabase() error {
-	// If DB connection fails, terminate
-	db, err := database.ConnectToDatabase()
+func InitializeDatabase() (*gorm.DB, error) {
+	db, err := ConnectToDatabase()
 	if err != nil {
-		return fmt.Print("could not connect to database: %s", err)
+		return nil, fmt.Errorf("could not connect to database: %w", err)
 	}
 
-	err = database.AutoMigrateAllModels(db)
+	err = AutoMigrateAllModels(db)
 	if err != nil {
-		log.Fatalf("could not migrate models: %s", err)
+		return nil, fmt.Errorf("could not migrate models: %w", err)
 	}
+
+	return db, nil
 }
