@@ -1,5 +1,6 @@
-# External packages
-pkg/
+# devcontainer extension
+.devcontainer/
+.github/
 
 # VSCode Setting
 .vscode/

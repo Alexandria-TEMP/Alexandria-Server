@@ -10,6 +10,10 @@ services:
       - ./:/app
     ports: 
       - 8080:8080
+    # TODO why is this here?
+    # args: 
+    #   - GOPKG=${GOROOT}\pkg
+    #   - GOBIN=${GOROOT}\bin
     # TODO This is only good for a prototype. Database credentials should not
     # be kept in memory/environment variables in a production context.
     environment: 

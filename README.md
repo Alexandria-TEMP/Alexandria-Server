@@ -24,6 +24,10 @@ Then in the VSCode workspace settings:
  - To run all tests run ```go test ./...``` or ```go test ./test```
  - To build the application run ```go build .``` or ```go build alexandria.go```
 
+### Swagger
+ - ```swag init -g ./alexandria.go ``` to update API spec
+ - view API spec at [here](http://localhost:8080/swagger/index.html)
+
 ### Deployment
 SSH into ```ssh [NetID]@student-linux.tudelft.nl``` and when prompted enter your SSO password.
 
@@ -31,6 +35,10 @@ SSH into ```ssh [NetID]@student-linux.tudelft.nl``` and when prompted enter your
  - Install [Docker](https://www.docker.com/products/docker-desktop/)
  - To start the container run ```docker-compose up```. In the event that this command results in the error on windows```Error response from daemon: Ports are not available``` try running ```net stop winnat```.
  - If you've made changes, run ```docker-compose up --build``` instead.
+
+### Mocking
+ - Run ```go get github.com/golang/mock/gomock``` and ```go get github.com/golang/mock/mockgen```
+ - Run ```go generate ./...``` to generate all mocks
 
 ## Default readme info to review and consider
 

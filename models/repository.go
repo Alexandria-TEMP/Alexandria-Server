@@ -11,5 +11,5 @@ type Repository struct {
 	VersionID uint
 
 	// TODO write serialization/deserialization, OR use a filesystem instead
-	// QuartoProject multipart.File
+	// QuartoProject multipart.File `swaggerignore:"true"`
 }
