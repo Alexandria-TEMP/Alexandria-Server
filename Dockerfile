@@ -1,7 +1,4 @@
 FROM golang:1.22.2 as builder
- 
-ARG GOPKG
-ARG GOBIN
 
 # Create directory for alexandria app
 WORKDIR /app

@@ -2,8 +2,9 @@
 .devcontainer/
 .github/
 
-# VSCode Setting
+# Editors Setting
 .vscode/
+.idea/
 
 # Built project
 *.exe
