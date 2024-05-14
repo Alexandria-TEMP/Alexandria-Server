@@ -8,18 +8,21 @@ import (
 
 // Interface that any database model must adhere to. Used by the ModelRepository.
 type Model interface {
-	getID() uint
+	GetID() uint
 }
 
 // Performs CRUD operations on a given type of database model to the database.
+// Type T must be a pointer to a struct, e.g. *Member.
+// Example usage: repo := ModelRepository[*Member] { db: ... }
 type ModelRepository[T Model] struct {
-	db *gorm.DB
+	Database *gorm.DB
 }
 
 // Create an object in the database. The passed object's initial ID field is ignored,
-// and a fresh new ID will be assigned to it. This modifies the original object.
-func (repo *ModelRepository[T]) Create(object *T) error {
-	result := repo.db.Create(object)
+// and a fresh new ID will be assigned to it. This modifies the original object, as
+// T must be a pointer to a Model type (as outlined above).
+func (repo *ModelRepository[T]) Create(object T) error {
+	result := repo.Database.Create(object)
 
 	if result.Error != nil {
 		return result.Error
