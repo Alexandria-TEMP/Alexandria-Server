@@ -13,14 +13,17 @@ type Model interface {
 
 // Performs CRUD operations on a given type of database model to the database.
 // Type T must be a pointer to a struct, e.g. *Member.
-// Example usage: repo := ModelRepository[*Member] { db: ... }
+// Example usage: repo := ModelRepository[*Member] { ... }
 type ModelRepository[T Model] struct {
 	Database *gorm.DB
 }
 
-// Create an object in the database. The passed object's initial ID field is ignored,
-// and a fresh new ID will be assigned to it. This modifies the original object, as
+// Create an object in the database.
 // T must be a pointer to a Model type (as outlined above).
+// In general, you should *not* specify the ID (leave it blank during struct creation
+// If the ID is specified:
+// - if an object with the given ID already exists, errors.
+// - otherwise, creates the object with that ID.
 func (repo *ModelRepository[T]) Create(object T) error {
 	result := repo.Database.Create(object)
 

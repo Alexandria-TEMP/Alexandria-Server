@@ -7,6 +7,7 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
+	"gorm.io/gorm"
 )
 
 type ServiceEnv struct {
@@ -40,6 +41,7 @@ func Init() {
 	memberRepo := database.ModelRepository[*models.Member]{Database: db}
 
 	err = memberRepo.Create(&models.Member{
+		Model:       gorm.Model{ID: 99},
 		FirstName:   "first name",
 		LastName:    "last name",
 		Email:       "email",
