@@ -55,12 +55,12 @@ services:
     image: mariadb
     restart: unless-stopped
     environment:
-      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_DATABASE=${ALEXANDRIA_TEST_DB_NAME}
       - MARIADB_USER=${MARIADB_USER}
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
     ports:
-      - 3306:3307
+      - 3308:3306
     volumes:
       - test_db_data:/var/lib/mysql
     healthcheck:
