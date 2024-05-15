@@ -46,14 +46,14 @@ func (repo *ModelRepository[T]) GetByID(id uint) (T, error) {
 	return found, nil
 }
 
-func (repo *ModelRepository[T]) Update(object T) {
+func (repo *ModelRepository[T]) Update(_ T) {
 	log.Fatal("TODO Update")
 }
 
-func (repo *ModelRepository[T]) Delete(object T) {
+func (repo *ModelRepository[T]) Delete(_ T) {
 	log.Fatal("TODO Delete")
 }
 
-func (repo *ModelRepository[T]) DeleteByID(id uint) {
+func (repo *ModelRepository[T]) DeleteByID(_ uint) {
 	log.Fatal("TODO Delete")
 }
