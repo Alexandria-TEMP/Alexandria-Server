@@ -62,13 +62,6 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	// Create and add post to database here. For now just do this to test.
 	err = versionController.VersionService.SaveRepository(c, repository.File, uint(version.ID), uint(postID))
 
-	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid article ID, cannot interpret as integer, id=%v ", postID))
-
-		return
-	}
-
 	// response
 	c.Status(http.StatusOK)
 }

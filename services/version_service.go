@@ -1,37 +1,41 @@
 package services
 
 import (
-	"fmt"
 	"mime/multipart"
-	"path/filepath"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 type VersionService struct {
 	Filesystem filesystem.Filesystem
 }
 
-func (versionService VersionService) SaveRepository(c *gin.Context, file *multipart.FileHeader, versionID uint, postID uint) error {
-	dirPath := versionService.Filesystem.GetRepositoryPath(versionID, postID)
-	zipName := fmt.Sprintf("%s.zip", strconv.FormatUint(uint64(versionID), 10))
-	zipFilePath := filepath.Join(dirPath, zipName)
+func (versionService VersionService) GetFilesystem() filesystem.Filesystem {
+	return versionService.Filesystem
+}
 
-	err := c.SaveUploadedFile(file, zipFilePath)
+func (versionService VersionService) SaveRepository(c *gin.Context, file *multipart.FileHeader, versionID, postID uint) error {
+	// Set current version
+	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+
+	// Save zip file
+	err := versionService.Filesystem.SaveRepository(c, file)
+
+	if err != nil {
+		return err
+	}
+
+	// Unzip saved file
+	err = versionService.Filesystem.Unzip()
 
 	if err != nil {
 		return err
 	}
 
-	err = utils.Unzip(zipFilePath, dirPath)
-
-	if err != nil {
-		return err
-	}
+	// Render quarto project
+	err = versionService.Filesystem.RenderProject()
 
 	return nil
 }

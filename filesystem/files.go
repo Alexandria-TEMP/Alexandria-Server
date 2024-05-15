@@ -1,7 +1,6 @@
-package utils
+package filesystem
 
 import (
-	"archive/zip"
 	"bytes"
 	"io"
 	"log"
@@ -76,44 +75,4 @@ func CreateMultipartFile(filePath string) (io.Reader, string) {
 	_, _ = io.Copy(w, in)
 
 	return body, mwriter.FormDataContentType()
-}
-
-func Unzip(zipFilePath, outputPath string) error {
-	archive, err := zip.OpenReader(zipFilePath)
-	if err != nil {
-		return err
-	}
-	defer archive.Close()
-
-	for _, f := range archive.File {
-		filePath := filepath.Join(outputPath, f.Name)
-
-		if f.FileInfo().IsDir() {
-			os.MkdirAll(filePath, os.ModePerm)
-			continue
-		}
-
-		if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
-			return err
-		}
-
-		dstFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-		if err != nil {
-			return err
-		}
-
-		fileInArchive, err := f.Open()
-		if err != nil {
-			return err
-		}
-
-		if _, err := io.Copy(dstFile, fileInArchive); err != nil {
-			return err
-		}
-
-		dstFile.Close()
-		fileInArchive.Close()
-	}
-
-	return nil
 }
