@@ -15,7 +15,7 @@ type Model interface {
 // Type T must be a pointer to a struct, e.g. *Member.
 // Example usage: repo := ModelRepository[*Member] { ... }
 type ModelRepository[T Model] struct {
-	Database *gorm.DB
+	database *gorm.DB
 }
 
 // Create an object in the database.
@@ -25,7 +25,7 @@ type ModelRepository[T Model] struct {
 // - if an object with the given ID already exists, errors.
 // - otherwise, creates the object with that ID.
 func (repo *ModelRepository[T]) Create(object T) error {
-	result := repo.Database.Create(object)
+	result := repo.database.Create(object)
 
 	if result.Error != nil {
 		return result.Error
@@ -36,7 +36,7 @@ func (repo *ModelRepository[T]) Create(object T) error {
 
 func (repo *ModelRepository[T]) GetByID(id uint) (T, error) {
 	var found T
-	result := repo.Database.First(&found, id)
+	result := repo.database.First(&found, id)
 
 	if result.Error != nil {
 		var zero T
@@ -54,6 +54,6 @@ func (repo *ModelRepository[T]) Delete(object T) {
 	log.Fatal("TODO Delete")
 }
 
-func (repo *ModelRepository[T]) DeleteByID(ID uint) {
+func (repo *ModelRepository[T]) DeleteByID(id uint) {
 	log.Fatal("TODO Delete")
 }

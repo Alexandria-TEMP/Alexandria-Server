@@ -1,16 +1,47 @@
-package database_test
+package database
 
 import (
+	"log"
 	"os"
 	"testing"
+
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gorm.io/gorm"
 )
 
-func setup() {
+var testDB *gorm.DB
+var modelRepository ModelRepository[*models.Member]
+var member models.Member
 
+func setup() {
+	// Database
+	database, err := InitializeTestDatabase()
+
+	if err != nil {
+		log.Fatalf("Could not initialize test database: %s", err)
+	}
+
+	testDB = database
+
+	// Helper data
+	member = models.Member{
+		FirstName:   "first name",
+		LastName:    "last name",
+		Email:       "email",
+		Password:    "password",
+		Institution: "institution",
+	}
+
+	// SUT
+	modelRepository = ModelRepository[*models.Member]{database: testDB}
 }
 
 func shutdown() {
+	// TODO does DB connection have to be closed?
+}
 
+func cleanDatabase() {
+	
 }
 
 func TestMain(m *testing.M) {
@@ -22,6 +53,66 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestDemo(t *testing.T) {
-	t.Error("Beep boop! Something went terribly wrong!")
+func TestCreateWithoutSpecifyingID(t *testing.T) {
+	t.Cleanup(cleanDatabase)
+
+	err := modelRepository.Create(&member)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCreateWithID(t *testing.T) {
+	t.Cleanup(cleanDatabase)
+
+	var id uint = 5
+
+	memberWithID := models.Member{
+		Model:       gorm.Model{ID: id},
+		FirstName:   "first name",
+		LastName:    "last name",
+		Email:       "email",
+		Password:    "password",
+		Institution: "institution",
+	}
+
+	err := modelRepository.Create(&memberWithID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if memberWithID.ID != id {
+		t.Fatalf("creation did not use ID %d", id)
+	}
+}
+
+func TestGetById(t *testing.T) {
+	t.Cleanup(cleanDatabase)
+
+	// Create a member
+	model := models.Member{
+		Model:       gorm.Model{ID: 5},
+		FirstName:   "first name",
+		LastName:    "last name",
+		Email:       "email",
+		Password:    "password",
+		Institution: "institution",
+	}
+
+	err := modelRepository.Create(&model)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Try to fetch the member
+	id := model.ID
+	found, err := modelRepository.GetByID(id)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if found.ID != id {
+		t.Fatal("fetched ID is not equal to ID at creation time")
+	}
 }
