@@ -14,16 +14,13 @@ var modelRepository ModelRepository[*models.Member]
 var member models.Member
 
 func setup() {
-	// Database
 	database, err := InitializeTestDatabase()
-
 	if err != nil {
 		log.Fatalf("Could not initialize test database: %s", err)
 	}
 
 	testDB = database
 
-	// Helper data
 	member = models.Member{
 		FirstName:   "first name",
 		LastName:    "last name",
@@ -32,16 +29,7 @@ func setup() {
 		Institution: "institution",
 	}
 
-	// SUT
 	modelRepository = ModelRepository[*models.Member]{database: testDB}
-}
-
-func shutdown() {
-	// TODO does DB connection have to be closed?
-}
-
-func cleanDatabase() {
-	
 }
 
 func TestMain(m *testing.M) {
@@ -49,8 +37,13 @@ func TestMain(m *testing.M) {
 
 	code := m.Run()
 
-	shutdown()
 	os.Exit(code)
+}
+
+// Helper function that deletes database contents
+func cleanDatabase() {
+	// Delete all members
+	testDB.Unscoped().Where("id >= 0").Delete(&models.Member{})
 }
 
 func TestCreateWithoutSpecifyingID(t *testing.T) {
