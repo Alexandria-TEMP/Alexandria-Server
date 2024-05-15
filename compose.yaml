@@ -14,6 +14,8 @@ services:
     # be kept in memory/environment variables in a production context.
     environment: 
       - ALEXANDRIA_DB_HOST=${ALEXANDRIA_DB_HOST}
+      - ALEXANDRIA_TEST_DB_HOST=${ALEXANDRIA_TEST_DB_HOST}
+      - ALEXANDRIA_TEST_DB_NAME=${ALEXANDRIA_TEST_DB_NAME}
       - MARIADB_DATABASE=${MARIADB_DATABASE}
       - MARIADB_USER=${MARIADB_USER}
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
@@ -60,7 +62,7 @@ services:
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
     ports:
-      - 3308:3306
+      - 3307:3306
     volumes:
       - test_db_data:/var/lib/mysql
     healthcheck:
