@@ -20,4 +20,4 @@ RUN go build -o /usr/bin/alexandria-backend -v ./
 EXPOSE 8080
 
 # Start server on run
-# ENTRYPOINT /usr/bin/alexandria-backend
+ENTRYPOINT /usr/bin/alexandria-backend
