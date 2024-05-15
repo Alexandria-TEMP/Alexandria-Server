@@ -19,5 +19,7 @@ RUN go build -o /usr/bin/alexandria-backend -v ./
 # Expose port
 EXPOSE 8080
 
+FROM build AS run
+
 # Start server on run
-# ENTRYPOINT /usr/bin/alexandria-backend
+ENTRYPOINT /usr/bin/alexandria-backend
