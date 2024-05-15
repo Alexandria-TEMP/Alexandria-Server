@@ -2,7 +2,7 @@ services:
   backend:
     build:
       context: .
-      target: builder
+      target: build
       dockerfile: Dockerfile
     stdin_open: true
     tty: true
@@ -19,6 +19,8 @@ services:
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
     depends_on:
       database:
+        condition: service_healthy
+      test_database:
         condition: service_healthy
 
   database:
@@ -48,5 +50,32 @@ services:
         ]
       timeout: 30s
 
+  # TODO this should not be running in production
+  test_database:
+    image: mariadb
+    restart: unless-stopped
+    environment:
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    ports:
+      - 3306:3307
+    volumes:
+      - test_db_data:/var/lib/mysql
+    healthcheck:
+      interval: 3s
+      retries: 100
+      test:
+        [
+          "CMD",
+          "healthcheck.sh",
+          "--su-mysql",
+          "--connect",
+          "--innodb_initialized"
+        ]
+      timeout: 30s
+
 volumes:
   db_data:
+  test_db_data:
