@@ -5,9 +5,7 @@ import (
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
-	"gorm.io/gorm"
 )
 
 type ServiceEnv struct {
@@ -31,28 +29,11 @@ func initControllerEnv(serviceEnv ServiceEnv) ControllerEnv {
 }
 
 func Init() {
-	db, err := database.InitializeDatabase()
+	_, err := database.InitializeDatabase()
 
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// TODO remove me
-	memberRepo := database.ModelRepository[*models.Member]{Database: db}
-
-	err = memberRepo.Create(&models.Member{
-		Model:       gorm.Model{ID: 99},
-		FirstName:   "first name",
-		LastName:    "last name",
-		Email:       "email",
-		Password:    "password",
-		Institution: "institution",
-	})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	// TODO remove until me
 
 	serviceEnv := initServiceEnv()
 	controllerEnv := initControllerEnv(serviceEnv)

@@ -34,8 +34,16 @@ func (repo *ModelRepository[T]) Create(object T) error {
 	return nil
 }
 
-func (repo *ModelRepository[T]) GetByID(id uint) {
-	log.Fatal("TODO GetByID")
+func (repo *ModelRepository[T]) GetByID(id uint) (T, error) {
+	var found T
+	result := repo.Database.First(&found, id)
+
+	if result.Error != nil {
+		var zero T
+		return zero, result.Error
+	}
+
+	return found, nil
 }
 
 func (repo *ModelRepository[T]) Update(object T) {
