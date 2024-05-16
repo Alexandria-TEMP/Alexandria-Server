@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"log"
 
 	"gorm.io/gorm"
 )
@@ -21,7 +20,7 @@ type ModelRepository[T Model] struct {
 
 // Create an object in the database.
 // T must be a pointer to a Model type (as outlined above).
-// In general, you should *not* specify the ID (leave it blank during struct creation
+// In general, you should *not* specify the ID (leave it blank during struct creation)
 // If the ID is specified:
 // - if an object with the given ID already exists, errors.
 // - otherwise, creates the object with that ID.
@@ -48,7 +47,7 @@ func (repo *ModelRepository[T]) GetByID(id uint) (T, error) {
 }
 
 func (repo *ModelRepository[T]) Update(object T) (T, error) {
-	// Ensure that a model with this ID already exists
+	// Ensure a model with this ID already exists
 	id := object.GetID()
 
 	result := repo.database.First(new(T), id)
@@ -69,10 +68,14 @@ func (repo *ModelRepository[T]) Update(object T) (T, error) {
 	return repo.GetByID(id)
 }
 
-func (repo *ModelRepository[T]) Delete(_ T) {
-	log.Fatal("TODO Delete")
-}
+func (repo *ModelRepository[T]) Delete(id uint) error {
+	// Ensure a model with this ID already exists
+	result := repo.database.First(new(T), id)
+	if result.Error != nil {
+		return fmt.Errorf("could not find model with ID %d to delete: %w", id, result.Error)
+	}
 
-func (repo *ModelRepository[T]) DeleteByID(_ uint) {
-	log.Fatal("TODO Delete")
+	result = repo.database.Delete(new(T), id)
+
+	return result.Error
 }

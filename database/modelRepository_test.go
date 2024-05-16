@@ -208,3 +208,43 @@ func TestUpdateWithModelFetchedFromDB(t *testing.T) {
 		t.Fatal("model was not updated")
 	}
 }
+
+func TestDeleteExistingModel(t *testing.T) {
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	// Insert an initial model
+	var id uint = 100
+	member.Model = gorm.Model{ID: id}
+
+	err := modelRepository.Create(&member)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Delete it again
+	err = modelRepository.Delete(id)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDeleteNonExistingModel(t *testing.T) {
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	// Insert an initial model with a different ID
+	var idA, idB uint = 100, 500
+	member.Model = gorm.Model{ID: idA}
+
+	err := modelRepository.Create(&member)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Delete a different ID
+	err = modelRepository.Delete(idB)
+	if err == nil {
+		t.Fatal("deletion should have failed")
+	}
+}
