@@ -1,12 +1,13 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Version struct {
 	gorm.Model
 
-	// Version has one Repository
-	Repository Repository `gorm:"foreignKey:VersionID"`
+	Repository Repository `gorm:"serializer:json"`
 
 	// Version has many Discussion
 	Discussions []Discussion `gorm:"foreignKey:VersionID"`
@@ -14,4 +15,9 @@ type Version struct {
 
 func (model *Version) GetID() uint {
 	return model.Model.ID
+}
+
+type Repository struct {
+	// TODO write serialization/deserialization, OR use a filesystem instead
+	// QuartoProject multipart.File `swaggerignore:"true"`
 }

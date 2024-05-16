@@ -5,6 +5,6 @@ import (
 )
 
 type PostCreationForm struct {
-	models.PostMetadata
+	Collaborators  []uint
 	CurrentVersion models.Version
 }

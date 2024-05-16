@@ -18,8 +18,8 @@ type PostCollaborator struct {
 	Member   Member `gorm:"foreignKey:MemberID"`
 	MemberID uint
 
-	// PostMetadata has many PostCollaborator
-	PostMetadataID uint
+	// Post has many PostCollaborator
+	PostID uint
 
 	CollaborationType CollaborationType
 }

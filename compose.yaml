@@ -2,7 +2,7 @@ services:
   backend:
     build:
       context: .
-      target: run
+      target: build # TODO change
       dockerfile: Dockerfile
     stdin_open: true
     tty: true
