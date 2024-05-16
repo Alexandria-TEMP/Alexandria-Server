@@ -235,6 +235,39 @@ func TestUpdateWithModelFetchedFromDB(t *testing.T) {
 	}
 }
 
+func TestUpdateWithNonExistingID(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	// Insert an initial model with a different ID
+	var idA, idB uint = 100, 500
+	member.Model = gorm.Model{ID: idA}
+
+	err := modelRepository.Create(&member)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Try to update it, but using a different ID
+	newModel := models.Member{
+		Model:       gorm.Model{ID: idB},
+		FirstName:   "A",
+		LastName:    "B",
+		Email:       "C",
+		Password:    "D",
+		Institution: "E",
+	}
+
+	_, err = modelRepository.Update(&newModel)
+	if err == nil {
+		t.Fatal("expected error after update using new ID")
+	}
+}
+
 func TestDeleteExistingModel(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
