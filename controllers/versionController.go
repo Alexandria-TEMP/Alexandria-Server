@@ -26,14 +26,11 @@ type VersionController struct {
 // @Param		postID		path		string				true	"Parent Post ID"
 // @Param		repository	body		models.Repository	true	"Repository to create"
 // @Produce		json
-// @Success 	200
+// @Success 	200		{object}	models.Version
 // @Failure		400 	{object} 	utils.HTTPError
+// @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/version/{postID}	[post]
 func (versionController *VersionController) CreateVersion(c *gin.Context) {
-	// other way of doing this
-	// form, err := c.MultipartForm()
-	// files := form.File["file"]
-
 	// extract file
 	repository := models.Repository{}
 	err := c.ShouldBindWith(&repository, binding.FormMultipart)
@@ -57,11 +54,15 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	}
 
 	// Create Version here
-	version := versionController.VersionService.CreateVersion()
+	version, err := versionController.VersionService.CreateVersion(c, repository.File, uint(postID))
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusInternalServerError, fmt.Errorf("%w", err))
 
-	// Create and add post to database here. For now just do this to test.
-	err = versionController.VersionService.SaveRepository(c, repository.File, uint(version.ID), uint(postID))
+		return
+	}
 
 	// response
-	c.Status(http.StatusOK)
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, version)
 }

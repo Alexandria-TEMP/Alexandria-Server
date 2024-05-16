@@ -2,11 +2,9 @@ package filesystem
 
 import (
 	"archive/zip"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 
@@ -21,21 +19,20 @@ type Filesystem struct {
 	CurrentQuartoDirPath string
 	CurrentZipFilePath   string
 	CurrentRenderDirPath string
-	renderFormat         string
 }
 
-var cwd, _ = os.Getwd()
-var DefaultRootPath = filepath.Clean(filepath.Join(cwd, "vfs"))
-var DefaultZipName = "quarto_project.zip"
-var DefaultQuartoDirectoryName = "quarto_project"
-var DefaultRenderFormat = "html"
+var (
+	cwd, _                     = os.Getwd()
+	defaultRootPath            = filepath.Clean(filepath.Join(cwd, "vfs"))
+	defaultZipName             = "quarto_project.zip"
+	defaultQuartoDirectoryName = "quarto_project"
+)
 
 func InitFilesystem() Filesystem {
 	filesystem := Filesystem{
-		rootPath:            DefaultRootPath,
-		zipName:             DefaultZipName,
-		quartoDirectoryName: DefaultQuartoDirectoryName,
-		renderFormat:        DefaultRenderFormat,
+		rootPath:            defaultRootPath,
+		zipName:             defaultZipName,
+		quartoDirectoryName: defaultQuartoDirectoryName,
 	}
 
 	err := os.MkdirAll(filesystem.rootPath, os.ModePerm)
@@ -112,66 +109,9 @@ func (filesystem *Filesystem) Unzip() error {
 	return nil
 }
 
-func (filesystem *Filesystem) RenderProject() error {
-	filesystem.InstallRenderDependencies()
-
-	cmd := exec.Command("quarto", "render", filesystem.CurrentQuartoDirPath, "--output-dir", filesystem.CurrentRenderDirPath, "--to", "html", "--no-cache")
-	out, err := cmd.CombinedOutput()
-
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("%s %s output:\n%s\n", cmd.Path, cmd.Args, out)
-
-	return nil
-}
-
-// InstallRenderDependencies first checks if a renv.lock file is present and if so gets all dependencies.
-// Next it checks for the
-func (filesystem *Filesystem) InstallRenderDependencies() error {
-	// Check if renv exists
-	rLockPath := filepath.Join(filesystem.CurrentQuartoDirPath, "renv.lock")
-	if _, err := os.Stat(rLockPath); err == nil {
-		// Install all existing dependencies from renv.lock
-		cmd := exec.Command("Rscript", "-e", "renv::restore()")
-		cmd.Dir = filesystem.CurrentQuartoDirPath
-		err := cmd.Run()
-
-		if err != nil {
-			return err
-		}
-	}
-
-	// Install rmarkdown
-	cmd := exec.Command("Rscript", "-e", "renv::install('rmarkdown')")
-	cmd.Dir = filesystem.CurrentQuartoDirPath
-	err := cmd.Run()
-
-	if err != nil {
-		return err
-	}
-
-	// Install knitr
-	cmd = exec.Command("Rscript", "-e", "renv::install('knitr')")
-	cmd.Dir = filesystem.CurrentQuartoDirPath
-	err = cmd.Run()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
+// RemoveProjectDirectory only removes the unzipped files, not the zip file or the render
 func (filesystem *Filesystem) RemoveProjectDirectory() error {
 	err := os.RemoveAll(filesystem.CurrentQuartoDirPath)
-
-	if err != nil {
-		return err
-	}
-
-	err = os.Remove(filesystem.CurrentQuartoDirPath)
 
 	if err != nil {
 		return err

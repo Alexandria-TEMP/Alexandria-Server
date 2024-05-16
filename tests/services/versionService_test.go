@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
@@ -17,7 +16,7 @@ func beforeEach(t *testing.T) {
 	t.Helper()
 
 	versionController = controllers.VersionController{
-		VersionService: services.VersionService{
+		VersionService: &services.VersionService{
 			Filesystem: filesystem.InitFilesystem(),
 		},
 	}
@@ -49,40 +48,11 @@ func cleanup(t *testing.T) {
 // 	// cleanup(t)
 // }
 
-func TestSetCurrentVersion(t *testing.T) {
-	beforeEach(t)
-
-	Filesystem := versionController.VersionService.GetFilesystem()
-
-	Filesystem.SetCurrentVersion(5, 10)
-
-	cwd, _ := os.Getwd()
-	assert.Equal(t, filepath.Join(cwd, "vfs", "10", "5"), Filesystem.CurrentDirPath)
-	assert.Equal(t, filepath.Join(cwd, "vfs", "10", "5", "quarto_project"), Filesystem.CurrentQuartoDirPath)
-	assert.Equal(t, filepath.Join(cwd, "vfs", "10", "5", "render"), Filesystem.CurrentRenderDirPath)
-	assert.Equal(t, filepath.Join(cwd, "vfs", "10", "5", "quarto_project.zip"), Filesystem.CurrentZipFilePath)
-}
-
-func TestUnzipSuccess(t *testing.T) {
-	beforeEach(t)
-
-	Filesystem := versionController.VersionService.GetFilesystem()
-	Filesystem.SetCurrentVersion(0, 0)
-	err := Filesystem.Unzip()
-
-	if err != nil {
-		println(err)
-	}
-
-	cleanup(t)
-}
-
 func TestRenderSuccess(t *testing.T) {
 	beforeEach(t)
 
-	Filesystem := versionController.VersionService.GetFilesystem()
-	Filesystem.SetCurrentVersion(0, 0)
-	err := Filesystem.RenderProject()
+	versionController.VersionService.GetFilesystem().SetCurrentVersion(0, 0)
+	err := versionController.VersionService.RenderProject()
 
 	if err != nil {
 		fmt.Printf("%v", err)

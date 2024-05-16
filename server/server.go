@@ -28,7 +28,7 @@ func initServiceEnv() ServiceEnv {
 	}
 }
 
-func initControllerEnv(serviceEnv ServiceEnv) ControllerEnv {
+func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 	return ControllerEnv{
 		postController:    controllers.PostController{PostService: &serviceEnv.postService},
 		versionController: controllers.VersionController{VersionService: &serviceEnv.versionService},
@@ -43,7 +43,7 @@ func Init() {
 	}
 
 	serviceEnv := initServiceEnv()
-	controllerEnv := initControllerEnv(serviceEnv)
+	controllerEnv := initControllerEnv(&serviceEnv)
 
 	router := SetUpRouter(controllerEnv)
 	err = router.Run(":8080")

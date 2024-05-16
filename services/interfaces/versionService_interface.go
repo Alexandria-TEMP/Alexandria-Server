@@ -11,7 +11,7 @@ import (
 //go:generate mockgen -source=./versionService_interface.go -destination=../../mocks/versionService_mock.go
 
 type VersionService interface {
-	SaveRepository(c *gin.Context, file *multipart.FileHeader, versionID uint, postID uint) error
-	CreateVersion() *models.Version
-	GetFilesystem() filesystem.Filesystem
+	CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (*models.Version, error)
+	RenderProject() error
+	GetFilesystem() *filesystem.Filesystem
 }
