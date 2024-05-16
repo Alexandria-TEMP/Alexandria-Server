@@ -23,12 +23,7 @@ func TestMain(m *testing.M) {
 }
 
 func setupSuite() {
-	database, err := InitializeTestDatabase()
-	if err != nil {
-		log.Fatalf("Could not initialize test database: %s", err)
-	}
 
-	testDB = database
 }
 
 func teardownSuite() {
@@ -36,6 +31,13 @@ func teardownSuite() {
 }
 
 func beforeEach() {
+	database, err := InitializeTestDatabase()
+	if err != nil {
+		log.Fatalf("Could not initialize test database: %s", err)
+	}
+
+	testDB = database
+
 	member = models.Member{
 		FirstName:   "first name",
 		LastName:    "last name",
@@ -53,6 +55,10 @@ func afterEach() {
 }
 
 func TestCreateWithoutSpecifyingID(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	beforeEach()
 	t.Cleanup(afterEach)
 
@@ -63,6 +69,10 @@ func TestCreateWithoutSpecifyingID(t *testing.T) {
 }
 
 func TestCreateWithID(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	beforeEach()
 	t.Cleanup(afterEach)
 
@@ -88,6 +98,10 @@ func TestCreateWithID(t *testing.T) {
 }
 
 func TestGetById(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	beforeEach()
 	t.Cleanup(afterEach)
 
@@ -120,6 +134,10 @@ func TestGetById(t *testing.T) {
 }
 
 func TestGetByIDReturnsError(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	beforeEach()
 	t.Cleanup(afterEach)
 
@@ -141,6 +159,10 @@ func TestGetByIDReturnsError(t *testing.T) {
 
 // Test updating a model, by creating a new model instance with the same ID
 func TestUpdateWithNewModelWithSameID(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	beforeEach()
 	t.Cleanup(afterEach)
 
@@ -179,6 +201,10 @@ func TestUpdateWithNewModelWithSameID(t *testing.T) {
 
 // Test updating a model, by getting the original instance and making changes to it
 func TestUpdateWithModelFetchedFromDB(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	beforeEach()
 	t.Cleanup(afterEach)
 
@@ -210,6 +236,10 @@ func TestUpdateWithModelFetchedFromDB(t *testing.T) {
 }
 
 func TestDeleteExistingModel(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	beforeEach()
 	t.Cleanup(afterEach)
 
@@ -230,6 +260,10 @@ func TestDeleteExistingModel(t *testing.T) {
 }
 
 func TestDeleteNonExistingModel(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	beforeEach()
 	t.Cleanup(afterEach)
 
