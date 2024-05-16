@@ -12,3 +12,7 @@ type Post struct {
 	CurrentVersion   Version `gorm:"foreignKey:CurrentVersionID"`
 	CurrentVersionID uint
 }
+
+func (model *Post) GetID() uint {
+	return model.Model.ID
+}

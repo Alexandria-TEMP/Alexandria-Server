@@ -24,3 +24,7 @@ type ClosedMergeRequest struct {
 	CreatedAt            time.Time
 	MergeRequestDecision MergeRequestDecision
 }
+
+func (model *ClosedMergeRequest) GetID() uint {
+	return model.Model.ID
+}

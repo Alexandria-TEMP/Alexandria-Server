@@ -13,3 +13,7 @@ type Repository struct {
 	// TODO write serialization/deserialization, OR use a filesystem instead
 	// QuartoProject multipart.File `swaggerignore:"true"`
 }
+
+func (model *Repository) GetID() uint {
+	return model.Model.ID
+}

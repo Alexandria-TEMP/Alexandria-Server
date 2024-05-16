@@ -22,3 +22,7 @@ type MergeRequestReview struct {
 	MergeRequestDecision MergeRequestDecision
 	Feedback             string
 }
+
+func (model *MergeRequestReview) GetID() uint {
+	return model.Model.ID
+}

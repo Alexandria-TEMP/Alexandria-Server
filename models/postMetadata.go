@@ -21,3 +21,7 @@ type PostMetadata struct {
 	PostType            tags.PostType
 	ScientificFieldTags []tags.ScientificField `gorm:"serializer:json"`
 }
+
+func (model *PostMetadata) GetID() uint {
+	return model.Model.ID
+}

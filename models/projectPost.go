@@ -18,3 +18,7 @@ type ProjectPost struct {
 	// ProjectPost has many ClosedMergeRequest
 	ClosedMergeRequests []ClosedMergeRequest `gorm:"foreignKey:ProjectPostID"`
 }
+
+func (model *ProjectPost) GetID() uint {
+	return model.Model.ID
+}
