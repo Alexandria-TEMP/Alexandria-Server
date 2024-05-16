@@ -29,9 +29,8 @@ type UserController struct {
 // @Router 		/member/{userID}	[get]
 func (userController *UserController) GetMember(c *gin.Context) {
 	// extract the id of the member
-	userIDStr := c.Param("UserID")
+	userIDStr := c.Param("userID")
 	userID, err := strconv.ParseUint(userIDStr, 10, 64)
-
 	// if this caused an error, print it
 	if err != nil {
 		fmt.Println(err)
@@ -39,7 +38,6 @@ func (userController *UserController) GetMember(c *gin.Context) {
 
 		return
 	}
-
 	// get the user through the service
 	member, err := userController.UserService.GetMember(userID)
 

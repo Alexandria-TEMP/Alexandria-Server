@@ -1,4 +1,4 @@
-package controllers
+package controllerTests
 
 import (
 	"bytes"
@@ -7,63 +7,16 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 )
 
-var (
-	mockPostService *mock_interfaces.MockPostService
-	postController  *controllers.PostController
-	router          *gin.Engine
-
-	responseRecorder       *httptest.ResponseRecorder
-	examplePost            models.Post
-	exampleProjectPost     models.ProjectPost
-	examplePostForm        forms.PostCreationForm
-	exampleProjectPostForm forms.ProjectPostCreationForm
-)
-
-// TestMain is a keyword function, this is run by the testing package before other tests
-func TestMain(m *testing.M) {
-	// Setup test router, to test controller endpoints through http
-	router = gin.Default()
-	gin.SetMode(gin.TestMode)
-
-	router.GET("/api/v1/post/:postID", func(c *gin.Context) {
-		postController.GetPost(c)
-	})
-	router.POST("/api/v1/post", func(c *gin.Context) {
-		postController.CreatePost(c)
-	})
-	router.PUT("/api/v1/post", func(c *gin.Context) {
-		postController.UpdatePost(c)
-	})
-	router.GET("/api/v1/projectPost/:postID", func(c *gin.Context) {
-		postController.GetProjectPost(c)
-	})
-	router.POST("/api/v1/projectPost", func(c *gin.Context) {
-		postController.CreateProjectPost(c)
-	})
-	router.PUT("/api/v1/projectPost", func(c *gin.Context) {
-		postController.UpdateProjectPost(c)
-	})
-
-	// Setup object
-	examplePost = models.Post{ID: 1}
-	exampleProjectPost = models.ProjectPost{ID: 2}
-
-	os.Exit(m.Run())
-}
-
-func beforeEach(t *testing.T) {
+func beforeEachController(t *testing.T) {
 	t.Helper()
 	mockCtrl := gomock.NewController(t)
 
@@ -76,11 +29,14 @@ func beforeEach(t *testing.T) {
 }
 
 func TestGetPost200(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().GetPost(uint64(1)).Return(&examplePost, nil).Times(1)
 
 	req, _ := http.NewRequest("GET", "/api/v1/post/1", http.NoBody)
+	println(router.Routes())
+	println(responseRecorder)
+	println(req)
 	router.ServeHTTP(responseRecorder, req)
 
 	var responsePost models.Post
@@ -92,7 +48,7 @@ func TestGetPost200(t *testing.T) {
 }
 
 func TestGetPost400(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().GetPost(gomock.Any()).Return(&examplePost, nil).Times(0)
 
@@ -105,7 +61,7 @@ func TestGetPost400(t *testing.T) {
 }
 
 func TestGetPost410(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().GetPost(uint64(1)).Return(&models.Post{}, errors.New("some error")).Times(1)
 
@@ -119,7 +75,7 @@ func TestGetPost410(t *testing.T) {
 }
 
 func TestCreatePost200(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().CreatePost(&examplePostForm).Return(&examplePost).Times(1)
 
@@ -136,7 +92,7 @@ func TestCreatePost200(t *testing.T) {
 }
 
 func TestCreatePost400(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().CreatePost(gomock.Any()).Return(&examplePost).Times(0)
 
@@ -150,7 +106,7 @@ func TestCreatePost400(t *testing.T) {
 }
 
 func TestUpdatePost200(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().UpdatePost(&examplePost).Return(nil).Times(1)
 
@@ -164,7 +120,7 @@ func TestUpdatePost200(t *testing.T) {
 }
 
 func TestUpdatePost400(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().UpdatePost(&examplePost).Return(nil).Times(0)
 
@@ -178,7 +134,7 @@ func TestUpdatePost400(t *testing.T) {
 }
 
 func TestUpdatePost410(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().UpdatePost(&examplePost).Return(errors.New("some error")).Times(1)
 
@@ -192,7 +148,7 @@ func TestUpdatePost410(t *testing.T) {
 }
 
 func TestGetProjectPost200(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().GetProjectPost(uint64(2)).Return(&exampleProjectPost, nil).Times(1)
 
@@ -208,11 +164,11 @@ func TestGetProjectPost200(t *testing.T) {
 }
 
 // func TestGetProjectPostDoesntExist(t *testing.T) {
-// 	beforeEach(t)
+// 	beforeEachController(t)
 // }
 
 func TestGetProjectPost400(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().GetProjectPost(gomock.Any()).Return(&exampleProjectPost, nil).Times(0)
 
@@ -225,7 +181,7 @@ func TestGetProjectPost400(t *testing.T) {
 }
 
 func TestGetProjectPost410(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().GetProjectPost(uint64(1)).Return(&models.ProjectPost{}, errors.New("some error")).Times(1)
 
@@ -239,7 +195,7 @@ func TestGetProjectPost410(t *testing.T) {
 }
 
 func TestCreateProjectPost200(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().CreateProjectPost(&exampleProjectPostForm).Return(&exampleProjectPost).Times(1)
 
@@ -256,7 +212,7 @@ func TestCreateProjectPost200(t *testing.T) {
 }
 
 func TestCreateProjectPost400(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().CreateProjectPost(gomock.Any()).Return(&exampleProjectPost).Times(0)
 
@@ -270,7 +226,7 @@ func TestCreateProjectPost400(t *testing.T) {
 }
 
 func TestUpdateProjectPost200(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().UpdateProjectPost(&exampleProjectPost).Return(nil).Times(1)
 
@@ -284,7 +240,7 @@ func TestUpdateProjectPost200(t *testing.T) {
 }
 
 func TestUpdateProjectPost400(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().UpdateProjectPost(gomock.Any()).Return(nil).Times(0)
 
@@ -298,7 +254,7 @@ func TestUpdateProjectPost400(t *testing.T) {
 }
 
 func TestUpdateProjectPost410(t *testing.T) {
-	beforeEach(t)
+	beforeEachController(t)
 
 	mockPostService.EXPECT().UpdateProjectPost(&exampleProjectPost).Return(errors.New("some error")).Times(1)
 
