@@ -13,7 +13,7 @@ func InitializeDatabase() (*gorm.DB, error) {
 		return nil, fmt.Errorf("could not read database credentials: %w", err)
 	}
 
-	db, err := connectToDatabase(info)
+	db, err := connectToDatabase(info, false)
 	if err != nil {
 		return nil, fmt.Errorf("could not connect to database: %w", err)
 	}
@@ -34,7 +34,7 @@ func InitializeTestDatabase() (*gorm.DB, error) {
 		return nil, fmt.Errorf("could not read database credentials: %w", err)
 	}
 
-	db, err := connectToDatabase(info)
+	db, err := connectToDatabase(info, true)
 	if err != nil {
 		return nil, fmt.Errorf("could not connect to database: %w", err)
 	}

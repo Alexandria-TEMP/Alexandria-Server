@@ -5,11 +5,23 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-func connectToDatabase(info *ConnectionInfo) (*gorm.DB, error) {
+func connectToDatabase(info *ConnectionInfo, silent bool) (*gorm.DB, error) {
 	connectionString := getConnectionString(info)
-	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
+
+	// Choose a database logger (used by GORM)
+	var log logger.Interface
+	if silent {
+		log = logger.Default.LogMode(logger.Silent)
+	} else {
+		log = logger.Default
+	}
+
+	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{
+		Logger: log,
+	})
 
 	if err != nil {
 		return nil, err

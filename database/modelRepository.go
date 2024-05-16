@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"log"
 
 	"gorm.io/gorm"
@@ -46,8 +47,26 @@ func (repo *ModelRepository[T]) GetByID(id uint) (T, error) {
 	return found, nil
 }
 
-func (repo *ModelRepository[T]) Update(_ T) {
-	log.Fatal("TODO Update")
+func (repo *ModelRepository[T]) Update(object T) (T, error) {
+	// Ensure that a model with this ID already exists
+	id := object.GetID()
+
+	result := repo.database.First(new(T), id)
+	if result.Error != nil {
+		var zero T
+		return zero, fmt.Errorf("could not find model with ID %d to update: %w", id, result.Error)
+	}
+
+	// Save the new data
+	result = repo.database.Save(object)
+	if result.Error != nil {
+		var zero T
+		return zero, fmt.Errorf("could not update model with ID %d: %w", id, result.Error)
+	}
+
+	// Return the newly saved object, because some of its fields
+	// (e.g. last-updated) may have been changed automatically.
+	return repo.GetByID(id)
 }
 
 func (repo *ModelRepository[T]) Delete(_ T) {

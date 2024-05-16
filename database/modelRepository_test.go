@@ -13,14 +13,29 @@ var testDB *gorm.DB
 var modelRepository ModelRepository[*models.Member]
 var member models.Member
 
-func setup() {
+func TestMain(m *testing.M) {
+	setupSuite()
+
+	code := m.Run()
+
+	teardownSuite()
+	os.Exit(code)
+}
+
+func setupSuite() {
 	database, err := InitializeTestDatabase()
 	if err != nil {
 		log.Fatalf("Could not initialize test database: %s", err)
 	}
 
 	testDB = database
+}
 
+func teardownSuite() {
+
+}
+
+func beforeEach() {
 	member = models.Member{
 		FirstName:   "first name",
 		LastName:    "last name",
@@ -32,21 +47,14 @@ func setup() {
 	modelRepository = ModelRepository[*models.Member]{database: testDB}
 }
 
-func TestMain(m *testing.M) {
-	setup()
-
-	code := m.Run()
-	os.Exit(code)
-}
-
-// Helper function that deletes database contents
-func cleanDatabase() {
+func afterEach() {
 	// Delete all members
 	testDB.Unscoped().Where("id >= 0").Delete(&models.Member{})
 }
 
 func TestCreateWithoutSpecifyingID(t *testing.T) {
-	t.Cleanup(cleanDatabase)
+	beforeEach()
+	t.Cleanup(afterEach)
 
 	err := modelRepository.Create(&member)
 	if err != nil {
@@ -55,7 +63,8 @@ func TestCreateWithoutSpecifyingID(t *testing.T) {
 }
 
 func TestCreateWithID(t *testing.T) {
-	t.Cleanup(cleanDatabase)
+	beforeEach()
+	t.Cleanup(afterEach)
 
 	var id uint = 5
 
@@ -79,7 +88,8 @@ func TestCreateWithID(t *testing.T) {
 }
 
 func TestGetById(t *testing.T) {
-	t.Cleanup(cleanDatabase)
+	beforeEach()
+	t.Cleanup(afterEach)
 
 	// Create a member
 	model := models.Member{
@@ -106,5 +116,95 @@ func TestGetById(t *testing.T) {
 
 	if found.ID != id {
 		t.Fatal("fetched ID is not equal to ID at creation time")
+	}
+}
+
+func TestGetByIDReturnsError(t *testing.T) {
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	// Insert a model with a different ID from the one we're getting
+	var idA, idB uint = 5, 66
+
+	member.Model = gorm.Model{ID: idA}
+
+	err := modelRepository.Create(&member)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	found, err := modelRepository.GetByID(idB)
+	if err == nil {
+		t.Fatalf("expected not to find model, but found model with ID %d", found.Model.ID)
+	}
+}
+
+// Test updating a model, by creating a new model instance with the same ID
+func TestUpdateWithNewModelWithSameID(t *testing.T) {
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	// Insert an initial model
+	var id uint = 99
+	member.Model = gorm.Model{ID: id}
+
+	err := modelRepository.Create(&member)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Update the model, using the same ID
+	newModel := models.Member{
+		Model:       gorm.Model{ID: id},
+		FirstName:   "updated first name",
+		LastName:    "updated last name",
+		Email:       "email",
+		Password:    "password",
+		Institution: "institution",
+	}
+
+	updated, err := modelRepository.Update(&newModel)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if updated.FirstName != "updated first name" || updated.LastName != "updated last name" {
+		t.Fatal("model fields did not update")
+	}
+
+	if updated.Email != "email" {
+		t.Fatal("model fields did not retain")
+	}
+}
+
+// Test updating a model, by getting the original instance and making changes to it
+func TestUpdateWithModelFetchedFromDB(t *testing.T) {
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	// Insert an initial model
+	var id uint = 55
+	member.Model = gorm.Model{ID: id}
+
+	err := modelRepository.Create(&member)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Fetch the model, change data, and update it
+	found, err := modelRepository.GetByID(id)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	found.FirstName = "new value"
+
+	updated, err := modelRepository.Update(found)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if updated.FirstName != "new value" {
+		t.Fatal("model was not updated")
 	}
 }
