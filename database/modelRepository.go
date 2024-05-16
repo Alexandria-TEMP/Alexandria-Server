@@ -15,7 +15,7 @@ type Model interface {
 // Type T must be a pointer to a struct, e.g. *Member.
 // Example usage: repo := ModelRepository[*Member] { ... }
 type ModelRepository[T Model] struct {
-	database *gorm.DB
+	Database *gorm.DB
 }
 
 // Create an object in the database.
@@ -25,7 +25,7 @@ type ModelRepository[T Model] struct {
 // - if an object with the given ID already exists, errors.
 // - otherwise, creates the object with that ID.
 func (repo *ModelRepository[T]) Create(object T) error {
-	result := repo.database.Create(object)
+	result := repo.Database.Create(object)
 
 	if result.Error != nil {
 		return result.Error
@@ -36,7 +36,7 @@ func (repo *ModelRepository[T]) Create(object T) error {
 
 func (repo *ModelRepository[T]) GetByID(id uint) (T, error) {
 	var found T
-	result := repo.database.First(&found, id)
+	result := repo.Database.First(&found, id)
 
 	if result.Error != nil {
 		var zero T
@@ -50,14 +50,14 @@ func (repo *ModelRepository[T]) Update(object T) (T, error) {
 	// Ensure a model with this ID already exists
 	id := object.GetID()
 
-	result := repo.database.First(new(T), id)
+	result := repo.Database.First(new(T), id)
 	if result.Error != nil {
 		var zero T
 		return zero, fmt.Errorf("could not find model with ID %d to update: %w", id, result.Error)
 	}
 
 	// Save the new data
-	result = repo.database.Save(object)
+	result = repo.Database.Save(object)
 	if result.Error != nil {
 		var zero T
 		return zero, fmt.Errorf("could not update model with ID %d: %w", id, result.Error)
@@ -70,12 +70,12 @@ func (repo *ModelRepository[T]) Update(object T) (T, error) {
 
 func (repo *ModelRepository[T]) Delete(id uint) error {
 	// Ensure a model with this ID already exists
-	result := repo.database.First(new(T), id)
+	result := repo.Database.First(new(T), id)
 	if result.Error != nil {
 		return fmt.Errorf("could not find model with ID %d to delete: %w", id, result.Error)
 	}
 
-	result = repo.database.Delete(new(T), id)
+	result = repo.Database.Delete(new(T), id)
 
 	return result.Error
 }

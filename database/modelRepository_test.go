@@ -46,7 +46,7 @@ func beforeEach() {
 		Institution: "institution",
 	}
 
-	modelRepository = ModelRepository[*models.Member]{database: testDB}
+	modelRepository = ModelRepository[*models.Member]{Database: testDB}
 }
 
 func afterEach() {
