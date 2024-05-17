@@ -28,8 +28,24 @@ var (
 	defaultQuartoDirectoryName = "quarto_project"
 )
 
-func InitFilesystem() Filesystem {
-	filesystem := Filesystem{
+func (filesystem *Filesystem) GetCurrentDirPath() string {
+	return filesystem.CurrentDirPath
+}
+
+func (filesystem *Filesystem) GetCurrentQuartoDirPath() string {
+	return filesystem.CurrentQuartoDirPath
+}
+
+func (filesystem *Filesystem) GetCurrentZipFilePath() string {
+	return filesystem.CurrentZipFilePath
+}
+
+func (filesystem *Filesystem) GetCurrentRenderDirPath() string {
+	return filesystem.CurrentRenderDirPath
+}
+
+func InitFilesystem() *Filesystem {
+	filesystem := &Filesystem{
 		rootPath:            defaultRootPath,
 		zipName:             defaultZipName,
 		quartoDirectoryName: defaultQuartoDirectoryName,
@@ -112,6 +128,16 @@ func (filesystem *Filesystem) Unzip() error {
 // RemoveProjectDirectory only removes the unzipped files, not the zip file or the render
 func (filesystem *Filesystem) RemoveProjectDirectory() error {
 	err := os.RemoveAll(filesystem.CurrentQuartoDirPath)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (filesystem *Filesystem) RemoveRepository() error {
+	err := os.RemoveAll(filesystem.CurrentDirPath)
 
 	if err != nil {
 		return err

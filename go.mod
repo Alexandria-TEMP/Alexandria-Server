@@ -3,6 +3,8 @@ module gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/al
 go 1.22.2
 
 require (
+	github.com/go-playground/assert/v2 v2.2.0
+	go.uber.org/mock v0.4.0
 	gorm.io/driver/mysql v1.5.6
 	gorm.io/gorm v1.25.10
 )
@@ -10,7 +12,6 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/gin-gonic/gin v1.10.0
-	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0

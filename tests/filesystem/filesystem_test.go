@@ -18,8 +18,9 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	Filesystem = filesystem.InitFilesystem()
 	cwd, _ = os.Getwd()
+
+	Filesystem = *filesystem.InitFilesystem()
 
 	os.Exit(m.Run())
 }
@@ -45,7 +46,7 @@ func TestFileHandling(t *testing.T) {
 	defer cleanup(t)
 
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
-	file := filesystem.CreateMultipartFileHeader("./util/test.zip")
+	file := filesystem.CreateMultipartFileHeader("../util/test.zip")
 
 	Filesystem.SetCurrentVersion(1, 2)
 

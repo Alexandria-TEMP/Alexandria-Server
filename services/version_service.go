@@ -6,18 +6,19 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
+	filesystem_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 )
 
 type VersionService struct {
-	Filesystem filesystem.Filesystem
+	Filesystem filesystem_interfaces.Filesystem
 }
 
 // GetFilesystem is a helper function to test the version service
-func (versionService *VersionService) GetFilesystem() *filesystem.Filesystem {
+func (versionService *VersionService) GetFilesystem() *filesystem_interfaces.Filesystem {
 	return &versionService.Filesystem
 }
 
@@ -40,6 +41,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 
 	// Save zip file
 	if err := versionService.Filesystem.SaveRepository(c, file); err != nil {
+		_ = versionService.Filesystem.RemoveRepository()
 		return version, err
 	}
 
@@ -48,18 +50,31 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		// Unzip saved file
 		if err := versionService.Filesystem.Unzip(); err != nil {
 			version.RenderStatus = models.Failure
+			_ = versionService.Filesystem.RemoveRepository()
+
+			return
+		}
+
+		if valid := versionService.IsValidProject(); !valid {
+			version.RenderStatus = models.Failure
+			_ = versionService.Filesystem.RemoveRepository()
+
 			return
 		}
 
 		// Render quarto project
 		if err := versionService.RenderProject(); err != nil {
 			version.RenderStatus = models.Failure
+			_ = versionService.Filesystem.RemoveRepository()
+
 			return
 		}
 
 		// Remove unzipped project file
 		if err := versionService.Filesystem.RemoveProjectDirectory(); err != nil {
 			version.RenderStatus = models.Failure
+			_ = versionService.Filesystem.RemoveRepository()
+
 			return
 		}
 
@@ -79,8 +94,8 @@ func (versionService *VersionService) RenderProject() error {
 	}
 
 	// TODO: This is super unsafe right now
-	cmd := exec.Command("quarto", "render", versionService.Filesystem.CurrentQuartoDirPath,
-		"--output-dir", versionService.Filesystem.CurrentRenderDirPath,
+	cmd := exec.Command("quarto", "render", versionService.Filesystem.GetCurrentQuartoDirPath(),
+		"--output-dir", versionService.Filesystem.GetCurrentRenderDirPath(),
 		"--to", "html",
 		"--no-cache",
 		"-M", "embed-resources:true",
@@ -98,10 +113,10 @@ func (versionService *VersionService) RenderProject() error {
 // Next it ensures packages necessary for quarto are there.
 func (versionService *VersionService) installRenderDependencies() error {
 	// Check if renv.lock exists and if so get dependencies
-	rLockPath := filepath.Join(versionService.Filesystem.CurrentQuartoDirPath, "renv.lock")
-	if _, err := os.Stat(rLockPath); err == nil {
+	rLockPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "renv.lock")
+	if FileExists(rLockPath) {
 		cmd := exec.Command("Rscript", "-e", "renv::restore()")
-		cmd.Dir = versionService.Filesystem.CurrentQuartoDirPath
+		cmd.Dir = versionService.Filesystem.GetCurrentQuartoDirPath()
 		out, err := cmd.CombinedOutput()
 
 		if err != nil {
@@ -109,23 +124,64 @@ func (versionService *VersionService) installRenderDependencies() error {
 		}
 	}
 
-	// Install rmarkdown
-	cmd := exec.Command("Rscript", "-e", "renv::install('rmarkdown')")
-	cmd.Dir = versionService.Filesystem.CurrentQuartoDirPath
-	out, err := cmd.CombinedOutput()
+	// Check if any renv exists.
+	renvActivatePath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "renv", "activate.R")
+	if FileExists(renvActivatePath) {
+		// Install rmarkdown
+		cmd := exec.Command("Rscript", "-e", "renv::install('rmarkdown')")
+		cmd.Dir = versionService.Filesystem.GetCurrentQuartoDirPath()
+		out, err := cmd.CombinedOutput()
 
-	if err != nil {
-		return errors.New(string(out))
-	}
+		if err != nil {
+			return errors.New(string(out))
+		}
 
-	// Install knitr
-	cmd = exec.Command("Rscript", "-e", "renv::install('knitr')")
-	cmd.Dir = versionService.Filesystem.CurrentQuartoDirPath
-	out, err = cmd.CombinedOutput()
+		// Install knitr
+		cmd = exec.Command("Rscript", "-e", "renv::install('knitr')")
+		cmd.Dir = versionService.Filesystem.GetCurrentQuartoDirPath()
+		out, err = cmd.CombinedOutput()
 
-	if err != nil {
-		return errors.New(string(out))
+		if err != nil {
+			return errors.New(string(out))
+		}
 	}
 
 	return nil
+}
+
+// IsValidProject validates that the files are a valid default quarto project
+func (versionService *VersionService) IsValidProject() bool {
+	// If there is no yml file to cofigure the project it is invalid
+	ymlPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "_quarto.yml")
+	yamlPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "_quarto.yaml")
+
+	if !(FileExists(ymlPath)) {
+		ymlPath = yamlPath
+
+		if !(FileExists(yamlPath)) {
+			return false
+		}
+	}
+
+	// If they type is not default it is invalid
+	if FileContains(ymlPath, "type:") && !FileContains(ymlPath, "type: default") {
+		return false
+	}
+
+	return true
+}
+
+func FileExists(filePath string) bool {
+	_, err := os.Stat(filePath)
+	return !errors.Is(err, os.ErrNotExist)
+}
+
+func FileContains(filePath, match string) bool {
+	if !FileExists(filePath) {
+		return false
+	}
+
+	text, _ := os.ReadFile(filePath)
+
+	return strings.Contains(string(text), match)
 }

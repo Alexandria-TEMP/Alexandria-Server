@@ -37,7 +37,7 @@ SSH into ```ssh [NetID]@student-linux.tudelft.nl``` and when prompted enter your
  - If you've made changes, run ```docker-compose up --build``` instead.
 
 ### Mocking
- - Run ```go get github.com/golang/mock/gomock``` and ```go get github.com/golang/mock/mockgen```
+ - Run ```go get go.uber.org/mock/gomock``` and ```go get github.com/golang/mock/mockgen```
  - Run ```go generate ./...``` to generate all mocks
 
 ## Default readme info to review and consider

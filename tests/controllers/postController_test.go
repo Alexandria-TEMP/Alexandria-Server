@@ -13,12 +13,12 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
+	"go.uber.org/mock/gomock"
 )
 
 var (
@@ -67,11 +67,12 @@ func TestMain(m *testing.M) {
 
 func beforeEach(t *testing.T) {
 	t.Helper()
+
+	responseRecorder = httptest.NewRecorder()
+
 	mockCtrl := gomock.NewController(t)
 
 	defer mockCtrl.Finish()
-
-	responseRecorder = httptest.NewRecorder()
 
 	mockPostService = mock_interfaces.NewMockPostService(mockCtrl)
 	postController = &controllers.PostController{PostService: mockPostService}
