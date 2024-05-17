@@ -328,7 +328,7 @@ func TestCreateWithAssociation(t *testing.T) {
 	// Create a Post that has a Version
 	version := models.Version{
 		Repository:  models.Repository{},
-		Discussions: []models.Discussion{},
+		Discussions: []*models.Discussion{},
 	}
 
 	post := models.Post{

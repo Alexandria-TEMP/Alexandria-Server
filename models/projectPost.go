@@ -15,10 +15,10 @@ type ProjectPost struct {
 	PostID uint
 
 	// ProjectPost has many MergeRequest
-	OpenMergeRequests []MergeRequest `gorm:"foreignKey:ProjectPostID"`
+	OpenMergeRequests []*MergeRequest `gorm:"foreignKey:ProjectPostID"`
 
 	// ProjectPost has many ClosedMergeRequest
-	ClosedMergeRequests []ClosedMergeRequest `gorm:"foreignKey:ProjectPostID"`
+	ClosedMergeRequests []*ClosedMergeRequest `gorm:"foreignKey:ProjectPostID"`
 
 	CompletionStatus    tags.CompletionStatus
 	FeedbackPreference  tags.FeedbackPreference
@@ -52,7 +52,7 @@ func (model *ProjectPost) MarshalJSON() ([]byte, error) {
 }
 
 // Helper function for JSON marshaling
-func mergeRequestsToIDs(mergeRequests []MergeRequest) []uint {
+func mergeRequestsToIDs(mergeRequests []*MergeRequest) []uint {
 	ids := make([]uint, len(mergeRequests))
 
 	for i, mergeRequests := range mergeRequests {
@@ -63,7 +63,7 @@ func mergeRequestsToIDs(mergeRequests []MergeRequest) []uint {
 }
 
 // Helper function for JSON marshaling
-func closedMergeRequestsToIDs(mergeRequests []ClosedMergeRequest) []uint {
+func closedMergeRequestsToIDs(mergeRequests []*ClosedMergeRequest) []uint {
 	ids := make([]uint, len(mergeRequests))
 
 	for i, mergeRequests := range mergeRequests {

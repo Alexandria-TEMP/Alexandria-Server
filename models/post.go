@@ -11,7 +11,7 @@ type Post struct {
 	gorm.Model
 
 	// Post has many PostCollaborator
-	Collaborators []PostCollaborator `gorm:"foreignKey:PostID"`
+	Collaborators []*PostCollaborator `gorm:"foreignKey:PostID"`
 
 	// Post belongs to Version
 	CurrentVersion   Version `gorm:"foreignKey:CurrentVersionID"`
@@ -44,7 +44,7 @@ func (model *Post) MarshalJSON() ([]byte, error) {
 }
 
 // Helper function for JSON marshaling
-func postCollaboratorsToIDs(collaborators []PostCollaborator) []uint {
+func postCollaboratorsToIDs(collaborators []*PostCollaborator) []uint {
 	ids := make([]uint, len(collaborators))
 
 	for i, collaborator := range collaborators {

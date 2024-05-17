@@ -15,10 +15,10 @@ type MergeRequest struct {
 	NewVersionID uint
 
 	// MergeRequest has many MergeRequestCollaborator
-	Collaborators []MergeRequestCollaborator `gorm:"foreignKey:MergeRequestID"`
+	Collaborators []*MergeRequestCollaborator `gorm:"foreignKey:MergeRequestID"`
 
 	// MergeRequest has many MergeRequestReview
-	Reviews []MergeRequestReview `gorm:"foreignKey:MergeRequestID"`
+	Reviews []*MergeRequestReview `gorm:"foreignKey:MergeRequestID"`
 
 	// ProjectPost has many MergeRequest
 	ProjectPostID uint
@@ -57,7 +57,7 @@ func (model *MergeRequest) MarshalJSON() ([]byte, error) {
 }
 
 // Helper function for JSON marshaling
-func mergeRequestCollaboratorsToIDs(collaborators []MergeRequestCollaborator) []uint {
+func mergeRequestCollaboratorsToIDs(collaborators []*MergeRequestCollaborator) []uint {
 	ids := make([]uint, len(collaborators))
 
 	for i, collaborator := range collaborators {
@@ -68,7 +68,7 @@ func mergeRequestCollaboratorsToIDs(collaborators []MergeRequestCollaborator) []
 }
 
 // Helper function for JSON marshaling
-func reviewsToIDs(reviews []MergeRequestReview) []uint {
+func reviewsToIDs(reviews []*MergeRequestReview) []uint {
 	ids := make([]uint, len(reviews))
 
 	for i, review := range reviews {

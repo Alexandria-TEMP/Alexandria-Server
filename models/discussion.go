@@ -17,7 +17,7 @@ type Discussion struct {
 	MemberID uint
 
 	// Discussion optionally has many Discussion
-	Replies  []Discussion `gorm:"foreignKey:ParentID"`
+	Replies  []*Discussion `gorm:"foreignKey:ParentID"`
 	ParentID *uint
 
 	Text      string
@@ -59,11 +59,11 @@ func discussionIntoDTO(model *Discussion) DiscussionDTO {
 }
 
 // Helper function for MarshalJSON
-func repliesIntoDTOs(replies []Discussion) []DiscussionDTO {
+func repliesIntoDTOs(replies []*Discussion) []DiscussionDTO {
 	result := make([]DiscussionDTO, len(replies))
 
 	for i, reply := range replies {
-		result[i] = discussionIntoDTO(&reply)
+		result[i] = discussionIntoDTO(reply)
 	}
 
 	return result
