@@ -16,8 +16,7 @@ func (postService *PostService) GetPost(_ uint64) (*models.Post, error) {
 
 func (postService *PostService) CreatePost(form *forms.PostCreationForm) *models.Post {
 	post := &models.Post{
-		PostMetadata:   form.PostMetadata,
-		CurrentVersion: form.CurrentVersion,
+		// TODO fill fields
 	}
 
 	// TODO: Add post to repo here
@@ -37,9 +36,7 @@ func (postService *PostService) GetProjectPost(_ uint64) (*models.ProjectPost, e
 
 func (postService *PostService) CreateProjectPost(form *forms.ProjectPostCreationForm) *models.ProjectPost {
 	post := &models.ProjectPost{
-		ProjectMetadata:     form.ProjectMetadata,
-		OpenMergeRequests:   form.OpenMergeRequests,
-		ClosedMergeRequests: form.ClosedMergeRequests,
+		// TODO fill fields
 	}
 
 	// TODO: Add post to repo here
