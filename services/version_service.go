@@ -8,18 +8,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
-	filesystem_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
+	filesysteminterface "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 )
 
 type VersionService struct {
-	Filesystem filesystem_interfaces.Filesystem
-}
-
-// GetFilesystem is a helper function to test the version service
-func (versionService *VersionService) GetFilesystem() *filesystem_interfaces.Filesystem {
-	return &versionService.Filesystem
+	Filesystem filesysteminterface.Filesystem
 }
 
 // CreateVersion orchestrates the version creation.
@@ -57,7 +52,16 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 			return
 		}
 
+		// Validate project
 		if valid := versionService.IsValidProject(); !valid {
+			version.RenderStatus = models.Failure
+			_ = versionService.Filesystem.RemoveRepository()
+
+			return
+		}
+
+		// Install dependencies
+		if err := versionService.InstallRenderDependencies(); err != nil {
 			version.RenderStatus = models.Failure
 			_ = versionService.Filesystem.RemoveRepository()
 
@@ -95,12 +99,6 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 // RenderProject renders the current project files.
 // It first tries to get all dependencies and then renders to html.
 func (versionService *VersionService) RenderProject() error {
-	err := versionService.installRenderDependencies()
-
-	if err != nil {
-		return err
-	}
-
 	// TODO: This is super unsafe right now
 	cmd := exec.Command("quarto", "render", versionService.Filesystem.GetCurrentQuartoDirPath(),
 		"--output-dir", versionService.Filesystem.GetCurrentRenderDirPath(),
@@ -121,7 +119,7 @@ func (versionService *VersionService) RenderProject() error {
 
 // InstallRenderDependencies first checks if a renv.lock file is present and if so gets all dependencies.
 // Next it ensures packages necessary for quarto are there.
-func (versionService *VersionService) installRenderDependencies() error {
+func (versionService *VersionService) InstallRenderDependencies() error {
 	// Check if renv.lock exists and if so get dependencies
 	rLockPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "renv.lock")
 	if filesystem.FileExists(rLockPath) {
@@ -186,7 +184,7 @@ func (versionService *VersionService) GetRender(versionID, postID uint) (forms.O
 	// If pending return error eccordingly
 	// If failure return error accordingly
 	// If success proceed to steps below
-
+	//
 	// Set current version
 	versionService.Filesystem.SetCurrentVersion(versionID, postID)
 

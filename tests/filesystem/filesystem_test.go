@@ -1,4 +1,4 @@
-package filesystem_tests
+package filesystemtests
 
 import (
 	"bufio"

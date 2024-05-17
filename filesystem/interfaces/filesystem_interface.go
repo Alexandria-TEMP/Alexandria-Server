@@ -1,4 +1,4 @@
-package filesystem_interfaces
+package filesysteminterface
 
 import (
 	"mime/multipart"

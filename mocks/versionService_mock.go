@@ -14,7 +14,6 @@ import (
 	reflect "reflect"
 
 	gin "github.com/gin-gonic/gin"
-	filesystem_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	models "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	forms "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 	gomock "go.uber.org/mock/gomock"
@@ -44,10 +43,10 @@ func (m *MockVersionService) EXPECT() *MockVersionServiceMockRecorder {
 }
 
 // CreateVersion mocks base method.
-func (m *MockVersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (models.Version, error) {
+func (m *MockVersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (*models.Version, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateVersion", c, file, postID)
-	ret0, _ := ret[0].(models.Version)
+	ret0, _ := ret[0].(*models.Version)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -56,20 +55,6 @@ func (m *MockVersionService) CreateVersion(c *gin.Context, file *multipart.FileH
 func (mr *MockVersionServiceMockRecorder) CreateVersion(c, file, postID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateVersion", reflect.TypeOf((*MockVersionService)(nil).CreateVersion), c, file, postID)
-}
-
-// GetFilesystem mocks base method.
-func (m *MockVersionService) GetFilesystem() *filesystem_interfaces.Filesystem {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFilesystem")
-	ret0, _ := ret[0].(*filesystem_interfaces.Filesystem)
-	return ret0
-}
-
-// GetFilesystem indicates an expected call of GetFilesystem.
-func (mr *MockVersionServiceMockRecorder) GetFilesystem() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFilesystem", reflect.TypeOf((*MockVersionService)(nil).GetFilesystem))
 }
 
 // GetRender mocks base method.

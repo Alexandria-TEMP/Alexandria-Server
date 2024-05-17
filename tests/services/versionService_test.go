@@ -1,4 +1,4 @@
-package services_tests
+package servicestests
 
 import (
 	"errors"

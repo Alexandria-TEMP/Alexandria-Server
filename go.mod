@@ -3,7 +3,6 @@ module gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/al
 go 1.22.2
 
 require (
-	github.com/go-playground/assert/v2 v2.2.0
 	go.uber.org/mock v0.4.0
 	gorm.io/driver/mysql v1.5.6
 	gorm.io/gorm v1.25.10
