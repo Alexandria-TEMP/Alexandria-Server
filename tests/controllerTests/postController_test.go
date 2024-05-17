@@ -34,9 +34,7 @@ func TestGetPost200(t *testing.T) {
 	mockPostService.EXPECT().GetPost(uint64(1)).Return(&examplePost, nil).Times(1)
 
 	req, _ := http.NewRequest("GET", "/api/v1/post/1", http.NoBody)
-	println(router.Routes())
-	println(responseRecorder)
-	println(req)
+
 	router.ServeHTTP(responseRecorder, req)
 
 	var responsePost models.Post

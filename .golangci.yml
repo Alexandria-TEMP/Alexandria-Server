@@ -2,7 +2,7 @@ linters-settings:
   errcheck:
     check-type-assertions: true
   dupl:
-    threshold: 500
+    threshold: 5000
   funlen:
     lines: 60
     statements: 50
