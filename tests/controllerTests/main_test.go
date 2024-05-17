@@ -13,20 +13,20 @@ import (
 )
 
 var (
-	router          *gin.Engine
+	router *gin.Engine
 
 	mockPostService *mock_interfaces.MockPostService
 	postController  *controllers.PostController
 
-	mockUserService 	*mock_interfaces.MockUserService
-	userController  	*controllers.UserController
+	mockUserService *mock_interfaces.MockUserService
+	userController  *controllers.UserController
 
-	responseRecorder       	*httptest.ResponseRecorder
-	
-	exampleMember          		models.Member
-	exampleCollaborator    		models.Collaborator
-	exampleMemberForm        	forms.MemberCreationForm
-	exampleCollaboratorForm 	forms.CollaboratorCreationForm
+	responseRecorder *httptest.ResponseRecorder
+
+	exampleMember           models.Member
+	exampleCollaborator     models.Collaborator
+	exampleMemberForm       forms.MemberCreationForm
+	exampleCollaboratorForm forms.CollaboratorCreationForm
 
 	examplePost            models.Post
 	exampleProjectPost     models.ProjectPost
