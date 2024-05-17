@@ -46,40 +46,98 @@ func TestFileHandling(t *testing.T) {
 	defer cleanup(t)
 
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
-	file := filesystem.CreateMultipartFileHeader("../util/test.zip")
+	file, _ := filesystem.CreateMultipartFileHeader("../utils/file_handling_test.zip")
 
 	Filesystem.SetCurrentVersion(1, 2)
 
 	// Test saving fileheader
 	err := Filesystem.SaveRepository(c, file)
-	assert.Equal(t, nil, err)
-
-	zipFilePath := filepath.Join(cwd, "vfs", "2", "1", "quarto_project.zip")
-	_, err = os.Stat(zipFilePath)
-	assert.Equal(t, nil, err)
+	assert.Nil(t, err)
+	assert.True(t, filesystem.FileExists(Filesystem.CurrentZipFilePath))
 
 	// Test unzipping succeeds and that contents are correct
 	err = Filesystem.Unzip()
-	assert.Equal(t, nil, err)
+	assert.Nil(t, err)
 
-	projectFilePath := filepath.Join(cwd, "vfs", "2", "1", "quarto_project", "1234.txt")
+	projectFilePath := filepath.Join(Filesystem.CurrentQuartoDirPath, "1234.txt")
 	f, err := os.Open(projectFilePath)
-	assert.Equal(t, nil, err)
+	assert.Nil(t, err)
 
 	defer f.Close()
 
 	reader := bufio.NewReader(f)
 	line, err := Readln(reader)
-	assert.Equal(t, nil, err)
+	assert.Nil(t, err)
 	assert.Equal(t, "5678", line)
 
 	// Test removing project directory
 	err = Filesystem.RemoveProjectDirectory()
-	assert.Equal(t, nil, err)
+	assert.Nil(t, err)
+	assert.False(t, filesystem.FileExists(Filesystem.CurrentQuartoDirPath))
+}
 
-	projectDirPath := filepath.Join(cwd, "vfs", "2", "1", "quarto_project")
-	_, err = os.Stat(projectDirPath)
-	assert.NotEqual(t, nil, err)
+func TestGetRenderFileSuccess(t *testing.T) {
+	Filesystem.CurrentDirPath = filepath.Join(cwd, "..", "utils", "good_repository_setup")
+	Filesystem.CurrentRenderDirPath = filepath.Join(Filesystem.CurrentDirPath, "render")
+	Filesystem.CurrentZipFilePath = filepath.Join(Filesystem.CurrentDirPath, "quarto_project.zip")
+
+	// Test GetRenderFile
+	fileForm, contentType, err := Filesystem.GetRenderFile()
+	assert.Nil(t, err)
+	assert.NotNil(t, fileForm)
+	assert.Equal(t, "multipart/form-data; boundary=", contentType[:30])
+}
+
+func TestGetRenderFileFailure1(t *testing.T) {
+	Filesystem.CurrentDirPath = filepath.Join(cwd, "..", "utils", "bad_repository_setup_1")
+	Filesystem.CurrentRenderDirPath = filepath.Join(Filesystem.CurrentDirPath, "render")
+	Filesystem.CurrentZipFilePath = filepath.Join(Filesystem.CurrentDirPath, "quarto_project.zip")
+
+	// Test GetRenderFile
+	_, _, err := Filesystem.GetRenderFile()
+	assert.NotNil(t, err)
+}
+
+func TestGetRenderFileFailure2(t *testing.T) {
+	Filesystem.CurrentDirPath = filepath.Join(cwd, "..", "utils", "bad_repository_setup_2")
+	Filesystem.CurrentRenderDirPath = filepath.Join(Filesystem.CurrentDirPath, "render")
+	Filesystem.CurrentZipFilePath = filepath.Join(Filesystem.CurrentDirPath, "quarto_project.zip")
+
+	// Test GetRenderFile
+	_, _, err := Filesystem.GetRenderFile()
+	assert.NotNil(t, err)
+}
+
+func TestGetRepositoryFileSuccess(t *testing.T) {
+	Filesystem.CurrentDirPath = filepath.Join(cwd, "..", "utils", "good_repository_setup")
+	Filesystem.CurrentRenderDirPath = filepath.Join(Filesystem.CurrentDirPath, "render")
+	Filesystem.CurrentZipFilePath = filepath.Join(Filesystem.CurrentDirPath, "quarto_project.zip")
+
+	// Test GetRepositoryFile
+	fileForm, contentType, err := Filesystem.GetRepositoryFile()
+	assert.Nil(t, err)
+	assert.NotNil(t, fileForm)
+	assert.Equal(t, "multipart/form-data; boundary=", contentType[:30])
+}
+
+func TestGetRepositoryFileFailure1(t *testing.T) {
+	Filesystem.CurrentDirPath = filepath.Join(cwd, "..", "utils", "bad_repository_setup_1")
+	Filesystem.CurrentRenderDirPath = filepath.Join(Filesystem.CurrentDirPath, "render")
+	Filesystem.CurrentZipFilePath = filepath.Join(Filesystem.CurrentDirPath, "quarto_project.zip")
+
+	// Test GetRenderFile
+	_, _, err := Filesystem.GetRepositoryFile()
+	assert.NotNil(t, err)
+}
+
+func TestGetRepositoryFileFailure2(t *testing.T) {
+	Filesystem.CurrentDirPath = filepath.Join(cwd, "..", "utils", "bad_repository_setup_2")
+	Filesystem.CurrentRenderDirPath = filepath.Join(Filesystem.CurrentDirPath, "render")
+	Filesystem.CurrentZipFilePath = filepath.Join(Filesystem.CurrentDirPath, "quarto_project.zip")
+
+	// Test GetRenderFile
+	_, _, err := Filesystem.GetRepositoryFile()
+	assert.NotNil(t, err)
 }
 
 // Readln returns a single line (without the ending \n)

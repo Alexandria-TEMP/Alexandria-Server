@@ -14,6 +14,7 @@ import (
 	reflect "reflect"
 
 	gin "github.com/gin-gonic/gin"
+	forms "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -38,6 +39,20 @@ func NewMockFilesystem(ctrl *gomock.Controller) *MockFilesystem {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockFilesystem) EXPECT() *MockFilesystemMockRecorder {
 	return m.recorder
+}
+
+// CountRenderFiles mocks base method.
+func (m *MockFilesystem) CountRenderFiles() int {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountRenderFiles")
+	ret0, _ := ret[0].(int)
+	return ret0
+}
+
+// CountRenderFiles indicates an expected call of CountRenderFiles.
+func (mr *MockFilesystemMockRecorder) CountRenderFiles() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountRenderFiles", reflect.TypeOf((*MockFilesystem)(nil).CountRenderFiles))
 }
 
 // GetCurrentDirPath mocks base method.
@@ -94,6 +109,38 @@ func (m *MockFilesystem) GetCurrentZipFilePath() string {
 func (mr *MockFilesystemMockRecorder) GetCurrentZipFilePath() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentZipFilePath", reflect.TypeOf((*MockFilesystem)(nil).GetCurrentZipFilePath))
+}
+
+// GetRenderFile mocks base method.
+func (m *MockFilesystem) GetRenderFile() (forms.OutgoingFileForm, string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRenderFile")
+	ret0, _ := ret[0].(forms.OutgoingFileForm)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetRenderFile indicates an expected call of GetRenderFile.
+func (mr *MockFilesystemMockRecorder) GetRenderFile() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRenderFile", reflect.TypeOf((*MockFilesystem)(nil).GetRenderFile))
+}
+
+// GetRepositoryFile mocks base method.
+func (m *MockFilesystem) GetRepositoryFile() (forms.OutgoingFileForm, string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRepositoryFile")
+	ret0, _ := ret[0].(forms.OutgoingFileForm)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetRepositoryFile indicates an expected call of GetRepositoryFile.
+func (mr *MockFilesystemMockRecorder) GetRepositoryFile() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRepositoryFile", reflect.TypeOf((*MockFilesystem)(nil).GetRepositoryFile))
 }
 
 // RemoveProjectDirectory mocks base method.

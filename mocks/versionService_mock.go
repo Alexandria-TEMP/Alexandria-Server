@@ -14,8 +14,9 @@ import (
 	reflect "reflect"
 
 	gin "github.com/gin-gonic/gin"
-	filesystem "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
+	filesystem_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	models "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	forms "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -43,10 +44,10 @@ func (m *MockVersionService) EXPECT() *MockVersionServiceMockRecorder {
 }
 
 // CreateVersion mocks base method.
-func (m *MockVersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (*models.Version, error) {
+func (m *MockVersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (models.Version, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateVersion", c, file, postID)
-	ret0, _ := ret[0].(*models.Version)
+	ret0, _ := ret[0].(models.Version)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -58,10 +59,10 @@ func (mr *MockVersionServiceMockRecorder) CreateVersion(c, file, postID any) *go
 }
 
 // GetFilesystem mocks base method.
-func (m *MockVersionService) GetFilesystem() *filesystem.Filesystem {
+func (m *MockVersionService) GetFilesystem() *filesystem_interfaces.Filesystem {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFilesystem")
-	ret0, _ := ret[0].(*filesystem.Filesystem)
+	ret0, _ := ret[0].(*filesystem_interfaces.Filesystem)
 	return ret0
 }
 
@@ -69,6 +70,38 @@ func (m *MockVersionService) GetFilesystem() *filesystem.Filesystem {
 func (mr *MockVersionServiceMockRecorder) GetFilesystem() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFilesystem", reflect.TypeOf((*MockVersionService)(nil).GetFilesystem))
+}
+
+// GetRender mocks base method.
+func (m *MockVersionService) GetRender(versionID, postID uint) (forms.OutgoingFileForm, string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRender", versionID, postID)
+	ret0, _ := ret[0].(forms.OutgoingFileForm)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetRender indicates an expected call of GetRender.
+func (mr *MockVersionServiceMockRecorder) GetRender(versionID, postID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRender", reflect.TypeOf((*MockVersionService)(nil).GetRender), versionID, postID)
+}
+
+// GetRepository mocks base method.
+func (m *MockVersionService) GetRepository(versionID, postID uint) (forms.OutgoingFileForm, string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRepository", versionID, postID)
+	ret0, _ := ret[0].(forms.OutgoingFileForm)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetRepository indicates an expected call of GetRepository.
+func (mr *MockVersionServiceMockRecorder) GetRepository(versionID, postID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRepository", reflect.TypeOf((*MockVersionService)(nil).GetRepository), versionID, postID)
 }
 
 // RenderProject mocks base method.

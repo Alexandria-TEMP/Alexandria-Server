@@ -3,14 +3,14 @@ package services
 import (
 	"errors"
 	"mime/multipart"
-	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"github.com/gin-gonic/gin"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	filesystem_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 )
 
 type VersionService struct {
@@ -31,7 +31,7 @@ func (versionService *VersionService) GetFilesystem() *filesystem_interfaces.Fil
 // 6. delete unzipped project files
 // TODO: persist data
 func (versionService *VersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (*models.Version, error) {
-	version := &models.Version{
+	version := models.Version{
 		RenderStatus: models.Pending,
 	}
 	versionID := version.ID
@@ -42,10 +42,12 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 	// Save zip file
 	if err := versionService.Filesystem.SaveRepository(c, file); err != nil {
 		_ = versionService.Filesystem.RemoveRepository()
-		return version, err
+		return &version, err
 	}
 
-	// Start goroutine to render after responding to client
+	// Start goroutine to render after responding to client.
+	// If it fails at any point we update the renderstatus to failure and remove the directory to this repository.
+	// If it succeeds we will update the renderstatus to success and remove the quarto project directory.
 	go func() {
 		// Unzip saved file
 		if err := versionService.Filesystem.Unzip(); err != nil {
@@ -70,6 +72,12 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 			return
 		}
 
+		// Verify that a render was produced in the form of a single file
+		if numFiles := versionService.Filesystem.CountRenderFiles(); numFiles != 1 {
+			version.RenderStatus = models.Failure
+			_ = versionService.Filesystem.RemoveRepository()
+		}
+
 		// Remove unzipped project file
 		if err := versionService.Filesystem.RemoveProjectDirectory(); err != nil {
 			version.RenderStatus = models.Failure
@@ -81,7 +89,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		version.RenderStatus = models.Success
 	}()
 
-	return version, nil
+	return &version, nil
 }
 
 // RenderProject renders the current project files.
@@ -99,7 +107,9 @@ func (versionService *VersionService) RenderProject() error {
 		"--to", "html",
 		"--no-cache",
 		"-M", "embed-resources:true",
-		"-M", "toc-location:body")
+		"-M", "toc-location:body",
+		"--log-level", "error",
+	)
 	out, err := cmd.CombinedOutput()
 
 	if err != nil {
@@ -114,7 +124,7 @@ func (versionService *VersionService) RenderProject() error {
 func (versionService *VersionService) installRenderDependencies() error {
 	// Check if renv.lock exists and if so get dependencies
 	rLockPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "renv.lock")
-	if FileExists(rLockPath) {
+	if filesystem.FileExists(rLockPath) {
 		cmd := exec.Command("Rscript", "-e", "renv::restore()")
 		cmd.Dir = versionService.Filesystem.GetCurrentQuartoDirPath()
 		out, err := cmd.CombinedOutput()
@@ -126,7 +136,7 @@ func (versionService *VersionService) installRenderDependencies() error {
 
 	// Check if any renv exists.
 	renvActivatePath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "renv", "activate.R")
-	if FileExists(renvActivatePath) {
+	if filesystem.FileExists(renvActivatePath) {
 		// Install rmarkdown
 		cmd := exec.Command("Rscript", "-e", "renv::install('rmarkdown')")
 		cmd.Dir = versionService.Filesystem.GetCurrentQuartoDirPath()
@@ -155,33 +165,39 @@ func (versionService *VersionService) IsValidProject() bool {
 	ymlPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "_quarto.yml")
 	yamlPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "_quarto.yaml")
 
-	if !(FileExists(ymlPath)) {
+	if !(filesystem.FileExists(ymlPath)) {
 		ymlPath = yamlPath
 
-		if !(FileExists(yamlPath)) {
+		if !(filesystem.FileExists(yamlPath)) {
 			return false
 		}
 	}
 
 	// If they type is not default it is invalid
-	if FileContains(ymlPath, "type:") && !FileContains(ymlPath, "type: default") {
+	if filesystem.FileContains(ymlPath, "type:") && !filesystem.FileContains(ymlPath, "type: default") {
 		return false
 	}
 
 	return true
 }
 
-func FileExists(filePath string) bool {
-	_, err := os.Stat(filePath)
-	return !errors.Is(err, os.ErrNotExist)
+func (versionService *VersionService) GetRender(versionID, postID uint) (forms.OutgoingFileForm, string, error) {
+	// TODO: Check version render status
+	// If pending return error eccordingly
+	// If failure return error accordingly
+	// If success proceed to steps below
+
+	// Set current version
+	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+
+	// Get render file
+	return versionService.Filesystem.GetRenderFile()
 }
 
-func FileContains(filePath, match string) bool {
-	if !FileExists(filePath) {
-		return false
-	}
+func (versionService *VersionService) GetRepository(versionID, postID uint) (forms.OutgoingFileForm, string, error) {
+	// Set current version
+	versionService.Filesystem.SetCurrentVersion(versionID, postID)
 
-	text, _ := os.ReadFile(filePath)
-
-	return strings.Contains(string(text), match)
+	// Get repository file
+	return versionService.Filesystem.GetRepositoryFile()
 }

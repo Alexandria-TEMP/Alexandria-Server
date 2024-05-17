@@ -2,13 +2,17 @@ package filesystem
 
 import (
 	"archive/zip"
+	"errors"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 )
 
 type Filesystem struct {
@@ -144,4 +148,74 @@ func (filesystem *Filesystem) RemoveRepository() error {
 	}
 
 	return nil
+}
+
+func (filesystem *Filesystem) CountRenderFiles() int {
+	files, err := os.ReadDir(filesystem.CurrentRenderDirPath)
+
+	if err != nil {
+		return 0
+	}
+
+	return len(files)
+}
+
+// Returns the rendered project post wrapped in a OutgoingFileForm with the content-type
+func (filesystem *Filesystem) GetRenderFile() (forms.OutgoingFileForm, string, error) {
+	var outgoingFileForm forms.OutgoingFileForm
+
+	// Check if directory exists
+	files, err := os.ReadDir(filesystem.CurrentRenderDirPath)
+
+	if err != nil {
+		return outgoingFileForm, "", errors.New("invalid directory")
+	}
+
+	// Check directory contains 1 file exactly
+	if len(files) != 1 {
+		return outgoingFileForm, "", fmt.Errorf("expected 1 file, but found %v", len(files))
+	}
+
+	// Get filename and check extension is html
+	fileName := files[0].Name()
+
+	if ext := path.Ext(fileName); ext != ".html" {
+		return outgoingFileForm, "", fmt.Errorf("expected .html file, but found %v", ext)
+	}
+
+	// Create multipart file
+	filePath := filepath.Join(filesystem.CurrentRenderDirPath, fileName)
+	rawFile, contentType, err := CreateMultipartFile(filePath)
+
+	if err != nil {
+		return outgoingFileForm, "", err
+	}
+
+	outgoingFileForm = forms.OutgoingFileForm{
+		File: &rawFile,
+	}
+
+	return outgoingFileForm, contentType, nil
+}
+
+func (filesystem *Filesystem) GetRepositoryFile() (forms.OutgoingFileForm, string, error) {
+	var outgoingFileForm forms.OutgoingFileForm
+
+	// Check if file exists
+	if !FileExists(filesystem.CurrentZipFilePath) {
+		return outgoingFileForm, "", errors.New("this project doesn't exist")
+	}
+
+	// Create multipart file
+	rawFile, contentType, err := CreateMultipartFile(filesystem.CurrentZipFilePath)
+
+	if err != nil {
+		return outgoingFileForm, "", err
+	}
+
+	outgoingFileForm = forms.OutgoingFileForm{
+		File: &rawFile,
+	}
+
+	return outgoingFileForm, contentType, nil
 }

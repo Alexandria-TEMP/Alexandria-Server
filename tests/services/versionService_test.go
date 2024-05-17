@@ -9,7 +9,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/assert/v2"
+	"github.com/stretchr/testify/assert"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
@@ -33,33 +34,6 @@ func cleanup(t *testing.T) {
 	os.RemoveAll(filepath.Join(cwd, "render"))
 }
 
-// func TestSaveRepository200(t *testing.T) {
-// 	beforeEach(t)
-
-// 	body, dataType := filesystem.CreateMultipartFile("file.zip")
-
-// 	req, _ := http.NewRequest("POST", "/api/v1/version/1", body)
-// 	req.Header.Add("Content-Type", dataType)
-// 	router.ServeHTTP(responseRecorder, req)
-
-// 	defer responseRecorder.Result().Body.Close()
-
-// 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
-
-// 	// cleanup(t)
-// }
-
-// func TestRenderSuccess(t *testing.T) {
-// 	beforeEach(t)
-
-// 	versionController.VersionService.GetFilesystem().SetCurrentVersion(0, 0)
-// 	err := versionController.VersionService.RenderProject()
-
-// 	if err != nil {
-// 		fmt.Printf("%v", err)
-// 	}
-// }
-
 func TestCreateVersionSuccess1(t *testing.T) {
 	testGoodProjectTemplate(t, "good_quarto_project_1")
 }
@@ -74,6 +48,10 @@ func TestCreateVersionSuccess3(t *testing.T) {
 
 // Can take a while, so if this times out increase limit
 func TestCreateVersionSuccess4(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
+
 	testGoodProjectTemplate(t, "good_quarto_project_4")
 }
 
@@ -93,6 +71,9 @@ func TestCreateVersionDelayedFailure4(t *testing.T) {
 	testBadProjectTemplate(t, "bad_quarto_project_4")
 }
 
+// func TestGetRenderFileSuccess(t *testing.T) {
+// }
+
 func TestCreateVersionImmediateFailure(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
@@ -107,11 +88,11 @@ func TestCreateVersionImmediateFailure(t *testing.T) {
 
 	_, err := versionService.CreateVersion(c, file, 2)
 
-	assert.NotEqual(t, nil, err)
+	assert.NotNil(t, err)
 
 	renderDirPath := filepath.Join(cwd, "render")
 	_, err = os.Stat(renderDirPath)
-	assert.NotEqual(t, nil, err)
+	assert.NotNil(t, err)
 }
 
 func testGoodProjectTemplate(t *testing.T, dirName string) {
@@ -124,15 +105,17 @@ func testGoodProjectTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().SetCurrentVersion(uint(0), uint(2)).Times(1)
 	mockFilesystem.EXPECT().SaveRepository(c, file).Return(nil).Times(1)
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
+	mockFilesystem.EXPECT().CountRenderFiles().Return(1).Times(1)
 	mockFilesystem.EXPECT().RemoveProjectDirectory().Return(nil).Times(1)
-	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "util", dirName)).AnyTimes()
+	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", dirName)).AnyTimes()
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
 
 	version, err := versionService.CreateVersion(c, file, 2)
 
-	assert.Equal(t, nil, err)
-	assert.Equal(t, exampleVersion, version)
+	assert.Nil(t, err)
+	assert.Equal(t, &exampleVersion, version)
 
+	// Wait until model has completed rendering
 	for version.RenderStatus == models.Pending {
 		print()
 	}
@@ -140,7 +123,7 @@ func testGoodProjectTemplate(t *testing.T, dirName string) {
 
 	renderDirPath := filepath.Join(cwd, "render")
 	_, err = os.Stat(renderDirPath)
-	assert.Equal(t, nil, err)
+	assert.Nil(t, err)
 }
 
 func testBadProjectTemplate(t *testing.T, dirName string) {
@@ -156,19 +139,20 @@ func testBadProjectTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
 	mockFilesystem.EXPECT().RemoveRepository().Return(nil).Times(1)
 	mockFilesystem.EXPECT().RemoveProjectDirectory().Return(nil).Times(0)
-	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "util", dirName)).AnyTimes()
+	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", dirName)).AnyTimes()
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
 
 	version, err := versionService.CreateVersion(c, file, 2)
 
-	assert.Equal(t, nil, err)
-	assert.Equal(t, exampleVersion, version)
+	assert.Nil(t, err)
+	assert.Equal(t, &exampleVersion, version)
 
+	// Wait until model has completed rendering
 	for version.RenderStatus == models.Pending {
 		print()
 	}
 	assert.Equal(t, models.Failure, version.RenderStatus)
 
 	renderDirPath := filepath.Join(cwd, "render", "quarto_project.html")
-	assert.Equal(t, false, services.FileExists(renderDirPath))
+	assert.Equal(t, false, filesystem.FileExists(renderDirPath))
 }

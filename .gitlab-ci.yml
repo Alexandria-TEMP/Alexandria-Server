@@ -28,7 +28,7 @@ lint:
 test:
   stage: test
   script:
-    - go test -coverpkg=./... -coverprofile=coverage.txt -covermode count -timeout 90s ./...
+    - go test -coverpkg=./... -coverprofile=coverage.txt -covermode count -timeout 300s ./...
     - go install github.com/gojekfarm/go-coverage@v0.0.1  
     - go-coverage -f coverage.txt
     

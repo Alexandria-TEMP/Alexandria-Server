@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
@@ -32,12 +32,12 @@ type VersionController struct {
 // @Router 		/version/{postID}	[post]
 func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	// extract file
-	repository := models.Repository{}
-	err := c.ShouldBindWith(&repository, binding.FormMultipart)
+	incomingFileForm := forms.IncomingFileForm{}
+	err := c.ShouldBindWith(&incomingFileForm, binding.FormMultipart)
 
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind Repository from request body"))
+		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind IncomingFileForm from request body"))
 
 		return
 	}
@@ -54,7 +54,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	}
 
 	// Create Version here
-	version, err := versionController.VersionService.CreateVersion(c, repository.File, uint(postID))
+	version, err := versionController.VersionService.CreateVersion(c, incomingFileForm.File, uint(postID))
 	if err != nil {
 		fmt.Println(err)
 		utils.ThrowHTTPError(c, http.StatusInternalServerError, fmt.Errorf("%w", err))
