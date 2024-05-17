@@ -51,8 +51,6 @@ func (model *ProjectPost) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// TODO reduce all the helper function code duplication!!!
-
 // Helper function for JSON marshaling
 func mergeRequestsToIDs(mergeRequests []MergeRequest) []uint {
 	ids := make([]uint, len(mergeRequests))

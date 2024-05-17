@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -313,5 +314,46 @@ func TestDeleteNonExistingModel(t *testing.T) {
 	err = modelRepository.Delete(idB)
 	if err == nil {
 		t.Fatal("deletion should have failed")
+	}
+}
+
+func TestCreateWithAssociation(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	// Create a Post that has a Version
+	version := models.Version{
+		Repository:  models.Repository{},
+		Discussions: []*models.Discussion{},
+	}
+
+	post := models.Post{
+		Collaborators:       []*models.PostCollaborator{},
+		CurrentVersion:      version,
+		PostType:            tags.Question,
+		ScientificFieldTags: []tags.ScientificField{},
+	}
+
+	postRepository := ModelRepository[*models.Post]{Database: testDB}
+
+	versionRepository := ModelRepository[*models.Version]{Database: testDB}
+
+	err := postRepository.Create(&post)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = postRepository.GetByID(post.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = versionRepository.GetByID(post.CurrentVersionID)
+	if err != nil {
+		t.Fatal(err)
 	}
 }
