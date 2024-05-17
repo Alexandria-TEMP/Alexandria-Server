@@ -6,11 +6,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Interface that any database model must adhere to. Used by the ModelRepository.
-type Model interface {
-	GetID() uint
-}
-
 // Performs CRUD operations on a given type of database model to the database.
 // Type T must be a pointer to a struct, e.g. *Member.
 // Example usage: repo := ModelRepository[*Member] { ... }
