@@ -21,10 +21,6 @@ type Post struct {
 	ScientificFieldTags []tags.ScientificField `gorm:"serializer:json"`
 }
 
-func (model *Post) GetID() uint {
-	return model.Model.ID
-}
-
 type PostDTO struct {
 	ID                  uint
 	CollaboratorIDs     []uint
@@ -33,14 +29,22 @@ type PostDTO struct {
 	ScientificFieldTags []tags.ScientificField
 }
 
-func (model *Post) MarshalJSON() ([]byte, error) {
-	return json.Marshal(PostDTO{
+func (model *Post) GetID() uint {
+	return model.Model.ID
+}
+
+func (model *Post) IntoDTO() PostDTO {
+	return PostDTO{
 		model.ID,
 		postCollaboratorsToIDs(model.Collaborators),
 		model.CurrentVersionID,
 		model.PostType,
 		model.ScientificFieldTags,
-	})
+	}
+}
+
+func (model *Post) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }
 
 // Helper function for JSON marshaling

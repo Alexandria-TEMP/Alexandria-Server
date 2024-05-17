@@ -28,10 +28,6 @@ type PostCollaborator struct {
 	CollaborationType CollaborationType
 }
 
-func (model *PostCollaborator) GetID() uint {
-	return model.Model.ID
-}
-
 type PostCollaboratorDTO struct {
 	ID                uint
 	MemberID          uint
@@ -39,13 +35,21 @@ type PostCollaboratorDTO struct {
 	CollaborationType CollaborationType
 }
 
-func (model *PostCollaborator) MarshalJSON() ([]byte, error) {
-	return json.Marshal(PostCollaboratorDTO{
+func (model *PostCollaborator) GetID() uint {
+	return model.Model.ID
+}
+
+func (model *PostCollaborator) IntoDTO() PostCollaboratorDTO {
+	return PostCollaboratorDTO{
 		model.ID,
 		model.MemberID,
 		model.PostID,
 		model.CollaborationType,
-	})
+	}
+}
+
+func (model *PostCollaborator) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }
 
 // A member that has collaborated on a merge request.
@@ -62,22 +66,26 @@ type MergeRequestCollaborator struct {
 	CollaborationType CollaborationType
 }
 
+type MergeRequestCollaboratorDTO struct {
+	ID                uint
+	MemberID          uint
+	MergeRequestID    uint
+	CollaborationType CollaborationType
+}
+
 func (model *MergeRequestCollaborator) GetID() uint {
 	return model.Model.ID
 }
 
-type MergeRequestCollaboratorDTO struct {
-	ID                uint
-	MemberID          uint
-	PostID            uint
-	CollaborationType CollaborationType
-}
-
-func (model *MergeRequestCollaborator) MarshalJSON() ([]byte, error) {
-	return json.Marshal(MergeRequestCollaboratorDTO{
+func (model *MergeRequestCollaborator) IntoDTO() MergeRequestCollaboratorDTO {
+	return MergeRequestCollaboratorDTO{
 		model.ID,
 		model.MemberID,
 		model.MergeRequestID,
 		model.CollaborationType,
-	})
+	}
+}
+
+func (model *MergeRequestCollaborator) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }

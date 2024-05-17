@@ -28,10 +28,6 @@ type MergeRequest struct {
 	Anonymous               bool
 }
 
-func (model *MergeRequest) GetID() uint {
-	return model.Model.ID
-}
-
 type MergeRequestDTO struct {
 	ID                      uint
 	NewVersionID            uint
@@ -43,8 +39,12 @@ type MergeRequestDTO struct {
 	Anonymous               bool
 }
 
-func (model *MergeRequest) MarshalJSON() ([]byte, error) {
-	return json.Marshal(MergeRequestDTO{
+func (model *MergeRequest) GetID() uint {
+	return model.Model.ID
+}
+
+func (model *MergeRequest) IntoDTO() MergeRequestDTO {
+	return MergeRequestDTO{
 		model.ID,
 		model.NewVersionID,
 		mergeRequestCollaboratorsToIDs(model.Collaborators),
@@ -53,7 +53,11 @@ func (model *MergeRequest) MarshalJSON() ([]byte, error) {
 		model.UpdatedCompletionStatus,
 		model.UpdatedScientificFields,
 		model.Anonymous,
-	})
+	}
+}
+
+func (model *MergeRequest) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }
 
 // Helper function for JSON marshaling

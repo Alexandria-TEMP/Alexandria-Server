@@ -27,10 +27,6 @@ type MergeRequestReview struct {
 	Feedback             string
 }
 
-func (model *MergeRequestReview) GetID() uint {
-	return model.Model.ID
-}
-
 type MergeRequestReviewDTO struct {
 	ID                   uint
 	MergeRequestID       uint
@@ -39,12 +35,20 @@ type MergeRequestReviewDTO struct {
 	Feedback             string
 }
 
-func (model *MergeRequestReview) MarshalJSON() ([]byte, error) {
-	return json.Marshal(MergeRequestReviewDTO{
+func (model *MergeRequestReview) GetID() uint {
+	return model.Model.ID
+}
+
+func (model *MergeRequestReview) IntoDTO() MergeRequestReviewDTO {
+	return MergeRequestReviewDTO{
 		model.ID,
 		model.MergeRequestID,
 		model.MemberID,
 		model.MergeRequestDecision,
 		model.Feedback,
-	})
+	}
+}
+
+func (model *MergeRequestReview) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }

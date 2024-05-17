@@ -20,20 +20,24 @@ type Version struct {
 	Discussions []*Discussion `gorm:"foreignKey:VersionID"`
 }
 
-func (model *Version) GetID() uint {
-	return model.Model.ID
-}
-
 type VersionDTO struct {
 	ID            uint
 	DiscussionIDs []uint
 }
 
-func (model *Version) MarshalJSON() ([]byte, error) {
-	return json.Marshal(VersionDTO{
+func (model *Version) GetID() uint {
+	return model.Model.ID
+}
+
+func (model *Version) IntoDTO() VersionDTO {
+	return VersionDTO{
 		model.ID,
 		discussionsIntoIDs(model.Discussions),
-	})
+	}
+}
+
+func (model *Version) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }
 
 // Helper function for JSON marshaling

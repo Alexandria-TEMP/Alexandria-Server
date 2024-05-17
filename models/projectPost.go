@@ -25,13 +25,9 @@ type ProjectPost struct {
 	PostReviewStatusTag tags.PostReviewStatus
 }
 
-func (model *ProjectPost) GetID() uint {
-	return model.Model.ID
-}
-
 type ProjectPostDTO struct {
 	ID                    uint
-	PostID                uint
+	PostDTO               PostDTO
 	OpenMergeRequestIDs   []uint
 	ClosedMergeRequestIDs []uint
 	CompletionStatus      tags.CompletionStatus
@@ -39,16 +35,24 @@ type ProjectPostDTO struct {
 	PostReviewStatusTag   tags.PostReviewStatus
 }
 
-func (model *ProjectPost) MarshalJSON() ([]byte, error) {
-	return json.Marshal(ProjectPostDTO{
+func (model *ProjectPost) GetID() uint {
+	return model.Model.ID
+}
+
+func (model *ProjectPost) IntoDTO() ProjectPostDTO {
+	return ProjectPostDTO{
 		model.ID,
-		model.PostID,
+		model.Post.IntoDTO(),
 		mergeRequestsToIDs(model.OpenMergeRequests),
 		closedMergeRequestsToIDs(model.ClosedMergeRequests),
 		model.CompletionStatus,
 		model.FeedbackPreference,
 		model.PostReviewStatusTag,
-	})
+	}
+}
+
+func (model *ProjectPost) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }
 
 // Helper function for JSON marshaling

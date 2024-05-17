@@ -24,10 +24,6 @@ type ClosedMergeRequest struct {
 	MergeRequestDecision MergeRequestDecision
 }
 
-func (model *ClosedMergeRequest) GetID() uint {
-	return model.Model.ID
-}
-
 type ClosedMergeRequestDTO struct {
 	ID                      uint
 	MergeRequestID          uint
@@ -36,12 +32,20 @@ type ClosedMergeRequestDTO struct {
 	MergeRequestDecision    MergeRequestDecision
 }
 
-func (model *ClosedMergeRequest) MarshalJSON() ([]byte, error) {
-	return json.Marshal(ClosedMergeRequestDTO{
+func (model *ClosedMergeRequest) GetID() uint {
+	return model.Model.ID
+}
+
+func (model *ClosedMergeRequest) IntoDTO() ClosedMergeRequestDTO {
+	return ClosedMergeRequestDTO{
 		model.ID,
 		model.MergeRequestID,
 		model.MainVersionWhenClosedID,
 		model.ProjectPostID,
 		model.MergeRequestDecision,
-	})
+	}
+}
+
+func (model *ClosedMergeRequest) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }

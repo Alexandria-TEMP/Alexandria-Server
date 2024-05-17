@@ -17,10 +17,6 @@ type Member struct {
 	Institution string
 }
 
-func (model *Member) GetID() uint {
-	return model.Model.ID
-}
-
 type MemberDTO struct {
 	ID          uint
 	FirstName   string
@@ -30,13 +26,21 @@ type MemberDTO struct {
 	Institution string
 }
 
-func (model *Member) MarshalJSON() ([]byte, error) {
-	return json.Marshal(MemberDTO{
+func (model *Member) GetID() uint {
+	return model.Model.ID
+}
+
+func (model *Member) IntoDTO() MemberDTO {
+	return MemberDTO{
 		model.ID,
 		model.FirstName,
 		model.LastName,
 		model.Email,
 		model.Password,
 		model.Institution,
-	})
+	}
+}
+
+func (model *Member) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }
