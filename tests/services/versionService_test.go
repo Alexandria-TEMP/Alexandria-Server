@@ -35,14 +35,26 @@ func cleanup(t *testing.T) {
 }
 
 func TestCreateVersionSuccess1(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
+
 	testGoodProjectTemplate(t, "good_quarto_project_1")
 }
 
 func TestCreateVersionSuccess2(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
+
 	testGoodProjectTemplate(t, "good_quarto_project_2")
 }
 
 func TestCreateVersionSuccess3(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
+
 	testGoodProjectTemplate(t, "good_quarto_project_3")
 }
 
