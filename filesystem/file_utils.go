@@ -93,11 +93,13 @@ func CreateMultipartFile(filePath string) (io.Reader, string, error) {
 	return body, mwriter.FormDataContentType(), nil
 }
 
+// FileExists checks that a file exists
 func FileExists(filePath string) bool {
 	_, err := os.Stat(filePath)
 	return !errors.Is(err, os.ErrNotExist)
 }
 
+// FileContains checks that a file contains a string
 func FileContains(filePath, match string) bool {
 	if !FileExists(filePath) {
 		return false

@@ -19,7 +19,7 @@ type VersionController struct {
 	VersionService interfaces.VersionService
 }
 
-// CreateVersion godoc
+// CreateVersion godoc specs are subject to change
 // @Summary 	Create new version
 // @Description Create a new version with discussions and repository
 // @Accept  	multipart/form-data

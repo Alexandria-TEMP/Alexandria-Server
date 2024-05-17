@@ -48,6 +48,7 @@ func (filesystem *Filesystem) GetCurrentRenderDirPath() string {
 	return filesystem.CurrentRenderDirPath
 }
 
+// InitFilesystem initializes a new filesystem by setting the root to the current working directory and assigning default values.
 func InitFilesystem() *Filesystem {
 	filesystem := &Filesystem{
 		rootPath:            defaultRootPath,
@@ -63,6 +64,7 @@ func InitFilesystem() *Filesystem {
 	return filesystem
 }
 
+// SetCurrentVersion will set the paths the filesystem uses in accordance with the IDs passed.
 func (filesystem *Filesystem) SetCurrentVersion(versionID, postID uint) {
 	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), strconv.FormatUint(uint64(versionID), 10))
 	filesystem.CurrentQuartoDirPath = filepath.Join(filesystem.CurrentDirPath, filesystem.quartoDirectoryName)
@@ -140,6 +142,7 @@ func (filesystem *Filesystem) RemoveProjectDirectory() error {
 	return nil
 }
 
+// RemoveRepository entirely removes a version repository if it is not valid
 func (filesystem *Filesystem) RemoveRepository() error {
 	err := os.RemoveAll(filesystem.CurrentDirPath)
 
@@ -150,6 +153,7 @@ func (filesystem *Filesystem) RemoveRepository() error {
 	return nil
 }
 
+// CountRenderFiles counts how many files are at the render directory of this version
 func (filesystem *Filesystem) CountRenderFiles() int {
 	files, err := os.ReadDir(filesystem.CurrentRenderDirPath)
 
@@ -198,6 +202,7 @@ func (filesystem *Filesystem) GetRenderFile() (forms.OutgoingFileForm, string, e
 	return outgoingFileForm, contentType, nil
 }
 
+// GetRepositoryFile return as zipped quarto project after validating that it exists, together the content type
 func (filesystem *Filesystem) GetRepositoryFile() (forms.OutgoingFileForm, string, error) {
 	var outgoingFileForm forms.OutgoingFileForm
 
