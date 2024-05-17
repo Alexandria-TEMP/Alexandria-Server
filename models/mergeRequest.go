@@ -28,3 +28,7 @@ type MergeRequest struct {
 	UpdatedScientificFields tags.ScientificField `gorm:"serializer:json"`
 	Anonymous               bool
 }
+
+func (model *MergeRequest) GetID() uint {
+	return model.Model.ID
+}

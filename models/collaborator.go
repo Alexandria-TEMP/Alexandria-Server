@@ -24,6 +24,10 @@ type PostCollaborator struct {
 	CollaborationType CollaborationType
 }
 
+func (model *PostCollaborator) GetID() uint {
+	return model.Model.ID
+}
+
 // A member that has collaborated on a merge request.
 type MergeRequestCollaborator struct {
 	gorm.Model
@@ -36,4 +40,8 @@ type MergeRequestCollaborator struct {
 	MergeRequestID uint
 
 	CollaborationType CollaborationType
+}
+
+func (model *MergeRequestCollaborator) GetID() uint {
+	return model.Model.ID
 }

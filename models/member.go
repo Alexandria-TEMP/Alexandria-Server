@@ -12,3 +12,7 @@ type Member struct {
 	Password    string
 	Institution string
 }
+
+func (model *Member) GetID() uint {
+	return model.Model.ID
+}

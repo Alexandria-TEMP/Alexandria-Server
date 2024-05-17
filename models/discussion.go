@@ -27,3 +27,7 @@ type Discussion struct {
 	Deleted   bool
 	Anonymous bool
 }
+
+func (model *Discussion) GetID() uint {
+	return model.Model.ID
+}

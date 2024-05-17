@@ -7,16 +7,13 @@ import (
 
 // Changes to the models require database migrations. All models should be migrated here.
 func autoMigrateAllModels(db *gorm.DB) error {
-	/*
-		NOTE FOR FUTURE CHANGES: the order of migrations matters!
-
-		Foreign keys (e.g. uint) have to be initialized AFTER the
-		model that is being pointed to has been migrated.
-		For example, if "Foo has one Bar" (meaning Foo holds "Bar",
-		and Bar holds "FooID uint"), Foo should be migrated before Bar.
-
-		If this is not upheld, foreign key constraint errors will be thrown.
-	*/
+	// NOTE FOR FUTURE CHANGES: the order of migrations matters!
+	// Foreign keys (e.g. uint) have to be initialized AFTER the
+	// model that is being pointed to has been migrated.
+	// For example, if "Foo has one Bar" (meaning Foo holds "Bar",
+	// and Bar holds "FooID uint"), Foo should be migrated before Bar.
+	//
+	// If this is not upheld, foreign key constraint errors will be thrown.
 	return db.AutoMigrate(
 		&models.Version{},                  //
 		&models.Repository{},               // FK to Version

@@ -16,8 +16,14 @@ type PostMetadata struct {
 	// Post has one PostMetadata
 	PostID uint
 
-	CreatedAt           time.Time
-	UpdatedAt           time.Time
+	// TODO maybe remove? since gorm.Model includes these already
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
 	PostType            tags.PostType
 	ScientificFieldTags []tags.ScientificField `gorm:"serializer:json"`
+}
+
+func (model *PostMetadata) GetID() uint {
+	return model.Model.ID
 }

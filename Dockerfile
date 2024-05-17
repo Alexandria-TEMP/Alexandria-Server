@@ -1,4 +1,4 @@
-FROM golang:1.22.2 as builder
+FROM golang:1.22.2 as build
  
 ARG GOPKG
 ARG GOBIN
@@ -18,6 +18,8 @@ RUN go build -o /usr/bin/alexandria-backend -v ./
 
 # Expose port
 EXPOSE 8080
+
+FROM build AS run
 
 # Start server on run
 ENTRYPOINT /usr/bin/alexandria-backend

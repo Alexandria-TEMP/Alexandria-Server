@@ -18,3 +18,7 @@ type ProjectMetadata struct {
 	FeedbackPreference  tags.FeedbackPreference
 	PostReviewStatusTag tags.PostReviewStatus
 }
+
+func (model *ProjectMetadata) GetID() uint {
+	return model.Model.ID
+}

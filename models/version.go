@@ -11,3 +11,7 @@ type Version struct {
 	// Version has many Discussion
 	Discussions []Discussion `gorm:"foreignKey:VersionID"`
 }
+
+func (model *Version) GetID() uint {
+	return model.Model.ID
+}
