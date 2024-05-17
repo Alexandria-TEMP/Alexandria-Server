@@ -1,8 +1,6 @@
 package services
 
 import (
-	rand "math/rand"
-
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 )
@@ -21,7 +19,7 @@ func (userService *UserService) CreateMember(form *forms.MemberCreationForm) *mo
 	// creating a member
 	// := is declaration + assignment
 	member := &models.Member{
-		UserID:      rand.Uint64(),
+		UserID:      0,
 		FirstName:   form.FirstName,
 		LastName:    form.LastName,
 		Email:       form.Email,
@@ -48,7 +46,7 @@ func (userService *UserService) GetCollaborator(_ uint64) (*models.Collaborator,
 
 func (userService *UserService) CreateCollaborator(form *forms.CollaboratorCreationForm) *models.Collaborator {
 	collaborator := &models.Collaborator{
-		CollaboratorID: rand.Uint64(),
+		CollaboratorID: 0,
 		Member:         form.Member,
 		// TODO: is this correct? will it assign the right thing?
 		// honestly have no clue yet
