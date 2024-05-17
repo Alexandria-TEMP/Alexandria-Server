@@ -332,7 +332,7 @@ func TestCreateWithAssociation(t *testing.T) {
 	}
 
 	post := models.Post{
-		Collaborators:       []models.PostCollaborator{},
+		Collaborators:       []*models.PostCollaborator{},
 		CurrentVersion:      version,
 		PostType:            tags.Question,
 		ScientificFieldTags: []tags.ScientificField{},
