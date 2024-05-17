@@ -17,7 +17,7 @@ type Version struct {
 	Repository Repository `gorm:"serializer:json"`
 
 	// Version has many Discussion
-	Discussions []Discussion `gorm:"foreignKey:VersionID"`
+	Discussions []*Discussion `gorm:"foreignKey:VersionID"`
 }
 
 func (model *Version) GetID() uint {
@@ -37,7 +37,7 @@ func (model *Version) MarshalJSON() ([]byte, error) {
 }
 
 // Helper function for JSON marshaling
-func discussionsIntoIDs(discussions []Discussion) []uint {
+func discussionsIntoIDs(discussions []*Discussion) []uint {
 	ids := make([]uint, len(discussions))
 
 	for i, discussion := range discussions {
