@@ -14,7 +14,7 @@ func (postService *PostService) GetPost(_ uint64) (*models.Post, error) {
 	return new(models.Post), nil
 }
 
-func (postService *PostService) CreatePost(form *forms.PostCreationForm) *models.Post {
+func (postService *PostService) CreatePost(_ *forms.PostCreationForm) *models.Post {
 	post := &models.Post{
 		// TODO fill fields
 	}
@@ -34,7 +34,7 @@ func (postService *PostService) GetProjectPost(_ uint64) (*models.ProjectPost, e
 	return new(models.ProjectPost), nil
 }
 
-func (postService *PostService) CreateProjectPost(form *forms.ProjectPostCreationForm) *models.ProjectPost {
+func (postService *PostService) CreateProjectPost(_ *forms.ProjectPostCreationForm) *models.ProjectPost {
 	post := &models.ProjectPost{
 		// TODO fill fields
 	}

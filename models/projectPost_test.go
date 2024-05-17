@@ -14,20 +14,8 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 	post := Post{
 		Model: gorm.Model{ID: 88},
 		Collaborators: []*PostCollaborator{
-			{
-				Model:             gorm.Model{ID: 1},
-				Member:            Member{},
-				MemberID:          90,
-				PostID:            88,
-				CollaborationType: Author,
-			},
-			{
-				Model:             gorm.Model{ID: 60},
-				Member:            Member{},
-				MemberID:          20,
-				PostID:            88,
-				CollaborationType: Contributor,
-			},
+			{Model: gorm.Model{ID: 1}},
+			{Model: gorm.Model{ID: 60}},
 		},
 		CurrentVersion:      Version{},
 		CurrentVersionID:    49,
@@ -40,17 +28,11 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 		Post:   post,
 		PostID: 88,
 		OpenMergeRequests: []*MergeRequest{
-			{
-				Model: gorm.Model{ID: 44},
-			},
+			{Model: gorm.Model{ID: 44}},
 		},
 		ClosedMergeRequests: []*ClosedMergeRequest{
-			{
-				Model: gorm.Model{ID: 59},
-			},
-			{
-				Model: gorm.Model{ID: 20},
-			},
+			{Model: gorm.Model{ID: 59}},
+			{Model: gorm.Model{ID: 20}},
 		},
 		CompletionStatus:    tags.Completed,
 		FeedbackPreference:  tags.FormalFeedback,

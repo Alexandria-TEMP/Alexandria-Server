@@ -17,18 +17,10 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 		NewVersionID: 99,
 		Collaborators: []*MergeRequestCollaborator{
 			{
-				Model:             gorm.Model{ID: 100},
-				Member:            Member{},
-				MemberID:          45,
-				MergeRequestID:    44,
-				CollaborationType: Author,
+				Model: gorm.Model{ID: 100},
 			},
 			{
-				Model:             gorm.Model{ID: 50},
-				Member:            Member{},
-				MemberID:          86,
-				MergeRequestID:    44,
-				CollaborationType: Contributor,
+				Model: gorm.Model{ID: 50},
 			},
 		},
 		Reviews: []*MergeRequestReview{
