@@ -1,7 +1,7 @@
 package models
 
 import (
-	"time"
+	"encoding/json"
 
 	"gorm.io/gorm"
 )
@@ -21,10 +21,27 @@ type ClosedMergeRequest struct {
 	// ProjectPost has many ClosedMergeRequest
 	ProjectPostID uint
 
-	CreatedAt            time.Time
 	MergeRequestDecision MergeRequestDecision
 }
 
 func (model *ClosedMergeRequest) GetID() uint {
 	return model.Model.ID
+}
+
+type ClosedMergeRequestDTO struct {
+	ID                      uint
+	MergeRequestID          uint
+	MainVersionWhenClosedID uint
+	ProjectPostID           uint
+	MergeRequestDecision    MergeRequestDecision
+}
+
+func (model *ClosedMergeRequest) MarshalJSON() ([]byte, error) {
+	return json.Marshal(ClosedMergeRequestDTO{
+		model.ID,
+		model.MergeRequestID,
+		model.MainVersionWhenClosedID,
+		model.ProjectPostID,
+		model.MergeRequestDecision,
+	})
 }

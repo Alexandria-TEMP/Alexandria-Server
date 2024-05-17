@@ -26,13 +26,30 @@ func (model *Post) GetID() uint {
 }
 
 type PostDTO struct {
-	ID               uint
-	CurrentVersionID uint
-	// TODO add fields
+	ID                  uint
+	CollaboratorIDs     []uint
+	VersionID           uint
+	PostType            tags.PostType
+	ScientificFieldTags []tags.ScientificField
 }
 
 func (model *Post) MarshalJSON() ([]byte, error) {
 	return json.Marshal(PostDTO{
-		// TODO add fields
+		model.ID,
+		postCollaboratorsToIDs(model.Collaborators),
+		model.CurrentVersionID,
+		model.PostType,
+		model.ScientificFieldTags,
 	})
+}
+
+// Helper function for JSON marshaling
+func postCollaboratorsToIDs(collaborators []PostCollaborator) []uint {
+	ids := make([]uint, len(collaborators))
+
+	for i, collaborator := range collaborators {
+		ids[i] = collaborator.ID
+	}
+
+	return ids
 }

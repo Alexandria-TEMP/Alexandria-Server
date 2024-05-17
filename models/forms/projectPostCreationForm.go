@@ -6,7 +6,7 @@ import (
 
 type ProjectPostCreationForm struct {
 	models.Post
-	models.ProjectMetadata
+	// models.ProjectMetadata // TODO replace with new data
 	OpenMergeRequests   []models.MergeRequest
 	ClosedMergeRequests []models.ClosedMergeRequest
 }
