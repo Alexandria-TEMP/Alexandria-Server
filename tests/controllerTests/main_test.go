@@ -15,8 +15,7 @@ import (
 var (
 	router *gin.Engine
 
-	mockPostService *mock_interfaces.MockPostService
-	postController  *controllers.PostController
+	postController *controllers.PostController
 
 	mockUserService *mock_interfaces.MockUserService
 	userController  *controllers.UserController
@@ -28,10 +27,8 @@ var (
 	exampleMemberForm       forms.MemberCreationForm
 	exampleCollaboratorForm forms.CollaboratorCreationForm
 
-	examplePost            models.Post
-	exampleProjectPost     models.ProjectPost
-	examplePostForm        forms.PostCreationForm
-	exampleProjectPostForm forms.ProjectPostCreationForm
+	examplePost        models.Post
+	exampleProjectPost models.ProjectPost
 )
 
 // TestMain is a keyword function, this is run by the testing package before other tests
