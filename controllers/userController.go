@@ -205,7 +205,7 @@ func (userController *UserController) CreateCollaborator(c *gin.Context) {
 // @Router 		/collaborator 		[put]
 func (userController *UserController) UpdateCollaborator(c *gin.Context) {
 	// extract the collaborator from the param
-	updatedCollaborator := models.Collaborator{}
+	updatedCollaborator := models.PostCollaborator{}
 	err := c.BindJSON(&updatedCollaborator)
 
 	// check for errors in the binding

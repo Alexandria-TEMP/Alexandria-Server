@@ -13,7 +13,7 @@ type UserService interface {
 	CreateMember(memberForm *forms.MemberCreationForm) *models.Member
 	UpdateMember(updatedMember *models.Member) error
 
-	GetCollaborator(collaboratorID uint64) (*models.Collaborator, error)
-	CreateCollaborator(collaboratorForm *forms.CollaboratorCreationForm) *models.Collaborator
-	UpdateCollaborator(updatedCollaborator *models.Collaborator) error
+	GetCollaborator(collaboratorID uint64) (*models.PostCollaborator, error)
+	CreateCollaborator(collaboratorForm *forms.CollaboratorCreationForm) *models.PostCollaborator
+	UpdateCollaborator(updatedCollaborator *models.PostCollaborator) error
 }

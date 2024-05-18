@@ -152,7 +152,7 @@ func TestGetCollaborator200(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v1/collaborator/2", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
-	var responsemember models.Collaborator
+	var responsemember models.PostCollaborator
 
 	responseJSON, _ := io.ReadAll(responseRecorder.Body)
 	_ = json.Unmarshal(responseJSON, &responsemember)
@@ -176,7 +176,7 @@ func TestGetCollaborator400(t *testing.T) {
 func TestGetCollaborator410(t *testing.T) {
 	beforeEachUser(t)
 
-	mockUserService.EXPECT().GetCollaborator(uint64(1)).Return(&models.Collaborator{}, errors.New("some error")).Times(1)
+	mockUserService.EXPECT().GetCollaborator(uint64(1)).Return(&models.PostCollaborator{}, errors.New("some error")).Times(1)
 
 	exampleCollaboratorJSON, _ := json.Marshal(exampleCollaborator)
 	req, _ := http.NewRequest("GET", "/api/v1/collaborator/1", bytes.NewBuffer(exampleCollaboratorJSON))
@@ -196,7 +196,7 @@ func TestCreateCollaborator200(t *testing.T) {
 	req, _ := http.NewRequest("member", "/api/v1/collaborator", bytes.NewBuffer(exampleCollaboratorFormJSON))
 	router.ServeHTTP(responseRecorder, req)
 
-	var responsemember models.Collaborator
+	var responsemember models.PostCollaborator
 
 	responseJSON, _ := io.ReadAll(responseRecorder.Body)
 	_ = json.Unmarshal(responseJSON, &responsemember)

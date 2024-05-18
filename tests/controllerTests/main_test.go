@@ -24,7 +24,7 @@ var (
 	responseRecorder *httptest.ResponseRecorder
 
 	exampleMember           models.Member
-	exampleCollaborator     models.Collaborator
+	exampleCollaborator     models.PostCollaborator
 	exampleMemberForm       forms.MemberCreationForm
 	exampleCollaboratorForm forms.CollaboratorCreationForm
 
@@ -78,11 +78,11 @@ func TestMain(m *testing.M) {
 	})
 
 	// Setup objects
-	examplePost = models.Post{ID: 1}
-	exampleProjectPost = models.ProjectPost{ID: 2}
+	examplePost = models.Post{}
+	exampleProjectPost = models.ProjectPost{}
 
 	exampleMember = models.Member{}
-	exampleCollaborator = models.Collaborator{}
+	exampleCollaborator = models.PostCollaborator{}
 
 	os.Exit(m.Run())
 }

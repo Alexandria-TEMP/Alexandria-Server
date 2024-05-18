@@ -36,10 +36,10 @@ func (m *MockUserService) EXPECT() *MockUserServiceMockRecorder {
 }
 
 // CreateCollaborator mocks base method.
-func (m *MockUserService) CreateCollaborator(collaboratorForm *forms.CollaboratorCreationForm) *models.Collaborator {
+func (m *MockUserService) CreateCollaborator(collaboratorForm *forms.CollaboratorCreationForm) *models.PostCollaborator {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateCollaborator", collaboratorForm)
-	ret0, _ := ret[0].(*models.Collaborator)
+	ret0, _ := ret[0].(*models.PostCollaborator)
 	return ret0
 }
 
@@ -64,10 +64,10 @@ func (mr *MockUserServiceMockRecorder) CreateMember(memberForm interface{}) *gom
 }
 
 // GetCollaborator mocks base method.
-func (m *MockUserService) GetCollaborator(collaboratorID uint64) (*models.Collaborator, error) {
+func (m *MockUserService) GetCollaborator(collaboratorID uint64) (*models.PostCollaborator, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCollaborator", collaboratorID)
-	ret0, _ := ret[0].(*models.Collaborator)
+	ret0, _ := ret[0].(*models.PostCollaborator)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -94,7 +94,7 @@ func (mr *MockUserServiceMockRecorder) GetMember(userID interface{}) *gomock.Cal
 }
 
 // UpdateCollaborator mocks base method.
-func (m *MockUserService) UpdateCollaborator(updatedCollaborator *models.Collaborator) error {
+func (m *MockUserService) UpdateCollaborator(updatedCollaborator *models.PostCollaborator) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateCollaborator", updatedCollaborator)
 	ret0, _ := ret[0].(error)
