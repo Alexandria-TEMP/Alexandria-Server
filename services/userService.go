@@ -42,7 +42,7 @@ func (userService *UserService) GetCollaborator(_ uint64) (*models.PostCollabora
 
 func (userService *UserService) CreateCollaborator(form *forms.CollaboratorCreationForm) *models.PostCollaborator {
 	collaborator := &models.PostCollaborator{
-		Member:         form.Member,
+		Member: form.Member,
 		// TODO: is this correct? will it assign the right thing?
 		// honestly have no clue yet
 		CollaborationType: models.CollaborationType(form.CollaborationType),
