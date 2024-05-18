@@ -1,7 +1,10 @@
-package routers
+package server
 
 import (
+	"log"
+
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
 )
 
@@ -30,11 +33,17 @@ func initControllerEnv(serviceEnv ServiceEnv) ControllerEnv {
 }
 
 func Init() {
+	_, err := database.InitializeDatabase()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	serviceEnv := initServiceEnv()
 	controllerEnv := initControllerEnv(serviceEnv)
 
 	router := SetUpRouter(controllerEnv)
-	err := router.Run(":8080")
+	err = router.Run(":8080")
 
 	if err != nil {
 		panic(err)

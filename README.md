@@ -39,7 +39,8 @@ SSH into `ssh [NetID]@student-linux.tudelft.nl` and when prompted enter your SSO
 ### Using Docker
 
 - Install [Docker](https://www.docker.com/products/docker-desktop/)
-- To start the container run `docker-compose up builder`. In the event that this command results in the error on windows`Error response from daemon: Ports are not available` try running `net stop winnat`.
+- To start the container run `docker-compose up`. In the event that this command results in the error on windows`Error response from daemon: Ports are not available` try running `net stop winnat`.
+- If you've made changes, run `docker-compose up --build` instead.
 
 ### Mocking
 
@@ -48,7 +49,7 @@ SSH into `ssh [NetID]@student-linux.tudelft.nl` and when prompted enter your SSO
 
 ## Default readme info to review and consider
 
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+- [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
+- [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
+- [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
+- [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)

@@ -1,21 +1,17 @@
 package tags
 
-type CompletionStatus int16
+type CompletionStatus string
 
 const (
-	Idea CompletionStatus = iota
-	Ongoing
-	Completed
+	Idea      CompletionStatus = "idea"
+	Ongoing   CompletionStatus = "ongoing"
+	Completed CompletionStatus = "completed"
 )
 
-type CompletionStatusTag struct {
-	label string
+func (tag *CompletionStatus) GetLabel() string {
+	return string(*tag)
 }
 
-func (tag *CompletionStatusTag) GetLabel() string {
-	return tag.label
-}
-
-func (tag *CompletionStatusTag) GetType() TagType {
+func (tag *CompletionStatus) GetType() TagType {
 	return CompletionStatusType
 }

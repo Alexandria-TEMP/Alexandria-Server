@@ -11,3 +11,6 @@
 # Testing
 coverage
 coverage.*
+
+# Secrets
+.env

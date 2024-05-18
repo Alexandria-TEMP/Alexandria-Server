@@ -9,15 +9,21 @@ import (
 	"net/http/httptest"
 	"testing"
 
+<<<<<<<< HEAD:tests/controllerTests/postController_test.go
+========
 	"gorm.io/gorm"
+
 	"github.com/gin-gonic/gin"
+>>>>>>>> main:controllers/postController_test.go
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 )
 
+<<<<<<<< HEAD:tests/controllerTests/postController_test.go
 func beforeEachController(t *testing.T) {
+========
 var (
 	mockPostService *mock_interfaces.MockPostService
 	postController  *PostController

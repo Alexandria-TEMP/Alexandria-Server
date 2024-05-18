@@ -1,0 +1,83 @@
+services:
+  backend:
+    build:
+      context: .
+      target: run
+      dockerfile: Dockerfile
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./:/app
+    ports: 
+      - 8080:8080
+    # TODO This is only good for a prototype. Database credentials should not
+    # be kept in memory/environment variables in a production context.
+    environment: 
+      - ALEXANDRIA_DB_HOST=${ALEXANDRIA_DB_HOST}
+      - ALEXANDRIA_TEST_DB_HOST=${ALEXANDRIA_TEST_DB_HOST}
+      - ALEXANDRIA_TEST_DB_NAME=${ALEXANDRIA_TEST_DB_NAME}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+    depends_on:
+      database:
+        condition: service_healthy
+      test_database:
+        condition: service_healthy
+
+  database:
+    image: mariadb
+    restart: unless-stopped
+    environment:
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    # TODO Once we have a separate prod compose.yaml, this port should not be exposed.
+    # This port is exposed so that you can inspect the database from your host machine.
+    ports:
+      - 3306:3306
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      interval: 3s
+      retries: 100
+      test:
+        [
+          "CMD",
+          "healthcheck.sh",
+          "--su-mysql",
+          "--connect",
+          "--innodb_initialized"
+        ]
+      timeout: 30s
+
+  # TODO this should not be running in production
+  test_database:
+    image: mariadb
+    restart: unless-stopped
+    environment:
+      - MARIADB_DATABASE=${ALEXANDRIA_TEST_DB_NAME}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    ports:
+      - 3307:3306
+    volumes:
+      - test_db_data:/var/lib/mysql
+    healthcheck:
+      interval: 3s
+      retries: 100
+      test:
+        [
+          "CMD",
+          "healthcheck.sh",
+          "--su-mysql",
+          "--connect",
+          "--innodb_initialized"
+        ]
+      timeout: 30s
+
+volumes:
+  db_data:
+  test_db_data:
