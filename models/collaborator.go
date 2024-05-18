@@ -1,14 +1,47 @@
 package models
 
-type CollaborationType int16
+import "gorm.io/gorm"
+
+type CollaborationType string
 
 const (
-	Author CollaborationType = iota
-	Contributor
-	Reviewer
+	Author      CollaborationType = "author"
+	Contributor CollaborationType = "contributor"
+	Reviewer    CollaborationType = "reviewer"
 )
 
-type Collaborator struct {
-	Member
-	CollaborationType
+// A member that has collaborated on a post.
+type PostCollaborator struct {
+	gorm.Model
+
+	// Belongs to Member
+	Member   Member `gorm:"foreignKey:MemberID"`
+	MemberID uint
+
+	// PostMetadata has many PostCollaborator
+	PostMetadataID uint
+
+	CollaborationType CollaborationType
+}
+
+func (model *PostCollaborator) GetID() uint {
+	return model.Model.ID
+}
+
+// A member that has collaborated on a merge request.
+type MergeRequestCollaborator struct {
+	gorm.Model
+
+	// Belongs to Member
+	Member   Member `gorm:"foreignKey:MemberID"`
+	MemberID uint
+
+	// MergeRequest has many MergeRequestCollaborator
+	MergeRequestID uint
+
+	CollaborationType CollaborationType
+}
+
+func (model *MergeRequestCollaborator) GetID() uint {
+	return model.Model.ID
 }

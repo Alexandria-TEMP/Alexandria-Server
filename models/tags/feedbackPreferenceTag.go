@@ -1,20 +1,16 @@
 package tags
 
-type FeedbackPreference int16
+type FeedbackPreference string
 
 const (
-	Discussion FeedbackPreference = iota
-	FormalFeedback
+	Discussion     FeedbackPreference = "discussion"
+	FormalFeedback FeedbackPreference = "formal feedback"
 )
 
-type FeedbackPreferenceTag struct {
-	label string
+func (tag *FeedbackPreference) GetLabel() string {
+	return string(*tag)
 }
 
-func (tag *FeedbackPreferenceTag) GetLabel() string {
-	return tag.label
-}
-
-func (tag *FeedbackPreferenceTag) GetType() TagType {
+func (tag *FeedbackPreference) GetType() TagType {
 	return FeedbackPreferenceType
 }

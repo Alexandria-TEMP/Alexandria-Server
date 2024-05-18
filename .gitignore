@@ -1,5 +1,6 @@
-# External packages
-pkg/
+# devcontainer extension
+.devcontainer/
+.github/
 
 # VSCode Setting
 .vscode/
@@ -10,3 +11,6 @@ pkg/
 # Testing
 coverage
 coverage.*
+
+# Secrets
+.env

@@ -1,0 +1,625 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/": {
+            "put": {
+                "description": "Update any number of the aspects of project post",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update project post",
+                "parameters": [
+                    {
+                        "description": "Updated Project Post",
+                        "name": "post",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ProjectPost"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "410": {
+                        "description": "Gone",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/post": {
+            "post": {
+                "description": "Create a new question or discussion post",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create new post",
+                "parameters": [
+                    {
+                        "description": "Post Creation Form",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.PostCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Post"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/post/{postID}": {
+            "get": {
+                "description": "Get a post by post ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Post"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/projectPost": {
+            "post": {
+                "description": "Create a new project post",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create new project post",
+                "parameters": [
+                    {
+                        "description": "Project Post Creation Form",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.ProjectPostCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ProjectPost"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/projectPost/{postID}": {
+            "get": {
+                "description": "Get a project post by post ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get project post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ProjectPost"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "forms.PostCreationForm": {
+            "type": "object",
+            "properties": {
+                "collaborators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Collaborator"
+                    }
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "currentVersion": {
+                    "$ref": "#/definitions/models.Version"
+                },
+                "postType": {
+                    "$ref": "#/definitions/tags.PostTypeTag"
+                },
+                "scientificFieldTags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificFieldTag"
+                    }
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "forms.ProjectPostCreationForm": {
+            "type": "object",
+            "properties": {
+                "closedMergeRequests": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ClosedMergeRequest"
+                    }
+                },
+                "collaborators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Collaborator"
+                    }
+                },
+                "completionStatus": {
+                    "$ref": "#/definitions/tags.CompletionStatusTag"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "currentVersion": {
+                    "$ref": "#/definitions/models.Version"
+                },
+                "feedbackPreference": {
+                    "$ref": "#/definitions/tags.FeedbackPreferenceTag"
+                },
+                "forkedFrom": {
+                    "$ref": "#/definitions/models.ClosedMergeRequest"
+                },
+                "id": {
+                    "description": "place holder until we make standardzied uuid system",
+                    "type": "integer"
+                },
+                "openMergeRequests": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MergeRequest"
+                    }
+                },
+                "postReviewStatusTag": {
+                    "$ref": "#/definitions/tags.PostReviewStatusTag"
+                },
+                "postType": {
+                    "$ref": "#/definitions/tags.PostTypeTag"
+                },
+                "scientificFieldTags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificFieldTag"
+                    }
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ClosedMergeRequest": {
+            "type": "object",
+            "properties": {
+                "MergeRequestDecision": {
+                    "type": "integer",
+                    "enum": [
+                        0,
+                        1
+                    ],
+                    "x-enum-varnames": [
+                        "Rejected",
+                        "Approved"
+                    ]
+                },
+                "anonymous": {
+                    "type": "boolean"
+                },
+                "collaborators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Collaborator"
+                    }
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "mainVersionWhenClosed": {
+                    "$ref": "#/definitions/models.Version"
+                },
+                "newVersion": {
+                    "$ref": "#/definitions/models.Version"
+                },
+                "reviews": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MergeRequestReview"
+                    }
+                },
+                "updatedCompletionStatus": {
+                    "$ref": "#/definitions/tags.CompletionStatusTag"
+                },
+                "updatedScientificFields": {
+                    "$ref": "#/definitions/tags.ScientificFieldTag"
+                }
+            }
+        },
+        "models.Collaborator": {
+            "type": "object",
+            "properties": {
+                "CollaborationType": {
+                    "type": "integer",
+                    "enum": [
+                        0,
+                        1,
+                        2
+                    ],
+                    "x-enum-varnames": [
+                        "Author",
+                        "Contributor",
+                        "Reviewer"
+                    ]
+                },
+                "discussions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Discussion"
+                    }
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "institution": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "posts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Post"
+                    }
+                },
+                "reviews": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MergeRequestReview"
+                    }
+                }
+            }
+        },
+        "models.Discussion": {
+            "type": "object",
+            "properties": {
+                "anonymous": {
+                    "type": "boolean"
+                },
+                "author": {
+                    "$ref": "#/definitions/models.Member"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "type": "boolean"
+                },
+                "deletedAt": {
+                    "type": "string"
+                },
+                "replies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Discussion"
+                    }
+                },
+                "text": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Member": {
+            "type": "object",
+            "properties": {
+                "discussions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Discussion"
+                    }
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "institution": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "posts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Post"
+                    }
+                },
+                "reviews": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MergeRequestReview"
+                    }
+                }
+            }
+        },
+        "models.MergeRequest": {
+            "type": "object",
+            "properties": {
+                "anonymous": {
+                    "type": "boolean"
+                },
+                "collaborators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Collaborator"
+                    }
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "newVersion": {
+                    "$ref": "#/definitions/models.Version"
+                },
+                "reviews": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MergeRequestReview"
+                    }
+                },
+                "updatedCompletionStatus": {
+                    "$ref": "#/definitions/tags.CompletionStatusTag"
+                },
+                "updatedScientificFields": {
+                    "$ref": "#/definitions/tags.ScientificFieldTag"
+                }
+            }
+        },
+        "models.MergeRequestReview": {
+            "type": "object",
+            "properties": {
+                "MergeRequestDecision": {
+                    "type": "integer",
+                    "enum": [
+                        0,
+                        1
+                    ],
+                    "x-enum-varnames": [
+                        "Rejected",
+                        "Approved"
+                    ]
+                },
+                "feedback": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Post": {
+            "type": "object",
+            "properties": {
+                "collaborators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Collaborator"
+                    }
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "currentVersion": {
+                    "$ref": "#/definitions/models.Version"
+                },
+                "id": {
+                    "description": "place holder until we make standardzied uuid system",
+                    "type": "integer"
+                },
+                "postType": {
+                    "$ref": "#/definitions/tags.PostTypeTag"
+                },
+                "scientificFieldTags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificFieldTag"
+                    }
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ProjectPost": {
+            "type": "object",
+            "properties": {
+                "closedMergeRequests": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ClosedMergeRequest"
+                    }
+                },
+                "collaborators": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Collaborator"
+                    }
+                },
+                "completionStatus": {
+                    "$ref": "#/definitions/tags.CompletionStatusTag"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "currentVersion": {
+                    "$ref": "#/definitions/models.Version"
+                },
+                "feedbackPreference": {
+                    "$ref": "#/definitions/tags.FeedbackPreferenceTag"
+                },
+                "forkedFrom": {
+                    "$ref": "#/definitions/models.ClosedMergeRequest"
+                },
+                "id": {
+                    "description": "place holder until we make standardzied uuid system",
+                    "type": "integer"
+                },
+                "openMergeRequests": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MergeRequest"
+                    }
+                },
+                "postReviewStatusTag": {
+                    "$ref": "#/definitions/tags.PostReviewStatusTag"
+                },
+                "postType": {
+                    "$ref": "#/definitions/tags.PostTypeTag"
+                },
+                "scientificFieldTags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificFieldTag"
+                    }
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Version": {
+            "type": "object",
+            "properties": {
+                "discussions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Discussion"
+                    }
+                }
+            }
+        },
+        "tags.CompletionStatusTag": {
+            "type": "object"
+        },
+        "tags.FeedbackPreferenceTag": {
+            "type": "object"
+        },
+        "tags.PostReviewStatusTag": {
+            "type": "object"
+        },
+        "tags.PostTypeTag": {
+            "type": "object"
+        },
+        "tags.ScientificFieldTag": {
+            "type": "object"
+        },
+        "utils.HTTPError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

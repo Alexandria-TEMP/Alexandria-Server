@@ -1,21 +1,17 @@
 package tags
 
-type PostReviewStatus int16
+type PostReviewStatus string
 
 const (
-	Open PostReviewStatus = iota
-	RevisionNeeded
-	Reviewed
+	Open           PostReviewStatus = "open"
+	RevisionNeeded PostReviewStatus = "revision needed"
+	Reviewed       PostReviewStatus = "reviewed"
 )
 
-type PostReviewStatusTag struct {
-	label string
+func (tag *PostReviewStatus) GetLabel() string {
+	return string(*tag)
 }
 
-func (tag *PostReviewStatusTag) GetLabel() string {
-	return tag.label
-}
-
-func (tag *PostReviewStatusTag) GetType() TagType {
+func (tag *PostReviewStatus) GetType() TagType {
 	return PostReviewStatusType
 }

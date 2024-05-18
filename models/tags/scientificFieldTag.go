@@ -1,19 +1,15 @@
 package tags
 
-type ScientificField int16
+type ScientificField string
 
 const (
-	Maf ScientificField = iota
+	Mathematics ScientificField = "mathematics"
 )
 
-type ScientificFieldTag struct {
-	label string
+func (tag *ScientificField) GetLabel() string {
+	return string(*tag)
 }
 
-func (tag *ScientificFieldTag) GetLabel() string {
-	return tag.label
-}
-
-func (tag *ScientificFieldTag) GetType() TagType {
+func (tag *ScientificField) GetType() TagType {
 	return ScientificFieldType
 }
