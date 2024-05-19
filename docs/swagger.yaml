@@ -3,282 +3,98 @@ definitions:
     properties:
       collaborators:
         items:
-          $ref: '#/definitions/models.Collaborator'
+          type: integer
         type: array
-      createdAt:
-        type: string
-      currentVersion:
-        $ref: '#/definitions/models.Version'
-      postType:
-        $ref: '#/definitions/tags.PostTypeTag'
-      scientificFieldTags:
-        items:
-          $ref: '#/definitions/tags.ScientificFieldTag'
-        type: array
-      updatedAt:
-        type: string
     type: object
   forms.ProjectPostCreationForm:
     properties:
-      closedMergeRequests:
+      postCreationForm:
+        allOf:
+        - $ref: '#/definitions/forms.PostCreationForm'
+        description: TODO add fields
+    type: object
+  models.PostDTO:
+    properties:
+      collaboratorIDs:
         items:
-          $ref: '#/definitions/models.ClosedMergeRequest'
+          type: integer
         type: array
-      collaborators:
+      id:
+        type: integer
+      postType:
+        $ref: '#/definitions/tags.PostType'
+      scientificFieldTags:
         items:
-          $ref: '#/definitions/models.Collaborator'
+          $ref: '#/definitions/tags.ScientificField'
+        type: array
+      versionID:
+        type: integer
+    type: object
+  models.ProjectPostDTO:
+    properties:
+      closedMergeRequestIDs:
+        items:
+          type: integer
         type: array
       completionStatus:
-        $ref: '#/definitions/tags.CompletionStatusTag'
-      createdAt:
-        type: string
-      currentVersion:
-        $ref: '#/definitions/models.Version'
+        $ref: '#/definitions/tags.CompletionStatus'
       feedbackPreference:
-        $ref: '#/definitions/tags.FeedbackPreferenceTag'
-      forkedFrom:
-        $ref: '#/definitions/models.ClosedMergeRequest'
+        $ref: '#/definitions/tags.FeedbackPreference'
       id:
-        description: place holder until we make standardzied uuid system
         type: integer
-      openMergeRequests:
+      openMergeRequestIDs:
         items:
-          $ref: '#/definitions/models.MergeRequest'
+          type: integer
         type: array
+      postID:
+        type: integer
       postReviewStatusTag:
-        $ref: '#/definitions/tags.PostReviewStatusTag'
-      postType:
-        $ref: '#/definitions/tags.PostTypeTag'
-      scientificFieldTags:
-        items:
-          $ref: '#/definitions/tags.ScientificFieldTag'
-        type: array
-      updatedAt:
-        type: string
+        $ref: '#/definitions/tags.PostReviewStatus'
     type: object
-  models.ClosedMergeRequest:
-    properties:
-      MergeRequestDecision:
-        enum:
-        - 0
-        - 1
-        type: integer
-        x-enum-varnames:
-        - Rejected
-        - Approved
-      anonymous:
-        type: boolean
-      collaborators:
-        items:
-          $ref: '#/definitions/models.Collaborator'
-        type: array
-      createdAt:
-        type: string
-      mainVersionWhenClosed:
-        $ref: '#/definitions/models.Version'
-      newVersion:
-        $ref: '#/definitions/models.Version'
-      reviews:
-        items:
-          $ref: '#/definitions/models.MergeRequestReview'
-        type: array
-      updatedCompletionStatus:
-        $ref: '#/definitions/tags.CompletionStatusTag'
-      updatedScientificFields:
-        $ref: '#/definitions/tags.ScientificFieldTag'
-    type: object
-  models.Collaborator:
-    properties:
-      CollaborationType:
-        enum:
-        - 0
-        - 1
-        - 2
-        type: integer
-        x-enum-varnames:
-        - Author
-        - Contributor
-        - Reviewer
-      discussions:
-        items:
-          $ref: '#/definitions/models.Discussion'
-        type: array
-      email:
-        type: string
-      firstName:
-        type: string
-      institution:
-        type: string
-      lastName:
-        type: string
-      password:
-        type: string
-      posts:
-        items:
-          $ref: '#/definitions/models.Post'
-        type: array
-      reviews:
-        items:
-          $ref: '#/definitions/models.MergeRequestReview'
-        type: array
-    type: object
-  models.Discussion:
-    properties:
-      anonymous:
-        type: boolean
-      author:
-        $ref: '#/definitions/models.Member'
-      createdAt:
-        type: string
-      deleted:
-        type: boolean
-      deletedAt:
-        type: string
-      replies:
-        items:
-          $ref: '#/definitions/models.Discussion'
-        type: array
-      text:
-        type: string
-      updatedAt:
-        type: string
-    type: object
-  models.Member:
-    properties:
-      discussions:
-        items:
-          $ref: '#/definitions/models.Discussion'
-        type: array
-      email:
-        type: string
-      firstName:
-        type: string
-      institution:
-        type: string
-      lastName:
-        type: string
-      password:
-        type: string
-      posts:
-        items:
-          $ref: '#/definitions/models.Post'
-        type: array
-      reviews:
-        items:
-          $ref: '#/definitions/models.MergeRequestReview'
-        type: array
-    type: object
-  models.MergeRequest:
-    properties:
-      anonymous:
-        type: boolean
-      collaborators:
-        items:
-          $ref: '#/definitions/models.Collaborator'
-        type: array
-      createdAt:
-        type: string
-      newVersion:
-        $ref: '#/definitions/models.Version'
-      reviews:
-        items:
-          $ref: '#/definitions/models.MergeRequestReview'
-        type: array
-      updatedCompletionStatus:
-        $ref: '#/definitions/tags.CompletionStatusTag'
-      updatedScientificFields:
-        $ref: '#/definitions/tags.ScientificFieldTag'
-    type: object
-  models.MergeRequestReview:
-    properties:
-      MergeRequestDecision:
-        enum:
-        - 0
-        - 1
-        type: integer
-        x-enum-varnames:
-        - Rejected
-        - Approved
-      feedback:
-        type: string
-    type: object
-  models.Post:
-    properties:
-      collaborators:
-        items:
-          $ref: '#/definitions/models.Collaborator'
-        type: array
-      createdAt:
-        type: string
-      currentVersion:
-        $ref: '#/definitions/models.Version'
-      id:
-        description: place holder until we make standardzied uuid system
-        type: integer
-      postType:
-        $ref: '#/definitions/tags.PostTypeTag'
-      scientificFieldTags:
-        items:
-          $ref: '#/definitions/tags.ScientificFieldTag'
-        type: array
-      updatedAt:
-        type: string
-    type: object
-  models.ProjectPost:
-    properties:
-      closedMergeRequests:
-        items:
-          $ref: '#/definitions/models.ClosedMergeRequest'
-        type: array
-      collaborators:
-        items:
-          $ref: '#/definitions/models.Collaborator'
-        type: array
-      completionStatus:
-        $ref: '#/definitions/tags.CompletionStatusTag'
-      createdAt:
-        type: string
-      currentVersion:
-        $ref: '#/definitions/models.Version'
-      feedbackPreference:
-        $ref: '#/definitions/tags.FeedbackPreferenceTag'
-      forkedFrom:
-        $ref: '#/definitions/models.ClosedMergeRequest'
-      id:
-        description: place holder until we make standardzied uuid system
-        type: integer
-      openMergeRequests:
-        items:
-          $ref: '#/definitions/models.MergeRequest'
-        type: array
-      postReviewStatusTag:
-        $ref: '#/definitions/tags.PostReviewStatusTag'
-      postType:
-        $ref: '#/definitions/tags.PostTypeTag'
-      scientificFieldTags:
-        items:
-          $ref: '#/definitions/tags.ScientificFieldTag'
-        type: array
-      updatedAt:
-        type: string
-    type: object
-  models.Version:
-    properties:
-      discussions:
-        items:
-          $ref: '#/definitions/models.Discussion'
-        type: array
-    type: object
-  tags.CompletionStatusTag:
-    type: object
-  tags.FeedbackPreferenceTag:
-    type: object
-  tags.PostReviewStatusTag:
-    type: object
-  tags.PostTypeTag:
-    type: object
-  tags.ScientificFieldTag:
-    type: object
+  tags.CompletionStatus:
+    enum:
+    - idea
+    - ongoing
+    - completed
+    type: string
+    x-enum-varnames:
+    - Idea
+    - Ongoing
+    - Completed
+  tags.FeedbackPreference:
+    enum:
+    - discussion
+    - formal feedback
+    type: string
+    x-enum-varnames:
+    - Discussion
+    - FormalFeedback
+  tags.PostReviewStatus:
+    enum:
+    - open
+    - revision needed
+    - reviewed
+    type: string
+    x-enum-varnames:
+    - Open
+    - RevisionNeeded
+    - Reviewed
+  tags.PostType:
+    enum:
+    - project
+    - question
+    - reflection
+    type: string
+    x-enum-varnames:
+    - Project
+    - Question
+    - Reflection
+  tags.ScientificField:
+    enum:
+    - mathematics
+    type: string
+    x-enum-varnames:
+    - Mathematics
   utils.HTTPError:
     properties:
       code:
@@ -300,12 +116,12 @@ paths:
         name: post
         required: true
         schema:
-          $ref: '#/definitions/models.ProjectPost'
+          $ref: '#/definitions/models.ProjectPostDTO'
       produces:
       - application/json
       responses:
         "200":
-          description: Success
+          description: OK
         "400":
           description: Bad Request
           schema:
@@ -333,7 +149,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Post'
+            $ref: '#/definitions/models.PostDTO'
         "400":
           description: Bad Request
           schema:
@@ -356,9 +172,13 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Post'
+            $ref: '#/definitions/models.PostDTO'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "410":
+          description: Gone
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get post
@@ -380,7 +200,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ProjectPost'
+            $ref: '#/definitions/models.ProjectPostDTO'
         "400":
           description: Bad Request
           schema:
@@ -403,9 +223,13 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ProjectPost'
+            $ref: '#/definitions/models.ProjectPostDTO'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "410":
+          description: Gone
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get project post

@@ -1,8 +1,8 @@
 package services
 
 import (
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 )
 
 type PostService struct {
@@ -14,10 +14,9 @@ func (postService *PostService) GetPost(_ uint64) (*models.Post, error) {
 	return new(models.Post), nil
 }
 
-func (postService *PostService) CreatePost(form *forms.PostCreationForm) *models.Post {
+func (postService *PostService) CreatePost(_ *forms.PostCreationForm) *models.Post {
 	post := &models.Post{
-		PostMetadata:   form.PostMetadata,
-		CurrentVersion: form.CurrentVersion,
+		// TODO fill fields
 	}
 
 	// TODO: Add post to repo here
@@ -35,11 +34,9 @@ func (postService *PostService) GetProjectPost(_ uint64) (*models.ProjectPost, e
 	return new(models.ProjectPost), nil
 }
 
-func (postService *PostService) CreateProjectPost(form *forms.ProjectPostCreationForm) *models.ProjectPost {
+func (postService *PostService) CreateProjectPost(_ *forms.ProjectPostCreationForm) *models.ProjectPost {
 	post := &models.ProjectPost{
-		ProjectMetadata:     form.ProjectMetadata,
-		OpenMergeRequests:   form.OpenMergeRequests,
-		ClosedMergeRequests: form.ClosedMergeRequests,
+		// TODO fill fields
 	}
 
 	// TODO: Add post to repo here

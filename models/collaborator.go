@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"encoding/json"
+
+	"gorm.io/gorm"
+)
 
 type CollaborationType string
 
@@ -18,14 +22,34 @@ type PostCollaborator struct {
 	Member   Member `gorm:"foreignKey:MemberID"`
 	MemberID uint
 
-	// PostMetadata has many PostCollaborator
-	PostMetadataID uint
+	// Post has many PostCollaborator
+	PostID uint
 
+	CollaborationType CollaborationType
+}
+
+type PostCollaboratorDTO struct {
+	ID                uint
+	MemberID          uint
+	PostID            uint
 	CollaborationType CollaborationType
 }
 
 func (model *PostCollaborator) GetID() uint {
 	return model.Model.ID
+}
+
+func (model *PostCollaborator) IntoDTO() PostCollaboratorDTO {
+	return PostCollaboratorDTO{
+		model.ID,
+		model.MemberID,
+		model.PostID,
+		model.CollaborationType,
+	}
+}
+
+func (model *PostCollaborator) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }
 
 // A member that has collaborated on a merge request.
@@ -42,6 +66,26 @@ type MergeRequestCollaborator struct {
 	CollaborationType CollaborationType
 }
 
+type MergeRequestCollaboratorDTO struct {
+	ID                uint
+	MemberID          uint
+	MergeRequestID    uint
+	CollaborationType CollaborationType
+}
+
 func (model *MergeRequestCollaborator) GetID() uint {
 	return model.Model.ID
+}
+
+func (model *MergeRequestCollaborator) IntoDTO() MergeRequestCollaboratorDTO {
+	return MergeRequestCollaboratorDTO{
+		model.ID,
+		model.MemberID,
+		model.MergeRequestID,
+		model.CollaborationType,
+	}
+}
+
+func (model *MergeRequestCollaborator) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }

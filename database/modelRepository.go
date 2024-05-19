@@ -6,11 +6,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Interface that any database model must adhere to. Used by the ModelRepository.
-type Model interface {
-	GetID() uint
-}
-
 // Performs CRUD operations on a given type of database model to the database.
 // Type T must be a pointer to a struct, e.g. *Member.
 // Example usage: repo := ModelRepository[*Member] { ... }
@@ -18,9 +13,11 @@ type ModelRepository[T Model] struct {
 	Database *gorm.DB
 }
 
-// Create an object in the database.
+// Create an object in the database. The passed object is updated with a new ID.
+//
 // T must be a pointer to a Model type (as outlined above).
 // In general, you should *not* specify the ID (leave it blank during struct creation)
+//
 // If the ID is specified:
 // - if an object with the given ID already exists, errors.
 // - otherwise, creates the object with that ID.
@@ -65,6 +62,7 @@ func (repo *ModelRepository[T]) Update(object T) (T, error) {
 
 	// Return the newly saved object, because some of its fields
 	// (e.g. last-updated) may have been changed automatically.
+	// TODO the "object" field may already have been modified by GORM's Save method above
 	return repo.GetByID(id)
 }
 

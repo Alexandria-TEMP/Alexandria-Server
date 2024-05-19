@@ -1,7 +1,7 @@
 package models
 
 import (
-	"time"
+	"encoding/json"
 
 	"gorm.io/gorm"
 )
@@ -17,12 +17,19 @@ type Discussion struct {
 	MemberID uint
 
 	// Discussion optionally has many Discussion
-	Replies  []Discussion `gorm:"foreignKey:ParentID"`
+	Replies  []*Discussion `gorm:"foreignKey:ParentID"`
 	ParentID *uint
 
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
+	Text      string
+	Deleted   bool
+	Anonymous bool
+}
+
+type DiscussionDTO struct {
+	ID        uint
+	VersionID uint
+	MemberID  uint
+	ParentID  uint // TODO how are optionals handled here?
 	Text      string
 	Deleted   bool
 	Anonymous bool
@@ -30,4 +37,20 @@ type Discussion struct {
 
 func (model *Discussion) GetID() uint {
 	return model.Model.ID
+}
+
+func (model *Discussion) IntoDTO() DiscussionDTO {
+	return DiscussionDTO{
+		model.ID,
+		model.VersionID,
+		model.MemberID,
+		*model.ParentID,
+		model.Text,
+		model.Deleted,
+		model.Anonymous,
+	}
+}
+
+func (model *Discussion) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }
