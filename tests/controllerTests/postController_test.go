@@ -1,4 +1,4 @@
-package controllers
+package controllertests
 
 import (
 	"bytes"
@@ -7,61 +7,14 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 )
-
-var (
-	mockPostService *mock_interfaces.MockPostService
-	postController  *controllers.PostController
-	router          *gin.Engine
-
-	responseRecorder       *httptest.ResponseRecorder
-	examplePost            models.Post
-	exampleProjectPost     models.ProjectPost
-	examplePostForm        forms.PostCreationForm
-	exampleProjectPostForm forms.ProjectPostCreationForm
-)
-
-// TestMain is a keyword function, this is run by the testing package before other tests
-func TestMain(m *testing.M) {
-	// Setup test router, to test controller endpoints through http
-	router = gin.Default()
-	gin.SetMode(gin.TestMode)
-
-	router.GET("/api/v1/post/:postID", func(c *gin.Context) {
-		postController.GetPost(c)
-	})
-	router.POST("/api/v1/post", func(c *gin.Context) {
-		postController.CreatePost(c)
-	})
-	router.PUT("/api/v1/post", func(c *gin.Context) {
-		postController.UpdatePost(c)
-	})
-	router.GET("/api/v1/projectPost/:postID", func(c *gin.Context) {
-		postController.GetProjectPost(c)
-	})
-	router.POST("/api/v1/projectPost", func(c *gin.Context) {
-		postController.CreateProjectPost(c)
-	})
-	router.PUT("/api/v1/projectPost", func(c *gin.Context) {
-		postController.UpdateProjectPost(c)
-	})
-
-	// Setup object
-	examplePost = models.Post{}
-	exampleProjectPost = models.ProjectPost{}
-
-	os.Exit(m.Run())
-}
 
 func beforeEach(t *testing.T) {
 	t.Helper()

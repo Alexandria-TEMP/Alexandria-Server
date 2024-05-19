@@ -18,6 +18,7 @@ var (
 	postController *controllers.PostController
 
 	mockUserService *mock_interfaces.MockUserService
+	mockPostService *mock_interfaces.MockPostService
 	userController  *controllers.UserController
 
 	responseRecorder *httptest.ResponseRecorder
@@ -26,6 +27,8 @@ var (
 	exampleCollaborator     models.PostCollaborator
 	exampleMemberForm       forms.MemberCreationForm
 	exampleCollaboratorForm forms.CollaboratorCreationForm
+	examplePostForm         forms.PostCreationForm
+	exampleProjectPostForm  forms.ProjectPostCreationForm
 
 	examplePost        models.Post
 	exampleProjectPost models.ProjectPost

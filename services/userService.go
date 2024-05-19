@@ -35,6 +35,7 @@ func (userService *UserService) UpdateMember(_ *models.Member) error {
 	// TODO: database call to update
 	return nil
 }
+
 func (userService *UserService) GetCollaborator(_ uint64) (*models.PostCollaborator, error) {
 	// TODO: actually get from database based on UUID
 	return new(models.PostCollaborator), nil
