@@ -2,7 +2,6 @@ package database
 
 import (
 	"log"
-	"os"
 	"testing"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
@@ -13,23 +12,6 @@ import (
 var testDB *gorm.DB
 var modelRepository ModelRepository[*models.Member]
 var member models.Member
-
-func TestMain(m *testing.M) {
-	setupSuite()
-
-	code := m.Run()
-
-	teardownSuite()
-	os.Exit(code)
-}
-
-func setupSuite() {
-
-}
-
-func teardownSuite() {
-
-}
 
 func beforeEach() {
 	database, err := InitializeTestDatabase()
