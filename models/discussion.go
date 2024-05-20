@@ -29,7 +29,7 @@ type DiscussionDTO struct {
 	ID        uint
 	VersionID uint
 	MemberID  uint
-	ParentID  uint // TODO how are optionals handled here?
+	ReplyIDs  []uint
 	Text      string
 	Deleted   bool
 	Anonymous bool
@@ -44,7 +44,7 @@ func (model *Discussion) IntoDTO() DiscussionDTO {
 		model.ID,
 		model.VersionID,
 		model.MemberID,
-		*model.ParentID,
+		discussionsIntoIDs(model.Replies),
 		model.Text,
 		model.Deleted,
 		model.Anonymous,

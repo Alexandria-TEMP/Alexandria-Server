@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"reflect"
 	"testing"
 
 	"gorm.io/gorm"
@@ -16,7 +17,14 @@ func TestDiscussionJSONMarshaling(t *testing.T) {
 		VersionID: 33,
 		Member:    Member{},
 		MemberID:  28,
-		Replies:   []*Discussion{},
+		Replies: []*Discussion{
+			{
+				Model: gorm.Model{ID: 50},
+			},
+			{
+				Model: gorm.Model{ID: 88},
+			},
+		},
 		ParentID:  &parentID,
 		Text:      "Test!",
 		Deleted:   false,
@@ -28,7 +36,7 @@ func TestDiscussionJSONMarshaling(t *testing.T) {
 		ID:        100,
 		VersionID: 33,
 		MemberID:  28,
-		ParentID:  5,
+		ReplyIDs:  []uint{50, 88},
 		Text:      "Test!",
 		Deleted:   false,
 		Anonymous: true,
@@ -46,7 +54,7 @@ func TestDiscussionJSONMarshaling(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if dto != targetDTO {
+	if !reflect.DeepEqual(dto, targetDTO) {
 		t.Fatal("parsed DTO did not equal target DTO")
 	}
 }
