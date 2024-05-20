@@ -7,9 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 )
 
 var (
@@ -27,8 +27,8 @@ var (
 	exampleCollaborator     models.PostCollaborator
 	exampleMemberForm       forms.MemberCreationForm
 	exampleCollaboratorForm forms.CollaboratorCreationForm
-	examplePostForm         forms.PostCreationForm
-	exampleProjectPostForm  forms.ProjectPostCreationForm
+	examplePostForm       forms.PostCreationForm
+	exampleProjectPostForm forms.ProjectPostCreationForm
 
 	examplePost        models.Post
 	exampleProjectPost models.ProjectPost
