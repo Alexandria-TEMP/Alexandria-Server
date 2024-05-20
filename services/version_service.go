@@ -106,6 +106,8 @@ func (versionService *VersionService) RenderProject() error {
 		"--no-cache",
 		"-M", "embed-resources:true",
 		"-M", "toc-location:body",
+		"-M", "margin-left:0",
+		"-M", "margin-right:0",
 		"--log-level", "error",
 	)
 	out, err := cmd.CombinedOutput()
