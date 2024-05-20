@@ -1,4 +1,4 @@
-package controllertests
+package controllers
 
 import (
 	"bytes"
@@ -11,7 +11,6 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 )
@@ -25,7 +24,7 @@ func beforeEachUser(t *testing.T) {
 	responseRecorder = httptest.NewRecorder()
 
 	mockUserService = mock_interfaces.NewMockUserService(mockCtrl)
-	userController = &controllers.UserController{UserService: mockUserService}
+	userController = &UserController{UserService: mockUserService}
 }
 
 func TestGetMember200(t *testing.T) {

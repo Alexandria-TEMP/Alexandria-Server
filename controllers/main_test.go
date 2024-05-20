@@ -1,4 +1,4 @@
-package controllertests
+package controllers
 
 import (
 	"net/http/httptest"
@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
@@ -15,11 +14,11 @@ import (
 var (
 	router *gin.Engine
 
-	postController *controllers.PostController
+	postController *PostController
 
 	mockUserService *mock_interfaces.MockUserService
 	mockPostService *mock_interfaces.MockPostService
-	userController  *controllers.UserController
+	userController  *UserController
 
 	responseRecorder *httptest.ResponseRecorder
 
