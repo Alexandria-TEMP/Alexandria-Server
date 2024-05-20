@@ -33,5 +33,15 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	projectPostRouter.GET("/:postID", controllers.postController.GetProjectPost)
 	projectPostRouter.POST("", controllers.postController.CreateProjectPost)
 
+	memberRouter := v1.Group("/member")
+	memberRouter.GET("/:userID", controllers.userController.GetMember)
+	memberRouter.POST("/", controllers.userController.CreateMember)
+	memberRouter.PUT("/", controllers.userController.UpdateMember)
+
+	collaboratorRouter := v1.Group("/collaborator")
+	collaboratorRouter.GET("/:userID", controllers.userController.GetCollaborator)
+	collaboratorRouter.POST("/", controllers.userController.CreateCollaborator)
+	collaboratorRouter.PUT("/", controllers.userController.UpdateCollaborator)
+
 	return router
 }

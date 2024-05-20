@@ -11,7 +11,11 @@ COPY . ./
 
 # Get missing dependencies
 RUN go mod download
+
+# Developer tools
+# TODO for prod these can be removed
 RUN go get github.com/golangci/golangci-lint
+RUN go install github.com/swaggo/swag/cmd/swag@v1.16.3
 
 # Build binary
 RUN go build -o /usr/bin/alexandria-backend -v ./

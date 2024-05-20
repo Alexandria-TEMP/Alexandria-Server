@@ -32,13 +32,13 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ProjectPost"
+                            "$ref": "#/definitions/models.ProjectPostDTO"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Success"
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -80,7 +80,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Post"
+                            "$ref": "#/definitions/models.PostDTO"
                         }
                     },
                     "400": {
@@ -115,11 +115,17 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Post"
+                            "$ref": "#/definitions/models.PostDTO"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "410": {
+                        "description": "Gone",
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
@@ -152,7 +158,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ProjectPost"
+                            "$ref": "#/definitions/models.ProjectPostDTO"
                         }
                     },
                     "400": {
@@ -187,11 +193,17 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ProjectPost"
+                            "$ref": "#/definitions/models.ProjectPostDTO"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "410": {
+                        "description": "Gone",
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
@@ -207,419 +219,140 @@ const docTemplate = `{
                 "collaborators": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Collaborator"
+                        "type": "integer"
                     }
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "currentVersion": {
-                    "$ref": "#/definitions/models.Version"
-                },
-                "postType": {
-                    "$ref": "#/definitions/tags.PostTypeTag"
-                },
-                "scientificFieldTags": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/tags.ScientificFieldTag"
-                    }
-                },
-                "updatedAt": {
-                    "type": "string"
                 }
             }
         },
         "forms.ProjectPostCreationForm": {
             "type": "object",
             "properties": {
-                "closedMergeRequests": {
+                "postCreationForm": {
+                    "description": "TODO add fields",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/forms.PostCreationForm"
+                        }
+                    ]
+                }
+            }
+        },
+        "models.PostDTO": {
+            "type": "object",
+            "properties": {
+                "collaboratorIDs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.ClosedMergeRequest"
+                        "type": "integer"
                     }
                 },
-                "collaborators": {
+                "id": {
+                    "type": "integer"
+                },
+                "postType": {
+                    "$ref": "#/definitions/tags.PostType"
+                },
+                "scientificFieldTags": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Collaborator"
+                        "$ref": "#/definitions/tags.ScientificField"
+                    }
+                },
+                "versionID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ProjectPostDTO": {
+            "type": "object",
+            "properties": {
+                "closedMergeRequestIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
                     }
                 },
                 "completionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatusTag"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "currentVersion": {
-                    "$ref": "#/definitions/models.Version"
+                    "$ref": "#/definitions/tags.CompletionStatus"
                 },
                 "feedbackPreference": {
-                    "$ref": "#/definitions/tags.FeedbackPreferenceTag"
-                },
-                "forkedFrom": {
-                    "$ref": "#/definitions/models.ClosedMergeRequest"
+                    "$ref": "#/definitions/tags.FeedbackPreference"
                 },
                 "id": {
-                    "description": "place holder until we make standardzied uuid system",
                     "type": "integer"
                 },
-                "openMergeRequests": {
+                "openMergeRequestIDs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.MergeRequest"
+                        "type": "integer"
                     }
+                },
+                "postID": {
+                    "type": "integer"
                 },
                 "postReviewStatusTag": {
-                    "$ref": "#/definitions/tags.PostReviewStatusTag"
-                },
-                "postType": {
-                    "$ref": "#/definitions/tags.PostTypeTag"
-                },
-                "scientificFieldTags": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/tags.ScientificFieldTag"
-                    }
-                },
-                "updatedAt": {
-                    "type": "string"
+                    "$ref": "#/definitions/tags.PostReviewStatus"
                 }
             }
         },
-        "models.ClosedMergeRequest": {
-            "type": "object",
-            "properties": {
-                "MergeRequestDecision": {
-                    "type": "integer",
-                    "enum": [
-                        0,
-                        1
-                    ],
-                    "x-enum-varnames": [
-                        "Rejected",
-                        "Approved"
-                    ]
-                },
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "collaborators": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Collaborator"
-                    }
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "mainVersionWhenClosed": {
-                    "$ref": "#/definitions/models.Version"
-                },
-                "newVersion": {
-                    "$ref": "#/definitions/models.Version"
-                },
-                "reviews": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.MergeRequestReview"
-                    }
-                },
-                "updatedCompletionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatusTag"
-                },
-                "updatedScientificFields": {
-                    "$ref": "#/definitions/tags.ScientificFieldTag"
-                }
-            }
+        "tags.CompletionStatus": {
+            "type": "string",
+            "enum": [
+                "idea",
+                "ongoing",
+                "completed"
+            ],
+            "x-enum-varnames": [
+                "Idea",
+                "Ongoing",
+                "Completed"
+            ]
         },
-        "models.Collaborator": {
-            "type": "object",
-            "properties": {
-                "CollaborationType": {
-                    "type": "integer",
-                    "enum": [
-                        0,
-                        1,
-                        2
-                    ],
-                    "x-enum-varnames": [
-                        "Author",
-                        "Contributor",
-                        "Reviewer"
-                    ]
-                },
-                "discussions": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Discussion"
-                    }
-                },
-                "email": {
-                    "type": "string"
-                },
-                "firstName": {
-                    "type": "string"
-                },
-                "institution": {
-                    "type": "string"
-                },
-                "lastName": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "posts": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Post"
-                    }
-                },
-                "reviews": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.MergeRequestReview"
-                    }
-                }
-            }
+        "tags.FeedbackPreference": {
+            "type": "string",
+            "enum": [
+                "discussion",
+                "formal feedback"
+            ],
+            "x-enum-varnames": [
+                "Discussion",
+                "FormalFeedback"
+            ]
         },
-        "models.Discussion": {
-            "type": "object",
-            "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "author": {
-                    "$ref": "#/definitions/models.Member"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "deleted": {
-                    "type": "boolean"
-                },
-                "deletedAt": {
-                    "type": "string"
-                },
-                "replies": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Discussion"
-                    }
-                },
-                "text": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
+        "tags.PostReviewStatus": {
+            "type": "string",
+            "enum": [
+                "open",
+                "revision needed",
+                "reviewed"
+            ],
+            "x-enum-varnames": [
+                "Open",
+                "RevisionNeeded",
+                "Reviewed"
+            ]
         },
-        "models.Member": {
-            "type": "object",
-            "properties": {
-                "discussions": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Discussion"
-                    }
-                },
-                "email": {
-                    "type": "string"
-                },
-                "firstName": {
-                    "type": "string"
-                },
-                "institution": {
-                    "type": "string"
-                },
-                "lastName": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "posts": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Post"
-                    }
-                },
-                "reviews": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.MergeRequestReview"
-                    }
-                }
-            }
+        "tags.PostType": {
+            "type": "string",
+            "enum": [
+                "project",
+                "question",
+                "reflection"
+            ],
+            "x-enum-varnames": [
+                "Project",
+                "Question",
+                "Reflection"
+            ]
         },
-        "models.MergeRequest": {
-            "type": "object",
-            "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "collaborators": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Collaborator"
-                    }
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "newVersion": {
-                    "$ref": "#/definitions/models.Version"
-                },
-                "reviews": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.MergeRequestReview"
-                    }
-                },
-                "updatedCompletionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatusTag"
-                },
-                "updatedScientificFields": {
-                    "$ref": "#/definitions/tags.ScientificFieldTag"
-                }
-            }
-        },
-        "models.MergeRequestReview": {
-            "type": "object",
-            "properties": {
-                "MergeRequestDecision": {
-                    "type": "integer",
-                    "enum": [
-                        0,
-                        1
-                    ],
-                    "x-enum-varnames": [
-                        "Rejected",
-                        "Approved"
-                    ]
-                },
-                "feedback": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Post": {
-            "type": "object",
-            "properties": {
-                "collaborators": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Collaborator"
-                    }
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "currentVersion": {
-                    "$ref": "#/definitions/models.Version"
-                },
-                "id": {
-                    "description": "place holder until we make standardzied uuid system",
-                    "type": "integer"
-                },
-                "postType": {
-                    "$ref": "#/definitions/tags.PostTypeTag"
-                },
-                "scientificFieldTags": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/tags.ScientificFieldTag"
-                    }
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.ProjectPost": {
-            "type": "object",
-            "properties": {
-                "closedMergeRequests": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ClosedMergeRequest"
-                    }
-                },
-                "collaborators": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Collaborator"
-                    }
-                },
-                "completionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatusTag"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "currentVersion": {
-                    "$ref": "#/definitions/models.Version"
-                },
-                "feedbackPreference": {
-                    "$ref": "#/definitions/tags.FeedbackPreferenceTag"
-                },
-                "forkedFrom": {
-                    "$ref": "#/definitions/models.ClosedMergeRequest"
-                },
-                "id": {
-                    "description": "place holder until we make standardzied uuid system",
-                    "type": "integer"
-                },
-                "openMergeRequests": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.MergeRequest"
-                    }
-                },
-                "postReviewStatusTag": {
-                    "$ref": "#/definitions/tags.PostReviewStatusTag"
-                },
-                "postType": {
-                    "$ref": "#/definitions/tags.PostTypeTag"
-                },
-                "scientificFieldTags": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/tags.ScientificFieldTag"
-                    }
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Version": {
-            "type": "object",
-            "properties": {
-                "discussions": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Discussion"
-                    }
-                }
-            }
-        },
-        "tags.CompletionStatusTag": {
-            "type": "object"
-        },
-        "tags.FeedbackPreferenceTag": {
-            "type": "object"
-        },
-        "tags.PostReviewStatusTag": {
-            "type": "object"
-        },
-        "tags.PostTypeTag": {
-            "type": "object"
-        },
-        "tags.ScientificFieldTag": {
-            "type": "object"
+        "tags.ScientificField": {
+            "type": "string",
+            "enum": [
+                "mathematics"
+            ],
+            "x-enum-varnames": [
+                "Mathematics"
+            ]
         },
         "utils.HTTPError": {
             "type": "object",

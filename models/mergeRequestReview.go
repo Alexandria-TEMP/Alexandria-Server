@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"encoding/json"
+
+	"gorm.io/gorm"
+)
 
 type MergeRequestDecision string
 
@@ -23,6 +27,28 @@ type MergeRequestReview struct {
 	Feedback             string
 }
 
+type MergeRequestReviewDTO struct {
+	ID                   uint
+	MergeRequestID       uint
+	MemberID             uint
+	MergeRequestDecision MergeRequestDecision
+	Feedback             string
+}
+
 func (model *MergeRequestReview) GetID() uint {
 	return model.Model.ID
+}
+
+func (model *MergeRequestReview) IntoDTO() MergeRequestReviewDTO {
+	return MergeRequestReviewDTO{
+		model.ID,
+		model.MergeRequestID,
+		model.MemberID,
+		model.MergeRequestDecision,
+		model.Feedback,
+	}
+}
+
+func (model *MergeRequestReview) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
 }

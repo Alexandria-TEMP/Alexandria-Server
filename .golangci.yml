@@ -1,6 +1,8 @@
 linters-settings:
   errcheck:
     check-type-assertions: true
+  dupl:
+    threshold: 5000
   funlen:
     lines: 60
     statements: 50
@@ -28,7 +30,7 @@ linters-settings:
 linters:
   disable-all: true
   enable:
-    - asciicheck 
+    - asciicheck
     - bidichk
     - decorder
     - dogsled
