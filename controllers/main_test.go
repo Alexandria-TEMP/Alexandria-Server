@@ -26,8 +26,8 @@ var (
 	exampleCollaborator     models.PostCollaborator
 	exampleMemberForm       forms.MemberCreationForm
 	exampleCollaboratorForm forms.CollaboratorCreationForm
-	examplePostForm       forms.PostCreationForm
-	exampleProjectPostForm forms.ProjectPostCreationForm
+	examplePostForm         forms.PostCreationForm
+	exampleProjectPostForm  forms.ProjectPostCreationForm
 
 	examplePost        models.Post
 	exampleProjectPost models.ProjectPost
