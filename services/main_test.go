@@ -1,19 +1,19 @@
-package servicestests
+package services
 
 import (
 	"net/http/httptest"
 	"os"
 	"testing"
 
+	"gorm.io/gorm"
+
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
-	"gorm.io/gorm"
 )
 
 var (
-	versionService services.VersionService
+	versionService VersionService
 	c              *gin.Context
 	mockFilesystem *mocks.MockFilesystem
 	exampleVersion models.Version

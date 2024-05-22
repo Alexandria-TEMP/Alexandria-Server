@@ -12,11 +12,13 @@ import (
 type ServiceEnv struct {
 	postService    services.PostService
 	versionService services.VersionService
+	userService    services.UserService
 }
 
 type ControllerEnv struct {
 	postController    controllers.PostController
 	versionController controllers.VersionController
+	userController    controllers.UserController
 }
 
 func initServiceEnv() ServiceEnv {
@@ -25,6 +27,7 @@ func initServiceEnv() ServiceEnv {
 	return ServiceEnv{
 		postService:    services.PostService{},
 		versionService: services.VersionService{Filesystem: fs},
+		userService:    services.UserService{},
 	}
 }
 
@@ -32,6 +35,7 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 	return ControllerEnv{
 		postController:    controllers.PostController{PostService: &serviceEnv.postService},
 		versionController: controllers.VersionController{VersionService: &serviceEnv.versionService},
+		userController:    controllers.UserController{UserService: &serviceEnv.userService},
 	}
 }
 
