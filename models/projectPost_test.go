@@ -24,12 +24,10 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 	}
 
 	model := ProjectPost{
-		Model:  gorm.Model{ID: 42},
-		Post:   post,
-		PostID: 88,
-		OpenMergeRequests: []*MergeRequest{
-			{Model: gorm.Model{ID: 44}},
-		},
+		Model:             gorm.Model{ID: 42},
+		Post:              post,
+		PostID:            88,
+		OpenMergeRequests: []*MergeRequest{{Model: gorm.Model{ID: 44}}},
 		ClosedMergeRequests: []*ClosedMergeRequest{
 			{Model: gorm.Model{ID: 59}},
 			{Model: gorm.Model{ID: 20}},
