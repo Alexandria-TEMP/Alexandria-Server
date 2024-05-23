@@ -29,6 +29,7 @@ func TestPostJSONMarshaling(t *testing.T) {
 				CollaborationType: Contributor,
 			},
 		},
+		Title:               "Nice Post",
 		CurrentVersion:      Version{},
 		CurrentVersionID:    49,
 		PostType:            tags.Question,
@@ -39,6 +40,7 @@ func TestPostJSONMarshaling(t *testing.T) {
 	targetDTO := PostDTO{
 		ID:                  88,
 		CollaboratorIDs:     []uint{1, 60},
+		Title:               "Nice Post",
 		VersionID:           49,
 		PostType:            tags.Question,
 		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
