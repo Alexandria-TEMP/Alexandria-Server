@@ -34,9 +34,10 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 			},
 		},
 		ProjectPostID:           45,
-		Title:                   "My Cool MR",
+		MergeRequestTitle:       "My Cool MR",
+		NewPostTitle:            "Updated Post Title",
 		UpdatedCompletionStatus: tags.Idea,
-		UpdatedScientificFields: tags.Mathematics,
+		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
 		Anonymous:               false,
 	}
 
@@ -47,9 +48,10 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 		CollaboratorIDs:         []uint{100, 50},
 		ReviewIDs:               []uint{2},
 		ProjectPostID:           45,
-		Title:                   "My Cool MR",
+		MergeRequestTitle:       "My Cool MR",
+		NewPostTitle:            "Updated Post Title",
 		UpdatedCompletionStatus: tags.Idea,
-		UpdatedScientificFields: tags.Mathematics,
+		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
 		Anonymous:               false,
 	}
 

@@ -20,19 +20,24 @@ type ProjectPost struct {
 	// ProjectPost has many ClosedMergeRequest
 	ClosedMergeRequests []*ClosedMergeRequest `gorm:"foreignKey:ProjectPostID"`
 
+	// Whether this project post has had its first 'peer review' (merge request),
+	// which determines whether new merge requests can be opened.
+	HasHadInitialPeerReview bool
+
 	CompletionStatus    tags.CompletionStatus
 	FeedbackPreference  tags.FeedbackPreference
 	PostReviewStatusTag tags.PostReviewStatus
 }
 
 type ProjectPostDTO struct {
-	ID                    uint
-	PostDTO               PostDTO
-	OpenMergeRequestIDs   []uint
-	ClosedMergeRequestIDs []uint
-	CompletionStatus      tags.CompletionStatus
-	FeedbackPreference    tags.FeedbackPreference
-	PostReviewStatusTag   tags.PostReviewStatus
+	ID                      uint
+	PostDTO                 PostDTO
+	OpenMergeRequestIDs     []uint
+	ClosedMergeRequestIDs   []uint
+	HasHadInitialPeerReview bool
+	CompletionStatus        tags.CompletionStatus
+	FeedbackPreference      tags.FeedbackPreference
+	PostReviewStatusTag     tags.PostReviewStatus
 }
 
 func (model *ProjectPost) GetID() uint {
@@ -45,6 +50,7 @@ func (model *ProjectPost) IntoDTO() ProjectPostDTO {
 		model.Post.IntoDTO(),
 		mergeRequestsToIDs(model.OpenMergeRequests),
 		closedMergeRequestsToIDs(model.ClosedMergeRequests),
+		model.HasHadInitialPeerReview,
 		model.CompletionStatus,
 		model.FeedbackPreference,
 		model.PostReviewStatusTag,
