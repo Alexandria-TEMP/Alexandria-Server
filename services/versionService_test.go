@@ -1,4 +1,4 @@
-package servicestests
+package services
 
 import (
 	"errors"
@@ -13,7 +13,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
 	"go.uber.org/mock/gomock"
 )
 
@@ -25,7 +24,7 @@ func beforeEach(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
-	versionService = services.VersionService{Filesystem: mockFilesystem}
+	versionService = VersionService{Filesystem: mockFilesystem}
 }
 
 func cleanup(t *testing.T) {
@@ -119,7 +118,7 @@ func testGoodProjectTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
 	mockFilesystem.EXPECT().CountRenderFiles().Return(1).Times(1)
 	mockFilesystem.EXPECT().RemoveProjectDirectory().Return(nil).Times(1)
-	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", dirName)).AnyTimes()
+	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", dirName)).AnyTimes()
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
 
 	version, err := versionService.CreateVersion(c, file, 2)
@@ -151,7 +150,7 @@ func testBadProjectTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
 	mockFilesystem.EXPECT().RemoveRepository().Return(nil).Times(1)
 	mockFilesystem.EXPECT().RemoveProjectDirectory().Return(nil).Times(0)
-	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", dirName)).AnyTimes()
+	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", dirName)).AnyTimes()
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
 
 	version, err := versionService.CreateVersion(c, file, 2)

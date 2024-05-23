@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
@@ -25,7 +25,7 @@ type PostController struct {
 // @Accept  	json
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
-// @Success 	200 		{object}	models.Post
+// @Success 	200 		{object}	models.PostDTO
 // @Failure		400 		{object} 	utils.HTTPError
 // @Failure		410 		{object} 	utils.HTTPError
 // @Router 		/post/{postID}	[get]
@@ -62,7 +62,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 // @Accept  	json
 // @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
 // @Produce		json
-// @Success 	200 	{object} 	models.Post
+// @Success 	200 	{object} 	models.PostDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Router 		/post 		[post]
 func (postController *PostController) CreatePost(c *gin.Context) {
@@ -89,7 +89,7 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 // @Summary 	Update post
 // @Description Update any number of the aspects of a question or discussion post
 // @Accept  	json
-// @Param		post	body		models.Post		true	"Updated Post"
+// @Param		post	body		models.PostDTO		true	"Updated Post"
 // @Produce		json
 // @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
@@ -128,7 +128,7 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 // @Accept  	json
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
-// @Success 	200 		{object}	models.ProjectPost
+// @Success 	200 		{object}	models.ProjectPostDTO
 // @Failure		400 		{object} 	utils.HTTPError
 // @Failure		410 		{object} 	utils.HTTPError
 // @Router 		/projectPost/{postID}	[get]
@@ -164,7 +164,7 @@ func (postController *PostController) GetProjectPost(c *gin.Context) {
 // @Accept  	json
 // @Param		form	body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
 // @Produce		json
-// @Success 	200 	{object} 	models.ProjectPost
+// @Success 	200 	{object} 	models.ProjectPostDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Router 		/projectPost 		[post]
 func (postController *PostController) CreateProjectPost(c *gin.Context) {
@@ -191,7 +191,7 @@ func (postController *PostController) CreateProjectPost(c *gin.Context) {
 // @Summary 	Update project post
 // @Description Update any number of the aspects of project post
 // @Accept  	json
-// @Param		post	body		models.ProjectPost		true	"Updated Project Post"
+// @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
 // @Produce		json
 // @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
