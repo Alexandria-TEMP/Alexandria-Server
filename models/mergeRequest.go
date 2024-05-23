@@ -23,6 +23,7 @@ type MergeRequest struct {
 	// ProjectPost has many MergeRequest
 	ProjectPostID uint
 
+	Title                   string
 	UpdatedCompletionStatus tags.CompletionStatus
 	UpdatedScientificFields tags.ScientificField `gorm:"serializer:json"`
 	Anonymous               bool
@@ -34,6 +35,7 @@ type MergeRequestDTO struct {
 	CollaboratorIDs         []uint
 	ReviewIDs               []uint
 	ProjectPostID           uint
+	Title                   string
 	UpdatedCompletionStatus tags.CompletionStatus
 	UpdatedScientificFields tags.ScientificField
 	Anonymous               bool
@@ -50,6 +52,7 @@ func (model *MergeRequest) IntoDTO() MergeRequestDTO {
 		mergeRequestCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
 		model.ProjectPostID,
+		model.Title,
 		model.UpdatedCompletionStatus,
 		model.UpdatedScientificFields,
 		model.Anonymous,
