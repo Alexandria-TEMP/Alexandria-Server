@@ -2,8 +2,10 @@ package models
 
 import (
 	"encoding/json"
+	"reflect"
 	"testing"
 
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +18,10 @@ func TestMemberJSONMarshaling(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
+		ScientificFieldTags: []tags.ScientificField{
+			tags.Mathematics,
+			tags.ComputerScience,
+		},
 	}
 
 	// should equal this DTO!
@@ -26,6 +32,10 @@ func TestMemberJSONMarshaling(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
+		ScientificFieldTags: []tags.ScientificField{
+			tags.Mathematics,
+			tags.ComputerScience,
+		},
 	}
 
 	dto := MemberDTO{}
@@ -40,7 +50,7 @@ func TestMemberJSONMarshaling(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if dto != targetDTO {
+	if !reflect.DeepEqual(dto, targetDTO) {
 		t.Fatal("parsed DTO did not equal target DTO")
 	}
 }
