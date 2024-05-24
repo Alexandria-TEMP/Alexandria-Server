@@ -1,0 +1,46 @@
+- `/members`
+  - `POST`
+  - `PUT` (ask frontend)
+  - `/:id` `GET`
+  - `/:id` `DELETE`
+  - `/:id/posts` `GET` (how does this work w/ project posts?) **_p_**
+  - `/:id/merge-requests` `GET` **_p_**
+  - `/:id/discussion` `GET` **_p_**
+  - `/:id/saved-posts` `POST`
+  - `/:id/saved-posts` `GET` **_p_**
+- `/posts`
+  - `POST`
+  - `/from-github` `POST`
+  - `/:id` `PUT` (ask frontend)
+  - `/:id` `GET`
+  - `/:id` `DELETE` (admin?)
+  - `/:id/reports` `POST` (wahhh)
+  - `/:id/reports` `GET` **_p_**
+- `/project-posts`
+  - `POST` (w/ a forked-from parameter)
+  - `/from-github` `POST`
+  - `/:id` `PUT` (ask frontend)
+  - `/:id` `GET`
+  - `/:id` `DELETE` (admin?)
+  - `/:id/all-discussions` `GET` **_p_**
+  - `/:id/open-merge-requests/` `GET` (returns MR DTOs) **_p_**
+  - `/:id/closed-merge-requests/` `GET` (returns MR DTOs) **_p_**
+- `/versions`
+  - `/:id` `GET` (get the files?)
+  - `/:id` `/render` `GET`
+  - `/:id/discussions` `GET` (gets all level-1 discussions of the version) **_p_**
+- `/discussions`
+  - `POST` (mandatory version ID, optional parent discussion ID)
+  - `/:id` `GET` (for nested discussions)
+  - `/:id` `DELETE`
+  - `/:id/reports` `POST` (wahhh)
+  - `/:id/reports` `GET` **_p_**
+- `/merge-requests`
+  - `POST`
+  - `PUT` (?)
+  - `/:id` `GET`
+  - `/:id` `DELETE`
+  - `/:id/reviews` `GET` (returns full DTOs of all reviews)
+  - `/:id/reviews` `POST` (does the merge - make sure to refresh page)
+  - `/:id/reviews/can-review` `GET` (utility endpoint for front-end - allowed to review?)
+- `/filter` `GET` (form with a bunch of parameters) **_p_**
