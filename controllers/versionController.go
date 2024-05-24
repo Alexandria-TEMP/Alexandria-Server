@@ -48,7 +48,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid article ID, cannot interpret as integer, id=%v ", postIDStr))
+		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr))
 
 		return
 	}
@@ -75,7 +75,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 // @Param		versionID	path		string				true	"Version ID"
 // @Produce		text/html
 // @Success 	200		{object}	BLOB
-// @Failure		400 	{object} 	utils.HTTPError
+// @Success		202
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/version/render/{postID}/{versionID}	[get]
@@ -86,21 +86,33 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid article ID, cannot interpret as integer, id=%v ", postIDStr))
+		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr))
 
 		return
 	}
 
 	// extract version id
-	versionIDstr := c.Param("postID")
+	versionIDstr := c.Param("versionID")
 	versionID, err := strconv.ParseInt(versionIDstr, 10, 64)
 
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid article ID, cannot interpret as integer, id=%v ", versionIDstr))
+		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr))
 		return
 	}
 
-	versionController.VersionService.GetRender(uint(versionID), uint(postID))
+	file, err202, err404 := versionController.VersionService.GetRender(uint(versionID), uint(postID))
 
+	if err202 != nil {
+		c.Status(http.StatusAccepted)
+		return
+	}
+
+	if err404 != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusNotFound, err404)
+		return
+	}
+
+	c.Data(http.StatusOK, "text/html; charset=utf-8", file)
 }

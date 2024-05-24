@@ -13,6 +13,6 @@ import (
 type VersionService interface {
 	CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (*models.Version, error)
 	RenderProject() error
-	GetRender(versionID, postID uint) (forms.OutgoingFileForm, string, error)
+	GetRender(versionID, postID uint) ([]byte, error, error)
 	GetRepository(versionID, postID uint) (forms.OutgoingFileForm, string, error)
 }

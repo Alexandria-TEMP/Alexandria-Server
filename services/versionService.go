@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"mime/multipart"
 	"os/exec"
 	"path/filepath"
@@ -183,17 +184,37 @@ func (versionService *VersionService) IsValidProject() bool {
 	return true
 }
 
-func (versionService *VersionService) GetRender(versionID, postID uint) (forms.OutgoingFileForm, string, error) {
-	// TODO: Check version render status
-	// If pending return error eccordingly
-	// If failure return error accordingly
-	// If success proceed to steps below
-	//
+// GetRender return a blob of the renderer repository.
+// Error 1 is for status 202.
+// Error 2 is for status 404.
+func (versionService *VersionService) GetRender(versionID, postID uint) ([]byte, error, error) {
+	version, err := versionService.VersionRepository.GetByID(versionID)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("no such version exists")
+	}
+
+	// If pending return error 202
+	if version.RenderStatus == models.Pending {
+		return nil, fmt.Errorf("version still rendering"), nil
+	}
+
+	// If failure return error 404
+	if version.RenderStatus == models.Failure {
+		return nil, nil, fmt.Errorf("version failed to render")
+	}
+
 	// Set current version
 	versionService.Filesystem.SetCurrentVersion(versionID, postID)
 
 	// Get render file
-	return versionService.Filesystem.GetRenderFile()
+	file, err := versionService.Filesystem.GetRenderFile()
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return file, nil, nil
 }
 
 func (versionService *VersionService) GetRepository(versionID, postID uint) (forms.OutgoingFileForm, string, error) {
