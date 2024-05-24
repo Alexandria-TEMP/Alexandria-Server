@@ -93,6 +93,16 @@ func CreateMultipartFile(filePath string) (io.Reader, string, error) {
 	return body, mwriter.FormDataContentType(), nil
 }
 
+// CreateByteSliceFile converts file at filpath into blob
+func CreateByteSliceFile(filepath string) ([]byte, error) {
+	file, err := os.ReadFile("myfile.txt") //read the content of file
+	if err != nil {
+		return nil, err
+	}
+
+	return file, nil
+}
+
 // FileExists checks that a file exists
 func FileExists(filePath string) bool {
 	_, err := os.Stat(filePath)

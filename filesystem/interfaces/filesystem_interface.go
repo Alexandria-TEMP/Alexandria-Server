@@ -20,6 +20,6 @@ type Filesystem interface {
 	GetCurrentQuartoDirPath() string
 	GetCurrentZipFilePath() string
 	GetCurrentRenderDirPath() string
-	GetRenderFile() (forms.OutgoingFileForm, string, error)
+	GetRenderFile() ([]byte, error)
 	GetRepositoryFile() (forms.OutgoingFileForm, string, error)
 }

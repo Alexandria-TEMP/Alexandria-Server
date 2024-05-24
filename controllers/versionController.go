@@ -66,3 +66,41 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, version)
 }
+
+// GetRender godoc specs are subject to change
+// @Summary 	Get the render of a version
+// @Description Get the render of the repository underlying a version if it exists and has been rendered successfully
+// @Accept  	json
+// @Param		postID		path		string				true	"Parent Post ID"
+// @Param		versionID	path		string				true	"Version ID"
+// @Produce		text/html
+// @Success 	200		{object}	BLOB
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500 	{object} 	utils.HTTPError
+// @Router 		/version/render/{postID}/{versionID}	[get]
+func (versionController *VersionController) GetRender(c *gin.Context) {
+	// extract post id
+	postIDStr := c.Param("postID")
+	postID, err := strconv.ParseInt(postIDStr, 10, 64)
+
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid article ID, cannot interpret as integer, id=%v ", postIDStr))
+
+		return
+	}
+
+	// extract version id
+	versionIDstr := c.Param("postID")
+	versionID, err := strconv.ParseInt(versionIDstr, 10, 64)
+
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid article ID, cannot interpret as integer, id=%v ", versionIDstr))
+		return
+	}
+
+	versionController.VersionService.GetRender(uint(versionID), uint(postID))
+
+}

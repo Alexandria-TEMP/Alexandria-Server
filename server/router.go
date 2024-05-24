@@ -35,6 +35,7 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 
 	versionRouter := v1.Group("/version")
 	versionRouter.POST("/:postID", controllers.versionController.CreateVersion)
+	versionRouter.GET("/render/:postID/:versionID", controllers.versionController.GetRender)
 
 	memberRouter := v1.Group("/member")
 	memberRouter.GET("/:userID", controllers.userController.GetMember)

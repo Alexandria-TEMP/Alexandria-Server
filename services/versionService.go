@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	filesysteminterface "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
@@ -14,7 +15,8 @@ import (
 )
 
 type VersionService struct {
-	Filesystem filesysteminterface.Filesystem
+	VersionRepository database.ModelRepository[*models.Version]
+	Filesystem        filesysteminterface.Filesystem
 }
 
 // CreateVersion orchestrates the version creation.

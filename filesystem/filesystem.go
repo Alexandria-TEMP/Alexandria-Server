@@ -164,42 +164,36 @@ func (filesystem *Filesystem) CountRenderFiles() int {
 	return len(files)
 }
 
-// Returns the rendered project post wrapped in a OutgoingFileForm with the content-type
-func (filesystem *Filesystem) GetRenderFile() (forms.OutgoingFileForm, string, error) {
-	var outgoingFileForm forms.OutgoingFileForm
-
+// Returns the rendered project as binary large object, ie a byte slice
+func (filesystem *Filesystem) GetRenderFile() ([]byte, error) {
 	// Check if directory exists
 	files, err := os.ReadDir(filesystem.CurrentRenderDirPath)
 
 	if err != nil {
-		return outgoingFileForm, "", errors.New("invalid directory")
+		return nil, errors.New("invalid directory")
 	}
 
 	// Check directory contains 1 file exactly
 	if len(files) != 1 {
-		return outgoingFileForm, "", fmt.Errorf("expected 1 file, but found %v", len(files))
+		return nil, fmt.Errorf("expected 1 file, but found %v", len(files))
 	}
 
 	// Get filename and check extension is html
 	fileName := files[0].Name()
 
 	if ext := path.Ext(fileName); ext != ".html" {
-		return outgoingFileForm, "", fmt.Errorf("expected .html file, but found %v", ext)
+		return nil, fmt.Errorf("expected .html file, but found %v", ext)
 	}
 
 	// Create multipart file
 	filePath := filepath.Join(filesystem.CurrentRenderDirPath, fileName)
-	rawFile, contentType, err := CreateMultipartFile(filePath)
+	file, err := CreateByteSliceFile(filePath)
 
 	if err != nil {
-		return outgoingFileForm, "", err
+		return nil, err
 	}
 
-	outgoingFileForm = forms.OutgoingFileForm{
-		File: &rawFile,
-	}
-
-	return outgoingFileForm, contentType, nil
+	return file, nil
 }
 
 // GetRepositoryFile return as zipped quarto project after validating that it exists, together the content type
