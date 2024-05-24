@@ -1,4 +1,5 @@
-FROM golang:1.22.2 as build
+# FROM golang:1.22.2 as build
+FROM janneskelso/go-with-quarto:alpha as build
  
 ARG GOPKG
 ARG GOBIN
