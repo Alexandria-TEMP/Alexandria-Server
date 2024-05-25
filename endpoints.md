@@ -35,16 +35,18 @@
 - `/discussions`
   - `POST` (mandatory version ID, optional parent discussion ID)
   - `/:id` `GET` (for nested discussions)
-- `/:id/replies` `GET` all discussions with that parent id
-- `/:id` `DELETE`
-- `/:id/reports` `POST` (wahhh)
-- `/:id/reports` `GET` **_p_**
+  - `/:id/replies` `GET` all discussions with that parent id
+  - `/:id` `DELETE`
+  - `/:id/reports` `POST` (wahhh)
+  - `/:id/reports` `GET` **_p_**
 - `/merge-requests`
   - `POST`
   - `PUT` (?)
   - `/:id` `GET`
   - `/:id` `DELETE`
-  - `/:id/reviews` `GET` (returns full DTOs of all reviews)
+  - `/:id/reviews` `GET` (gets acceptance status of all reviews)
+  - `/:id/reviews/:id` `GET` (gets specific review)
   - `/:id/reviews` `POST` (does the merge - make sure to refresh page)
   - `/:id/reviews/can-review` `GET` (utility endpoint for front-end - allowed to review?)
 - `/filter` `GET` (form with a bunch of parameters) **_p_**
+- `/tags/scientific` `GET` (returns full list of all scientific field tags)
