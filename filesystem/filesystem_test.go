@@ -81,10 +81,9 @@ func TestGetRenderFileSuccess(t *testing.T) {
 	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
 
 	// Test GetRenderFile
-	fileForm, contentType, err := CurrentFilesystem.GetRenderFile()
+	file, err := CurrentFilesystem.GetRenderFile()
 	assert.Nil(t, err)
-	assert.NotNil(t, fileForm)
-	assert.Equal(t, "multipart/form-data; boundary=", contentType[:30])
+	assert.Equal(t, []byte{53, 54, 55, 56}, file)
 }
 
 func TestGetRenderFileFailure1(t *testing.T) {
@@ -93,7 +92,7 @@ func TestGetRenderFileFailure1(t *testing.T) {
 	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
 
 	// Test GetRenderFile
-	_, _, err := CurrentFilesystem.GetRenderFile()
+	_, err := CurrentFilesystem.GetRenderFile()
 	assert.NotNil(t, err)
 }
 
@@ -103,7 +102,7 @@ func TestGetRenderFileFailure2(t *testing.T) {
 	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
 
 	// Test GetRenderFile
-	_, _, err := CurrentFilesystem.GetRenderFile()
+	_, err := CurrentFilesystem.GetRenderFile()
 	assert.NotNil(t, err)
 }
 

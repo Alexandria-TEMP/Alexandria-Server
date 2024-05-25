@@ -80,7 +80,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		}
 
 		// Verify that a render was produced in the form of a single file
-		if numFiles := versionService.Filesystem.CountRenderFiles(); numFiles != 1 {
+		if exists, _ := versionService.Filesystem.RenderExists(); !exists {
 			version.RenderStatus = models.Failure
 			_ = versionService.Filesystem.RemoveRepository()
 		}
@@ -206,6 +206,13 @@ func (versionService *VersionService) GetRender(versionID, postID uint) ([]byte,
 
 	// Set current version
 	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+
+	// Check that render exists, if not update render status to failed and return 404
+	if exists, _ := versionService.Filesystem.RenderExists(); !exists {
+		version.RenderStatus = models.Failure
+		versionService.VersionRepository.Update(version)
+		return nil, nil, fmt.Errorf("version failed to render")
+	}
 
 	// Get render file
 	file, err := versionService.Filesystem.GetRenderFile()

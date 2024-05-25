@@ -153,39 +153,40 @@ func (filesystem *Filesystem) RemoveRepository() error {
 	return nil
 }
 
-// CountRenderFiles counts how many files are at the render directory of this version
-func (filesystem *Filesystem) CountRenderFiles() int {
+// RenderExists checks if the render exists and is a single html file
+// Returns a bool and the name of the file if it does exist
+func (filesystem *Filesystem) RenderExists() (bool, string) {
 	files, err := os.ReadDir(filesystem.CurrentRenderDirPath)
 
 	if err != nil {
-		return 0
-	}
-
-	return len(files)
-}
-
-// Returns the rendered project as binary large object, ie a byte slice
-func (filesystem *Filesystem) GetRenderFile() ([]byte, error) {
-	// Check if directory exists
-	files, err := os.ReadDir(filesystem.CurrentRenderDirPath)
-
-	if err != nil {
-		return nil, errors.New("invalid directory")
+		return false, ""
 	}
 
 	// Check directory contains 1 file exactly
 	if len(files) != 1 {
-		return nil, fmt.Errorf("expected 1 file, but found %v", len(files))
+		return false, ""
 	}
 
 	// Get filename and check extension is html
 	fileName := files[0].Name()
 
 	if ext := path.Ext(fileName); ext != ".html" {
-		return nil, fmt.Errorf("expected .html file, but found %v", ext)
+		return false, ""
 	}
 
-	// Create multipart file
+	return true, fileName
+}
+
+// Returns the rendered project as binary large object, ie a byte slice
+func (filesystem *Filesystem) GetRenderFile() ([]byte, error) {
+	// Check if directory exists
+	exists, fileName := filesystem.RenderExists()
+
+	if !exists {
+		return nil, fmt.Errorf("render doesn't exist or is invalid")
+	}
+
+	// Create blob
 	filePath := filepath.Join(filesystem.CurrentRenderDirPath, fileName)
 	file, err := CreateByteSliceFile(filePath)
 

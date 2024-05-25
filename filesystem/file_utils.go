@@ -95,7 +95,7 @@ func CreateMultipartFile(filePath string) (io.Reader, string, error) {
 
 // CreateByteSliceFile converts file at filpath into blob
 func CreateByteSliceFile(filepath string) ([]byte, error) {
-	file, err := os.ReadFile("myfile.txt") //read the content of file
+	file, err := os.ReadFile(filepath) //read the content of file
 	if err != nil {
 		return nil, err
 	}

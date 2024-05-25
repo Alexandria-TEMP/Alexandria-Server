@@ -15,7 +15,7 @@ type Filesystem interface {
 	Unzip() error
 	RemoveProjectDirectory() error
 	RemoveRepository() error
-	CountRenderFiles() int
+	RenderExists() (bool, string)
 	GetCurrentDirPath() string
 	GetCurrentQuartoDirPath() string
 	GetCurrentZipFilePath() string
