@@ -14,7 +14,6 @@ import (
 	reflect "reflect"
 
 	gin "github.com/gin-gonic/gin"
-	forms "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -110,22 +109,6 @@ func (m *MockFilesystem) GetRenderFile() ([]byte, error) {
 func (mr *MockFilesystemMockRecorder) GetRenderFile() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRenderFile", reflect.TypeOf((*MockFilesystem)(nil).GetRenderFile))
-}
-
-// GetRepositoryFile mocks base method.
-func (m *MockFilesystem) GetRepositoryFile() (forms.OutgoingFileForm, string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRepositoryFile")
-	ret0, _ := ret[0].(forms.OutgoingFileForm)
-	ret1, _ := ret[1].(string)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
-}
-
-// GetRepositoryFile indicates an expected call of GetRepositoryFile.
-func (mr *MockFilesystemMockRecorder) GetRepositoryFile() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRepositoryFile", reflect.TypeOf((*MockFilesystem)(nil).GetRepositoryFile))
 }
 
 // RemoveProjectDirectory mocks base method.

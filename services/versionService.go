@@ -11,7 +11,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	filesysteminterface "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 )
 
@@ -20,18 +19,12 @@ type VersionService struct {
 	Filesystem        filesysteminterface.Filesystem
 }
 
-// CreateVersion orchestrates the version creation.
-// 1. creates a new version with the pending render status.
-// 2. saves the file to its directory
-// 3. return a status 200 to client
-// 4. unzip file
-// 5. render project and update render status
-// 6. delete unzipped project files
-// TODO: persist data
 func (versionService *VersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (*models.Version, error) {
+	// Create version, with pending render status
 	version := models.Version{
 		RenderStatus: models.Pending,
 	}
+	_ = versionService.VersionRepository.Create(&version)
 	versionID := version.ID
 
 	// Set paths in filesystem
@@ -39,17 +32,22 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 
 	// Save zip file
 	if err := versionService.Filesystem.SaveRepository(c, file); err != nil {
+		version.RenderStatus = models.Failure
+		_, _ = versionService.VersionRepository.Update(&version)
 		_ = versionService.Filesystem.RemoveRepository()
+
 		return &version, err
 	}
 
-	// Start goroutine to render after responding to client.
-	// If it fails at any point we update the renderstatus to failure and remove the directory to this repository.
-	// If it succeeds we will update the renderstatus to success and remove the quarto project directory.
+	// Start goroutine to render the repository.
+	// This runs parallel to our response being sent, and will likely finish at a later point in time.
+	// If it fails at any point we update the render status to failure and remove this repository.
+	// If it succeeds we will update the renderstatus to success.
 	go func() {
 		// Unzip saved file
 		if err := versionService.Filesystem.Unzip(); err != nil {
 			version.RenderStatus = models.Failure
+			_, _ = versionService.VersionRepository.Update(&version)
 			_ = versionService.Filesystem.RemoveRepository()
 
 			return
@@ -58,6 +56,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		// Validate project
 		if valid := versionService.IsValidProject(); !valid {
 			version.RenderStatus = models.Failure
+			_, _ = versionService.VersionRepository.Update(&version)
 			_ = versionService.Filesystem.RemoveRepository()
 
 			return
@@ -66,6 +65,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		// Install dependencies
 		if err := versionService.InstallRenderDependencies(); err != nil {
 			version.RenderStatus = models.Failure
+			_, _ = versionService.VersionRepository.Update(&version)
 			_ = versionService.Filesystem.RemoveRepository()
 
 			return
@@ -74,6 +74,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		// Render quarto project
 		if err := versionService.RenderProject(); err != nil {
 			version.RenderStatus = models.Failure
+			_, _ = versionService.VersionRepository.Update(&version)
 			_ = versionService.Filesystem.RemoveRepository()
 
 			return
@@ -82,18 +83,12 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		// Verify that a render was produced in the form of a single file
 		if exists, _ := versionService.Filesystem.RenderExists(); !exists {
 			version.RenderStatus = models.Failure
+			_, _ = versionService.VersionRepository.Update(&version)
 			_ = versionService.Filesystem.RemoveRepository()
-		}
-
-		// Remove unzipped project file
-		if err := versionService.Filesystem.RemoveProjectDirectory(); err != nil {
-			version.RenderStatus = models.Failure
-			_ = versionService.Filesystem.RemoveRepository()
-
-			return
 		}
 
 		version.RenderStatus = models.Success
+		versionService.VersionRepository.Update(&version)
 	}()
 
 	return &version, nil
@@ -184,24 +179,22 @@ func (versionService *VersionService) IsValidProject() bool {
 	return true
 }
 
-// GetRender return a blob of the renderer repository.
-// Error 1 is for status 202.
-// Error 2 is for status 404.
-func (versionService *VersionService) GetRender(versionID, postID uint) ([]byte, error, error) {
+func (versionService *VersionService) GetRenderFile(versionID, postID uint) (string, error, error) {
 	version, err := versionService.VersionRepository.GetByID(versionID)
+	var filePath string
 
 	if err != nil {
-		return nil, nil, fmt.Errorf("no such version exists")
+		return filePath, nil, fmt.Errorf("no such version exists")
 	}
 
 	// If pending return error 202
 	if version.RenderStatus == models.Pending {
-		return nil, fmt.Errorf("version still rendering"), nil
+		return filePath, fmt.Errorf("version still rendering"), nil
 	}
 
 	// If failure return error 404
 	if version.RenderStatus == models.Failure {
-		return nil, nil, fmt.Errorf("version failed to render")
+		return filePath, nil, fmt.Errorf("version failed to render")
 	}
 
 	// Set current version
@@ -210,24 +203,22 @@ func (versionService *VersionService) GetRender(versionID, postID uint) ([]byte,
 	// Check that render exists, if not update render status to failed and return 404
 	if exists, _ := versionService.Filesystem.RenderExists(); !exists {
 		version.RenderStatus = models.Failure
-		versionService.VersionRepository.Update(version)
-		return nil, nil, fmt.Errorf("version failed to render")
+		_, _ = versionService.VersionRepository.Update(version)
+
+		return filePath, nil, fmt.Errorf("version failed to render")
 	}
 
-	// Get render file
-	file, err := versionService.Filesystem.GetRenderFile()
-
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return file, nil, nil
+	return versionService.Filesystem.GetCurrentRenderDirPath(), nil, nil
 }
 
-func (versionService *VersionService) GetRepository(versionID, postID uint) (forms.OutgoingFileForm, string, error) {
+func (versionService *VersionService) GetRepositoryFile(versionID, postID uint) (string, error) {
 	// Set current version
 	versionService.Filesystem.SetCurrentVersion(versionID, postID)
 
-	// Get repository file
-	return versionService.Filesystem.GetRepositoryFile()
+	// Check that render exists, if not update render status to failed and return 404
+	if exists := filesystem.FileExists(versionService.Filesystem.GetCurrentZipFilePath()); !exists {
+		return "", fmt.Errorf("no such file exists")
+	}
+
+	return versionService.Filesystem.GetCurrentZipFilePath(), nil
 }

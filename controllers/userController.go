@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -10,7 +9,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 type UserController struct {
@@ -25,7 +23,7 @@ type UserController struct {
 // @Produce		json
 // @Success 	200 		{object}	models.Member
 // @Failure		400 		{object} 	utils.HTTPError
-// @Failure		410 		{object} 	utils.HTTPError
+// @Failure		404 		{object} 	utils.HTTPError
 // @Router 		/member/{userID}	[get]
 func (userController *UserController) GetMember(c *gin.Context) {
 	// extract the id of the member
@@ -33,8 +31,7 @@ func (userController *UserController) GetMember(c *gin.Context) {
 	userID, err := strconv.ParseUint(userIDStr, 10, 64)
 	// if this caused an error, print it
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%s ", userIDStr)})
 
 		return
 	}
@@ -43,8 +40,7 @@ func (userController *UserController) GetMember(c *gin.Context) {
 
 	// if there was an error, print it and return
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot get member because no user with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot get member because no user with this ID exists")})
 
 		return
 	}
@@ -71,8 +67,7 @@ func (userController *UserController) CreateMember(c *gin.Context) {
 
 	// check for errors
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind userCreationForm from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind userCreationForm from request body")})
 
 		return
 	}
@@ -93,7 +88,7 @@ func (userController *UserController) CreateMember(c *gin.Context) {
 // @Produce		json
 // @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
-// @Failure		410 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
 // @Router 		/member 		[put]
 func (userController *UserController) UpdateMember(c *gin.Context) {
 	// get the new member object
@@ -102,8 +97,7 @@ func (userController *UserController) UpdateMember(c *gin.Context) {
 
 	// check for errors
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind updated user from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind updated user from request body")})
 
 		return
 	}
@@ -113,8 +107,7 @@ func (userController *UserController) UpdateMember(c *gin.Context) {
 
 	// check for errors again
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update user because no user with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot update user because no user with this ID exists")})
 
 		return
 	}
@@ -132,7 +125,7 @@ func (userController *UserController) UpdateMember(c *gin.Context) {
 // @Produce		json
 // @Success 	200 		{object}	models.Collaborator
 // @Failure		400 		{object} 	utils.HTTPError
-// @Failure		410 		{object} 	utils.HTTPError
+// @Failure		404 		{object} 	utils.HTTPError
 // @Router 		/collaborator/{userID}	[get]
 func (userController *UserController) GetCollaborator(c *gin.Context) {
 	// get the user id from the input
@@ -141,8 +134,7 @@ func (userController *UserController) GetCollaborator(c *gin.Context) {
 
 	// check for errors
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr)})
 
 		return
 	}
@@ -152,8 +144,7 @@ func (userController *UserController) GetCollaborator(c *gin.Context) {
 
 	// check if collaborator found and returned successfully
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot get project user because no user with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot get project user because no user with this ID exists")})
 
 		return
 	}
@@ -179,8 +170,7 @@ func (userController *UserController) CreateCollaborator(c *gin.Context) {
 
 	// check for errors
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind CollaboratorCreationForm from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind CollaboratorCreationForm from request body")})
 
 		return
 	}
@@ -201,7 +191,7 @@ func (userController *UserController) CreateCollaborator(c *gin.Context) {
 // @Produce		json
 // @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
-// @Failure		410 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
 // @Router 		/collaborator 		[put]
 func (userController *UserController) UpdateCollaborator(c *gin.Context) {
 	// extract the collaborator from the param
@@ -210,8 +200,7 @@ func (userController *UserController) UpdateCollaborator(c *gin.Context) {
 
 	// check for errors in the binding
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind updated collaborator from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind updated collaborator from request body")})
 
 		return
 	}
@@ -221,8 +210,7 @@ func (userController *UserController) UpdateCollaborator(c *gin.Context) {
 
 	// check for errors in database connection
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update user because no Projectuser with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot update user because no Projectuser with this ID exists")})
 
 		return
 	}

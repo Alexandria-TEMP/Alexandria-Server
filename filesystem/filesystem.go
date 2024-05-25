@@ -2,7 +2,6 @@ package filesystem
 
 import (
 	"archive/zip"
-	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -12,7 +11,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 )
 
 type Filesystem struct {
@@ -131,17 +129,6 @@ func (filesystem *Filesystem) Unzip() error {
 	return nil
 }
 
-// RemoveProjectDirectory only removes the unzipped files, not the zip file or the render
-func (filesystem *Filesystem) RemoveProjectDirectory() error {
-	err := os.RemoveAll(filesystem.CurrentQuartoDirPath)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // RemoveRepository entirely removes a version repository if it is not valid
 func (filesystem *Filesystem) RemoveRepository() error {
 	err := os.RemoveAll(filesystem.CurrentDirPath)
@@ -155,7 +142,7 @@ func (filesystem *Filesystem) RemoveRepository() error {
 
 // RenderExists checks if the render exists and is a single html file
 // Returns a bool and the name of the file if it does exist
-func (filesystem *Filesystem) RenderExists() (bool, string) {
+func (filesystem *Filesystem) RenderExists() (exists bool, name string) {
 	files, err := os.ReadDir(filesystem.CurrentRenderDirPath)
 
 	if err != nil {
@@ -197,25 +184,29 @@ func (filesystem *Filesystem) GetRenderFile() ([]byte, error) {
 	return file, nil
 }
 
-// GetRepositoryFile return as zipped quarto project after validating that it exists, together the content type
-func (filesystem *Filesystem) GetRepositoryFile() (forms.OutgoingFileForm, string, error) {
-	var outgoingFileForm forms.OutgoingFileForm
+// // GetRepositoryFile return as zipped quarto project after validating that it exists, together the content type
+// func (filesystem *Filesystem) GetRepositoryFile() (forms.OutgoingFileForm, string, error) {
+// 	var outgoingFileForm forms.OutgoingFileForm
 
-	// Check if file exists
-	if !FileExists(filesystem.CurrentZipFilePath) {
-		return outgoingFileForm, "", errors.New("this project doesn't exist")
-	}
+// 	// Check if file exists
+// 	if !FileExists(filesystem.CurrentZipFilePath) {
+// 		return outgoingFileForm, "", errors.New("this project doesn't exist")
+// 	}
 
-	// Create multipart file
-	rawFile, contentType, err := CreateMultipartFile(filesystem.CurrentZipFilePath)
+// 	// Create multipart file
+// 	rawFile, contentType, err := CreateMultipartFile(filesystem.CurrentZipFilePath)
 
-	if err != nil {
-		return outgoingFileForm, "", err
-	}
+// 	if err != nil {
+// 		return outgoingFileForm, "", err
+// 	}
 
-	outgoingFileForm = forms.OutgoingFileForm{
-		File: &rawFile,
-	}
+// 	outgoingFileForm = forms.OutgoingFileForm{
+// 		File: &rawFile,
+// 	}
 
-	return outgoingFileForm, contentType, nil
-}
+// 	return outgoingFileForm, contentType, nil
+// }
+
+// func (filesystem *Filesystem) GetOneRepositoryFile(relativeFilePath string) (forms.OutgoingFileForm, string, error) {
+// 	var outgoingFileForm forms.OutgoingFileForm
+// }

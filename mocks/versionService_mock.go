@@ -14,7 +14,6 @@ import (
 	reflect "reflect"
 
 	gin "github.com/gin-gonic/gin"
-	forms "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	models "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -57,36 +56,20 @@ func (mr *MockVersionServiceMockRecorder) CreateVersion(c, file, postID any) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateVersion", reflect.TypeOf((*MockVersionService)(nil).CreateVersion), c, file, postID)
 }
 
-// GetRender mocks base method.
-func (m *MockVersionService) GetRender(versionID, postID uint) ([]byte, error, error) {
+// GetRenderFile mocks base method.
+func (m *MockVersionService) GetRenderFile(versionID, postID uint) (string, error, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRender", versionID, postID)
-	ret0, _ := ret[0].([]byte)
+	ret := m.ctrl.Call(m, "GetRenderFile", versionID, postID)
+	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
 }
 
-// GetRender indicates an expected call of GetRender.
-func (mr *MockVersionServiceMockRecorder) GetRender(versionID, postID any) *gomock.Call {
+// GetRenderFile indicates an expected call of GetRenderFile.
+func (mr *MockVersionServiceMockRecorder) GetRenderFile(versionID, postID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRender", reflect.TypeOf((*MockVersionService)(nil).GetRender), versionID, postID)
-}
-
-// GetRepository mocks base method.
-func (m *MockVersionService) GetRepository(versionID, postID uint) (forms.OutgoingFileForm, string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRepository", versionID, postID)
-	ret0, _ := ret[0].(forms.OutgoingFileForm)
-	ret1, _ := ret[1].(string)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
-}
-
-// GetRepository indicates an expected call of GetRepository.
-func (mr *MockVersionServiceMockRecorder) GetRepository(versionID, postID any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRepository", reflect.TypeOf((*MockVersionService)(nil).GetRepository), versionID, postID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRenderFile", reflect.TypeOf((*MockVersionService)(nil).GetRenderFile), versionID, postID)
 }
 
 // RenderProject mocks base method.

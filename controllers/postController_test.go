@@ -56,7 +56,7 @@ func TestGetPost400(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
-func TestGetPost410(t *testing.T) {
+func TestGetPost404(t *testing.T) {
 	beforeEach(t)
 
 	mockPostService.EXPECT().GetPost(uint64(1)).Return(&models.Post{}, errors.New("some error")).Times(1)
@@ -67,7 +67,7 @@ func TestGetPost410(t *testing.T) {
 
 	defer responseRecorder.Result().Body.Close()
 
-	assert.Equal(t, http.StatusGone, responseRecorder.Result().StatusCode)
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
 
 func TestCreatePost200(t *testing.T) {
@@ -129,7 +129,7 @@ func TestUpdatePost400(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
-func TestUpdatePost410(t *testing.T) {
+func TestUpdatePost404(t *testing.T) {
 	beforeEach(t)
 
 	mockPostService.EXPECT().UpdatePost(&examplePost).Return(errors.New("some error")).Times(1)
@@ -140,7 +140,7 @@ func TestUpdatePost410(t *testing.T) {
 
 	defer responseRecorder.Result().Body.Close()
 
-	assert.Equal(t, http.StatusGone, responseRecorder.Result().StatusCode)
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
 
 func TestGetProjectPost200(t *testing.T) {
@@ -176,7 +176,7 @@ func TestGetProjectPost400(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
-func TestGetProjectPost410(t *testing.T) {
+func TestGetProjectPost404(t *testing.T) {
 	beforeEach(t)
 
 	mockPostService.EXPECT().GetProjectPost(uint64(1)).Return(&models.ProjectPost{}, errors.New("some error")).Times(1)
@@ -187,7 +187,7 @@ func TestGetProjectPost410(t *testing.T) {
 
 	defer responseRecorder.Result().Body.Close()
 
-	assert.Equal(t, http.StatusGone, responseRecorder.Result().StatusCode)
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
 
 func TestCreateProjectPost200(t *testing.T) {
@@ -249,7 +249,7 @@ func TestUpdateProjectPost400(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
-func TestUpdateProjectPost410(t *testing.T) {
+func TestUpdateProjectPost404(t *testing.T) {
 	beforeEach(t)
 
 	mockPostService.EXPECT().UpdateProjectPost(&exampleProjectPost).Return(errors.New("some error")).Times(1)
@@ -260,5 +260,5 @@ func TestUpdateProjectPost410(t *testing.T) {
 
 	defer responseRecorder.Result().Body.Close()
 
-	assert.Equal(t, http.StatusGone, responseRecorder.Result().StatusCode)
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }

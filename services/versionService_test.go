@@ -109,7 +109,7 @@ func TestGetRenderFileSuccess(t *testing.T) {
 	mockFilesystem.EXPECT().RenderExists().Return(true, "").Times(1)
 	mockFilesystem.EXPECT().GetRenderFile().Return([]byte{53, 54, 55, 56}, nil).Times(1)
 
-	file, err202, err404 := versionService.GetRender(2, 0)
+	file, err202, err404 := versionService.GetRenderFile(2, 0)
 
 	assert.Nil(t, err202)
 	assert.Nil(t, err404)
@@ -126,7 +126,7 @@ func TestGetRenderFileFailure1(t *testing.T) {
 	mockFilesystem.EXPECT().RenderExists().Times(0)
 	mockFilesystem.EXPECT().GetRenderFile().Times(0)
 
-	_, err202, err404 := versionService.GetRender(0, 0)
+	_, err202, err404 := versionService.GetRenderFile(0, 0)
 
 	assert.NotNil(t, err202)
 	assert.Nil(t, err404)

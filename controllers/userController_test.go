@@ -56,7 +56,7 @@ func TestGetMember400(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
-func TestGetMember410(t *testing.T) {
+func TestGetMember404(t *testing.T) {
 	beforeEachUser(t)
 
 	mockUserService.EXPECT().GetMember(uint64(1)).Return(&models.Member{}, errors.New("some error")).Times(1)
@@ -67,7 +67,7 @@ func TestGetMember410(t *testing.T) {
 
 	defer responseRecorder.Result().Body.Close()
 
-	assert.Equal(t, http.StatusGone, responseRecorder.Result().StatusCode)
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
 
 func TestCreateMember200(t *testing.T) {
@@ -129,7 +129,7 @@ func TestUpdateMember400(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
-func TestUpdateMember410(t *testing.T) {
+func TestUpdateMember404(t *testing.T) {
 	beforeEachUser(t)
 
 	mockUserService.EXPECT().UpdateMember(&exampleMember).Return(errors.New("some error")).Times(1)
@@ -140,7 +140,7 @@ func TestUpdateMember410(t *testing.T) {
 
 	defer responseRecorder.Result().Body.Close()
 
-	assert.Equal(t, http.StatusGone, responseRecorder.Result().StatusCode)
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
 
 func TestGetCollaborator200(t *testing.T) {
@@ -172,7 +172,7 @@ func TestGetCollaborator400(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
-func TestGetCollaborator410(t *testing.T) {
+func TestGetCollaborator404(t *testing.T) {
 	beforeEachUser(t)
 
 	mockUserService.EXPECT().GetCollaborator(uint64(1)).Return(&models.PostCollaborator{}, errors.New("some error")).Times(1)
@@ -183,7 +183,7 @@ func TestGetCollaborator410(t *testing.T) {
 
 	defer responseRecorder.Result().Body.Close()
 
-	assert.Equal(t, http.StatusGone, responseRecorder.Result().StatusCode)
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
 
 func TestCreateCollaborator200(t *testing.T) {
@@ -245,7 +245,7 @@ func TestUpdateCollaborator400(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
-func TestUpdateCollaborator410(t *testing.T) {
+func TestUpdateCollaborator404(t *testing.T) {
 	beforeEachUser(t)
 
 	mockUserService.EXPECT().UpdateCollaborator(&exampleCollaborator).Return(errors.New("some error")).Times(1)
@@ -256,5 +256,5 @@ func TestUpdateCollaborator410(t *testing.T) {
 
 	defer responseRecorder.Result().Body.Close()
 
-	assert.Equal(t, http.StatusGone, responseRecorder.Result().StatusCode)
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
