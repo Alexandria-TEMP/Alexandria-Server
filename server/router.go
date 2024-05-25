@@ -37,7 +37,7 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	versionRouter.POST("/:postID", controllers.versionController.CreateVersion)
 	versionRouter.GET("/:postID/:versionID/render", controllers.versionController.GetRender)
 	versionRouter.GET("/:postID/:versionID/repository", controllers.versionController.GetRepository)
-	versionRouter.GET("/:postID/:versionID/tree/*filepath", controllers.versionController.GetTreeFromRepository)
+	versionRouter.GET("/:postID/:versionID/tree", controllers.versionController.GetTreeFromRepository)
 	versionRouter.GET("/:postID/:versionID/blob/*filepath", controllers.versionController.GetFileFromRepository)
 
 	memberRouter := v1.Group("/member")

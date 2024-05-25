@@ -222,3 +222,30 @@ func (versionService *VersionService) GetRepositoryFile(versionID, postID uint) 
 
 	return versionService.Filesystem.GetCurrentZipFilePath(), nil
 }
+
+func (versionService *VersionService) GetTreeFromRepository(versionID, postID uint) (map[string]int64, error, error) {
+	// Set current version
+	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+
+	// Check that render exists, if not update render status to failed and return 404
+	if exists := filesystem.FileExists(versionService.Filesystem.GetCurrentQuartoDirPath()); !exists {
+		return nil, fmt.Errorf("no such directory exists"), nil
+	}
+
+	fileTree, err := versionService.Filesystem.GetFileTree()
+
+	return fileTree, nil, err
+}
+
+func (versionService *VersionService) GetFileFromRepository(versionID, postID uint, relFilepath string) (string, error) {
+	// Set current version
+	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+	absFilepath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), relFilepath)
+
+	// Check that file exists, if not return 404
+	if exists := filesystem.FileExists(absFilepath); !exists {
+		return "", fmt.Errorf("no such file exists")
+	}
+
+	return absFilepath, nil
+}

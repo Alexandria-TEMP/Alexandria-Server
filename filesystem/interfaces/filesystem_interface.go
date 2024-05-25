@@ -19,6 +19,5 @@ type Filesystem interface {
 	GetCurrentZipFilePath() string
 	GetCurrentRenderDirPath() string
 	GetRenderFile() ([]byte, error)
-	// GetRepositoryFile() (forms.OutgoingFileForm, string, error)
-	// GetOneRepositoryFile() (forms.OutgoingFileForm, string, error)
+	GetFileTree() (map[string]int64, error)
 }

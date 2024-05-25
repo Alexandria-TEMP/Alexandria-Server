@@ -184,29 +184,31 @@ func (filesystem *Filesystem) GetRenderFile() ([]byte, error) {
 	return file, nil
 }
 
-// // GetRepositoryFile return as zipped quarto project after validating that it exists, together the content type
-// func (filesystem *Filesystem) GetRepositoryFile() (forms.OutgoingFileForm, string, error) {
-// 	var outgoingFileForm forms.OutgoingFileForm
+// GetFileTree returns a map of all filepaths in a quarto project and their size in bytes
+func (filesystem Filesystem) GetFileTree() (map[string]int64, error) {
+	var fileTree map[string]int64
 
-// 	// Check if file exists
-// 	if !FileExists(filesystem.CurrentZipFilePath) {
-// 		return outgoingFileForm, "", errors.New("this project doesn't exist")
-// 	}
+	// Recursively find all files in quarto project and add path and size to map
+	err := filepath.Walk(filesystem.CurrentQuartoDirPath,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
 
-// 	// Create multipart file
-// 	rawFile, contentType, err := CreateMultipartFile(filesystem.CurrentZipFilePath)
+			relativePath, err := filepath.Rel(filesystem.CurrentQuartoDirPath, path)
 
-// 	if err != nil {
-// 		return outgoingFileForm, "", err
-// 	}
+			if err != nil {
+				return err
+			}
 
-// 	outgoingFileForm = forms.OutgoingFileForm{
-// 		File: &rawFile,
-// 	}
+			fileTree[relativePath] = info.Size()
 
-// 	return outgoingFileForm, contentType, nil
-// }
+			return nil
+		})
 
-// func (filesystem *Filesystem) GetOneRepositoryFile(relativeFilePath string) (forms.OutgoingFileForm, string, error) {
-// 	var outgoingFileForm forms.OutgoingFileForm
-// }
+	if err != nil {
+		return nil, nil
+	}
+
+	return fileTree, nil
+}
