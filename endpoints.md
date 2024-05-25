@@ -26,15 +26,19 @@
   - `/:id/open-merge-requests/` `GET` (returns MR DTOs) **_p_**
   - `/:id/closed-merge-requests/` `GET` (returns MR DTOs) **_p_**
 - `/versions`
+  - `POST`
   - `/:id` `GET` (get the files?)
+  - `/:id/file` (get one specific file)
+  - `/:id/tree`
   - `/:id` `/render` `GET`
   - `/:id/discussions` `GET` (gets all level-1 discussions of the version) **_p_**
 - `/discussions`
   - `POST` (mandatory version ID, optional parent discussion ID)
   - `/:id` `GET` (for nested discussions)
-  - `/:id` `DELETE`
-  - `/:id/reports` `POST` (wahhh)
-  - `/:id/reports` `GET` **_p_**
+- `/:id/replies` `GET` all discussions with that parent id
+- `/:id` `DELETE`
+- `/:id/reports` `POST` (wahhh)
+- `/:id/reports` `GET` **_p_**
 - `/merge-requests`
   - `POST`
   - `PUT` (?)
