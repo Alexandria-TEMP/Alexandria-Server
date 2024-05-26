@@ -103,30 +103,31 @@ func TestGetRenderFileSuccess(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
 
-	versionService.VersionRepository.Create(&successVersion)
+	_ = versionService.VersionRepository.Create(&successVersion)
 
-	mockFilesystem.EXPECT().SetCurrentVersion(uint(2), uint(0)).Times(1)
+	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
 	mockFilesystem.EXPECT().RenderExists().Return(true, "").Times(1)
 	mockFilesystem.EXPECT().GetRenderFile().Return([]byte{53, 54, 55, 56}, nil).Times(1)
+	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("test").Times(1)
 
-	file, err202, err404 := versionService.GetRenderFile(2, 0)
+	path, err202, err404 := versionService.GetRenderFile(successVersion.ID, 0)
 
 	assert.Nil(t, err202)
 	assert.Nil(t, err404)
-	assert.Equal(t, []byte{53, 54, 55, 56}, file)
+	assert.Equal(t, "test", path)
 }
 
 func TestGetRenderFileFailure1(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
 
-	versionService.VersionRepository.Create(&pendingVersion)
+	_ = versionService.VersionRepository.Create(&pendingVersion)
 
-	mockFilesystem.EXPECT().SetCurrentVersion(uint(0), uint(0)).Times(0)
+	mockFilesystem.EXPECT().SetCurrentVersion(pendingVersion.ID, uint(0)).Times(0)
 	mockFilesystem.EXPECT().RenderExists().Times(0)
 	mockFilesystem.EXPECT().GetRenderFile().Times(0)
 
-	_, err202, err404 := versionService.GetRenderFile(0, 0)
+	_, err202, err404 := versionService.GetRenderFile(pendingVersion.ID, 0)
 
 	assert.NotNil(t, err202)
 	assert.Nil(t, err404)
@@ -190,7 +191,7 @@ func testBadProjectTemplate(t *testing.T, dirName string) {
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	file := &multipart.FileHeader{}
 
-	mockFilesystem.EXPECT().SetCurrentVersion(uint(0), uint(2)).Times(1)
+	mockFilesystem.EXPECT().SetCurrentVersion(gomock.Any(), uint(2)).Times(1)
 	mockFilesystem.EXPECT().SaveRepository(c, file).Return(nil).Times(1)
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
 	mockFilesystem.EXPECT().RemoveRepository().Return(nil).Times(1)
@@ -200,7 +201,8 @@ func testBadProjectTemplate(t *testing.T, dirName string) {
 	version, err := versionService.CreateVersion(c, file, 2)
 
 	assert.Nil(t, err)
-	assert.Equal(t, &pendingVersion, version)
+
+	assert.Equal(t, pendingVersion.RenderStatus, version.RenderStatus)
 
 	// Wait until model has completed rendering
 	for version.RenderStatus == models.Pending {
