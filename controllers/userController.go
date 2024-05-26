@@ -30,7 +30,7 @@ func (userController *UserController) GetMember(c *gin.Context) {
 	userIDStr := c.Param("userID")
 	userID, err := strconv.ParseUint(userIDStr, 10, 64)
 	// if this caused an error, print it
-	if err != nil || userID < 0 {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%s ", userIDStr)})
 
 		return
@@ -40,7 +40,7 @@ func (userController *UserController) GetMember(c *gin.Context) {
 
 	// if there was an error, print it and return
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot get member because no user with this ID exists")})
+		c.JSON(http.StatusNotFound, gin.H{"error": "cannot get member because no user with this ID exists"})
 
 		return
 	}
@@ -67,7 +67,7 @@ func (userController *UserController) CreateMember(c *gin.Context) {
 
 	// check for errors
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind userCreationForm from request body")})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind userCreationForm from request body"})
 
 		return
 	}
@@ -97,7 +97,7 @@ func (userController *UserController) UpdateMember(c *gin.Context) {
 
 	// check for errors
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind updated user from request body")})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated user from request body"})
 
 		return
 	}
@@ -107,7 +107,7 @@ func (userController *UserController) UpdateMember(c *gin.Context) {
 
 	// check for errors again
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot update user because no user with this ID exists")})
+		c.JSON(http.StatusNotFound, gin.H{"error": "cannot update user because no user with this ID exists"})
 
 		return
 	}
@@ -130,21 +130,21 @@ func (userController *UserController) UpdateMember(c *gin.Context) {
 func (userController *UserController) GetCollaborator(c *gin.Context) {
 	// get the user id from the input
 	userIDStr := c.Param("userID")
-	userID, err := strconv.ParseInt(userIDStr, 10, 64)
+	userID, err := strconv.ParseUint(userIDStr, 10, 64)
 
 	// check for errors
-	if err != nil || userID < 0 {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr)})
 
 		return
 	}
 
 	// get the collaborator from the database
-	collaborator, err := userController.UserService.GetCollaborator(uint64(userID))
+	collaborator, err := userController.UserService.GetCollaborator(userID)
 
 	// check if collaborator found and returned successfully
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot get project user because no user with this ID exists")})
+		c.JSON(http.StatusNotFound, gin.H{"error": "cannot get project user because no user with this ID exists"})
 
 		return
 	}
@@ -170,7 +170,7 @@ func (userController *UserController) CreateCollaborator(c *gin.Context) {
 
 	// check for errors
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind CollaboratorCreationForm from request body")})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind CollaboratorCreationForm from request body"})
 
 		return
 	}
@@ -200,7 +200,7 @@ func (userController *UserController) UpdateCollaborator(c *gin.Context) {
 
 	// check for errors in the binding
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind updated collaborator from request body")})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated collaborator from request body"})
 
 		return
 	}
@@ -210,7 +210,7 @@ func (userController *UserController) UpdateCollaborator(c *gin.Context) {
 
 	// check for errors in database connection
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot update user because no Projectuser with this ID exists")})
+		c.JSON(http.StatusNotFound, gin.H{"error": "cannot update user because no Projectuser with this ID exists"})
 
 		return
 	}

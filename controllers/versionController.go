@@ -35,16 +35,16 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	file, err := c.FormFile("file")
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("no file found")})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "no file found"})
 
 		return
 	}
 
 	// extract post id
 	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseInt(postIDStr, 10, 64)
+	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
-	if err != nil || postID < 0 {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
 
 		return
@@ -53,7 +53,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	// Create Version
 	version, err := versionController.VersionService.CreateVersion(c, file, uint(postID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create version")})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create version"})
 
 		return
 	}
@@ -77,9 +77,9 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 func (versionController *VersionController) GetRender(c *gin.Context) {
 	// extract post id
 	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseInt(postIDStr, 10, 64)
+	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
-	if err != nil || postID < 0 {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
 
 		return
@@ -87,9 +87,9 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 
 	// extract version id
 	versionIDstr := c.Param("versionID")
-	versionID, err := strconv.ParseInt(versionIDstr, 10, 64)
+	versionID, err := strconv.ParseUint(versionIDstr, 10, 64)
 
-	if err != nil || versionID < 0 {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr)})
 
 		return
@@ -114,7 +114,7 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 	// Set the headers for the file transfer and return the file
 	c.Header("Content-Description", "File Transfer")
 	c.Header("Content-Transfer-Encoding", "binary")
-	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=render.html"))
+	c.Header("Content-Disposition", "attachment; filename=render.html")
 	c.Header("Content-Type", "text/html; charset=utf-8")
 	c.File(filePath)
 }
@@ -133,9 +133,9 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 func (versionController *VersionController) GetRepository(c *gin.Context) {
 	// extract post id
 	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseInt(postIDStr, 10, 64)
+	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
-	if err != nil || postID < 0 {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
 
 		return
@@ -143,9 +143,9 @@ func (versionController *VersionController) GetRepository(c *gin.Context) {
 
 	// extract version id
 	versionIDstr := c.Param("versionID")
-	versionID, err := strconv.ParseInt(versionIDstr, 10, 64)
+	versionID, err := strconv.ParseUint(versionIDstr, 10, 64)
 
-	if err != nil || versionID < 0 {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr)})
 
 		return
@@ -198,9 +198,9 @@ func (versionController *VersionController) GetRepository(c *gin.Context) {
 func (versionController *VersionController) GetTreeFromRepository(c *gin.Context) {
 	// extract post id
 	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseInt(postIDStr, 10, 64)
+	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
-	if err != nil || postID < 0 {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
 
 		return
@@ -208,9 +208,9 @@ func (versionController *VersionController) GetTreeFromRepository(c *gin.Context
 
 	// extract version id
 	versionIDstr := c.Param("versionID")
-	versionID, err := strconv.ParseInt(versionIDstr, 10, 64)
+	versionID, err := strconv.ParseUint(versionIDstr, 10, 64)
 
-	if err != nil || versionID < 0 {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr)})
 
 		return
@@ -250,9 +250,9 @@ func (versionController *VersionController) GetTreeFromRepository(c *gin.Context
 func (versionController *VersionController) GetFileFromRepository(c *gin.Context) {
 	// extract post id
 	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseInt(postIDStr, 10, 64)
+	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
-	if err != nil || postID < 0 {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
 
 		return
@@ -260,9 +260,9 @@ func (versionController *VersionController) GetFileFromRepository(c *gin.Context
 
 	// extract version id
 	versionIDstr := c.Param("versionID")
-	versionID, err := strconv.ParseInt(versionIDstr, 10, 64)
+	versionID, err := strconv.ParseUint(versionIDstr, 10, 64)
 
-	if err != nil || versionID < 0 {
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr)})
 
 		return
@@ -273,7 +273,7 @@ func (versionController *VersionController) GetFileFromRepository(c *gin.Context
 
 	// if files doesnt exist return 404 not found
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("no such file exists")})
+		c.JSON(http.StatusNotFound, gin.H{"error": "no such file exists"})
 
 		return
 	}

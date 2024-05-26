@@ -21,14 +21,11 @@ type VersionService struct {
 
 func (versionService *VersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (*models.Version, error) {
 	// Create version, with pending render status
-	version := models.Version{
-		RenderStatus: models.Pending,
-	}
+	version := models.Version{RenderStatus: models.Pending}
 	_ = versionService.VersionRepository.Create(&version)
-	versionID := version.ID
 
 	// Set paths in filesystem
-	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+	versionService.Filesystem.SetCurrentVersion(version.ID, postID)
 
 	// Save zip file
 	if err := versionService.Filesystem.SaveRepository(c, file); err != nil {
@@ -39,35 +36,27 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		return &version, err
 	}
 
-	// Start goroutine to render the repository.
-	// This runs parallel to our response being sent, and will likely finish at a later point in time.
-	// If it fails at any point before rendering we update the render status to failure and remove the repository.
-	// If it fails at any point after we start rendering we just update the render status to failure.
-	// If it succeeds we will update the renderstatus to success.
+	// This goroutine runs parallel to our response being sent, and will likely finish at a later point in time.
+	// If it fails before rendering we will remove the repository entirely.
+	// If it succeeds we will update the renderstatus to success, otherwise failure.
 	go func() {
 		// Unzip saved file
 		if err := versionService.Filesystem.Unzip(); err != nil {
-			version.RenderStatus = models.Failure
-			_, _ = versionService.VersionRepository.Update(&version)
-			_ = versionService.Filesystem.RemoveRepository()
+			versionService.FailAndRemoveVersion(&version)
 
 			return
 		}
 
 		// Validate project
 		if valid := versionService.IsValidProject(); !valid {
-			version.RenderStatus = models.Failure
-			_, _ = versionService.VersionRepository.Update(&version)
-			_ = versionService.Filesystem.RemoveRepository()
+			versionService.FailAndRemoveVersion(&version)
 
 			return
 		}
 
 		// Install dependencies
 		if err := versionService.InstallRenderDependencies(); err != nil {
-			version.RenderStatus = models.Failure
-			_, _ = versionService.VersionRepository.Update(&version)
-			_ = versionService.Filesystem.RemoveRepository()
+			versionService.FailAndRemoveVersion(&version)
 
 			return
 		}
@@ -84,10 +73,17 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		if exists, _ := versionService.Filesystem.RenderExists(); !exists {
 			version.RenderStatus = models.Failure
 			_, _ = versionService.VersionRepository.Update(&version)
+
+			return
 		}
 
 		version.RenderStatus = models.Success
-		versionService.VersionRepository.Update(&version)
+		if _, err := versionService.VersionRepository.Update(&version); err != nil {
+			version.RenderStatus = models.Failure
+			_, _ = versionService.VersionRepository.Update(&version)
+
+			return
+		}
 	}()
 
 	return &version, nil
@@ -252,4 +248,10 @@ func (versionService *VersionService) GetFileFromRepository(versionID, postID ui
 	}
 
 	return absFilepath, nil
+}
+
+func (versionService *VersionService) FailAndRemoveVersion(version *models.Version) {
+	version.RenderStatus = models.Failure
+	_, _ = versionService.VersionRepository.Update(version)
+	_ = versionService.Filesystem.RemoveRepository()
 }

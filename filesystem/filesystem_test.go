@@ -74,9 +74,9 @@ func TestFileHandling(t *testing.T) {
 	assert.Equal(t, "5678", line)
 
 	// Test removing version repository
-	// err = CurrentFilesystem.RemoveRepository()
-	// assert.Nil(t, err)
-	// assert.False(t, utils.FileExists(CurrentFilesystem.CurrentDirPath))
+	err = CurrentFilesystem.RemoveRepository()
+	assert.Nil(t, err)
+	assert.False(t, utils.FileExists(CurrentFilesystem.CurrentDirPath))
 }
 
 func TestGetFileTreeSuccess(t *testing.T) {

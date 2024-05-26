@@ -293,21 +293,6 @@ func TestGetRenderFileFailure3(t *testing.T) {
 	_ = versionService.VersionRepository.Create(&successVersion)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
-	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("").Times(0)
-
-	_, err202, err404 := versionService.GetRenderFile(successVersion.ID, 0)
-
-	assert.Nil(t, err202)
-	assert.NotNil(t, err404)
-}
-
-func TestGetRenderFileFailure4(t *testing.T) {
-	beforeEach(t)
-	defer cleanup(t)
-
-	_ = versionService.VersionRepository.Create(&successVersion)
-
-	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
 	mockFilesystem.EXPECT().RenderExists().Return(false, "").Times(1)
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("test").Times(0)
 

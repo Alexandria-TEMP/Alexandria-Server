@@ -43,8 +43,27 @@ var (
 // TestMain is a keyword function, this is run by the testing package before other tests
 func TestMain(m *testing.M) {
 	// Setup test router, to test controller endpoints through http
-	router = gin.Default()
+	router = SetUpRouter()
+
+	// Setup objects
+	examplePost = models.Post{}
+	exampleProjectPost = models.ProjectPost{}
+
+	exampleMember = models.Member{}
+	exampleCollaborator = models.PostCollaborator{}
+
+	examplePendingVersion = models.Version{RenderStatus: models.Pending}
+	exampleSuccessVersion = models.Version{RenderStatus: models.Success}
+	exampleFailureVersion = models.Version{RenderStatus: models.Failure}
+
+	cwd, _ = os.Getwd()
+
+	os.Exit(m.Run())
+}
+
+func SetUpRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
+	router = gin.Default()
 
 	router.GET("/api/v1/post/:postID", func(c *gin.Context) {
 		postController.GetPost(c)
@@ -98,18 +117,5 @@ func TestMain(m *testing.M) {
 		versionController.GetFileFromRepository(c)
 	})
 
-	// Setup objects
-	examplePost = models.Post{}
-	exampleProjectPost = models.ProjectPost{}
-
-	exampleMember = models.Member{}
-	exampleCollaborator = models.PostCollaborator{}
-
-	examplePendingVersion = models.Version{RenderStatus: models.Pending}
-	exampleSuccessVersion = models.Version{RenderStatus: models.Success}
-	exampleFailureVersion = models.Version{RenderStatus: models.Failure}
-
-	cwd, _ = os.Getwd()
-
-	os.Exit(m.Run())
+	return router
 }
