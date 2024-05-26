@@ -65,7 +65,6 @@ func (mergeRequestController *MergeRequestController) DeleteMergeRequest(c *gin.
 }
 
 
-//   - `/:id/reviews` `GET` (gets acceptance status of all reviews)
 // GetReviewStatus godoc
 // @Summary 	Returns status of all merge request reviews
 // @Description Returns an array of the statuses of all the reviews of this merge request
@@ -81,7 +80,7 @@ func (mergeRequestController *MergeRequestController) GetReviewStatus(c *gin.Con
 	//delete method goes here
 }
 
-//   - `/:id/reviews/:id` `GET` (gets specific review)
+
 // GetReview godoc
 // @Summary 	Returns a review of a merge request
 // @Description Returns a review with the given ID of the merge request with the given ID
@@ -93,9 +92,57 @@ func (mergeRequestController *MergeRequestController) GetReviewStatus(c *gin.Con
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/merge-requests/{mergeRequestID}/reviews		[get]
+// @Router 		/merge-requests/{mergeRequestID}/reviews/{reviewID}		[get]
 func (mergeRequestController *MergeRequestController) GetReview(c *gin.Context) {
-	//delete method goes here
+	
+}
+
+
+// CreateReview godoc
+// @Summary 	Adds a review to a merge request
+// @Description Adds a review to a merge request
+// @Accept  	json
+// @Param		mergeRequestID		path		string			true	"merge request ID"
+// @Produce		json
+// @Success 	200		{object}	models.ReviewDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/merge-requests/{mergeRequestID}/reviews		[post]
+func (mergeRequestController *MergeRequestController) CreateReview(c *gin.Context) {
+	
+}
+
+// UserCanReview godoc
+// @Summary 	Returns whether the user is allowed to review this merge request
+// @Description Returns true if the user fulfills the requirements to review the merge request
+// @Description Returns false if user is unauthorized to review the merge request
+// @Accept  	json
+// @Param		mergeRequestID		path		string			true	"merge request ID"
+// @Param		reviewID			path		string			true	"review ID"
+// @Produce		json
+// @Success 	200		bool
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/merge-requests/{mergeRequestID}/can-review/{userID}		[get]
+func (mergeRequestController *MergeRequestController) UserCanReview(c *gin.Context) {
+	
+}
+
+// MergeMergeRequest godoc
+// @Summary 	Merges the merge request into parent post
+// @Description Merges the merge request with the given id into the respective project post
+// @Accept  	json
+// @Param		mergeRequestID		path		string			true	"merge request ID"
+// @Produce		json
+// @Success 	200		{object}	models.ProjectPostDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/merge-requests/{mergeRequestID}/merge		[put]
+func (mergeRequestController *MergeRequestController) MergeMergeRequest(c *gin.Context) {
+	
 }
 
 

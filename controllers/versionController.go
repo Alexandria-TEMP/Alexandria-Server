@@ -22,27 +22,29 @@ func (versionController *VersionController) GetVersion(c *gin.Context) {
 
 }
 
+
 // CreateVersion godoc
 // @Summary 	Create new version
-// @Description Create a new version
-// @Accept  	json
-// @Param		form	body	forms.VersionCreationForm	true	"Version Creation Form"
-// @Produce		json
-// @Success 	200 	{object} 	models.VersionDTO
+// @Description Create a new version with discussions and repository
+// @Accept  	multipart/form-data
+// @Param		postID		body		string				true	"Parent Post ID"
+// @Param		repository	body		models.Repository	true	"Repository to create"
+// @Produce		application/json
+// @Success 	200		{object}	models.Version
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/versions 		[post]
+// @Router 		/versions	[post]
 func (versionController *VersionController) CreateVersion(c *gin.Context) {
 
 }
 
+
 // RenderVersion godoc
-// @Summary Returns the rendered form of the version files
-// @Description Returns html file of the rendered version
-// @Accept  	json
+// @Summary Get the render of a version
+// @Description Get the render of the repository underlying a version
 // @Param		versionID		path		string			true	"version ID"
-// @Produce		html
-// @Success 	200		{object}	file
+// @Produce		text/html
+// @Success 	200		[]byte
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -51,29 +53,44 @@ func (versionController *VersionController) RenderVersion(c *gin.Context) {
 	//TODO: find out how to send back html file in godoc
 }
 
+
+// GetRepository godoc specs
+// @Summary 	Get the repository of a version
+// @Description Get the entire zipped repository of a version
+// @Param		versionID	path		string				true	"Version ID"
+// @Produce		application/zip
+// @Success 	200		[]byte
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500 	{object} 	utils.HTTPError
+// @Router 		/version/{versionID}/repository	[get]
+func (versionController *VersionController) GetRepository(c *gin.Context) {
+
+}
+
 // GetFileTreeVersion godoc
-// @Summary Returns the base level names the version files
-// @Description Returns the top layer of names of the version files
+// @Summary 	Get the file tree of a repository
+// @Description Get the file tree of a repository of a version
 // @Accept  	json
 // @Param		versionID		path		string			true	"version ID"
-// @Produce		application/zip
-// @Success 	200		{object}	file
+// @Produce		application/json
+// @Success 	200		{object}	map[string]int64
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/versions/{versionID}/tree	[get]
 func (versionController *VersionController) GetFileTreeVersion(c *gin.Context) {
-	//TODO: find out how to send back html file in godoc
+
 }
 
+
+
 // GetFileFromVersion godoc
-// @Summary Returns a specific file from the version repository
-// @Description Returns the file from the given path
-// @Accept  	json
+// @Summary 	Get a file from a repository
+// @Description Get the contents of a single file from a repository of a version
 // @Param		versionID		path		string			true	"version ID"
 // @Param		filePath		body		string			true	"file path"
 // @Produce		application/zip
-// @Success 	200		{object}	file
+// @Success 	200		[]byte
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -81,6 +98,7 @@ func (versionController *VersionController) GetFileTreeVersion(c *gin.Context) {
 func (versionController *VersionController) GetFileFromVersion(c *gin.Context) {
 	//TODO: find out if this response type is correct
 }
+
 
 
 // GetVersionDiscussions godoc
@@ -110,3 +128,5 @@ func (versionController *VersionController) GetVersionDiscussions(c *gin.Context
 //   - `/:id/tree`
 //   - `/:id` `/render` `GET`
 //   - `/:id/discussions` `GET` (gets all level-1 discussions of the version) **_p_**
+
+
