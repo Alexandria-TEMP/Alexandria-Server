@@ -2,7 +2,6 @@ package filesystem
 
 import (
 	"archive/zip"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
@@ -129,7 +128,7 @@ func (filesystem *Filesystem) Unzip() error {
 	return nil
 }
 
-// RemoveRepository entirely removes a version repository if it is not valid
+// RemoveRepository entirely removes a version repository
 func (filesystem *Filesystem) RemoveRepository() error {
 	err := os.RemoveAll(filesystem.CurrentDirPath)
 
@@ -164,35 +163,19 @@ func (filesystem *Filesystem) RenderExists() (exists bool, name string) {
 	return true, fileName
 }
 
-// Returns the rendered project as binary large object, ie a byte slice
-func (filesystem *Filesystem) GetRenderFile() ([]byte, error) {
-	// Check if directory exists
-	exists, fileName := filesystem.RenderExists()
-
-	if !exists {
-		return nil, fmt.Errorf("render doesn't exist or is invalid")
-	}
-
-	// Create blob
-	filePath := filepath.Join(filesystem.CurrentRenderDirPath, fileName)
-	file, err := CreateByteSliceFile(filePath)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return file, nil
-}
-
 // GetFileTree returns a map of all filepaths in a quarto project and their size in bytes
 func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
-	var fileTree map[string]int64
+	fileTree := make(map[string]int64)
 
 	// Recursively find all files in quarto project and add path and size to map
 	err := filepath.Walk(filesystem.CurrentQuartoDirPath,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
+			}
+
+			if info.IsDir() {
+				return nil
 			}
 
 			relativePath, err := filepath.Rel(filesystem.CurrentQuartoDirPath, path)
@@ -207,7 +190,7 @@ func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
 		})
 
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return fileTree, nil

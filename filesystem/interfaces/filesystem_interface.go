@@ -12,12 +12,11 @@ type Filesystem interface {
 	SetCurrentVersion(versionID, postID uint)
 	SaveRepository(c *gin.Context, file *multipart.FileHeader) error
 	Unzip() error
-	RemoveRepository() error
 	RenderExists() (bool, string)
+	RemoveRepository() error
 	GetCurrentDirPath() string
 	GetCurrentQuartoDirPath() string
 	GetCurrentZipFilePath() string
 	GetCurrentRenderDirPath() string
-	GetRenderFile() ([]byte, error)
 	GetFileTree() (map[string]int64, error)
 }

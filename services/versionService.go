@@ -9,9 +9,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	filesysteminterface "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 type VersionService struct {
@@ -41,7 +41,8 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 
 	// Start goroutine to render the repository.
 	// This runs parallel to our response being sent, and will likely finish at a later point in time.
-	// If it fails at any point we update the render status to failure and remove this repository.
+	// If it fails at any point before rendering we update the render status to failure and remove the repository.
+	// If it fails at any point after we start rendering we just update the render status to failure.
 	// If it succeeds we will update the renderstatus to success.
 	go func() {
 		// Unzip saved file
@@ -75,7 +76,6 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		if err := versionService.RenderProject(); err != nil {
 			version.RenderStatus = models.Failure
 			_, _ = versionService.VersionRepository.Update(&version)
-			_ = versionService.Filesystem.RemoveRepository()
 
 			return
 		}
@@ -84,7 +84,6 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		if exists, _ := versionService.Filesystem.RenderExists(); !exists {
 			version.RenderStatus = models.Failure
 			_, _ = versionService.VersionRepository.Update(&version)
-			_ = versionService.Filesystem.RemoveRepository()
 		}
 
 		version.RenderStatus = models.Success
@@ -122,7 +121,7 @@ func (versionService *VersionService) RenderProject() error {
 func (versionService *VersionService) InstallRenderDependencies() error {
 	// Check if renv.lock exists and if so get dependencies
 	rLockPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "renv.lock")
-	if filesystem.FileExists(rLockPath) {
+	if utils.FileExists(rLockPath) {
 		cmd := exec.Command("Rscript", "-e", "renv::restore()")
 		cmd.Dir = versionService.Filesystem.GetCurrentQuartoDirPath()
 		out, err := cmd.CombinedOutput()
@@ -134,7 +133,7 @@ func (versionService *VersionService) InstallRenderDependencies() error {
 
 	// Check if any renv exists.
 	renvActivatePath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "renv", "activate.R")
-	if filesystem.FileExists(renvActivatePath) {
+	if utils.FileExists(renvActivatePath) {
 		// Install rmarkdown
 		cmd := exec.Command("Rscript", "-e", "renv::install('rmarkdown')")
 		cmd.Dir = versionService.Filesystem.GetCurrentQuartoDirPath()
@@ -158,21 +157,23 @@ func (versionService *VersionService) InstallRenderDependencies() error {
 }
 
 // IsValidProject validates that the files are a valid default quarto project
+// They mus have a _quarto.yml or _quarto.yaml file.
+// They must be of default quarto project type.
 func (versionService *VersionService) IsValidProject() bool {
 	// If there is no yml file to cofigure the project it is invalid
 	ymlPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "_quarto.yml")
 	yamlPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "_quarto.yaml")
 
-	if !(filesystem.FileExists(ymlPath)) {
+	if !(utils.FileExists(ymlPath)) {
 		ymlPath = yamlPath
 
-		if !(filesystem.FileExists(yamlPath)) {
+		if !(utils.FileExists(yamlPath)) {
 			return false
 		}
 	}
 
 	// If they type is not default it is invalid
-	if filesystem.FileContains(ymlPath, "type:") && !filesystem.FileContains(ymlPath, "type: default") {
+	if utils.FileContains(ymlPath, "type:") && !utils.FileContains(ymlPath, "type: default") {
 		return false
 	}
 
@@ -181,6 +182,7 @@ func (versionService *VersionService) IsValidProject() bool {
 
 func (versionService *VersionService) GetRenderFile(versionID, postID uint) (string, error, error) {
 	version, err := versionService.VersionRepository.GetByID(versionID)
+
 	var filePath string
 
 	if err != nil {
@@ -216,11 +218,13 @@ func (versionService *VersionService) GetRepositoryFile(versionID, postID uint) 
 	versionService.Filesystem.SetCurrentVersion(versionID, postID)
 
 	// Check that render exists, if not update render status to failed and return 404
-	if exists := filesystem.FileExists(versionService.Filesystem.GetCurrentZipFilePath()); !exists {
+	if exists := utils.FileExists(versionService.Filesystem.GetCurrentZipFilePath()); !exists {
 		return "", fmt.Errorf("no such file exists")
 	}
 
-	return versionService.Filesystem.GetCurrentZipFilePath(), nil
+	absFilepath, _ := filepath.Abs(versionService.Filesystem.GetCurrentZipFilePath())
+
+	return absFilepath, nil
 }
 
 func (versionService *VersionService) GetTreeFromRepository(versionID, postID uint) (map[string]int64, error, error) {
@@ -228,7 +232,7 @@ func (versionService *VersionService) GetTreeFromRepository(versionID, postID ui
 	versionService.Filesystem.SetCurrentVersion(versionID, postID)
 
 	// Check that render exists, if not update render status to failed and return 404
-	if exists := filesystem.FileExists(versionService.Filesystem.GetCurrentQuartoDirPath()); !exists {
+	if exists := utils.FileExists(versionService.Filesystem.GetCurrentQuartoDirPath()); !exists {
 		return nil, fmt.Errorf("no such directory exists"), nil
 	}
 
@@ -240,10 +244,10 @@ func (versionService *VersionService) GetTreeFromRepository(versionID, postID ui
 func (versionService *VersionService) GetFileFromRepository(versionID, postID uint, relFilepath string) (string, error) {
 	// Set current version
 	versionService.Filesystem.SetCurrentVersion(versionID, postID)
-	absFilepath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), relFilepath)
+	absFilepath, _ := filepath.Abs(filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), relFilepath))
 
 	// Check that file exists, if not return 404
-	if exists := filesystem.FileExists(absFilepath); !exists {
+	if exists := utils.FileExists(absFilepath); !exists {
 		return "", fmt.Errorf("no such file exists")
 	}
 

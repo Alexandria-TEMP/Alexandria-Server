@@ -1,16 +1,18 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"go.uber.org/mock/gomock"
 )
@@ -33,7 +35,7 @@ func TestCreateVersion200(t *testing.T) {
 	mockVersionService.EXPECT().CreateVersion(gomock.Any(), gomock.Any(), uint(1)).Return(&examplePendingVersion, nil).Times(1)
 
 	zipPath := filepath.Join(cwd, "..", "utils", "test_files", "file_handling_test.zip")
-	body, dataType, err := filesystem.CreateMultipartFile(zipPath)
+	body, dataType, err := CreateMultipartFile(zipPath)
 	assert.Nil(t, err)
 
 	req, _ := http.NewRequest("POST", "/api/v1/version/1", body)
@@ -64,7 +66,7 @@ func TestCreateVersion4002(t *testing.T) {
 	mockVersionService.EXPECT().CreateVersion(gomock.Any(), gomock.Any(), uint(1)).Return(&examplePendingVersion, nil).Times(0)
 
 	zipPath := filepath.Join(cwd, "..", "utils", "test_files", "file_handling_test.zip")
-	body, dataType, err := filesystem.CreateMultipartFile(zipPath)
+	body, dataType, err := CreateMultipartFile(zipPath)
 	assert.Nil(t, err)
 
 	req, _ := http.NewRequest("POST", "/api/v1/version/bad", body)
@@ -82,7 +84,7 @@ func TestCreateVersion500(t *testing.T) {
 	mockVersionService.EXPECT().CreateVersion(gomock.Any(), gomock.Any(), uint(1)).Return(&examplePendingVersion, errors.New("err")).Times(1)
 
 	zipPath := filepath.Join(cwd, "..", "utils", "test_files", "file_handling_test.zip")
-	body, dataType, err := filesystem.CreateMultipartFile(zipPath)
+	body, dataType, err := CreateMultipartFile(zipPath)
 	assert.Nil(t, err)
 
 	req, _ := http.NewRequest("POST", "/api/v1/version/1", body)
@@ -271,23 +273,17 @@ func TestGetReposiotry4044(t *testing.T) {
 func TestGetFileFromRepository200(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetFileFromRepository(uint(1), uint(0), "/child-dir/_child.qmd").Return("../utils/test_files/good_quarto_project_4/child-dir/_child.qmd", nil)
+	mockVersionService.EXPECT().GetFileFromRepository(uint(1), uint(0), "/child_dir/test.txt").Return("../utils/test_files/file_tree/child_dir/test.txt", nil)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/1/blob/child-dir/_child.qmd", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v1/version/0/1/blob/child_dir/test.txt", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
 
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
-	assert.Equal(t, "attachment; filename=_child.qmd", responseRecorder.Result().Header.Get("Content-Disposition"))
+	assert.Equal(t, "attachment; filename=test.txt", responseRecorder.Result().Header.Get("Content-Disposition"))
 
-	fileHeader := make([]byte, headerSize)
-	_, err := responseRecorder.Result().Body.Read(fileHeader)
-	assert.Nil(t, err)
-
-	fileContentType := http.DetectContentType(fileHeader)
-
-	assert.Equal(t, fileContentType, "application/octet-stream")
+	assert.Equal(t, "text/plain", responseRecorder.Result().Header.Get("Content-Type"))
 }
 
 func TestGetFileFromRepository4041(t *testing.T) {
@@ -442,4 +438,36 @@ func TestGetTreeFromRepository4004(t *testing.T) {
 	defer responseRecorder.Result().Body.Close()
 
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+// CreateMultipartFile bundles a file into an object go can interact with to return it as a response.
+// Returns file, content-type, and error
+func CreateMultipartFile(filePath string) (io.Reader, string, error) {
+	// create a buffer to hold the file in memory
+	body := new(bytes.Buffer)
+
+	mwriter := multipart.NewWriter(body)
+	defer mwriter.Close()
+
+	w, err := mwriter.CreateFormFile("file", filePath)
+
+	if err != nil {
+		return body, "", err
+	}
+
+	in, err := os.Open(filePath)
+
+	if err != nil {
+		return body, "", err
+	}
+
+	defer in.Close()
+
+	_, err = io.Copy(w, in)
+
+	if err != nil {
+		return body, "", err
+	}
+
+	return body, mwriter.FormDataContentType(), nil
 }

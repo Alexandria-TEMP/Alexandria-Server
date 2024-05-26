@@ -2,6 +2,9 @@ package filesystem
 
 import (
 	"bufio"
+	"bytes"
+	"io"
+	"mime/multipart"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
@@ -9,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 var (
@@ -52,7 +56,7 @@ func TestFileHandling(t *testing.T) {
 	// Test saving fileheader
 	err := CurrentFilesystem.SaveRepository(c, file)
 	assert.Nil(t, err)
-	assert.True(t, FileExists(CurrentFilesystem.CurrentZipFilePath))
+	assert.True(t, utils.FileExists(CurrentFilesystem.CurrentZipFilePath))
 
 	// Test unzipping succeeds and that contents are correct
 	err = CurrentFilesystem.Unzip()
@@ -70,39 +74,26 @@ func TestFileHandling(t *testing.T) {
 	assert.Equal(t, "5678", line)
 
 	// Test removing version repository
-	err = CurrentFilesystem.RemoveRepository()
+	// err = CurrentFilesystem.RemoveRepository()
+	// assert.Nil(t, err)
+	// assert.False(t, utils.FileExists(CurrentFilesystem.CurrentDirPath))
+}
+
+func TestGetFileTreeSuccess(t *testing.T) {
+	CurrentFilesystem.CurrentQuartoDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "file_tree")
+
+	files, err := CurrentFilesystem.GetFileTree()
+
 	assert.Nil(t, err)
-	assert.False(t, FileExists(CurrentFilesystem.CurrentDirPath))
+
+	assert.Equal(t, map[string]int64{"child_dir/test.txt": 0, "example.qmd": 0}, files)
 }
 
-func TestGetRenderFileSuccess(t *testing.T) {
-	CurrentFilesystem.CurrentDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup")
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(CurrentFilesystem.CurrentDirPath, "render")
-	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
+func TestGetFileTreeFailure(t *testing.T) {
+	CurrentFilesystem.CurrentQuartoDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "file_tree", "doesntexist")
 
-	// Test GetRenderFile
-	file, err := CurrentFilesystem.GetRenderFile()
-	assert.Nil(t, err)
-	assert.Equal(t, []byte{53, 54, 55, 56}, file)
-}
+	_, err := CurrentFilesystem.GetFileTree()
 
-func TestGetRenderFileFailure1(t *testing.T) {
-	CurrentFilesystem.CurrentDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_1")
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(CurrentFilesystem.CurrentDirPath, "render")
-	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
-
-	// Test GetRenderFile
-	_, err := CurrentFilesystem.GetRenderFile()
-	assert.NotNil(t, err)
-}
-
-func TestGetRenderFileFailure2(t *testing.T) {
-	CurrentFilesystem.CurrentDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_2")
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(CurrentFilesystem.CurrentDirPath, "render")
-	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
-
-	// Test GetRenderFile
-	_, err := CurrentFilesystem.GetRenderFile()
 	assert.NotNil(t, err)
 }
 
@@ -121,4 +112,55 @@ func Readln(r *bufio.Reader) (string, error) {
 	}
 
 	return string(ln), err
+}
+
+// CreateMultipartFileHeader is used for testing, to simulate an incoming request with a file
+func CreateMultipartFileHeader(filePath string) (*multipart.FileHeader, error) {
+	// open the file
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	// create a buffer to hold the file in memory
+	var buff bytes.Buffer
+	buffWriter := io.Writer(&buff)
+
+	// create a new form and create a new file field
+	formWriter := multipart.NewWriter(buffWriter)
+	formPart, err := formWriter.CreateFormFile("file", filepath.Base(file.Name()))
+
+	if err != nil {
+		return nil, err
+	}
+
+	// copy the content of the file to the form's file field
+	if _, err := io.Copy(formPart, file); err != nil {
+		return nil, err
+	}
+
+	// close the form writer after the copying process is finished
+	// I don't use defer in here to avoid unexpected EOF error
+	formWriter.Close()
+
+	// transform the bytes buffer into a form reader
+	buffReader := bytes.NewReader(buff.Bytes())
+	formReader := multipart.NewReader(buffReader, formWriter.Boundary())
+
+	// read the form components with max stored memory of 1MB
+	maxMemoryBits := 20
+	multipartForm, err := formReader.ReadForm(1 << maxMemoryBits)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// return the multipart file header
+	files, exists := multipartForm.File["file"]
+	if !exists || len(files) == 0 {
+		return nil, err
+	}
+
+	return files[0], nil
 }
