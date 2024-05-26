@@ -21,10 +21,10 @@ func beforeEachUser(t *testing.T) {
 
 	defer mockCtrl.Finish()
 
-	responseRecorder = httptest.NewRecorder()
-
 	mockUserService = mock_interfaces.NewMockUserService(mockCtrl)
 	userController = &UserController{UserService: mockUserService}
+
+	responseRecorder = httptest.NewRecorder()
 }
 
 func TestGetMember200(t *testing.T) {

@@ -96,6 +96,21 @@ func (mr *MockFilesystemMockRecorder) GetCurrentZipFilePath() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentZipFilePath", reflect.TypeOf((*MockFilesystem)(nil).GetCurrentZipFilePath))
 }
 
+// GetFileTree mocks base method.
+func (m *MockFilesystem) GetFileTree() (map[string]int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFileTree")
+	ret0, _ := ret[0].(map[string]int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFileTree indicates an expected call of GetFileTree.
+func (mr *MockFilesystemMockRecorder) GetFileTree() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFileTree", reflect.TypeOf((*MockFilesystem)(nil).GetFileTree))
+}
+
 // GetRenderFile mocks base method.
 func (m *MockFilesystem) GetRenderFile() ([]byte, error) {
 	m.ctrl.T.Helper()
@@ -109,20 +124,6 @@ func (m *MockFilesystem) GetRenderFile() ([]byte, error) {
 func (mr *MockFilesystemMockRecorder) GetRenderFile() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRenderFile", reflect.TypeOf((*MockFilesystem)(nil).GetRenderFile))
-}
-
-// RemoveProjectDirectory mocks base method.
-func (m *MockFilesystem) RemoveProjectDirectory() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemoveProjectDirectory")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// RemoveProjectDirectory indicates an expected call of RemoveProjectDirectory.
-func (mr *MockFilesystemMockRecorder) RemoveProjectDirectory() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveProjectDirectory", reflect.TypeOf((*MockFilesystem)(nil).RemoveProjectDirectory))
 }
 
 // RemoveRepository mocks base method.

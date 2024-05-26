@@ -106,38 +106,6 @@ func TestGetRenderFileFailure2(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-// func TestGetRepositoryFileSuccess(t *testing.T) {
-// 	CurrentFilesystem.CurrentDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup")
-// 	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(CurrentFilesystem.CurrentDirPath, "render")
-// 	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
-
-// 	// Test GetRepositoryFile
-// 	fileForm, contentType, err := CurrentFilesystem.GetRepositoryFile()
-// 	assert.Nil(t, err)
-// 	assert.NotNil(t, fileForm)
-// 	assert.Equal(t, "multipart/form-data; boundary=", contentType[:30])
-// }
-
-// func TestGetRepositoryFileFailure1(t *testing.T) {
-// 	CurrentFilesystem.CurrentDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_1")
-// 	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(CurrentFilesystem.CurrentDirPath, "render")
-// 	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
-
-// 	// Test GetRenderFile
-// 	_, _, err := CurrentFilesystem.GetRepositoryFile()
-// 	assert.NotNil(t, err)
-// }
-
-// func TestGetRepositoryFileFailure2(t *testing.T) {
-// 	CurrentFilesystem.CurrentDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_2")
-// 	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(CurrentFilesystem.CurrentDirPath, "render")
-// 	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
-
-// 	// Test GetRenderFile
-// 	_, _, err := CurrentFilesystem.GetRepositoryFile()
-// 	assert.NotNil(t, err)
-// }
-
 // Readln returns a single line (without the ending \n)
 // from the input buffered reader.
 func Readln(r *bufio.Reader) (string, error) {

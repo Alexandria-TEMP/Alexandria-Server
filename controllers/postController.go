@@ -32,7 +32,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 	postIDStr := c.Param("postID")
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
-	if err != nil {
+	if err != nil || postID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr)})
 
 		return
@@ -105,7 +105,7 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 	err = postController.PostService.UpdatePost(&updatedPost)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot update post because no post with this ID exists"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "cannot update post because no post with this ID exists"})
 
 		return
 	}
@@ -130,7 +130,7 @@ func (postController *PostController) GetProjectPost(c *gin.Context) {
 	postIDStr := c.Param("postID")
 	postID, err := strconv.ParseInt(postIDStr, 10, 64)
 
-	if err != nil {
+	if err != nil || postID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr)})
 
 		return

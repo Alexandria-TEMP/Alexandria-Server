@@ -30,7 +30,7 @@ func (userController *UserController) GetMember(c *gin.Context) {
 	userIDStr := c.Param("userID")
 	userID, err := strconv.ParseUint(userIDStr, 10, 64)
 	// if this caused an error, print it
-	if err != nil {
+	if err != nil || userID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%s ", userIDStr)})
 
 		return
@@ -133,7 +133,7 @@ func (userController *UserController) GetCollaborator(c *gin.Context) {
 	userID, err := strconv.ParseInt(userIDStr, 10, 64)
 
 	// check for errors
-	if err != nil {
+	if err != nil || userID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr)})
 
 		return

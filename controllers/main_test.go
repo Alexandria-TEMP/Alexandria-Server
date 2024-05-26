@@ -12,25 +12,32 @@ import (
 )
 
 var (
-	router *gin.Engine
-
-	postController *PostController
-
-	mockUserService *mock_interfaces.MockUserService
-	mockPostService *mock_interfaces.MockPostService
-	userController  *UserController
-
+	cwd              string
+	router           *gin.Engine
 	responseRecorder *httptest.ResponseRecorder
+
+	postController  *PostController
+	mockPostService *mock_interfaces.MockPostService
+
+	examplePostForm        forms.PostCreationForm
+	exampleProjectPostForm forms.ProjectPostCreationForm
+	examplePost            models.Post
+	exampleProjectPost     models.ProjectPost
+
+	userController  *UserController
+	mockUserService *mock_interfaces.MockUserService
 
 	exampleMember           models.Member
 	exampleCollaborator     models.PostCollaborator
-	exampleMemberForm       forms.MemberCreationForm
 	exampleCollaboratorForm forms.CollaboratorCreationForm
-	examplePostForm         forms.PostCreationForm
-	exampleProjectPostForm  forms.ProjectPostCreationForm
+	exampleMemberForm       forms.MemberCreationForm
 
-	examplePost        models.Post
-	exampleProjectPost models.ProjectPost
+	versionController  *VersionController
+	mockVersionService *mock_interfaces.MockVersionService
+
+	examplePendingVersion models.Version
+	exampleSuccessVersion models.Version
+	exampleFailureVersion models.Version
 )
 
 // TestMain is a keyword function, this is run by the testing package before other tests
@@ -75,6 +82,21 @@ func TestMain(m *testing.M) {
 	router.PUT("/api/v1/collaborator", func(c *gin.Context) {
 		userController.UpdateCollaborator(c)
 	})
+	router.POST("/api/v1/version/:postID", func(c *gin.Context) {
+		versionController.CreateVersion(c)
+	})
+	router.GET("/api/v1/version/:postID/:versionID/render", func(c *gin.Context) {
+		versionController.GetRender(c)
+	})
+	router.GET("/api/v1/version/:postID/:versionID/repository", func(c *gin.Context) {
+		versionController.GetRepository(c)
+	})
+	router.GET("/api/v1/version/:postID/:versionID/tree", func(c *gin.Context) {
+		versionController.GetTreeFromRepository(c)
+	})
+	router.GET("/api/v1/version/:postID/:versionID/blob/*filepath", func(c *gin.Context) {
+		versionController.GetFileFromRepository(c)
+	})
 
 	// Setup objects
 	examplePost = models.Post{}
@@ -82,6 +104,12 @@ func TestMain(m *testing.M) {
 
 	exampleMember = models.Member{}
 	exampleCollaborator = models.PostCollaborator{}
+
+	examplePendingVersion = models.Version{RenderStatus: models.Pending}
+	exampleSuccessVersion = models.Version{RenderStatus: models.Success}
+	exampleFailureVersion = models.Version{RenderStatus: models.Failure}
+
+	cwd, _ = os.Getwd()
 
 	os.Exit(m.Run())
 }

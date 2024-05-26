@@ -21,10 +21,10 @@ func beforeEach(t *testing.T) {
 
 	defer mockCtrl.Finish()
 
-	responseRecorder = httptest.NewRecorder()
-
 	mockPostService = mock_interfaces.NewMockPostService(mockCtrl)
 	postController = &PostController{PostService: mockPostService}
+
+	responseRecorder = httptest.NewRecorder()
 }
 
 func TestGetPost200(t *testing.T) {

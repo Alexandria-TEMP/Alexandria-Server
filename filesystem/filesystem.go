@@ -185,7 +185,7 @@ func (filesystem *Filesystem) GetRenderFile() ([]byte, error) {
 }
 
 // GetFileTree returns a map of all filepaths in a quarto project and their size in bytes
-func (filesystem Filesystem) GetFileTree() (map[string]int64, error) {
+func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
 	var fileTree map[string]int64
 
 	// Recursively find all files in quarto project and add path and size to map

@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
@@ -43,7 +44,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	postIDStr := c.Param("postID")
 	postID, err := strconv.ParseInt(postIDStr, 10, 64)
 
-	if err != nil {
+	if err != nil || postID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
 
 		return
@@ -70,14 +71,15 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 // @Produce		text/html
 // @Success 	200		[]byte
 // @Success		202
+// @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
-// @Router 		/version/render/{postID}/{versionID}	[get]
+// @Router 		/version/{postID}/{versionID}/render	[get]
 func (versionController *VersionController) GetRender(c *gin.Context) {
 	// extract post id
 	postIDStr := c.Param("postID")
 	postID, err := strconv.ParseInt(postIDStr, 10, 64)
 
-	if err != nil {
+	if err != nil || postID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
 
 		return
@@ -87,7 +89,7 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 	versionIDstr := c.Param("versionID")
 	versionID, err := strconv.ParseInt(versionIDstr, 10, 64)
 
-	if err != nil {
+	if err != nil || versionID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr)})
 
 		return
@@ -113,7 +115,7 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 	c.Header("Content-Description", "File Transfer")
 	c.Header("Content-Transfer-Encoding", "binary")
 	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=render.html"))
-	c.Header("Content-Type", "text/html; charset=utf8")
+	c.Header("Content-Type", "text/html; charset=utf-8")
 	c.File(filePath)
 }
 
@@ -124,6 +126,7 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 // @Param		versionID	path		string				true	"Version ID"
 // @Produce		application/zip
 // @Success 	200		[]byte
+// @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/version/{postID}/{versionID}/repository	[get]
@@ -132,7 +135,7 @@ func (versionController *VersionController) GetRepository(c *gin.Context) {
 	postIDStr := c.Param("postID")
 	postID, err := strconv.ParseInt(postIDStr, 10, 64)
 
-	if err != nil {
+	if err != nil || postID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
 
 		return
@@ -142,46 +145,41 @@ func (versionController *VersionController) GetRepository(c *gin.Context) {
 	versionIDstr := c.Param("versionID")
 	versionID, err := strconv.ParseInt(versionIDstr, 10, 64)
 
-	if err != nil {
+	if err != nil || versionID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr)})
 
 		return
 	}
 
 	// get repository filepath
-	filePath, err1 := versionController.VersionService.GetRepositoryFile(uint(versionID), uint(postID))
-
-	// open zip file
-	fileData, err := os.Open(filePath)
+	filePath, err := versionController.VersionService.GetRepositoryFile(uint(versionID), uint(postID))
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to open file"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "no such repository found"})
+
+		return
+	}
+
+	fileContentType, err1 := mimetype.DetectFile(filePath)
+
+	fileData, err2 := os.Open(filePath)
+
+	// Get the file info
+	fileInfo, err3 := fileData.Stat()
+
+	if err1 != nil || err2 != nil || err3 != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file"})
 
 		return
 	}
 
 	defer fileData.Close()
 
-	// Read the first 512 bytes of the file to determine its content type
-	fileHeader := make([]byte, headerSize)
-	_, err2 := fileData.Read(fileHeader)
-
-	fileContentType := http.DetectContentType(fileHeader)
-
-	// Get the file info
-	fileInfo, err3 := fileData.Stat()
-
-	if err1 != nil || err2 != nil || err3 != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Bad file"})
-
-		return
-	}
-
 	// Set the headers for the file transfer and return the file
 	c.Header("Content-Description", "File Transfer")
 	c.Header("Content-Transfer-Encoding", "binary")
 	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileInfo.Name()))
-	c.Header("Content-Type", fileContentType)
+	c.Header("Content-Type", fileContentType.String())
 	c.Header("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
 	c.File(filePath)
 }
@@ -193,6 +191,7 @@ func (versionController *VersionController) GetRepository(c *gin.Context) {
 // @Param		versionID	path		string				true	"Version ID"
 // @Produce		application/json
 // @Success 	200		{object}	map[string]int64
+// @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/{postID}/{versionID}/tree		[get]
@@ -201,7 +200,7 @@ func (versionController *VersionController) GetTreeFromRepository(c *gin.Context
 	postIDStr := c.Param("postID")
 	postID, err := strconv.ParseInt(postIDStr, 10, 64)
 
-	if err != nil {
+	if err != nil || postID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
 
 		return
@@ -211,7 +210,7 @@ func (versionController *VersionController) GetTreeFromRepository(c *gin.Context
 	versionIDstr := c.Param("versionID")
 	versionID, err := strconv.ParseInt(versionIDstr, 10, 64)
 
-	if err != nil {
+	if err != nil || versionID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr)})
 
 		return
@@ -253,7 +252,7 @@ func (versionController *VersionController) GetFileFromRepository(c *gin.Context
 	postIDStr := c.Param("postID")
 	postID, err := strconv.ParseInt(postIDStr, 10, 64)
 
-	if err != nil {
+	if err != nil || postID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
 
 		return
@@ -263,7 +262,7 @@ func (versionController *VersionController) GetFileFromRepository(c *gin.Context
 	versionIDstr := c.Param("versionID")
 	versionID, err := strconv.ParseInt(versionIDstr, 10, 64)
 
-	if err != nil {
+	if err != nil || versionID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr)})
 
 		return
@@ -279,42 +278,26 @@ func (versionController *VersionController) GetFileFromRepository(c *gin.Context
 		return
 	}
 
-	fileData, err := os.Open(absFilepath)
+	fileContentType, err1 := mimetype.DetectFile(absFilepath)
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to open file"})
+	fileData, err2 := os.Open(absFilepath)
+
+	// Get the file info
+	fileInfo, err3 := fileData.Stat()
+
+	if err1 != nil || err2 != nil || err3 != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file"})
 
 		return
 	}
 
 	defer fileData.Close()
 
-	// Read the first 512 bytes of the file to determine its content type
-	fileHeader := make([]byte, headerSize)
-	_, err = fileData.Read(fileHeader)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read file"})
-
-		return
-	}
-
-	fileContentType := http.DetectContentType(fileHeader)
-
-	// Get the file info
-	fileInfo, err := fileData.Stat()
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get file info"})
-
-		return
-	}
-
 	// Set the headers for the file transfer and return the file
 	c.Header("Content-Description", "File Transfer")
 	c.Header("Content-Transfer-Encoding", "binary")
 	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileInfo.Name()))
-	c.Header("Content-Type", fileContentType)
+	c.Header("Content-Type", fileContentType.String())
 	c.Header("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
 	c.File(absFilepath)
 }

@@ -141,7 +141,6 @@ func TestCreateVersionImmediateFailure(t *testing.T) {
 	mockFilesystem.EXPECT().SetCurrentVersion(uint(0), uint(2)).Times(1)
 	mockFilesystem.EXPECT().SaveRepository(c, file).Return(errors.New("")).Times(1)
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(0)
-	mockFilesystem.EXPECT().RemoveProjectDirectory().Return(nil).Times(0)
 	mockFilesystem.EXPECT().RemoveRepository().Return(nil).Times(1)
 
 	_, err := versionService.CreateVersion(c, file, 2)
@@ -164,7 +163,6 @@ func testGoodProjectTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().SaveRepository(c, file).Return(nil).Times(1)
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
 	mockFilesystem.EXPECT().RenderExists().Return(true, "").Times(1)
-	mockFilesystem.EXPECT().RemoveProjectDirectory().Return(nil).Times(1)
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", dirName)).AnyTimes()
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
 
@@ -196,7 +194,6 @@ func testBadProjectTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().SaveRepository(c, file).Return(nil).Times(1)
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
 	mockFilesystem.EXPECT().RemoveRepository().Return(nil).Times(1)
-	mockFilesystem.EXPECT().RemoveProjectDirectory().Return(nil).Times(0)
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", dirName)).AnyTimes()
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
 
