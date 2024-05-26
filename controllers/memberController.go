@@ -157,6 +157,7 @@ func (memberController *MemberController) DeleteMember(c *gin.Context) {
 func (memberController *MemberController) GetMemberPosts(c *gin.Context) {
 	//return all the posts
 	//that this member is a collaborator/author of
+	//TODO: make endpoint paginated
 }
 
 // GetMemberProjectPosts godoc
@@ -173,15 +174,16 @@ func (memberController *MemberController) GetMemberPosts(c *gin.Context) {
 func (memberController *MemberController) GetMemberProjectPosts(c *gin.Context) {
 	//return all the project posts
 	//that this member is a collaborator/author of
+	//TODO: make endpoint paginated
 }
 
-// GetMemberMergeRequestss godoc
+// GetMemberMergeRequests godoc
 // @Summary		Get all merge requests of this member
 // @Description	Get all merge requests that this member is a collaborator of
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
 // @Produce		json
-// @Success 	200		{array}		models.ProjectPostDTO
+// @Success 	200		{array}		models.MergeRequestDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -189,14 +191,88 @@ func (memberController *MemberController) GetMemberProjectPosts(c *gin.Context) 
 func (memberController *MemberController) GetMemberMergeRequests(c *gin.Context) {
 	//return all the merge requests
 	//that this member is a collaborator/author of
+	//TODO: make endpoint paginated
+}
+
+// GetMemberDiscussions godoc
+// @Summary		Get all merge requests of this member
+// @Description	Get all merge requests that this member is a collaborator of
+// @Accept 		json
+// @Param		userID		path		string			true	"user ID"
+// @Produce		json
+// @Success 	200		{array}		models.DiscussionDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/members/{userID}/project-posts 		[get]
+func (memberController *MemberController) GetMemberDiscussions(c *gin.Context) {
+	//returns all the discussions this member is a part of
+	//TODO: make paginated
+}
+
+// AddMemberSavedPost godoc
+// @Summary 	Adds new saved post
+// @Description Adds a post to the saved posts of a member
+// @Accept  	json
+// @Param		userID		path		string			true	"user ID"
+// @Param		postID		path		string			true	"post ID"
+// @Produce		json
+// @Success 	200
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/members/{userID}/saved-posts/{postID} 		[post]
+func (memberController *MemberController) AddMemberSavedPost(c *gin.Context) {
+	
+}
+
+// AddMemberSavedProjectPost godoc
+// @Summary 	Adds new saved project post
+// @Description Adds a project post to the saved project posts of a member
+// @Accept  	json
+// @Param		userID		path		string			true	"user ID"
+// @Param		postID		path		string			true	"post ID"
+// @Produce		json
+// @Success 	200
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/members/{userID}/saved-project-posts/{postID} 		[post]
+func (memberController *MemberController) AddMemberSavedProjectPost(c *gin.Context) {
+
 }
 
 
+// GetMemberSavedPosts godoc
+// @Summary		Get all saved posts of this member
+// @Description	Get all posts that this member has saved
+// @Accept 		json
+// @Param		userID		path		string			true	"user ID"
+// @Produce		json
+// @Success 	200		{array}		models.PostDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/members/{userID}/saved-posts 		[get]
+func (memberController *MemberController) GetMemberSavedPosts(c *gin.Context) {
+	//return all saved posts of this member
+	//TODO: make endpoint paginated
+}
 
-// - `/:id/merge-requests` `GET` **_p_**
-// - `/:id/discussion` `GET` **_p_**
-// - `/:id/saved-posts` `POST`
-// - `/:id/saved-posts` `GET` **_p_**
+// GetMemberProjectPosts godoc
+// @Summary		Get all saved project posts of this member
+// @Description	Get all project posts that this member has saved
+// @Accept 		json
+// @Param		userID		path		string			true	"user ID"
+// @Produce		json
+// @Success 	200		{array}		models.ProjectPostDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/members/{userID}/saved-project-posts 		[get]
+func (memberController *MemberController) GetMemberSavedProjectPosts(c *gin.Context) {
+	//return all the project posts that this member has saved
+	//TODO: make endpoint paginated
+}
+
 
 // // GetCollaborator godoc
 // // @Summary 	Get collaborator

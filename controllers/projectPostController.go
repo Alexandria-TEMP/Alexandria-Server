@@ -9,25 +9,29 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 // @BasePath /api/v2
 
 type ProjectPostController struct {
+	//TODO: change to project post service
+	ProjectPostService interfaces.PostService
 }
 
 // GetProjectPost godoc
 // @Summary 	Get project post
-// @Description Get a project post by post ID
+// @Description Get a project post by ID
 // @Accept  	json
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
 // @Success 	200 		{object}	models.ProjectPostDTO
 // @Failure		400 		{object} 	utils.HTTPError
-// @Failure		410 		{object} 	utils.HTTPError
-// @Router 		/project-post/{postID}	[get]
-func (postController *PostController) GetProjectPost(c *gin.Context) {
+// @Failure		404 		{object} 	utils.HTTPError
+// @Failure		500 		{object} 	utils.HTTPError
+// @Router 		/project-posts/{postID}	[get]
+func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Context) {
 	// extract postID
 	postIDStr := c.Param("postID")
 	postID, err := strconv.ParseInt(postIDStr, 10, 64)
@@ -39,7 +43,7 @@ func (postController *PostController) GetProjectPost(c *gin.Context) {
 		return
 	}
 
-	post, err := postController.PostService.GetProjectPost(uint64(postID))
+	post, err := projectPostController.ProjectPostService.GetProjectPost(uint64(postID))
 
 	if err != nil {
 		fmt.Println(err)
@@ -57,12 +61,14 @@ func (postController *PostController) GetProjectPost(c *gin.Context) {
 // @Summary 	Create new project post
 // @Description Create a new project post
 // @Accept  	json
-// @Param		form	body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
+// @Param		form			body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
+// @Param 		parentPostID	body		string							false	"Parent post ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Router 		/projectPost 		[post]
-func (postController *PostController) CreateProjectPost(c *gin.Context) {
+// @Failure		400 		{object} 	utils.HTTPError
+// @Failure		500 		{object} 	utils.HTTPError
+// @Router 		/project-posts		[post]
+func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Context) {
 	// extract post
 	form := forms.ProjectPostCreationForm{}
 	err := c.BindJSON(&form)
@@ -75,7 +81,7 @@ func (postController *PostController) CreateProjectPost(c *gin.Context) {
 	}
 
 	// Create and add post to database here. For now just do this to test.
-	post := postController.PostService.CreateProjectPost(&form)
+	post := projectPostController.ProjectPostService.CreateProjectPost(&form)
 
 	// response
 	c.Header("Content-Type", "application/json")
@@ -84,15 +90,17 @@ func (postController *PostController) CreateProjectPost(c *gin.Context) {
 
 // UpdateProjectPost godoc
 // @Summary 	Update project post
-// @Description Update any number of the aspects of project post
+// @Description Update any number of the aspects of a project post
 // @Accept  	json
 // @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		410 	{object} 	utils.HTTPError
-// @Router 		/ 		[put]
-func (postController *PostController) UpdateProjectPost(c *gin.Context) {
+// @Failure		400 		{object} 	utils.HTTPError
+// @Failure		400 		{object} 	utils.HTTPError
+// @Failure		404 		{object} 	utils.HTTPError
+// @Failure		500 		{object} 	utils.HTTPError
+// @Router 		/project-posts 		[put]
+func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Context) {
 	// extract post
 	updatedProjectPost := models.ProjectPost{}
 	err := c.BindJSON(&updatedProjectPost)
@@ -105,7 +113,7 @@ func (postController *PostController) UpdateProjectPost(c *gin.Context) {
 	}
 
 	// Update and add post to database here. For now just do this to test.
-	err = postController.PostService.UpdateProjectPost(&updatedProjectPost)
+	err = projectPostController.ProjectPostService.UpdateProjectPost(&updatedProjectPost)
 
 	if err != nil {
 		fmt.Println(err)
@@ -117,4 +125,85 @@ func (postController *PostController) UpdateProjectPost(c *gin.Context) {
 	// response
 	c.Header("Content-Type", "application/json")
 	c.Status(http.StatusOK)
+}
+
+// DeleteProjectPost godoc
+// @Summary 	Delete a project post
+// @Description Delete a project post with given ID from database
+// @Accept  	json
+// @Param		postID		path		string			true	"post ID"
+// @Produce		json
+// @Success 	200
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/project-posts/{postID} 		[delete]
+func (projectPostController *ProjectPostController) DeleteProjectPost(c *gin.Context) {
+	//delete method goes here
+}
+
+// CreateProjectPostFromGithub godoc
+// @Summary 	Create new project post with the version imported from github
+// @Description Create a new project post
+// @Description Creates a project post in the same way as CreateProjectPost
+// @Description However, the post files are imported from the given Github repository
+// @Accept  	json
+// @Param		form	body	forms.ProjectPostCreationForm	true	"Post Creation Form"
+// @Param		url		body	string							true	"Github repository url"
+// @Produce		json
+// @Success 	200 	{object} 	models.ProjectPostDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		500 	{object} 	utils.HTTPError
+// @Failure 	502 	{object}	utils.HTTPError
+// @Router 		/project-posts/from-github 		[post]
+func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(c *gin.Context) {
+
+}
+
+// GetProjectPostDiscussions godoc
+// @Summary Returns all discussions associated with the project post
+// @Description Returns all discussions on this project post and all of it's merge requests
+// @Description Endpoint is offset-paginated
+// @Accept  	json
+// @Param		postID		path		string			true	"post ID"
+// @Produce		json
+// @Success 	200		{array}		models.DiscussionDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router		/project-posts/{postID}/all-discussions 	[get]
+func (projectPostController *ProjectPostController) GetProjectPostDiscussions(c *gin.Context) {
+
+}
+
+// GetProjectPostOpenMergeRequests godoc
+// @Summary		Get all open merge requests of a project post
+// @Description	Get all open merge requests associated with the given project post
+// @Accept 		json
+// @Param		postID		path		string			true	"post ID"
+// @Produce		json
+// @Success 	200		{array}		models.MergeRequestDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/project-posts/{postID}/open-merge-requests 		[get]
+func (projectPostController *ProjectPostController) GetProjectPostOpenMergeRequests(c *gin.Context) {
+	//return all the merge requests associated with this project post that are open
+	//TODO: make endpoint paginated
+}
+
+// GetProjectPostClosedMergeRequests godoc
+// @Summary		Get all closed merge requests of a project post
+// @Description	Get all closed merge requests associated with the given project post
+// @Accept 		json
+// @Param		postID		path		string			true	"post ID"
+// @Produce		json
+// @Success 	200		{array}		models.MergeRequestDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/project-posts/{postID}/closed-merge-requests 		[get]
+func (projectPostController *ProjectPostController) GetProjectPostClosedMergeRequests(c *gin.Context) {
+	//return all the merge requests associated with this project post that are closed
+	//TODO: make endpoint paginated
 }

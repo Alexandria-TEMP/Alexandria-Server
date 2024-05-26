@@ -15,10 +15,11 @@ var (
 	router *gin.Engine
 
 	postController *PostController
+	projectPostController *ProjectPostController
 
 	mockUserService *mock_interfaces.MockUserService
 	mockPostService *mock_interfaces.MockPostService
-	userController  *UserController
+	userController  *MemberController
 
 	responseRecorder *httptest.ResponseRecorder
 
@@ -49,13 +50,13 @@ func TestMain(m *testing.M) {
 		postController.UpdatePost(c)
 	})
 	router.GET("/api/v1/projectPost/:postID", func(c *gin.Context) {
-		postController.GetProjectPost(c)
+		projectPostController.GetProjectPost(c)
 	})
 	router.POST("/api/v1/projectPost", func(c *gin.Context) {
-		postController.CreateProjectPost(c)
+		projectPostController.CreateProjectPost(c)
 	})
 	router.PUT("/api/v1/projectPost", func(c *gin.Context) {
-		postController.UpdateProjectPost(c)
+		projectPostController.UpdateProjectPost(c)
 	})
 	router.GET("/api/v1/member/:userID", func(c *gin.Context) {
 		userController.GetMember(c)
@@ -66,15 +67,15 @@ func TestMain(m *testing.M) {
 	router.PUT("/api/v1/member", func(c *gin.Context) {
 		userController.UpdateMember(c)
 	})
-	router.GET("/api/v1/collaborator/:userID", func(c *gin.Context) {
-		userController.GetCollaborator(c)
-	})
-	router.POST("/api/v1/collaborator", func(c *gin.Context) {
-		userController.CreateCollaborator(c)
-	})
-	router.PUT("/api/v1/collaborator", func(c *gin.Context) {
-		userController.UpdateCollaborator(c)
-	})
+	// router.GET("/api/v1/collaborator/:userID", func(c *gin.Context) {
+	// 	userController.GetCollaborator(c)
+	// })
+	// router.POST("/api/v1/collaborator", func(c *gin.Context) {
+	// 	userController.CreateCollaborator(c)
+	// })
+	// router.PUT("/api/v1/collaborator", func(c *gin.Context) {
+	// 	userController.UpdateCollaborator(c)
+	// })
 
 	// Setup objects
 	examplePost = models.Post{}
