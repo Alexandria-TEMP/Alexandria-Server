@@ -20,6 +20,9 @@ RUN go install github.com/swaggo/swag/cmd/swag@v1.16.3
 # Build binary
 RUN go build -o /usr/bin/alexandria-backend -v ./
 
+# Generate API spec
+RUN swag init -g alexandria.go
+
 # Expose port
 EXPOSE 8080
 
