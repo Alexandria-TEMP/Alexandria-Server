@@ -17,6 +17,7 @@ type Post struct {
 	CurrentVersion   Version `gorm:"foreignKey:CurrentVersionID"`
 	CurrentVersionID uint
 
+	Title               string
 	PostType            tags.PostType
 	ScientificFieldTags []tags.ScientificField `gorm:"serializer:json"`
 }
@@ -25,6 +26,7 @@ type PostDTO struct {
 	ID                  uint
 	CollaboratorIDs     []uint
 	VersionID           uint
+	Title               string
 	PostType            tags.PostType
 	ScientificFieldTags []tags.ScientificField
 }
@@ -38,6 +40,7 @@ func (model *Post) IntoDTO() PostDTO {
 		model.ID,
 		postCollaboratorsToIDs(model.Collaborators),
 		model.CurrentVersionID,
+		model.Title,
 		model.PostType,
 		model.ScientificFieldTags,
 	}

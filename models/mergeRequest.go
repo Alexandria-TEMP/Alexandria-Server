@@ -10,9 +10,20 @@ import (
 type MergeRequest struct {
 	gorm.Model
 
+	/////////////////////////////////////////////
+	// The MR's proposed changes:
+
 	// MergeRequest belongs to Version
 	NewVersion   Version `gorm:"foreignKey:NewVersionID"`
 	NewVersionID uint
+
+	NewPostTitle string
+
+	UpdatedCompletionStatus tags.CompletionStatus
+	UpdatedScientificFields []tags.ScientificField `gorm:"serializer:json"`
+
+	/////////////////////////////////////////////
+	// The MR's metadata:
 
 	// MergeRequest has many MergeRequestCollaborator
 	Collaborators []*MergeRequestCollaborator `gorm:"foreignKey:MergeRequestID"`
@@ -23,20 +34,29 @@ type MergeRequest struct {
 	// ProjectPost has many MergeRequest
 	ProjectPostID uint
 
-	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields tags.ScientificField `gorm:"serializer:json"`
-	Anonymous               bool
+	// MergeRequest belongs to Version (previous version)
+	PreviousVersion   Version `gorm:"foreignKey:PreviousVersionID"`
+	PreviousVersionID uint
+
+	MergeRequestTitle string
+
+	Anonymous bool
 }
 
 type MergeRequestDTO struct {
-	ID                      uint
+	ID uint
+	// MR's proposed changes
 	NewVersionID            uint
-	CollaboratorIDs         []uint
-	ReviewIDs               []uint
-	ProjectPostID           uint
+	NewPostTitle            string
 	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields tags.ScientificField
-	Anonymous               bool
+	UpdatedScientificFields []tags.ScientificField
+	// MR metadata
+	CollaboratorIDs   []uint
+	ReviewIDs         []uint
+	ProjectPostID     uint
+	PreviousVersionID uint
+	MergeRequestTitle string
+	Anonymous         bool
 }
 
 func (model *MergeRequest) GetID() uint {
@@ -47,11 +67,14 @@ func (model *MergeRequest) IntoDTO() MergeRequestDTO {
 	return MergeRequestDTO{
 		model.ID,
 		model.NewVersionID,
+		model.NewPostTitle,
+		model.UpdatedCompletionStatus,
+		model.UpdatedScientificFields,
 		mergeRequestCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
 		model.ProjectPostID,
-		model.UpdatedCompletionStatus,
-		model.UpdatedScientificFields,
+		model.PreviousVersionID,
+		model.MergeRequestTitle,
 		model.Anonymous,
 	}
 }

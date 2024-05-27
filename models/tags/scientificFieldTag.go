@@ -5,7 +5,8 @@ type ScientificFieldTag struct {
 type ScientificField string
 
 const (
-	Mathematics ScientificField = "mathematics"
+	Mathematics     ScientificField = "mathematics"
+	ComputerScience ScientificField = "computer science"
 )
 
 func (tag *ScientificField) GetLabel() string {
