@@ -15,7 +15,7 @@ import (
 )
 
 type VersionService struct {
-	VersionRepository database.ModelRepository[*models.Version]
+	VersionRepository database.RepositoryInterface[*models.Version]
 	Filesystem        filesysteminterface.Filesystem
 }
 

@@ -12,7 +12,7 @@ import (
 )
 
 type RepositoryEnv struct {
-	versionRepository database.ModelRepository[*models.Version]
+	versionRepository database.RepositoryInterface[*models.Version]
 }
 
 type ServiceEnv struct {
@@ -29,7 +29,7 @@ type ControllerEnv struct {
 
 func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 	return RepositoryEnv{
-		versionRepository: database.ModelRepository[*models.Version]{Database: db},
+		versionRepository: &database.ModelRepository[*models.Version]{Database: db},
 	}
 }
 

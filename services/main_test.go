@@ -8,21 +8,22 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 )
 
 var (
-	versionService    VersionService
-	c                 *gin.Context
-	mockFilesystem    *mocks.MockFilesystem
-	pendingVersion    models.Version
-	failureVersion    models.Version
-	successVersion    models.Version
-	cwd               string
-	versionRepository database.ModelRepository[*models.Version]
-	db                *gorm.DB
+	versionService        VersionService
+	mockVersionRepository *mocks.MockRepositoryInterface[*models.Version]
+	mockFilesystem        *mocks.MockFilesystem
+
+	c   *gin.Context
+	cwd string
+	db  *gorm.DB
+
+	pendingVersion models.Version
+	failureVersion models.Version
+	successVersion models.Version
 )
 
 func TestMain(m *testing.M) {

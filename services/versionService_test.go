@@ -27,15 +27,17 @@ func beforeEach(t *testing.T) {
 		log.Fatalf("Could not initialize test database: %s", err)
 	}
 
-	versionRepository = database.ModelRepository[*models.Version]{Database: db}
-
+	// Setup mock DB
 	mockCtrl := gomock.NewController(t)
-
 	defer mockCtrl.Finish()
+	mockVersionRepository = mocks.NewMockRepositoryInterface[*models.Version](mockCtrl)
 
+	// Setup mock filesystem
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
+
+	// Cretae version service
 	versionService = VersionService{
-		VersionRepository: versionRepository,
+		VersionRepository: mockVersionRepository,
 		Filesystem:        mockFilesystem,
 	}
 }
@@ -112,6 +114,9 @@ func TestCreateVersionDelayedFailure5(t *testing.T) {
 	mockFilesystem.EXPECT().RenderExists().Times(0)
 	mockFilesystem.EXPECT().RemoveRepository().Times(1)
 
+	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending})
+	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Failure}).Times(1)
+
 	version, err := versionService.CreateVersion(c, file, 2)
 
 	assert.Nil(t, err)
@@ -138,6 +143,9 @@ func TestCreateVersionDelayedFailure6(t *testing.T) {
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
 	mockFilesystem.EXPECT().RenderExists().Return(false, "").Times(1)
 	mockFilesystem.EXPECT().RemoveRepository().Times(0)
+
+	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending})
+	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Failure}).Times(1)
 
 	version, err := versionService.CreateVersion(c, file, 2)
 
@@ -166,6 +174,9 @@ func TestCreateVersionImmediateFailure(t *testing.T) {
 	mockFilesystem.EXPECT().RemoveRepository().Return(nil).Times(1)
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(0)
 
+	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending})
+	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Failure}).Times(1)
+
 	_, err := versionService.CreateVersion(c, file, 2)
 
 	assert.NotNil(t, err)
@@ -189,6 +200,9 @@ func testGoodProjectTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", dirName)).AnyTimes()
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
 	mockFilesystem.EXPECT().RemoveRepository().Times(0)
+
+	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending}).Times(1)
+	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Success}).Times(1)
 
 	version, err := versionService.CreateVersion(c, file, 2)
 
@@ -221,6 +235,9 @@ func testBadProjectTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().RenderExists().Times(0)
 	mockFilesystem.EXPECT().RemoveRepository().Times(1)
 
+	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending})
+	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Failure}).Times(1)
+
 	version, err := versionService.CreateVersion(c, file, 2)
 
 	assert.Nil(t, err)
@@ -241,11 +258,12 @@ func TestGetRenderFileSuccess(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
 
-	_ = versionService.VersionRepository.Create(&successVersion)
-
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
 	mockFilesystem.EXPECT().RenderExists().Return(true, "").Times(1)
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("test").Times(1)
+
+	mockVersionRepository.EXPECT().GetByID(successVersion.ID).Return(&successVersion, nil).Times(1)
+	mockVersionRepository.EXPECT().Update(gomock.Any()).Times(0)
 
 	path, err202, err404 := versionService.GetRenderFile(successVersion.ID, 0)
 
@@ -258,11 +276,12 @@ func TestGetRenderFileFailure1(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
 
-	_ = versionService.VersionRepository.Create(&pendingVersion)
-
 	mockFilesystem.EXPECT().SetCurrentVersion(pendingVersion.ID, uint(0)).Times(0)
 	mockFilesystem.EXPECT().RenderExists().Times(0)
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("").Times(0)
+
+	mockVersionRepository.EXPECT().GetByID(pendingVersion.ID).Return(&pendingVersion, nil).Times(1)
+	mockVersionRepository.EXPECT().Update(gomock.Any()).Times(0)
 
 	_, err202, err404 := versionService.GetRenderFile(pendingVersion.ID, 0)
 
@@ -274,11 +293,12 @@ func TestGetRenderFileFailure2(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
 
-	_ = versionService.VersionRepository.Create(&failureVersion)
-
 	mockFilesystem.EXPECT().SetCurrentVersion(failureVersion.ID, uint(0)).Times(0)
 	mockFilesystem.EXPECT().RenderExists().Times(0)
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("").Times(0)
+
+	mockVersionRepository.EXPECT().GetByID(failureVersion.ID).Return(&failureVersion, nil).Times(1)
+	mockVersionRepository.EXPECT().Update(gomock.Any()).Times(0)
 
 	_, err202, err404 := versionService.GetRenderFile(failureVersion.ID, 0)
 
@@ -290,11 +310,12 @@ func TestGetRenderFileFailure3(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
 
-	_ = versionService.VersionRepository.Create(&successVersion)
-
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
 	mockFilesystem.EXPECT().RenderExists().Return(false, "").Times(1)
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("test").Times(0)
+
+	mockVersionRepository.EXPECT().GetByID(successVersion.ID).Return(&successVersion, nil).Times(1)
+	mockVersionRepository.EXPECT().Update(&successVersion).Times(1)
 
 	_, err202, err404 := versionService.GetRenderFile(successVersion.ID, 0)
 
@@ -305,8 +326,6 @@ func TestGetRenderFileFailure3(t *testing.T) {
 func TestGetTreeFromRepositorySuccess(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
-
-	_ = versionService.VersionRepository.Create(&successVersion)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return("../utils/test_files/file_tree").Times(1)
@@ -323,8 +342,6 @@ func TestGetTreeFromRepositoryFailure1(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
 
-	_ = versionService.VersionRepository.Create(&successVersion)
-
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return("doesntexist").Times(1)
 	mockFilesystem.EXPECT().GetFileTree().Return(map[string]int64{"child_dir/test.txt": 0, "example.qmd": 0}, nil).Times(0)
@@ -338,8 +355,6 @@ func TestGetTreeFromRepositoryFailure1(t *testing.T) {
 func TestGetTreeFromRepositoryFailure2(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
-
-	_ = versionService.VersionRepository.Create(&successVersion)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return("../utils/test_files/file_tree").Times(1)
@@ -355,8 +370,6 @@ func TestGetRepositoryFileSuccess(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
 
-	_ = versionService.VersionRepository.Create(&successVersion)
-
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
 	mockFilesystem.EXPECT().GetCurrentZipFilePath().Return("../utils/test_files/good_repository_setup/quarto_project.zip").Times(2)
 
@@ -370,8 +383,6 @@ func TestGetRepositoryFileFailure(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
 
-	_ = versionService.VersionRepository.Create(&successVersion)
-
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
 	mockFilesystem.EXPECT().GetCurrentZipFilePath().Return("doesntexist").Times(1)
 
@@ -383,8 +394,6 @@ func TestGetRepositoryFileFailure(t *testing.T) {
 func TestGetFileFromRepositorySuccess(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
-
-	_ = versionService.VersionRepository.Create(&successVersion)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return("../utils/test_files/file_tree").Times(1)

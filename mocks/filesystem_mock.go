@@ -111,21 +111,6 @@ func (mr *MockFilesystemMockRecorder) GetFileTree() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFileTree", reflect.TypeOf((*MockFilesystem)(nil).GetFileTree))
 }
 
-// GetRenderFile mocks base method.
-func (m *MockFilesystem) GetRenderFile() ([]byte, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRenderFile")
-	ret0, _ := ret[0].([]byte)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetRenderFile indicates an expected call of GetRenderFile.
-func (mr *MockFilesystemMockRecorder) GetRenderFile() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRenderFile", reflect.TypeOf((*MockFilesystem)(nil).GetRenderFile))
-}
-
 // RemoveRepository mocks base method.
 func (m *MockFilesystem) RemoveRepository() error {
 	m.ctrl.T.Helper()
