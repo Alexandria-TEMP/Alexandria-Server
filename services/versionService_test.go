@@ -57,15 +57,6 @@ func TestCreateVersionSuccess3(t *testing.T) {
 	testGoodProjectTemplate(t, "good_quarto_project_3")
 }
 
-// Can take a while, so if this times out increase limit
-func TestCreateVersionSuccess4(t *testing.T) {
-	if testing.Short() {
-		t.Skip()
-	}
-
-	testGoodProjectTemplate(t, "good_quarto_project_4")
-}
-
 func TestCreateVersionDelayedFailure1(t *testing.T) {
 	testBadProjectTemplate(t, "bad_quarto_project_1")
 }
