@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"mime/multipart"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	filesysteminterface "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
+	"gopkg.in/yaml.v3"
 )
 
 type VersionService struct {
@@ -62,6 +64,12 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 			return
 		}
 
+		if err := versionService.SetProjectConfig(); err != nil {
+			versionService.FailAndRemoveVersion(&version)
+
+			return
+		}
+
 		// Render quarto project
 		if err := versionService.RenderProject(); err != nil {
 			version.RenderStatus = models.Failure
@@ -90,18 +98,60 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 	return &version, nil
 }
 
+func (versionService *VersionService) SetProjectConfig() error {
+	// Find config file
+	yamlFilepath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "_quarto.yaml")
+	ymlFilepath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "_quarto.yml")
+	configFilepath := yamlFilepath
+
+	if !utils.FileExists(yamlFilepath) {
+		configFilepath = ymlFilepath
+	}
+
+	// Unmarshal yaml file
+	yamlObj := make(map[string]interface{})
+	yamlFile, err := os.ReadFile(configFilepath)
+
+	if err != nil {
+		return fmt.Errorf("failed to open yaml config file")
+	}
+
+	err = yaml.Unmarshal(yamlFile, yamlObj)
+
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal yaml config file")
+	}
+
+	yamlObj["format"] = map[string]interface{}{"html": map[string]interface{}{"page-layout": "custom"}}
+	yamlFile, err = yaml.Marshal(yamlObj)
+
+	if err != nil {
+		return fmt.Errorf("failed to marshal yaml config file")
+	}
+
+	err = os.WriteFile(configFilepath, yamlFile, 0666)
+
+	if err != nil {
+		return fmt.Errorf("failed to write yaml config file back")
+	}
+
+	return nil
+}
+
 // RenderProject renders the current project files.
 // It first tries to get all dependencies and then renders to html.
 func (versionService *VersionService) RenderProject() error {
-	// TODO: This is super unsafe right now
+	// Run render command
 	cmd := exec.Command("quarto", "render", versionService.Filesystem.GetCurrentQuartoDirPath(),
 		"--output-dir", versionService.Filesystem.GetCurrentRenderDirPath(),
 		"--to", "html",
 		"--no-cache",
 		"-M", "embed-resources:true",
-		"-M", "toc-location:body",
-		"-M", "margin-left:0",
-		"-M", "margin-right:0",
+		"-M", "title:",
+		"-M", "date:",
+		"-M", "date-modified:",
+		"-M", "author:",
+		"-M", "doi:",
 		"--log-level", "error",
 	)
 	out, err := cmd.CombinedOutput()
