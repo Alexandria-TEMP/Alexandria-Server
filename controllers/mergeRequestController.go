@@ -130,7 +130,6 @@ func (mergeRequestController *MergeRequestController) UserCanReview(_ *gin.Conte
 
 }
 
-
 // - `/merge-requests`
 //   - `POST`
 //   - `PUT` (?)
