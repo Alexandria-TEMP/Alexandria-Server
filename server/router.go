@@ -38,6 +38,5 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	memberRouter.POST("/", controllers.userController.CreateMember)
 	memberRouter.PUT("/", controllers.userController.UpdateMember)
 
-
 	return router
 }

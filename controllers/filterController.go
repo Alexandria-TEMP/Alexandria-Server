@@ -21,7 +21,7 @@ type FilterController struct {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/filter/posts		[get]
-func (filterController *FilterController) FilterPosts(c *gin.Context) {
+func (filterController *FilterController) FilterPosts(_ *gin.Context) {
 
 }
 
@@ -39,6 +39,6 @@ func (filterController *FilterController) FilterPosts(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/filter/project-posts		[get]
-func (filterController *FilterController) FilterProjectPosts(c *gin.Context) {
+func (filterController *FilterController) FilterProjectPosts(_ *gin.Context) {
 
 }

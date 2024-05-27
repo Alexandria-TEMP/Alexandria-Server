@@ -136,8 +136,8 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/posts/{postID} 		[delete]
-func (postController *PostController) DeletePost(c *gin.Context) {
-	//delete method goes here
+func (postController *PostController) DeletePost(_ *gin.Context) {
+	// delete method goes here
 }
 
 // CreatePostFromGithub godoc
@@ -154,7 +154,7 @@ func (postController *PostController) DeletePost(c *gin.Context) {
 // @Failure		500 	{object} 	utils.HTTPError
 // @Failure 	502 	{object}	utils.HTTPError
 // @Router 		/posts/from-github 		[post]
-func (postController *PostController) CreatePostFromGithub(c *gin.Context) {
+func (postController *PostController) CreatePostFromGithub(_ *gin.Context) {
 
 }
 
@@ -170,7 +170,7 @@ func (postController *PostController) CreatePostFromGithub(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/posts/{postID}/reports 		[post]
-func (postController *PostController) AddPostReport(c *gin.Context) {
+func (postController *PostController) AddPostReport(_ *gin.Context) {
 
 }
 
@@ -188,6 +188,6 @@ func (postController *PostController) AddPostReport(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/posts/{postID}/reports 		[get]
-func (postController *PostController) GetPostReports(c *gin.Context) {
-	//TODO: make paginated
+func (postController *PostController) GetPostReports(_ *gin.Context) {
+	// TODO: make paginated
 }

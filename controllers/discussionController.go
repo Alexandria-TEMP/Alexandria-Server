@@ -18,7 +18,7 @@ type DiscussionController struct {
 // @Failure		404 		{object} 	utils.HTTPError
 // @Failure		500 		{object} 	utils.HTTPError
 // @Router 		/discussions/{discussionID}	[get]
-func (versionController *VersionController) GetDiscussion(c *gin.Context) {
+func (versionController *VersionController) GetDiscussion(_ *gin.Context) {
 
 }
 
@@ -34,7 +34,7 @@ func (versionController *VersionController) GetDiscussion(c *gin.Context) {
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/discussions 		[post]
-func (versionController *VersionController) CreateDiscussion(c *gin.Context) {
+func (versionController *VersionController) CreateDiscussion(_ *gin.Context) {
 
 }
 
@@ -49,8 +49,8 @@ func (versionController *VersionController) CreateDiscussion(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/discussions/{discussionID} 		[delete]
-func (versionController *VersionController) DeleteDiscussion(c *gin.Context) {
-	//delete method goes here
+func (versionController *VersionController) DeleteDiscussion(_ *gin.Context) {
+	// delete method goes here
 }
 
 // GetDiscussionReplies godoc
@@ -67,7 +67,7 @@ func (versionController *VersionController) DeleteDiscussion(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/discussions/{discussionID}/replies 		[get]
-func (versionController *VersionController) GetDiscussionReplies(c *gin.Context) {
+func (versionController *VersionController) GetDiscussionReplies(_ *gin.Context) {
 	//TODO: make paginated
 }
 
@@ -83,7 +83,7 @@ func (versionController *VersionController) GetDiscussionReplies(c *gin.Context)
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/discussions/{discussionID}/reports 		[post]
-func (versionController *VersionController) AddDiscussionReport(c *gin.Context) {
+func (versionController *VersionController) AddDiscussionReport(_ *gin.Context) {
 
 }
 
@@ -101,14 +101,6 @@ func (versionController *VersionController) AddDiscussionReport(c *gin.Context) 
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/discussions/{discussionID}/reports 		[get]
-func (versionController *VersionController) GetDiscussionReports(c *gin.Context) {
+func (versionController *VersionController) GetDiscussionReports(_ *gin.Context) {
 	//TODO: make paginated
 }
-
-// - `/discussions`
-//   - `POST` (mandatory version ID, optional parent discussion ID)
-//   - `/:id` `GET` (for nested discussions)
-//   - `/:id/replies` `GET` all discussions with that parent id
-//   - `/:id` `DELETE`
-//   - `/:id/reports` `POST` (wahhh)
-//   - `/:id/reports` `GET` **_p_**

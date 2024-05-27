@@ -14,7 +14,7 @@ import (
 var (
 	router *gin.Engine
 
-	postController *PostController
+	postController        *PostController
 	projectPostController *ProjectPostController
 
 	mockUserService *mock_interfaces.MockUserService
@@ -67,17 +67,7 @@ func TestMain(m *testing.M) {
 	router.PUT("/api/v1/member", func(c *gin.Context) {
 		userController.UpdateMember(c)
 	})
-	// router.GET("/api/v1/collaborator/:userID", func(c *gin.Context) {
-	// 	userController.GetCollaborator(c)
-	// })
-	// router.POST("/api/v1/collaborator", func(c *gin.Context) {
-	// 	userController.CreateCollaborator(c)
-	// })
-	// router.PUT("/api/v1/collaborator", func(c *gin.Context) {
-	// 	userController.UpdateCollaborator(c)
-	// })
 
-	// Setup objects
 	examplePost = models.Post{}
 	exampleProjectPost = models.ProjectPost{}
 

@@ -20,10 +20,9 @@ type VersionController struct {
 // @Failure		404 		{object} 	utils.HTTPError
 // @Failure		500 		{object} 	utils.HTTPError
 // @Router 		/versions/{versionID}	[get]
-func (versionController *VersionController) GetVersion(c *gin.Context) {
+func (versionController *VersionController) GetVersion(_ *gin.Context) {
 
 }
-
 
 // CreateVersion godoc
 // @Summary 	Create new version
@@ -36,10 +35,9 @@ func (versionController *VersionController) GetVersion(c *gin.Context) {
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/versions	[post]
-func (versionController *VersionController) CreateVersion(c *gin.Context) {
+func (versionController *VersionController) CreateVersion(_ *gin.Context) {
 
 }
-
 
 // RenderVersion godoc
 // @Summary Get the render of a version
@@ -51,10 +49,9 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/versions/{versionID}/render	[get]
-func (versionController *VersionController) RenderVersion(c *gin.Context) {
+func (versionController *VersionController) RenderVersion(_ *gin.Context) {
 	//TODO: find out how to send back html file in godoc
 }
-
 
 // GetRepository godoc specs
 // @Summary 	Get the repository of a version
@@ -65,7 +62,7 @@ func (versionController *VersionController) RenderVersion(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/version/{versionID}/repository	[get]
-func (versionController *VersionController) GetRepository(c *gin.Context) {
+func (versionController *VersionController) GetRepository(_ *gin.Context) {
 
 }
 
@@ -80,11 +77,9 @@ func (versionController *VersionController) GetRepository(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/versions/{versionID}/tree	[get]
-func (versionController *VersionController) GetFileTreeVersion(c *gin.Context) {
+func (versionController *VersionController) GetFileTreeVersion(_ *gin.Context) {
 
 }
-
-
 
 // GetFileFromVersion godoc
 // @Summary 	Get a file from a repository
@@ -97,11 +92,9 @@ func (versionController *VersionController) GetFileTreeVersion(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/versions/{versionID}/file	[get]
-func (versionController *VersionController) GetFileFromVersion(c *gin.Context) {
+func (versionController *VersionController) GetFileFromVersion(_ *gin.Context) {
 	//TODO: find out if this response type is correct
 }
-
-
 
 // GetVersionDiscussions godoc
 // @Summary Returns all level 1 discussions associated with the version
@@ -117,13 +110,9 @@ func (versionController *VersionController) GetFileFromVersion(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/versions/{versionID}/discussions 	[get]
-func (versionController *VersionController) GetVersionDiscussions(c *gin.Context) {
+func (versionController *VersionController) GetVersionDiscussions(_ *gin.Context) {
 
 }
-
-
-
-
 
 // - `/versions`
 //   - `POST`
@@ -132,5 +121,3 @@ func (versionController *VersionController) GetVersionDiscussions(c *gin.Context
 //   - `/:id/tree`
 //   - `/:id` `/render` `GET`
 //   - `/:id/discussions` `GET` (gets all level-1 discussions of the version) **_p_**
-
-

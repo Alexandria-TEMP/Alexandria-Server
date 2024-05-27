@@ -18,7 +18,7 @@ type MergeRequestController struct {
 // @Failure		404 		{object} 	utils.HTTPError
 // @Failure		500 		{object} 	utils.HTTPError
 // @Router 		/merge-requests/{mergeRequestID}	[get]
-func (mergeRequestController *MergeRequestController) GetMergeRequest(c *gin.Context) {
+func (mergeRequestController *MergeRequestController) GetMergeRequest(_ *gin.Context) {
 
 }
 
@@ -32,7 +32,7 @@ func (mergeRequestController *MergeRequestController) GetMergeRequest(c *gin.Con
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/merge-requests 		[post]
-func (mergeRequestController *MergeRequestController) CreateMergeRequest(c *gin.Context) {
+func (mergeRequestController *MergeRequestController) CreateMergeRequest(_ *gin.Context) {
 
 }
 
@@ -47,7 +47,7 @@ func (mergeRequestController *MergeRequestController) CreateMergeRequest(c *gin.
 // @Failure		404 		{object} 	utils.HTTPError
 // @Failure		500 		{object} 	utils.HTTPError
 // @Router 		/merge-requests 		[put]
-func (mergeRequestController *MergeRequestController) UpdateMergeRequest(c *gin.Context) {
+func (mergeRequestController *MergeRequestController) UpdateMergeRequest(_ *gin.Context) {
 
 }
 
@@ -62,10 +62,9 @@ func (mergeRequestController *MergeRequestController) UpdateMergeRequest(c *gin.
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/merge-requests/{mergeRequestID} 		[delete]
-func (mergeRequestController *MergeRequestController) DeleteMergeRequest(c *gin.Context) {
-	//delete method goes here
+func (mergeRequestController *MergeRequestController) DeleteMergeRequest(_ *gin.Context) {
+	// delete method goes here
 }
-
 
 // GetReviewStatus godoc
 // @Summary 	Returns status of all merge request reviews
@@ -78,10 +77,9 @@ func (mergeRequestController *MergeRequestController) DeleteMergeRequest(c *gin.
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/merge-requests/{mergeRequestID}/reviews		[get]
-func (mergeRequestController *MergeRequestController) GetReviewStatus(c *gin.Context) {
-	//delete method goes here
+func (mergeRequestController *MergeRequestController) GetReviewStatus(_ *gin.Context) {
+	// delete method goes here
 }
-
 
 // GetReview godoc
 // @Summary 	Returns a review of a merge request
@@ -95,10 +93,9 @@ func (mergeRequestController *MergeRequestController) GetReviewStatus(c *gin.Con
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/merge-requests/{mergeRequestID}/reviews/{reviewID}		[get]
-func (mergeRequestController *MergeRequestController) GetReview(c *gin.Context) {
-	
-}
+func (mergeRequestController *MergeRequestController) GetReview(_ *gin.Context) {
 
+}
 
 // CreateReview godoc
 // @Summary 	Adds a review to a merge request
@@ -111,8 +108,8 @@ func (mergeRequestController *MergeRequestController) GetReview(c *gin.Context) 
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/merge-requests/{mergeRequestID}/reviews		[post]
-func (mergeRequestController *MergeRequestController) CreateReview(c *gin.Context) {
-	
+func (mergeRequestController *MergeRequestController) CreateReview(_ *gin.Context) {
+
 }
 
 // UserCanReview godoc
@@ -128,8 +125,8 @@ func (mergeRequestController *MergeRequestController) CreateReview(c *gin.Contex
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/merge-requests/{mergeRequestID}/can-review/{userID}		[get]
-func (mergeRequestController *MergeRequestController) UserCanReview(c *gin.Context) {
-	
+func (mergeRequestController *MergeRequestController) UserCanReview(_ *gin.Context) {
+
 }
 
 // MergeMergeRequest godoc
@@ -143,10 +140,9 @@ func (mergeRequestController *MergeRequestController) UserCanReview(c *gin.Conte
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/merge-requests/{mergeRequestID}/merge		[put]
-func (mergeRequestController *MergeRequestController) MergeMergeRequest(c *gin.Context) {
-	
-}
+func (mergeRequestController *MergeRequestController) MergeMergeRequest(_ *gin.Context) {
 
+}
 
 // - `/merge-requests`
 //   - `POST`

@@ -140,11 +140,10 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID} 		[delete]
-func (memberController *MemberController) DeleteMember(c *gin.Context) {
+func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 	// delete method goes here
 }
 
-// - `/:id/posts` `GET` (how does this work w/ project posts?) **_p_**
 // GetMemberPosts godoc
 // @Summary		Get all posts of this member
 // @Description	Get all posts that this member is a collaborator of
@@ -159,7 +158,7 @@ func (memberController *MemberController) DeleteMember(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/posts 		[get]
-func (memberController *MemberController) GetMemberPosts(c *gin.Context) {
+func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 	// return all the posts
 	// that this member is a collaborator/author of
 	// TODO: make endpoint paginated
@@ -179,10 +178,10 @@ func (memberController *MemberController) GetMemberPosts(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/project-posts 		[get]
-func (memberController *MemberController) GetMemberProjectPosts(c *gin.Context) {
-	//return all the project posts
-	//that this member is a collaborator/author of
-	//TODO: make endpoint paginated
+func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) {
+	// return all the project posts
+	// that this member is a collaborator/author of
+	// TODO: make endpoint paginated
 }
 
 // GetMemberMergeRequests godoc
@@ -199,10 +198,10 @@ func (memberController *MemberController) GetMemberProjectPosts(c *gin.Context) 
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/merge-requests 		[get]
-func (memberController *MemberController) GetMemberMergeRequests(c *gin.Context) {
-	//return all the merge requests
-	//that this member is a collaborator/author of
-	//TODO: make endpoint paginated
+func (memberController *MemberController) GetMemberMergeRequests(_ *gin.Context) {
+	// return all the merge requests
+	// that this member is a collaborator/author of
+	// TODO: make endpoint paginated
 }
 
 // GetMemberDiscussions godoc
@@ -219,9 +218,9 @@ func (memberController *MemberController) GetMemberMergeRequests(c *gin.Context)
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/discussions		[get]
-func (memberController *MemberController) GetMemberDiscussions(c *gin.Context) {
-	//returns all the discussions this member is a part of
-	//TODO: make paginated
+func (memberController *MemberController) GetMemberDiscussions(_ *gin.Context) {
+	// returns all the discussions this member is a part of
+	// TODO: make paginated
 }
 
 // AddMemberSavedPost godoc
@@ -235,8 +234,8 @@ func (memberController *MemberController) GetMemberDiscussions(c *gin.Context) {
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/saved-posts/{postID} 		[post]
-func (memberController *MemberController) AddMemberSavedPost(c *gin.Context) {
-	
+func (memberController *MemberController) AddMemberSavedPost(_ *gin.Context) {
+
 }
 
 // AddMemberSavedProjectPost godoc
@@ -250,10 +249,9 @@ func (memberController *MemberController) AddMemberSavedPost(c *gin.Context) {
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/saved-project-posts/{postID} 		[post]
-func (memberController *MemberController) AddMemberSavedProjectPost(c *gin.Context) {
+func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Context) {
 
 }
-
 
 // GetMemberSavedPosts godoc
 // @Summary		Get all saved posts of this member
@@ -269,9 +267,9 @@ func (memberController *MemberController) AddMemberSavedProjectPost(c *gin.Conte
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/saved-posts 		[get]
-func (memberController *MemberController) GetMemberSavedPosts(c *gin.Context) {
-	//return all saved posts of this member
-	//TODO: make endpoint paginated
+func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
+	// return all saved posts of this member
+	// TODO: make endpoint paginated
 }
 
 // GetMemberProjectPosts godoc
@@ -288,119 +286,7 @@ func (memberController *MemberController) GetMemberSavedPosts(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/saved-project-posts 		[get]
-func (memberController *MemberController) GetMemberSavedProjectPosts(c *gin.Context) {
-	//return all the project posts that this member has saved
-	//TODO: make endpoint paginated
+func (memberController *MemberController) GetMemberSavedProjectPosts(_ *gin.Context) {
+	// return all the project posts that this member has saved
+	// TODO: make endpoint paginated
 }
-
-
-// // GetCollaborator godoc
-// // @Summary 	Get collaborator
-// // @Description Get collaborator by user ID
-// // @Accept  	json
-// // @Param		userID		path		string			true	"user ID"
-// // @Produce		json
-// // @Success 	200 		{object}	models.Collaborator
-// // @Failure		400 		{object} 	utils.HTTPError
-// // @Failure		410 		{object} 	utils.HTTPError
-// // @Router 		/collaborator/{userID}	[get]
-// func (memberController *MemberController) GetCollaborator(c *gin.Context) {
-// 	// get the user id from the input
-// 	userIDStr := c.Param("userID")
-// 	userID, err := strconv.ParseInt(userIDStr, 10, 64)
-
-// 	// check for errors
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr))
-
-// 		return
-// 	}
-
-// 	// get the collaborator from the database
-// 	collaborator, err := memberController.UserService.GetCollaborator(uint64(userID))
-
-// 	// check if collaborator found and returned successfully
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot get project user because no user with this ID exists"))
-
-// 		return
-// 	}
-
-// 	// if successful, send back the collaborator
-// 	c.Header("Content-Type", "application/json")
-// 	c.JSON(http.StatusOK, collaborator)
-// }
-
-// // CreateCollaborator godoc
-// // @Summary 	Create new collaborator
-// // @Description Create a new collaborator
-// // @Accept  	json
-// // @Param		form	body		forms.CollaboratorCreationForm	true	"Collaborator Creation Form"
-// // @Produce		json
-// // @Success 	200 	{object} 	models.Collaborator
-// // @Failure		400 	{object} 	utils.HTTPError
-// // @Router 		/collaborator 		[post]
-// func (memberController *MemberController) CreateCollaborator(c *gin.Context) {
-// 	// extract the fields of the form
-// 	form := forms.CollaboratorCreationForm{}
-// 	err := c.BindJSON(&form)
-
-// 	// check for errors
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind CollaboratorCreationForm from request body"))
-
-// 		return
-// 	}
-
-// 	// create a collaborator and add to database through the user service
-// 	collaborator := memberController.UserService.CreateCollaborator(&form)
-
-// 	// send back the created collaborator
-// 	c.Header("Content-Type", "application/json")
-// 	c.JSON(http.StatusOK, &collaborator)
-// }
-
-// // UpdateCollaborator godoc
-// // @Summary 	Update a collaborator
-// // @Description Update any number of the fields of a collaborator
-// // @Accept  	json
-// // @Param		collaborator	body		models.Collaborator		true	"Updated Collaborator"
-// // @Produce		json
-// // @Success 	200
-// // @Failure		400 	{object} 	utils.HTTPError
-// // @Failure		410 	{object} 	utils.HTTPError
-// // @Router 		/collaborator 		[put]
-// func (memberController *MemberController) UpdateCollaborator(c *gin.Context) {
-// 	// extract the collaborator from the param
-// 	updatedCollaborator := models.PostCollaborator{}
-// 	err := c.BindJSON(&updatedCollaborator)
-
-// 	// check for errors in the binding
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind updated collaborator from request body"))
-
-// 		return
-// 	}
-
-// 	// update collaborator and add to database through the userService
-// 	err = memberController.UserService.UpdateCollaborator(&updatedCollaborator)
-
-// 	// check for errors in database connection
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update user because no Projectuser with this ID exists"))
-
-// 		return
-// 	}
-
-// 	// if updated successfully return an OK response
-// 	c.Header("Content-Type", "application/json")
-// 	c.Status(http.StatusOK)
-// }
-
-
-

@@ -11,7 +11,6 @@ import (
 // @host      localhost:8080
 // @BasePath  /api/v2
 
-
 func main() {
 	server.Init()
 }

@@ -138,8 +138,8 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/project-posts/{postID} 		[delete]
-func (projectPostController *ProjectPostController) DeleteProjectPost(c *gin.Context) {
-	//delete method goes here
+func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Context) {
+	// delete method goes here
 }
 
 // CreateProjectPostFromGithub godoc
@@ -156,7 +156,7 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(c *gin.Con
 // @Failure		500 	{object} 	utils.HTTPError
 // @Failure 	502 	{object}	utils.HTTPError
 // @Router 		/project-posts/from-github 		[post]
-func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(c *gin.Context) {
+func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(_ *gin.Context) {
 
 }
 
@@ -174,7 +174,7 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/project-posts/{postID}/all-discussions 	[get]
-func (projectPostController *ProjectPostController) GetProjectPostDiscussions(c *gin.Context) {
+func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ *gin.Context) {
 
 }
 
@@ -192,9 +192,9 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussions(c 
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/project-posts/{postID}/open-merge-requests 		[get]
-func (projectPostController *ProjectPostController) GetProjectPostOpenMergeRequests(c *gin.Context) {
-	//return all the merge requests associated with this project post that are open
-	//TODO: make endpoint paginated
+func (projectPostController *ProjectPostController) GetProjectPostOpenMergeRequests(_ *gin.Context) {
+	// return all the merge requests associated with this project post that are open
+	// TODO: make endpoint paginated
 }
 
 // GetProjectPostClosedMergeRequests godoc
@@ -211,7 +211,7 @@ func (projectPostController *ProjectPostController) GetProjectPostOpenMergeReque
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/project-posts/{postID}/closed-merge-requests 		[get]
-func (projectPostController *ProjectPostController) GetProjectPostClosedMergeRequests(c *gin.Context) {
-	//return all the merge requests associated with this project post that are closed
-	//TODO: make endpoint paginated
+func (projectPostController *ProjectPostController) GetProjectPostClosedMergeRequests(_ *gin.Context) {
+	// return all the merge requests associated with this project post that are closed
+	// TODO: make endpoint paginated
 }

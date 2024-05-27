@@ -14,8 +14,8 @@ type ServiceEnv struct {
 }
 
 type ControllerEnv struct {
-	postController controllers.PostController
-	userController controllers.MemberController
+	postController        controllers.PostController
+	userController        controllers.MemberController
 	projectPostController controllers.ProjectPostController
 }
 
@@ -28,8 +28,8 @@ func initServiceEnv() ServiceEnv {
 
 func initControllerEnv(serviceEnv ServiceEnv) ControllerEnv {
 	return ControllerEnv{
-		postController: controllers.PostController{PostService: &serviceEnv.postService},
-		userController: controllers.MemberController{UserService: &serviceEnv.userService},
+		postController:        controllers.PostController{PostService: &serviceEnv.postService},
+		userController:        controllers.MemberController{UserService: &serviceEnv.userService},
 		projectPostController: controllers.ProjectPostController{},
 	}
 }
