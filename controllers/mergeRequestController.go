@@ -102,8 +102,9 @@ func (mergeRequestController *MergeRequestController) GetReview(_ *gin.Context) 
 // @Description Adds a review to a merge request
 // @Accept  	json
 // @Param		mergeRequestID		path		string			true	"merge request ID"
+// @Param		form	body	forms.ReviewCreationForm	true	"review creation form"
 // @Produce		json
-// @Success 	200		{object}	models.ReviewDTO
+// @Success 	200		{object}	models.ProjectPostDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
