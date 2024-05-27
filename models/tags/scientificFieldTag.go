@@ -1,5 +1,8 @@
 package tags
 
+type ScientificFieldTag struct {
+	
+}
 type ScientificField string
 
 const (

@@ -59,7 +59,7 @@ func (mergeRequestController *MergeRequestController) UpdateMergeRequest(c *gin.
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/merge requests/{mergeRequestID} 		[delete]
+// @Router 		/merge-requests/{mergeRequestID} 		[delete]
 func (mergeRequestController *MergeRequestController) DeleteMergeRequest(c *gin.Context) {
 	//delete method goes here
 }
@@ -121,7 +121,7 @@ func (mergeRequestController *MergeRequestController) CreateReview(c *gin.Contex
 // @Param		mergeRequestID		path		string			true	"merge request ID"
 // @Param		reviewID			path		string			true	"review ID"
 // @Produce		json
-// @Success 	200		bool
+// @Success 	200		{array}		boolean
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError

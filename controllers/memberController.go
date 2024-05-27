@@ -187,7 +187,7 @@ func (memberController *MemberController) GetMemberProjectPosts(c *gin.Context) 
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID}/project-posts 		[get]
+// @Router 		/members/{userID}/merge-requests 		[get]
 func (memberController *MemberController) GetMemberMergeRequests(c *gin.Context) {
 	//return all the merge requests
 	//that this member is a collaborator/author of
@@ -204,7 +204,7 @@ func (memberController *MemberController) GetMemberMergeRequests(c *gin.Context)
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID}/project-posts 		[get]
+// @Router 		/members/{userID}/discussions		[get]
 func (memberController *MemberController) GetMemberDiscussions(c *gin.Context) {
 	//returns all the discussions this member is a part of
 	//TODO: make paginated
