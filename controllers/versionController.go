@@ -50,7 +50,7 @@ func (versionController *VersionController) CreateVersion(_ *gin.Context) {
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/versions/{versionID}/render	[get]
 func (versionController *VersionController) RenderVersion(_ *gin.Context) {
-	//TODO: find out how to send back html file in godoc
+	// TODO: find out how to send back html file in godoc
 }
 
 // GetRepository godoc specs
@@ -93,7 +93,7 @@ func (versionController *VersionController) GetFileTreeVersion(_ *gin.Context) {
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/versions/{versionID}/file	[get]
 func (versionController *VersionController) GetFileFromVersion(_ *gin.Context) {
-	//TODO: find out if this response type is correct
+	// TODO: find out if this response type is correct
 }
 
 // GetVersionDiscussions godoc
@@ -113,11 +113,3 @@ func (versionController *VersionController) GetFileFromVersion(_ *gin.Context) {
 func (versionController *VersionController) GetVersionDiscussions(_ *gin.Context) {
 
 }
-
-// - `/versions`
-//   - `POST`
-//   - `/:id` `GET` (get the files?)
-//   - `/:id/file` (get one specific file)
-//   - `/:id/tree`
-//   - `/:id` `/render` `GET`
-//   - `/:id/discussions` `GET` (gets all level-1 discussions of the version) **_p_**

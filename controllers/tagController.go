@@ -16,6 +16,6 @@ type TagController struct {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/tags/scientific	[get]
-func (filterController *FilterController) GetScientificTags(_ *gin.Context) {
+func (tagController *TagController) GetScientificTags(_ *gin.Context) {
 
 }

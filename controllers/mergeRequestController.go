@@ -104,7 +104,7 @@ func (mergeRequestController *MergeRequestController) GetReview(_ *gin.Context) 
 // @Param		mergeRequestID		path		string			true	"merge request ID"
 // @Param		form	body	forms.ReviewCreationForm	true	"review creation form"
 // @Produce		json
-// @Success 	200		{object}	models.ProjectPostDTO
+// @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -130,20 +130,6 @@ func (mergeRequestController *MergeRequestController) UserCanReview(_ *gin.Conte
 
 }
 
-// MergeMergeRequest godoc
-// @Summary 	Merges the merge request into parent post
-// @Description Merges the merge request with the given id into the respective project post
-// @Accept  	json
-// @Param		mergeRequestID		path		string			true	"merge request ID"
-// @Produce		json
-// @Success 	200		{object}	models.ProjectPostDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
-// @Router 		/merge-requests/{mergeRequestID}/merge		[put]
-func (mergeRequestController *MergeRequestController) MergeMergeRequest(_ *gin.Context) {
-
-}
 
 // - `/merge-requests`
 //   - `POST`

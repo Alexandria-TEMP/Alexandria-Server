@@ -18,7 +18,7 @@ type DiscussionController struct {
 // @Failure		404 		{object} 	utils.HTTPError
 // @Failure		500 		{object} 	utils.HTTPError
 // @Router 		/discussions/{discussionID}	[get]
-func (versionController *VersionController) GetDiscussion(_ *gin.Context) {
+func (discussionController *DiscussionController) GetDiscussion(_ *gin.Context) {
 
 }
 
@@ -34,7 +34,7 @@ func (versionController *VersionController) GetDiscussion(_ *gin.Context) {
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/discussions 		[post]
-func (versionController *VersionController) CreateDiscussion(_ *gin.Context) {
+func (discussionController *DiscussionController) CreateDiscussion(_ *gin.Context) {
 
 }
 
@@ -49,7 +49,7 @@ func (versionController *VersionController) CreateDiscussion(_ *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/discussions/{discussionID} 		[delete]
-func (versionController *VersionController) DeleteDiscussion(_ *gin.Context) {
+func (discussionController *DiscussionController) DeleteDiscussion(_ *gin.Context) {
 	// delete method goes here
 }
 
@@ -67,7 +67,7 @@ func (versionController *VersionController) DeleteDiscussion(_ *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/discussions/{discussionID}/replies 		[get]
-func (versionController *VersionController) GetDiscussionReplies(_ *gin.Context) {
+func (discussionController *DiscussionController) GetDiscussionReplies(_ *gin.Context) {
 	//TODO: make paginated
 }
 
@@ -83,7 +83,7 @@ func (versionController *VersionController) GetDiscussionReplies(_ *gin.Context)
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/discussions/{discussionID}/reports 		[post]
-func (versionController *VersionController) AddDiscussionReport(_ *gin.Context) {
+func (discussionController *DiscussionController) AddDiscussionReport(_ *gin.Context) {
 
 }
 
@@ -101,6 +101,6 @@ func (versionController *VersionController) AddDiscussionReport(_ *gin.Context) 
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/discussions/{discussionID}/reports 		[get]
-func (versionController *VersionController) GetDiscussionReports(_ *gin.Context) {
+func (discussionController *DiscussionController) GetDiscussionReports(_ *gin.Context) {
 	//TODO: make paginated
 }
