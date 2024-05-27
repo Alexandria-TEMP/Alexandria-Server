@@ -34,6 +34,10 @@ type MergeRequest struct {
 	// ProjectPost has many MergeRequest
 	ProjectPostID uint
 
+	// MergeRequest belongs to Version (previous version)
+	PreviousVersion   Version `gorm:"foreignKey:PreviousVersionID"`
+	PreviousVersionID uint
+
 	MergeRequestTitle string
 
 	Anonymous bool
@@ -50,6 +54,7 @@ type MergeRequestDTO struct {
 	CollaboratorIDs   []uint
 	ReviewIDs         []uint
 	ProjectPostID     uint
+	PreviousVersionID uint
 	MergeRequestTitle string
 	Anonymous         bool
 }
@@ -68,6 +73,7 @@ func (model *MergeRequest) IntoDTO() MergeRequestDTO {
 		mergeRequestCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
 		model.ProjectPostID,
+		model.PreviousVersionID,
 		model.MergeRequestTitle,
 		model.Anonymous,
 	}
