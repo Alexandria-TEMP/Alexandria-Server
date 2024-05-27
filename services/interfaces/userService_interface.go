@@ -6,9 +6,9 @@ import (
 )
 
 // run to create the mock
-//go:generate mockgen -package=mocks -source=./userService_interface.go -destination=../../mocks/userService_mock.go
+//go:generate mockgen -package=mocks -source=./memberService_interface.go -destination=../../mocks/memberService_mock.go
 
-type UserService interface {
+type MemberService interface {
 	GetMember(userID uint64) (*models.Member, error)
 	CreateMember(memberForm *forms.MemberCreationForm) *models.Member
 	UpdateMember(updatedMember *models.Member) error

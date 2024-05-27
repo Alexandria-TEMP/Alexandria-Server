@@ -16,7 +16,7 @@ import (
 // @BasePath /api/v2
 
 type MemberController struct {
-	UserService interfaces.UserService
+	MemberService interfaces.MemberService
 }
 
 // GetMember godoc
@@ -42,7 +42,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 		return
 	}
 	// get the user through the service
-	member, err := memberController.UserService.GetMember(userID)
+	member, err := memberController.MemberService.GetMember(userID)
 
 	// if there was an error, print it and return
 	if err != nil {
@@ -81,8 +81,8 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 		return
 	}
 
-	// create and add to database(not done yet) through the userService
-	member := memberController.UserService.CreateMember(&form)
+	// create and add to database(not done yet) through the memberService
+	member := memberController.MemberService.CreateMember(&form)
 
 	// send back a positive response with the created member
 	c.Header("Content-Type", "application/json")
@@ -114,7 +114,7 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	}
 
 	// update and add the member to the database
-	err = memberController.UserService.UpdateMember(&updatedMember)
+	err = memberController.MemberService.UpdateMember(&updatedMember)
 
 	// check for errors again
 	if err != nil {
