@@ -36,9 +36,6 @@ func cleanup(t *testing.T) {
 	t.Helper()
 
 	os.RemoveAll(filepath.Join(cwd, "render"))
-
-	db.Unscoped().Where("id >= 0").Delete(&models.Post{})
-	db.Unscoped().Where("id >= 0").Delete(&models.Version{})
 }
 
 func TestCreateVersionSuccess1(t *testing.T) {

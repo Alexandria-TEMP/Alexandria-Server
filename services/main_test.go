@@ -19,7 +19,6 @@ var (
 
 	c   *gin.Context
 	cwd string
-	db  *gorm.DB
 
 	pendingVersion models.Version
 	failureVersion models.Version
