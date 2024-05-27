@@ -2,14 +2,12 @@ package services
 
 import (
 	"errors"
-	"log"
 	"mime/multipart"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
@@ -18,14 +16,6 @@ import (
 
 func beforeEach(t *testing.T) {
 	t.Helper()
-
-	// Create fresh repo
-	var err error
-	db, err = database.InitializeTestDatabase()
-
-	if err != nil {
-		log.Fatalf("Could not initialize test database: %s", err)
-	}
 
 	// Setup mock DB
 	mockCtrl := gomock.NewController(t)
