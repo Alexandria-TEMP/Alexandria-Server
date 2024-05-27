@@ -1330,53 +1330,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests/{mergeRequestID}/merge": {
-            "put": {
-                "description": "Merges the merge request with the given id into the respective project post",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Merges the merge request into parent post",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "merge request ID",
-                        "name": "mergeRequestID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ProjectPostDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
         "/merge-requests/{mergeRequestID}/reviews": {
             "get": {
                 "description": "Returns an array of the statuses of all the reviews of this merge request",
@@ -1442,14 +1395,20 @@ const docTemplate = `{
                         "name": "mergeRequestID",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "review creation form",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.ReviewCreationForm"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ReviewDTO"
-                        }
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -2746,6 +2705,9 @@ const docTemplate = `{
             }
         },
         "forms.ReportCreationForm": {
+            "type": "object"
+        },
+        "forms.ReviewCreationForm": {
             "type": "object"
         },
         "models.DiscussionDTO": {

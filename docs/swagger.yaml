@@ -38,6 +38,8 @@ definitions:
     type: object
   forms.ReportCreationForm:
     type: object
+  forms.ReviewCreationForm:
+    type: object
   models.DiscussionDTO:
     properties:
       anonymous:
@@ -1103,38 +1105,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns whether the user is allowed to review this merge request
-  /merge-requests/{mergeRequestID}/merge:
-    put:
-      consumes:
-      - application/json
-      description: Merges the merge request with the given id into the respective
-        project post
-      parameters:
-      - description: merge request ID
-        in: path
-        name: mergeRequestID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ProjectPostDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Merges the merge request into parent post
   /merge-requests/{mergeRequestID}/reviews:
     get:
       consumes:
@@ -1179,13 +1149,17 @@ paths:
         name: mergeRequestID
         required: true
         type: string
+      - description: review creation form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.ReviewCreationForm'
       produces:
       - application/json
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/models.ReviewDTO'
         "400":
           description: Bad Request
           schema:
