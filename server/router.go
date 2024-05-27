@@ -24,38 +24,11 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	// Setup routing
 	v2 := router.Group("/api/v2")
 
-	postRouter := v2.Group("/posts")
-	postRouter.GET("/:postID", controllers.postController.GetPost)
-	postRouter.POST("/", controllers.postController.CreatePost)
-	postRouter.PUT("/", controllers.postController.UpdatePost)
-	postRouter.DELETE("/:postID", controllers.postController.DeletePost)
-	postRouter.POST("/from-github", controllers.postController.CreatePostFromGithub)
-	postRouter.POST("/:postID/reports", controllers.postController.AddPostReport)
-	postRouter.GET("/:postID/reports", controllers.postController.GetPostReports)
+	postRouter(v2, controllers)
 
-	projectPostRouter := v2.Group("/project-posts")
-	projectPostRouter.GET("/:postID", controllers.projectPostController.GetProjectPost)
-	projectPostRouter.POST("/", controllers.projectPostController.CreateProjectPost)
-	projectPostRouter.PUT("/", controllers.projectPostController.UpdateProjectPost)
-	projectPostRouter.DELETE("/:postID", controllers.projectPostController.DeleteProjectPost)
-	projectPostRouter.POST("/from-github", controllers.projectPostController.CreateProjectPostFromGithub)
-	projectPostRouter.GET("/:postID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
-	projectPostRouter.GET("/:postID/open-merge-requests", controllers.projectPostController.GetProjectPostOpenMergeRequests)
-	projectPostRouter.GET("/:postID/closed-merge-requests", controllers.projectPostController.GetProjectPostClosedMergeRequests)
+	projectPostRouter(v2, controllers)
 
-	memberRouter := v2.Group("/members")
-	memberRouter.GET("/:userID", controllers.memberController.GetMember)
-	memberRouter.POST("/", controllers.memberController.CreateMember)
-	memberRouter.PUT("/", controllers.memberController.UpdateMember)
-	memberRouter.DELETE("/:userID", controllers.memberController.DeleteMember)
-	memberRouter.GET("/:userID/posts", controllers.memberController.GetMemberPosts)
-	memberRouter.GET("/:userID/project-posts", controllers.memberController.GetMemberProjectPosts)
-	memberRouter.GET("/:userID/merge-requests", controllers.memberController.GetMemberMergeRequests)
-	memberRouter.GET("/:userID/discussions", controllers.memberController.GetMemberDiscussions)
-	memberRouter.POST("/:userID/saved-posts", controllers.memberController.AddMemberSavedPost)
-	memberRouter.POST("/:userID/saved-project-posts", controllers.memberController.AddMemberSavedProjectPost)
-	memberRouter.GET("/:userID/saved-posts", controllers.memberController.GetMemberSavedPosts)
-	memberRouter.GET("/:userID/saved-project-posts", controllers.memberController.GetMemberSavedProjectPosts)
+	memberRouter(v2, controllers)
 
 	mergeRequestRouter := v2.Group("/merge-requests")
 	mergeRequestRouter.GET("/:mergeRequestID", controllers.mergeRequestController.GetMergeRequest)
@@ -92,4 +65,43 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	versionRouter.GET("/:versionID/discussions", controllers.versionController.GetVersionDiscussions)
 
 	return router
+}
+
+func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+	memberRouter := v2.Group("/members")
+	memberRouter.GET("/:userID", controllers.memberController.GetMember)
+	memberRouter.POST("/", controllers.memberController.CreateMember)
+	memberRouter.PUT("/", controllers.memberController.UpdateMember)
+	memberRouter.DELETE("/:userID", controllers.memberController.DeleteMember)
+	memberRouter.GET("/:userID/posts", controllers.memberController.GetMemberPosts)
+	memberRouter.GET("/:userID/project-posts", controllers.memberController.GetMemberProjectPosts)
+	memberRouter.GET("/:userID/merge-requests", controllers.memberController.GetMemberMergeRequests)
+	memberRouter.GET("/:userID/discussions", controllers.memberController.GetMemberDiscussions)
+	memberRouter.POST("/:userID/saved-posts", controllers.memberController.AddMemberSavedPost)
+	memberRouter.POST("/:userID/saved-project-posts", controllers.memberController.AddMemberSavedProjectPost)
+	memberRouter.GET("/:userID/saved-posts", controllers.memberController.GetMemberSavedPosts)
+	memberRouter.GET("/:userID/saved-project-posts", controllers.memberController.GetMemberSavedProjectPosts)
+}
+
+func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+	projectPostRouter := v2.Group("/project-posts")
+	projectPostRouter.GET("/:postID", controllers.projectPostController.GetProjectPost)
+	projectPostRouter.POST("/", controllers.projectPostController.CreateProjectPost)
+	projectPostRouter.PUT("/", controllers.projectPostController.UpdateProjectPost)
+	projectPostRouter.DELETE("/:postID", controllers.projectPostController.DeleteProjectPost)
+	projectPostRouter.POST("/from-github", controllers.projectPostController.CreateProjectPostFromGithub)
+	projectPostRouter.GET("/:postID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
+	projectPostRouter.GET("/:postID/open-merge-requests", controllers.projectPostController.GetProjectPostOpenMergeRequests)
+	projectPostRouter.GET("/:postID/closed-merge-requests", controllers.projectPostController.GetProjectPostClosedMergeRequests)
+}
+
+func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+	postRouter := v2.Group("/posts")
+	postRouter.GET("/:postID", controllers.postController.GetPost)
+	postRouter.POST("/", controllers.postController.CreatePost)
+	postRouter.PUT("/", controllers.postController.UpdatePost)
+	postRouter.DELETE("/:postID", controllers.postController.DeletePost)
+	postRouter.POST("/from-github", controllers.postController.CreatePostFromGithub)
+	postRouter.POST("/:postID/reports", controllers.postController.AddPostReport)
+	postRouter.GET("/:postID/reports", controllers.postController.GetPostReports)
 }
