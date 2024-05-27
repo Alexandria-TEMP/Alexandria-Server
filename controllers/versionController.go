@@ -29,10 +29,10 @@ func (versionController *VersionController) GetVersion(c *gin.Context) {
 // @Summary 	Create new version
 // @Description Create a new version with discussions and repository
 // @Accept  	multipart/form-data
-// @Param		postID		body		string				true	"Parent Post ID"
+// @Param		postID		query		string				true	"Parent Post ID"
 // @Param		repository	body		models.Repository	true	"Repository to create"
 // @Produce		application/json
-// @Success 	200		{object}	models.Version
+// @Success 	200		{object}	models.VersionDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/versions	[post]
@@ -46,7 +46,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 // @Description Get the render of the repository underlying a version
 // @Param		versionID		path		string			true	"version ID"
 // @Produce		text/html
-// @Success 	200		[]byte
+// @Success 	200		{object}	[]byte
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -61,7 +61,7 @@ func (versionController *VersionController) RenderVersion(c *gin.Context) {
 // @Description Get the entire zipped repository of a version
 // @Param		versionID	path		string				true	"Version ID"
 // @Produce		application/zip
-// @Success 	200		[]byte
+// @Success 	200		{object}	[]byte
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/version/{versionID}/repository	[get]
@@ -92,7 +92,7 @@ func (versionController *VersionController) GetFileTreeVersion(c *gin.Context) {
 // @Param		versionID		path		string			true	"version ID"
 // @Param		filePath		body		string			true	"file path"
 // @Produce		application/zip
-// @Success 	200		[]byte
+// @Success 	200		{object}	[]byte
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError

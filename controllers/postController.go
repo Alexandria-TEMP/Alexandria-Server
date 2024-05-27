@@ -147,7 +147,7 @@ func (postController *PostController) DeletePost(c *gin.Context) {
 // @Description However, the post files are imported from the given Github repository
 // @Accept  	json
 // @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
-// @Param		url		body	string					true	"Github repository url"
+// @Param		url		query	string					true	"Github repository url"
 // @Produce		json
 // @Success 	200 	{object} 	models.PostDTO
 // @Failure		400 	{object} 	utils.HTTPError

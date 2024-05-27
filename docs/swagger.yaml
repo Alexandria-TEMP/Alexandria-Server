@@ -1,4 +1,27 @@
+basePath: /api/v2
 definitions:
+  forms.DiscussionCreationForm:
+    type: object
+  forms.FilterForm:
+    type: object
+  forms.MemberCreationForm:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      institution:
+        type: string
+      lastName:
+        type: string
+      password:
+        description: |-
+          making the password just a string for now
+          TODO: some hashing or semblance of security
+        type: string
+    type: object
+  forms.MergeRequestCreationForm:
+    type: object
   forms.PostCreationForm:
     properties:
       collaborators:
@@ -12,6 +35,67 @@ definitions:
         allOf:
         - $ref: '#/definitions/forms.PostCreationForm'
         description: TODO add fields
+    type: object
+  forms.ReportCreationForm:
+    type: object
+  models.DiscussionDTO:
+    properties:
+      anonymous:
+        type: boolean
+      deleted:
+        type: boolean
+      id:
+        type: integer
+      memberID:
+        type: integer
+      replyIDs:
+        items:
+          type: integer
+        type: array
+      text:
+        type: string
+      versionID:
+        type: integer
+    type: object
+  models.Member:
+    type: object
+  models.MemberDTO:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: integer
+      institution:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+    type: object
+  models.MergeRequestDTO:
+    properties:
+      anonymous:
+        type: boolean
+      collaboratorIDs:
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
+      newVersionID:
+        type: integer
+      projectPostID:
+        type: integer
+      reviewIDs:
+        items:
+          type: integer
+        type: array
+      updatedCompletionStatus:
+        $ref: '#/definitions/tags.CompletionStatus'
+      updatedScientificFields:
+        $ref: '#/definitions/tags.ScientificField'
     type: object
   models.PostDTO:
     properties:
@@ -46,10 +130,25 @@ definitions:
         items:
           type: integer
         type: array
-      postID:
-        type: integer
+      postDTO:
+        $ref: '#/definitions/models.PostDTO'
       postReviewStatusTag:
         $ref: '#/definitions/tags.PostReviewStatus'
+    type: object
+  models.ReportDTO:
+    type: object
+  models.Repository:
+    type: object
+  models.ReviewDTO:
+    type: object
+  models.VersionDTO:
+    properties:
+      discussionIDs:
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
     type: object
   tags.CompletionStatus:
     enum:
@@ -95,6 +194,8 @@ definitions:
     type: string
     x-enum-varnames:
     - Mathematics
+  tags.ScientificFieldTag:
+    type: object
   utils.HTTPError:
     properties:
       code:
@@ -102,21 +203,58 @@ definitions:
       message:
         type: string
     type: object
+host: localhost:8080
 info:
   contact: {}
+  description: This is the API of Alexandria.
+  title: Alexandria API
+  version: "2.0"
 paths:
-  /:
-    put:
+  /discussions:
+    post:
       consumes:
       - application/json
-      description: Update any number of the aspects of project post
+      description: |-
+        Create a new discussion
+        If parent ID field is used, the discussion will be a reply
       parameters:
-      - description: Updated Project Post
+      - description: Discussion Creation Form
         in: body
-        name: post
+        name: form
         required: true
         schema:
-          $ref: '#/definitions/models.ProjectPostDTO'
+          $ref: '#/definitions/forms.DiscussionCreationForm'
+      - description: Parent ID
+        in: query
+        name: parentID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DiscussionDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Create new discussion
+  /discussions/{discussionID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a discussion with given ID from database
+      parameters:
+      - description: discussion ID
+        in: path
+        name: discussionID
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -126,12 +264,979 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.HTTPError'
-        "410":
-          description: Gone
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Update project post
-  /post:
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Delete a discussion
+    get:
+      consumes:
+      - application/json
+      description: Get a discussion by discussion ID
+      parameters:
+      - description: Discussion ID
+        in: path
+        name: discussionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DiscussionDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get discussion
+  /discussions/{discussionID}/replies:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Gets an array of all the first-level replies of a discussion
+        Endpoint is offset-paginated
+      parameters:
+      - description: discussion ID
+        in: path
+        name: discussionID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.DiscussionDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get all the replies of a discussion
+  /discussions/{discussionID}/reports:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get all reports that have been added to this discussion
+        Endpoint is offset-paginated
+      parameters:
+      - description: Discussion ID
+        in: path
+        name: discussionID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ReportDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get all reports of this discussion
+    post:
+      consumes:
+      - application/json
+      description: Create a new report for a discussion
+      parameters:
+      - description: Report Creation Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.ReportCreationForm'
+      - description: Discussion ID
+        in: path
+        name: discussionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ReportDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Add a new report to a discussion
+  /filter/posts:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Returns all posts that meet the requirements in the form
+        Endpoint is offset-paginated
+      parameters:
+      - description: Filter form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.FilterForm'
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PostDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Filters all posts
+  /filter/project-posts:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Returns all project posts that meet the requirements in the form
+        Endpoint is offset-paginated
+      parameters:
+      - description: Filter form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.FilterForm'
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ProjectPostDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Filters all project posts
+  /members:
+    post:
+      consumes:
+      - application/json
+      description: Create a new member from the given fields
+      parameters:
+      - description: Member Creation Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.MemberCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MemberDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Create a new member
+    put:
+      consumes:
+      - application/json
+      description: Update the fields of a member
+      parameters:
+      - description: Updated member
+        in: body
+        name: member
+        required: true
+        schema:
+          $ref: '#/definitions/models.Member'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Update a member
+  /members/{userID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a member with given ID from database
+      parameters:
+      - description: user ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Delete a member
+    get:
+      consumes:
+      - application/json
+      description: Get a member by user ID
+      parameters:
+      - description: user ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MemberDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get member from database
+  /members/{userID}/discussions:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get all merge requests that this member is a collaborator of
+        Endpoint is offset-paginated
+      parameters:
+      - description: user ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.DiscussionDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get all merge requests of this member
+  /members/{userID}/merge-requests:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get all merge requests that this member is a collaborator of
+        Endpoint is offset-paginated
+      parameters:
+      - description: user ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MergeRequestDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get all merge requests of this member
+  /members/{userID}/posts:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get all posts that this member is a collaborator of
+        Endpoint is offset-paginated
+      parameters:
+      - description: user ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PostDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get all posts of this member
+  /members/{userID}/project-posts:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get all project posts that this member is a collaborator of
+        Endpoint is offset-paginated
+      parameters:
+      - description: user ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ProjectPostDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get all project posts of this member
+  /members/{userID}/saved-posts:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get all posts that this member has saved
+        Endpoint is offset-paginated
+      parameters:
+      - description: user ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PostDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get all saved posts of this member
+  /members/{userID}/saved-posts/{postID}:
+    post:
+      consumes:
+      - application/json
+      description: Adds a post to the saved posts of a member
+      parameters:
+      - description: user ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Adds new saved post
+  /members/{userID}/saved-project-posts:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get all project posts that this member has saved
+        Endpoint is offset-paginated
+      parameters:
+      - description: user ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ProjectPostDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get all saved project posts of this member
+  /members/{userID}/saved-project-posts/{postID}:
+    post:
+      consumes:
+      - application/json
+      description: Adds a project post to the saved project posts of a member
+      parameters:
+      - description: user ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Adds new saved project post
+  /merge-requests:
+    post:
+      consumes:
+      - application/json
+      description: Create a new question or discussion merge request
+      parameters:
+      - description: MergeRequest Creation Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.MergeRequestCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MergeRequestDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Create new merge request
+    put:
+      consumes:
+      - application/json
+      description: Update any number of the aspects of a merge request
+      parameters:
+      - description: Updated MergeRequest
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.MergeRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Update merge request
+  /merge-requests/{mergeRequestID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a merge request with given ID from database
+      parameters:
+      - description: merge request ID
+        in: path
+        name: mergeRequestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Delete a merge request
+    get:
+      consumes:
+      - application/json
+      description: Get a merge request by merge request ID
+      parameters:
+      - description: MergeRequest ID
+        in: path
+        name: mergeRequestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MergeRequestDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get merge request
+  /merge-requests/{mergeRequestID}/can-review/{userID}:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Returns true if the user fulfills the requirements to review the merge request
+        Returns false if user is unauthorized to review the merge request
+      parameters:
+      - description: merge request ID
+        in: path
+        name: mergeRequestID
+        required: true
+        type: string
+      - description: user ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: boolean
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Returns whether the user is allowed to review this merge request
+  /merge-requests/{mergeRequestID}/merge:
+    put:
+      consumes:
+      - application/json
+      description: Merges the merge request with the given id into the respective
+        project post
+      parameters:
+      - description: merge request ID
+        in: path
+        name: mergeRequestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ProjectPostDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Merges the merge request into parent post
+  /merge-requests/{mergeRequestID}/reviews:
+    get:
+      consumes:
+      - application/json
+      description: Returns an array of the statuses of all the reviews of this merge
+        request
+      parameters:
+      - description: merge request ID
+        in: path
+        name: mergeRequestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Returns status of all merge request reviews
+    post:
+      consumes:
+      - application/json
+      description: Adds a review to a merge request
+      parameters:
+      - description: merge request ID
+        in: path
+        name: mergeRequestID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ReviewDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Adds a review to a merge request
+  /merge-requests/{mergeRequestID}/reviews/{reviewID}:
+    get:
+      consumes:
+      - application/json
+      description: Returns a review with the given ID of the merge request with the
+        given ID
+      parameters:
+      - description: merge request ID
+        in: path
+        name: mergeRequestID
+        required: true
+        type: string
+      - description: review ID
+        in: path
+        name: reviewID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ReviewDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Returns a review of a merge request
+  /posts:
     post:
       consumes:
       - application/json
@@ -154,8 +1259,69 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
       summary: Create new post
-  /post/{postID}:
+    put:
+      consumes:
+      - application/json
+      description: Update any number of the aspects of a question or discussion post
+      parameters:
+      - description: Updated Post
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/models.PostDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Update post
+  /posts/{postID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a post with given ID from database
+      parameters:
+      - description: post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Delete a post
     get:
       consumes:
       - application/json
@@ -177,12 +1343,135 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.HTTPError'
-        "410":
-          description: Gone
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get post
-  /projectPost:
+  /posts/{postID}/reports:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get all reports that have been added to this post
+        Endpoint is offset-paginated
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ReportDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get all reports of this post
+    post:
+      consumes:
+      - application/json
+      description: Create a new report for a post
+      parameters:
+      - description: Report Creation Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.ReportCreationForm'
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ReportDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Add a new report to a post
+  /posts/from-github:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Create a new question or discussion post
+        Creates a post in the same way as CreatePost
+        However, the post files are imported from the given Github repository
+      parameters:
+      - description: Post Creation Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.PostCreationForm'
+      - description: Github repository url
+        in: query
+        name: url
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PostDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Create new post with the version imported from github
+  /project-posts:
     post:
       consumes:
       - application/json
@@ -194,6 +1483,10 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/forms.ProjectPostCreationForm'
+      - description: Parent post ID
+        in: query
+        name: parentPostID
+        type: string
       produces:
       - application/json
       responses:
@@ -205,12 +1498,73 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
       summary: Create new project post
-  /projectPost/{postID}:
+    put:
+      consumes:
+      - application/json
+      description: Update any number of the aspects of a project post
+      parameters:
+      - description: Updated Project Post
+        in: body
+        name: post
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProjectPostDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Update project post
+  /project-posts/{postID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a project post with given ID from database
+      parameters:
+      - description: post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Delete a project post
     get:
       consumes:
       - application/json
-      description: Get a project post by post ID
+      description: Get a project post by ID
       parameters:
       - description: Post ID
         in: path
@@ -228,9 +1582,442 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.HTTPError'
-        "410":
-          description: Gone
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get project post
+  /project-posts/{postID}/all-discussions:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Returns all discussions on this project post and all of it's merge requests
+        Endpoint is offset-paginated
+      parameters:
+      - description: post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.DiscussionDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Returns all discussions associated with the project post
+  /project-posts/{postID}/closed-merge-requests:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get all closed merge requests associated with the given project post
+        Endpoint is offset-paginated
+      parameters:
+      - description: post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MergeRequestDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get all closed merge requests of a project post
+  /project-posts/{postID}/open-merge-requests:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Get all open merge requests associated with the given project post
+        Endpoint is offset-paginated
+      parameters:
+      - description: post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.MergeRequestDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get all open merge requests of a project post
+  /project-posts/from-github:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Create a new project post
+        Creates a project post in the same way as CreateProjectPost
+        However, the post files are imported from the given Github repository
+      parameters:
+      - description: Post Creation Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.ProjectPostCreationForm'
+      - description: Github repository url
+        in: query
+        name: url
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ProjectPostDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Create new project post with the version imported from github
+  /tags/scientific:
+    get:
+      description: Returns all scientific tags in the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/tags.ScientificFieldTag'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Returns all scientific tags
+  /version/{versionID}/repository:
+    get:
+      description: Get the entire zipped repository of a version
+      parameters:
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/zip
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get the repository of a version
+  /versions:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new version with discussions and repository
+      parameters:
+      - description: Parent Post ID
+        in: query
+        name: postID
+        required: true
+        type: string
+      - description: Repository to create
+        in: body
+        name: repository
+        required: true
+        schema:
+          $ref: '#/definitions/models.Repository'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.VersionDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Create new version
+  /versions/{versionID}:
+    get:
+      consumes:
+      - application/json
+      description: Get a version by version ID
+      parameters:
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.VersionDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get version
+  /versions/{versionID}/discussions:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Returns all discussions on this version that are not a reply to another discussion
+        Endpoint is offset-paginated
+      parameters:
+      - description: version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.DiscussionDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Returns all level 1 discussions associated with the version
+  /versions/{versionID}/file:
+    get:
+      description: Get the contents of a single file from a repository of a version
+      parameters:
+      - description: version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      - description: file path
+        in: body
+        name: filePath
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/zip
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get a file from a repository
+  /versions/{versionID}/render:
+    get:
+      description: Get the render of the repository underlying a version
+      parameters:
+      - description: version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get the render of a version
+  /versions/{versionID}/tree:
+    get:
+      consumes:
+      - application/json
+      description: Get the file tree of a repository of a version
+      parameters:
+      - description: version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get the file tree of a repository
 swagger: "2.0"

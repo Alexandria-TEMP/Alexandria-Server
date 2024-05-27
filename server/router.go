@@ -17,23 +17,23 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	}
 
 	// Setup swagger documentation
-	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.BasePath = "/api/v2"
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Setup routing
-	v1 := router.Group("/api/v1")
+	v2 := router.Group("/api/v2")
 
-	postRouter := v1.Group("/post")
+	postRouter := v2.Group("/post")
 	postRouter.GET("/:postID", controllers.postController.GetPost)
 	postRouter.POST("/", controllers.postController.CreatePost)
 	postRouter.PUT("/", controllers.postController.UpdatePost)
 
-	projectPostRouter := v1.Group("/projectPost")
+	projectPostRouter := v2.Group("/projectPost")
 	projectPostRouter.GET("/:postID", controllers.projectPostController.GetProjectPost)
 	projectPostRouter.POST("", controllers.projectPostController.CreateProjectPost)
 
-	memberRouter := v1.Group("/member")
+	memberRouter := v2.Group("/member")
 	memberRouter.GET("/:userID", controllers.userController.GetMember)
 	memberRouter.POST("/", controllers.userController.CreateMember)
 	memberRouter.PUT("/", controllers.userController.UpdateMember)

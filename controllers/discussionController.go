@@ -28,7 +28,7 @@ func (versionController *VersionController) GetDiscussion(c *gin.Context) {
 // @Description If parent ID field is used, the discussion will be a reply
 // @Accept  	json
 // @Param		form	body	forms.DiscussionCreationForm	true	"Discussion Creation Form"
-// @Param 		parentID			body		string			false	"Parent ID"
+// @Param 		parentID			query		string			false	"Parent ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.DiscussionDTO
 // @Failure		400 	{object} 	utils.HTTPError

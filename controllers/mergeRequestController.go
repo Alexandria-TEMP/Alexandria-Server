@@ -121,7 +121,7 @@ func (mergeRequestController *MergeRequestController) CreateReview(c *gin.Contex
 // @Description Returns false if user is unauthorized to review the merge request
 // @Accept  	json
 // @Param		mergeRequestID		path		string			true	"merge request ID"
-// @Param		reviewID			path		string			true	"review ID"
+// @Param		userID			path		string			true	"user ID"
 // @Produce		json
 // @Success 	200		{array}		boolean
 // @Failure		400 	{object} 	utils.HTTPError

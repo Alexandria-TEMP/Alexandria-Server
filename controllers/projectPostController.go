@@ -62,7 +62,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 // @Description Create a new project post
 // @Accept  	json
 // @Param		form			body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
-// @Param 		parentPostID	body		string							false	"Parent post ID"
+// @Param 		parentPostID	query		string							false	"Parent post ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
 // @Failure		400 		{object} 	utils.HTTPError
@@ -149,7 +149,7 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(c *gin.Con
 // @Description However, the post files are imported from the given Github repository
 // @Accept  	json
 // @Param		form	body	forms.ProjectPostCreationForm	true	"Post Creation Form"
-// @Param		url		body	string							true	"Github repository url"
+// @Param		url		query	string							true	"Github repository url"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
 // @Failure		400 	{object} 	utils.HTTPError
