@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
@@ -238,9 +239,13 @@ func (versionService *VersionService) GetTreeFromRepository(versionID, postID ui
 }
 
 func (versionService *VersionService) GetFileFromRepository(versionID, postID uint, relFilepath string) (string, error) {
+	if strings.Contains(relFilepath, "..") {
+		return "", fmt.Errorf("file is outside of repository")
+	}
+
 	// Set current version
 	versionService.Filesystem.SetCurrentVersion(versionID, postID)
-	absFilepath, _ := filepath.Abs(filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), relFilepath))
+	absFilepath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), relFilepath)
 
 	// Check that file exists, if not return 404
 	if exists := utils.FileExists(absFilepath); !exists {

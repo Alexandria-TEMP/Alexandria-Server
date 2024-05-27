@@ -396,10 +396,22 @@ func TestGetFileFromRepositorySuccess(t *testing.T) {
 	defer cleanup(t)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
-	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return("../utils/test_files/file_tree").Times(1)
+	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return("/app/utils/test_files/file_tree").Times(1)
 
 	absFilepath, err := versionService.GetFileFromRepository(successVersion.ID, 0, "/child_dir/test.txt")
 
 	assert.Nil(t, err)
 	assert.Equal(t, "/app/utils/test_files/file_tree/child_dir/test.txt", absFilepath)
+}
+
+func TestGetFileFromRepositoryFailure(t *testing.T) {
+	beforeEach(t)
+	defer cleanup(t)
+
+	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID, uint(0)).Times(1)
+	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return("/app/utils/test_files/file_tree").Times(1)
+
+	_, err := versionService.GetFileFromRepository(successVersion.ID, 0, "../../../.env")
+
+	assert.NotNil(t, err)
 }
