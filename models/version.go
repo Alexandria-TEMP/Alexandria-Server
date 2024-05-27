@@ -6,23 +6,26 @@ import (
 	"gorm.io/gorm"
 )
 
-type Repository struct {
-	// TODO write serialization/deserialization, OR use a filesystem instead
-	// QuartoProject multipart.File `swaggerignore:"true"`
-}
+type RenderStatus string
+
+const (
+	Success RenderStatus = "success"
+	Pending RenderStatus = "pending"
+	Failure RenderStatus = "failure"
+)
 
 type Version struct {
 	gorm.Model
 
-	Repository Repository `gorm:"serializer:json"`
-
 	// Version has many Discussion
-	Discussions []*Discussion `gorm:"foreignKey:VersionID"`
+	Discussions  []*Discussion `gorm:"foreignKey:VersionID"`
+	RenderStatus RenderStatus
 }
 
 type VersionDTO struct {
 	ID            uint
 	DiscussionIDs []uint
+	RenderStatus  RenderStatus
 }
 
 func (model *Version) GetID() uint {
@@ -33,6 +36,7 @@ func (model *Version) IntoDTO() VersionDTO {
 	return VersionDTO{
 		model.ID,
 		discussionsIntoIDs(model.Discussions),
+		model.RenderStatus,
 	}
 }
 

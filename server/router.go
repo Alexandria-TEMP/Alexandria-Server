@@ -58,11 +58,11 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	versionRouter := v2.Group("/versions")
 	versionRouter.GET("/:versionID", controllers.versionController.GetVersion)
 	versionRouter.POST("/", controllers.versionController.CreateVersion)
-	versionRouter.GET("/:versionID/render", controllers.versionController.RenderVersion)
+	versionRouter.GET("/:versionID/render", controllers.versionController.GetRender)
 	versionRouter.GET("/:versionID/repository", controllers.versionController.GetRepository)
-	versionRouter.GET("/:versionID/tree", controllers.versionController.GetFileTreeVersion)
-	versionRouter.GET("/:versionID/file", controllers.versionController.GetFileFromVersion)
-	versionRouter.GET("/:versionID/discussions", controllers.versionController.GetVersionDiscussions)
+	versionRouter.GET("/:versionID/tree", controllers.versionController.GetFileTree)
+	versionRouter.GET("/:versionID/file", controllers.versionController.GetFileFromrepository)
+	versionRouter.GET("/:versionID/discussions", controllers.versionController.GetDiscussions)
 
 	return router
 }
