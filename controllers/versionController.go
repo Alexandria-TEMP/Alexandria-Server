@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @BasePath /api/v2
+
 type VersionController struct {
 }
 
@@ -107,6 +109,8 @@ func (versionController *VersionController) GetFileFromVersion(c *gin.Context) {
 // @Description Endpoint is offset-paginated
 // @Accept  	json
 // @Param		versionID		path		string			true	"version ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.DiscussionDTO
 // @Failure		400 	{object} 	utils.HTTPError

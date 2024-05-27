@@ -2,6 +2,8 @@ package controllers
 
 import "github.com/gin-gonic/gin"
 
+// @BasePath /api/v2
+
 type DiscussionController struct {
 }
 
@@ -54,8 +56,11 @@ func (versionController *VersionController) DeleteDiscussion(c *gin.Context) {
 // GetDiscussionReplies godoc
 // @Summary 	Get all the replies of a discussion
 // @Description Gets an array of all the first-level replies of a discussion
+// @Description Endpoint is offset-paginated
 // @Accept  	json
 // @Param		discussionID		path		string			true	"discussion ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.DiscussionDTO
 // @Failure		400 	{object} 	utils.HTTPError
@@ -85,8 +90,11 @@ func (versionController *VersionController) AddDiscussionReport(c *gin.Context) 
 // GetDiscussionReports godoc
 // @Summary		Get all reports of this discussion
 // @Description	Get all reports that have been added to this discussion
+// @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		discussionID		path		string			true	"Discussion ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.ReportDTO
 // @Failure		400 	{object} 	utils.HTTPError

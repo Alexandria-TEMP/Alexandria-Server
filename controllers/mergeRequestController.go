@@ -2,6 +2,8 @@ package controllers
 
 import "github.com/gin-gonic/gin"
 
+// @BasePath /api/v2
+
 type MergeRequestController struct {
 }
 

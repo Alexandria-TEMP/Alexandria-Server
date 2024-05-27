@@ -166,6 +166,8 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Description Endpoint is offset-paginated
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.DiscussionDTO
 // @Failure		400 	{object} 	utils.HTTPError
@@ -179,8 +181,11 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussions(c 
 // GetProjectPostOpenMergeRequests godoc
 // @Summary		Get all open merge requests of a project post
 // @Description	Get all open merge requests associated with the given project post
+// @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		postID		path		string			true	"post ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.MergeRequestDTO
 // @Failure		400 	{object} 	utils.HTTPError
@@ -195,8 +200,11 @@ func (projectPostController *ProjectPostController) GetProjectPostOpenMergeReque
 // GetProjectPostClosedMergeRequests godoc
 // @Summary		Get all closed merge requests of a project post
 // @Description	Get all closed merge requests associated with the given project post
+// @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		postID		path		string			true	"post ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.MergeRequestDTO
 // @Failure		400 	{object} 	utils.HTTPError

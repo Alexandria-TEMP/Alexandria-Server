@@ -13,6 +13,8 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
+// @BasePath /api/v2
+
 type MemberController struct {
 	UserService interfaces.UserService
 }
@@ -139,15 +141,18 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID} 		[delete]
 func (memberController *MemberController) DeleteMember(c *gin.Context) {
-	//delete method goes here
+	// delete method goes here
 }
 
 // - `/:id/posts` `GET` (how does this work w/ project posts?) **_p_**
 // GetMemberPosts godoc
 // @Summary		Get all posts of this member
 // @Description	Get all posts that this member is a collaborator of
+// @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.PostDTO
 // @Failure		400 	{object} 	utils.HTTPError
@@ -155,16 +160,19 @@ func (memberController *MemberController) DeleteMember(c *gin.Context) {
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/posts 		[get]
 func (memberController *MemberController) GetMemberPosts(c *gin.Context) {
-	//return all the posts
-	//that this member is a collaborator/author of
-	//TODO: make endpoint paginated
+	// return all the posts
+	// that this member is a collaborator/author of
+	// TODO: make endpoint paginated
 }
 
 // GetMemberProjectPosts godoc
 // @Summary		Get all project posts of this member
 // @Description	Get all project posts that this member is a collaborator of
+// @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.ProjectPostDTO
 // @Failure		400 	{object} 	utils.HTTPError
@@ -180,8 +188,11 @@ func (memberController *MemberController) GetMemberProjectPosts(c *gin.Context) 
 // GetMemberMergeRequests godoc
 // @Summary		Get all merge requests of this member
 // @Description	Get all merge requests that this member is a collaborator of
+// @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.MergeRequestDTO
 // @Failure		400 	{object} 	utils.HTTPError
@@ -197,8 +208,11 @@ func (memberController *MemberController) GetMemberMergeRequests(c *gin.Context)
 // GetMemberDiscussions godoc
 // @Summary		Get all merge requests of this member
 // @Description	Get all merge requests that this member is a collaborator of
+// @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.DiscussionDTO
 // @Failure		400 	{object} 	utils.HTTPError
@@ -244,8 +258,11 @@ func (memberController *MemberController) AddMemberSavedProjectPost(c *gin.Conte
 // GetMemberSavedPosts godoc
 // @Summary		Get all saved posts of this member
 // @Description	Get all posts that this member has saved
+// @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.PostDTO
 // @Failure		400 	{object} 	utils.HTTPError
@@ -260,8 +277,11 @@ func (memberController *MemberController) GetMemberSavedPosts(c *gin.Context) {
 // GetMemberProjectPosts godoc
 // @Summary		Get all saved project posts of this member
 // @Description	Get all project posts that this member has saved
+// @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.ProjectPostDTO
 // @Failure		400 	{object} 	utils.HTTPError
