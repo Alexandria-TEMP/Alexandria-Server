@@ -1,4 +1,0 @@
-- source: index.qmd
-  quarto-pub:
-    - id: c3e47920-a894-407a-a2ca-4f794ce63ebc
-      url: 'https://quartopub.com/sites/examples/create-tabsets-panel-from-r-code'

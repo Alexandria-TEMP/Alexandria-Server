@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"mime/multipart"
 	"os"
 	"os/exec"
@@ -32,9 +33,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 
 	// Save zip file
 	if err := versionService.Filesystem.SaveRepository(c, file); err != nil {
-		version.RenderStatus = models.Failure
-		_, _ = versionService.VersionRepository.Update(&version)
-		_ = versionService.Filesystem.RemoveRepository()
+		versionService.FailAndRemoveVersion(&version)
 
 		return &version, err
 	}
@@ -129,7 +128,8 @@ func (versionService *VersionService) SetProjectConfig() error {
 		return fmt.Errorf("failed to marshal yaml config file")
 	}
 
-	err = os.WriteFile(configFilepath, yamlFile, 0666)
+	var permMode fs.FileMode = 0o666
+	err = os.WriteFile(configFilepath, yamlFile, permMode)
 
 	if err != nil {
 		return fmt.Errorf("failed to write yaml config file back")
