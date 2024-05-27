@@ -16,12 +16,8 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 		NewVersion:   Version{},
 		NewVersionID: 99,
 		Collaborators: []*MergeRequestCollaborator{
-			{
-				Model: gorm.Model{ID: 100},
-			},
-			{
-				Model: gorm.Model{ID: 50},
-			},
+			{Model: gorm.Model{ID: 100}},
+			{Model: gorm.Model{ID: 50}},
 		},
 		Reviews: []*MergeRequestReview{
 			{
