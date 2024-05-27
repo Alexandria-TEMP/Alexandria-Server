@@ -174,11 +174,13 @@ func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
 				return err
 			}
 
+			relativePath, err := filepath.Rel(filesystem.CurrentQuartoDirPath, path)
+
+			// If its a directory add it with size -1
 			if info.IsDir() {
+				fileTree[relativePath] = -1
 				return nil
 			}
-
-			relativePath, err := filepath.Rel(filesystem.CurrentQuartoDirPath, path)
 
 			if err != nil {
 				return err

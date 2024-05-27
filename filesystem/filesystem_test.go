@@ -86,7 +86,7 @@ func TestGetFileTreeSuccess(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	assert.Equal(t, map[string]int64{"child_dir/test.txt": 0, "example.qmd": 0}, files)
+	assert.Equal(t, map[string]int64{".": -1, "child_dir": -1, "child_dir/test.txt": 0, "example.qmd": 0}, files)
 }
 
 func TestGetFileTreeFailure(t *testing.T) {
