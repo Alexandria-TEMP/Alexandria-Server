@@ -40,9 +40,12 @@ func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 
 func initServiceEnv(repositoryEnv RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
 	return ServiceEnv{
-		postService:    services.PostService{},
-		versionService: services.VersionService{Filesystem: fs},
-		memberService:  services.MemberService{},
+		postService: services.PostService{},
+		versionService: services.VersionService{
+			VersionRepository: repositoryEnv.versionRepository,
+			Filesystem:        fs,
+		},
+		memberService: services.MemberService{},
 	}
 }
 

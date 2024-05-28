@@ -37,12 +37,12 @@ func cleanup(t *testing.T) {
 func TestInitsystem(t *testing.T) {
 	defer cleanup(t)
 
-	CurrentFilesystem.SetCurrentVersion(1, 2)
+	CurrentFilesystem.SetCurrentVersion(1)
 
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "2", "1"), CurrentFilesystem.CurrentDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "2", "1", "quarto_project"), CurrentFilesystem.CurrentQuartoDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "2", "1", "render"), CurrentFilesystem.CurrentRenderDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "2", "1", "quarto_project.zip"), CurrentFilesystem.CurrentZipFilePath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1"), CurrentFilesystem.CurrentDirPath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "quarto_project"), CurrentFilesystem.CurrentQuartoDirPath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "render"), CurrentFilesystem.CurrentRenderDirPath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "quarto_project.zip"), CurrentFilesystem.CurrentZipFilePath)
 }
 
 func TestFileHandling(t *testing.T) {
@@ -51,7 +51,7 @@ func TestFileHandling(t *testing.T) {
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	file, _ := CreateMultipartFileHeader("../utils/test_files/file_handling_test.zip")
 
-	CurrentFilesystem.SetCurrentVersion(1, 2)
+	CurrentFilesystem.SetCurrentVersion(1)
 
 	// Test saving fileheader
 	err := CurrentFilesystem.SaveRepository(c, file)

@@ -42,39 +42,39 @@ func (m *MockVersionService) EXPECT() *MockVersionServiceMockRecorder {
 }
 
 // CreateVersion mocks base method.
-func (m *MockVersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (*models.Version, error) {
+func (m *MockVersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader) (*models.Version, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateVersion", c, file, postID)
+	ret := m.ctrl.Call(m, "CreateVersion", c, file)
 	ret0, _ := ret[0].(*models.Version)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateVersion indicates an expected call of CreateVersion.
-func (mr *MockVersionServiceMockRecorder) CreateVersion(c, file, postID any) *gomock.Call {
+func (mr *MockVersionServiceMockRecorder) CreateVersion(c, file any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateVersion", reflect.TypeOf((*MockVersionService)(nil).CreateVersion), c, file, postID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateVersion", reflect.TypeOf((*MockVersionService)(nil).CreateVersion), c, file)
 }
 
 // GetFileFromRepository mocks base method.
-func (m *MockVersionService) GetFileFromRepository(versionID, postID uint, relFilepath string) (string, error) {
+func (m *MockVersionService) GetFileFromRepository(versionID uint, relFilepath string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFileFromRepository", versionID, postID, relFilepath)
+	ret := m.ctrl.Call(m, "GetFileFromRepository", versionID, relFilepath)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFileFromRepository indicates an expected call of GetFileFromRepository.
-func (mr *MockVersionServiceMockRecorder) GetFileFromRepository(versionID, postID, relFilepath any) *gomock.Call {
+func (mr *MockVersionServiceMockRecorder) GetFileFromRepository(versionID, relFilepath any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFileFromRepository", reflect.TypeOf((*MockVersionService)(nil).GetFileFromRepository), versionID, postID, relFilepath)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFileFromRepository", reflect.TypeOf((*MockVersionService)(nil).GetFileFromRepository), versionID, relFilepath)
 }
 
 // GetRenderFile mocks base method.
-func (m *MockVersionService) GetRenderFile(versionID, postID uint) (string, error, error) {
+func (m *MockVersionService) GetRenderFile(versionID uint) (string, error, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRenderFile", versionID, postID)
+	ret := m.ctrl.Call(m, "GetRenderFile", versionID)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	ret2, _ := ret[2].(error)
@@ -82,30 +82,30 @@ func (m *MockVersionService) GetRenderFile(versionID, postID uint) (string, erro
 }
 
 // GetRenderFile indicates an expected call of GetRenderFile.
-func (mr *MockVersionServiceMockRecorder) GetRenderFile(versionID, postID any) *gomock.Call {
+func (mr *MockVersionServiceMockRecorder) GetRenderFile(versionID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRenderFile", reflect.TypeOf((*MockVersionService)(nil).GetRenderFile), versionID, postID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRenderFile", reflect.TypeOf((*MockVersionService)(nil).GetRenderFile), versionID)
 }
 
 // GetRepositoryFile mocks base method.
-func (m *MockVersionService) GetRepositoryFile(versionID, postID uint) (string, error) {
+func (m *MockVersionService) GetRepositoryFile(versionID uint) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRepositoryFile", versionID, postID)
+	ret := m.ctrl.Call(m, "GetRepositoryFile", versionID)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetRepositoryFile indicates an expected call of GetRepositoryFile.
-func (mr *MockVersionServiceMockRecorder) GetRepositoryFile(versionID, postID any) *gomock.Call {
+func (mr *MockVersionServiceMockRecorder) GetRepositoryFile(versionID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRepositoryFile", reflect.TypeOf((*MockVersionService)(nil).GetRepositoryFile), versionID, postID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRepositoryFile", reflect.TypeOf((*MockVersionService)(nil).GetRepositoryFile), versionID)
 }
 
 // GetTreeFromRepository mocks base method.
-func (m *MockVersionService) GetTreeFromRepository(versionID, postID uint) (map[string]int64, error, error) {
+func (m *MockVersionService) GetTreeFromRepository(versionID uint) (map[string]int64, error, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetTreeFromRepository", versionID, postID)
+	ret := m.ctrl.Call(m, "GetTreeFromRepository", versionID)
 	ret0, _ := ret[0].(map[string]int64)
 	ret1, _ := ret[1].(error)
 	ret2, _ := ret[2].(error)
@@ -113,7 +113,7 @@ func (m *MockVersionService) GetTreeFromRepository(versionID, postID uint) (map[
 }
 
 // GetTreeFromRepository indicates an expected call of GetTreeFromRepository.
-func (mr *MockVersionServiceMockRecorder) GetTreeFromRepository(versionID, postID any) *gomock.Call {
+func (mr *MockVersionServiceMockRecorder) GetTreeFromRepository(versionID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTreeFromRepository", reflect.TypeOf((*MockVersionService)(nil).GetTreeFromRepository), versionID, postID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTreeFromRepository", reflect.TypeOf((*MockVersionService)(nil).GetTreeFromRepository), versionID)
 }

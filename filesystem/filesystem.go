@@ -62,14 +62,14 @@ func InitFilesystem() *Filesystem {
 }
 
 // SetCurrentVersion will set the paths the filesystem uses in accordance with the IDs passed.
-func (filesystem *Filesystem) SetCurrentVersion(versionID, postID uint) {
-	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), strconv.FormatUint(uint64(versionID), 10))
+func (filesystem *Filesystem) SetCurrentVersion(versionID uint) {
+	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(versionID), 10))
 	filesystem.CurrentQuartoDirPath = filepath.Join(filesystem.CurrentDirPath, filesystem.quartoDirectoryName)
 	filesystem.CurrentZipFilePath = filepath.Join(filesystem.CurrentDirPath, filesystem.zipName)
 	filesystem.CurrentRenderDirPath = filepath.Join(filesystem.CurrentDirPath, "render")
 }
 
-// SaveRepository saves a zip file to a ./vfs/{postID}/{versionID} in the filesystem and return the path to the directory.
+// SaveRepository saves a zip file to a ./vfs/{versionID} in the filesystem and return the path to the directory.
 func (filesystem *Filesystem) SaveRepository(c *gin.Context, file *multipart.FileHeader) error {
 	// Save zip file
 	err := c.SaveUploadedFile(file, filesystem.CurrentZipFilePath)

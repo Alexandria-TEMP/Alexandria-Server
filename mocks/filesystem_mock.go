@@ -155,15 +155,15 @@ func (mr *MockFilesystemMockRecorder) SaveRepository(c, file any) *gomock.Call {
 }
 
 // SetCurrentVersion mocks base method.
-func (m *MockFilesystem) SetCurrentVersion(versionID, postID uint) {
+func (m *MockFilesystem) SetCurrentVersion(versionID uint) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "SetCurrentVersion", versionID, postID)
+	m.ctrl.Call(m, "SetCurrentVersion", versionID)
 }
 
 // SetCurrentVersion indicates an expected call of SetCurrentVersion.
-func (mr *MockFilesystemMockRecorder) SetCurrentVersion(versionID, postID any) *gomock.Call {
+func (mr *MockFilesystemMockRecorder) SetCurrentVersion(versionID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetCurrentVersion", reflect.TypeOf((*MockFilesystem)(nil).SetCurrentVersion), versionID, postID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetCurrentVersion", reflect.TypeOf((*MockFilesystem)(nil).SetCurrentVersion), versionID)
 }
 
 // Unzip mocks base method.

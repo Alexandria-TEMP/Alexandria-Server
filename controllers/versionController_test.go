@@ -32,13 +32,13 @@ func beforeEachVersion(t *testing.T) {
 func TestCreateVersion200(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().CreateVersion(gomock.Any(), gomock.Any(), uint(1)).Return(&examplePendingVersion, nil).Times(1)
+	mockVersionService.EXPECT().CreateVersion(gomock.Any(), gomock.Any()).Return(&examplePendingVersion, nil).Times(1)
 
 	zipPath := filepath.Join(cwd, "..", "utils", "test_files", "file_handling_test.zip")
 	body, dataType, err := CreateMultipartFile(zipPath)
 	assert.Nil(t, err)
 
-	req, _ := http.NewRequest("POST", "/api/v1/version/1", body)
+	req, _ := http.NewRequest("POST", "/api/v2/versions", body)
 	req.Header.Add("Content-Type", dataType)
 	router.ServeHTTP(responseRecorder, req)
 
@@ -50,27 +50,9 @@ func TestCreateVersion200(t *testing.T) {
 func TestCreateVersion4001(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().CreateVersion(gomock.Any(), gomock.Any(), uint(1)).Return(&examplePendingVersion, nil).Times(0)
+	mockVersionService.EXPECT().CreateVersion(gomock.Any(), gomock.Any()).Return(&examplePendingVersion, nil).Times(0)
 
-	req, _ := http.NewRequest("POST", "/api/v1/version/1", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestCreateVersion4002(t *testing.T) {
-	beforeEachVersion(t)
-
-	mockVersionService.EXPECT().CreateVersion(gomock.Any(), gomock.Any(), uint(1)).Return(&examplePendingVersion, nil).Times(0)
-
-	zipPath := filepath.Join(cwd, "..", "utils", "test_files", "file_handling_test.zip")
-	body, dataType, err := CreateMultipartFile(zipPath)
-	assert.Nil(t, err)
-
-	req, _ := http.NewRequest("POST", "/api/v1/version/bad", body)
-	req.Header.Add("Content-Type", dataType)
+	req, _ := http.NewRequest("POST", "/api/v2/versions", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -81,13 +63,13 @@ func TestCreateVersion4002(t *testing.T) {
 func TestCreateVersion500(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().CreateVersion(gomock.Any(), gomock.Any(), uint(1)).Return(&examplePendingVersion, errors.New("err")).Times(1)
+	mockVersionService.EXPECT().CreateVersion(gomock.Any(), gomock.Any()).Return(&examplePendingVersion, errors.New("err")).Times(1)
 
 	zipPath := filepath.Join(cwd, "..", "utils", "test_files", "file_handling_test.zip")
 	body, dataType, err := CreateMultipartFile(zipPath)
 	assert.Nil(t, err)
 
-	req, _ := http.NewRequest("POST", "/api/v1/version/1", body)
+	req, _ := http.NewRequest("POST", "/api/v2/versions", body)
 	req.Header.Add("Content-Type", dataType)
 	router.ServeHTTP(responseRecorder, req)
 
@@ -99,9 +81,9 @@ func TestCreateVersion500(t *testing.T) {
 func TestGetRender200(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetRenderFile(uint(1), uint(0)).Return("../utils/test_files/good_repository_setup/render/1234.html", nil, nil)
+	mockVersionService.EXPECT().GetRenderFile(uint(1)).Return("../utils/test_files/good_repository_setup/render/1234.html", nil, nil)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/1/render", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/1/render", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -121,9 +103,9 @@ func TestGetRender200(t *testing.T) {
 func TestGetRender202(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetRenderFile(uint(1), uint(0)).Return("", errors.New("err"), nil)
+	mockVersionService.EXPECT().GetRenderFile(uint(1)).Return("", errors.New("err"), nil)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/1/render", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/1/render", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -134,9 +116,9 @@ func TestGetRender202(t *testing.T) {
 func TestGetRender4001(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetRenderFile(gomock.Any(), gomock.Any()).Return("../utils/test_files/good_repository_setup/render/1234.html", nil, nil).Times(0)
+	mockVersionService.EXPECT().GetRenderFile(gomock.Any()).Return("../utils/test_files/good_repository_setup/render/1234.html", nil, nil).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/bad/1/render", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/bad/render", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -147,35 +129,9 @@ func TestGetRender4001(t *testing.T) {
 func TestGetRender4002(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetRenderFile(gomock.Any(), gomock.Any()).Return("../utils/test_files/good_repository_setup/render/1234.html", nil, nil).Times(0)
+	mockVersionService.EXPECT().GetRenderFile(gomock.Any()).Return("../utils/test_files/good_repository_setup/render/1234.html", nil, nil).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/bad/render", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestGetRender4003(t *testing.T) {
-	beforeEachVersion(t)
-
-	mockVersionService.EXPECT().GetRenderFile(gomock.Any(), gomock.Any()).Return("../utils/test_files/good_repository_setup/render/1234.html", nil, nil).Times(0)
-
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/-1/render", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestGetRender4004(t *testing.T) {
-	beforeEachVersion(t)
-
-	mockVersionService.EXPECT().GetRenderFile(gomock.Any(), gomock.Any()).Return("../utils/test_files/good_repository_setup/render/1234.html", nil, nil).Times(0)
-
-	req, _ := http.NewRequest("GET", "/api/v1/version/-1/1/render", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/-1/render", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -186,9 +142,9 @@ func TestGetRender4004(t *testing.T) {
 func TestGetRender404(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetRenderFile(uint(1), uint(0)).Return("", nil, errors.New("err"))
+	mockVersionService.EXPECT().GetRenderFile(uint(1)).Return("", nil, errors.New("err"))
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/1/render", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/1/render", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -199,9 +155,9 @@ func TestGetRender404(t *testing.T) {
 func TestGetReposiotry200(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetRepositoryFile(uint(1), uint(0)).Return("../utils/test_files/good_repository_setup/quarto_project.zip", nil)
+	mockVersionService.EXPECT().GetRepositoryFile(uint(1)).Return("../utils/test_files/good_repository_setup/quarto_project.zip", nil)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/1/repository", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/1/repository", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -221,9 +177,9 @@ func TestGetReposiotry200(t *testing.T) {
 func TestGetReposiotry4041(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetRepositoryFile(gomock.Any(), gomock.Any()).Return("../utils/test_files/good_repository_setup/quarto_project.zip", nil).Times(0)
+	mockVersionService.EXPECT().GetRepositoryFile(gomock.Any()).Return("../utils/test_files/good_repository_setup/quarto_project.zip", nil).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/-1/1/repository", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/-1/repository", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -234,35 +190,9 @@ func TestGetReposiotry4041(t *testing.T) {
 func TestGetReposiotry4042(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetRepositoryFile(gomock.Any(), gomock.Any()).Return("../utils/test_files/good_repository_setup/quarto_project.zip", nil).Times(0)
+	mockVersionService.EXPECT().GetRepositoryFile(gomock.Any()).Return("../utils/test_files/good_repository_setup/quarto_project.zip", nil).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/bad/1/repository", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestGetReposiotry4043(t *testing.T) {
-	beforeEachVersion(t)
-
-	mockVersionService.EXPECT().GetRepositoryFile(gomock.Any(), gomock.Any()).Return("../utils/test_files/good_repository_setup/quarto_project.zip", nil).Times(0)
-
-	req, _ := http.NewRequest("GET", "/api/v1/version/5/-1/repository", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestGetReposiotry4044(t *testing.T) {
-	beforeEachVersion(t)
-
-	mockVersionService.EXPECT().GetRepositoryFile(gomock.Any(), gomock.Any()).Return("../utils/test_files/good_repository_setup/quarto_project.zip", nil).Times(0)
-
-	req, _ := http.NewRequest("GET", "/api/v1/version/5/bad/repository", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/bad/repository", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -273,9 +203,9 @@ func TestGetReposiotry4044(t *testing.T) {
 func TestGetFileFromRepository200(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetFileFromRepository(uint(1), uint(0), "/child_dir/test.txt").Return("../utils/test_files/file_tree/child_dir/test.txt", nil)
+	mockVersionService.EXPECT().GetFileFromRepository(uint(1), "/child_dir/test.txt").Return("../utils/test_files/file_tree/child_dir/test.txt", nil)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/1/blob/child_dir/test.txt", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/1/file/child_dir/test.txt", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -289,9 +219,9 @@ func TestGetFileFromRepository200(t *testing.T) {
 func TestGetFileFromRepository4041(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetFileFromRepository(gomock.Any(), gomock.Any(), gomock.Any()).Return("../utils/test_files/good_quarto_project_4/child-dir/_child.qmd", nil).Times(0)
+	mockVersionService.EXPECT().GetFileFromRepository(gomock.Any(), gomock.Any()).Return("../utils/test_files/good_quarto_project_4/child-dir/_child.qmd", nil).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/bad/1/blob/child-dir/_child.qmd", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/bad/file/child-dir/_child.qmd", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -302,35 +232,9 @@ func TestGetFileFromRepository4041(t *testing.T) {
 func TestGetFileFromRepository4042(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetFileFromRepository(gomock.Any(), gomock.Any(), gomock.Any()).Return("../utils/test_files/good_quarto_project_4/child-dir/_child.qmd", nil).Times(0)
+	mockVersionService.EXPECT().GetFileFromRepository(gomock.Any(), gomock.Any()).Return("../utils/test_files/good_quarto_project_4/child-dir/_child.qmd", nil).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/-1/1/blob/child-dir/_child.qmd", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestGetFileFromRepository4043(t *testing.T) {
-	beforeEachVersion(t)
-
-	mockVersionService.EXPECT().GetFileFromRepository(gomock.Any(), gomock.Any(), gomock.Any()).Return("../utils/test_files/good_quarto_project_4/child-dir/_child.qmd", nil).Times(0)
-
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/bad/blob/child-dir/_child.qmd", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestGetFileFromRepository4044(t *testing.T) {
-	beforeEachVersion(t)
-
-	mockVersionService.EXPECT().GetFileFromRepository(gomock.Any(), gomock.Any(), gomock.Any()).Return("../utils/test_files/good_quarto_project_4/child-dir/_child.qmd", nil).Times(0)
-
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/-1/blob/child-dir/_child.qmd", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/-1/file/child-dir/_child.qmd", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -341,9 +245,9 @@ func TestGetFileFromRepository4044(t *testing.T) {
 func TestGetFileFromRepository4045(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetFileFromRepository(uint(1), uint(0), "/bad").Return("", errors.New("err"))
+	mockVersionService.EXPECT().GetFileFromRepository(uint(1), "/bad").Return("", errors.New("err"))
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/1/blob/bad", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/1/file/bad", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -354,9 +258,9 @@ func TestGetFileFromRepository4045(t *testing.T) {
 func TestGetFileFromRepository500(t *testing.T) {
 	beforeEachVersion(t)
 
-	mockVersionService.EXPECT().GetFileFromRepository(uint(1), uint(0), "/bad").Return("nonexistent", nil)
+	mockVersionService.EXPECT().GetFileFromRepository(uint(1), "/bad").Return("nonexistent", nil)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/1/blob/bad", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/1/file/bad", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -368,9 +272,9 @@ func TestGetTreeFromRepository200(t *testing.T) {
 	beforeEachVersion(t)
 
 	fileTree := map[string]int64{"file1": 4}
-	mockVersionService.EXPECT().GetTreeFromRepository(uint(1), uint(0)).Return(fileTree, nil, nil)
+	mockVersionService.EXPECT().GetTreeFromRepository(uint(1)).Return(fileTree, nil, nil)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/1/tree", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/1/tree", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -388,9 +292,9 @@ func TestGetTreeFromRepository4001(t *testing.T) {
 	beforeEachVersion(t)
 
 	fileTree := map[string]int64{"file1": 4}
-	mockVersionService.EXPECT().GetTreeFromRepository(gomock.Any(), gomock.Any()).Return(fileTree, nil, nil).Times(0)
+	mockVersionService.EXPECT().GetTreeFromRepository(gomock.Any()).Return(fileTree, nil, nil).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/bad/1/tree", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/bad/tree", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -402,37 +306,9 @@ func TestGetTreeFromRepository4002(t *testing.T) {
 	beforeEachVersion(t)
 
 	fileTree := map[string]int64{"file1": 4}
-	mockVersionService.EXPECT().GetTreeFromRepository(gomock.Any(), gomock.Any()).Return(fileTree, nil, nil).Times(0)
+	mockVersionService.EXPECT().GetTreeFromRepository(gomock.Any()).Return(fileTree, nil, nil).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v1/version/-1/1/tree", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestGetTreeFromRepository4003(t *testing.T) {
-	beforeEachVersion(t)
-
-	fileTree := map[string]int64{"file1": 4}
-	mockVersionService.EXPECT().GetTreeFromRepository(gomock.Any(), gomock.Any()).Return(fileTree, nil, nil).Times(0)
-
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/bad/tree", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestGetTreeFromRepository4004(t *testing.T) {
-	beforeEachVersion(t)
-
-	fileTree := map[string]int64{"file1": 4}
-	mockVersionService.EXPECT().GetTreeFromRepository(gomock.Any(), gomock.Any()).Return(fileTree, nil, nil).Times(0)
-
-	req, _ := http.NewRequest("GET", "/api/v1/version/0/-1/tree", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/versions/-1/tree", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()

@@ -23,13 +23,13 @@ type VersionService struct {
 	Filesystem        filesysteminterface.Filesystem
 }
 
-func (versionService *VersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (*models.Version, error) {
+func (versionService *VersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader) (*models.Version, error) {
 	// Create version, with pending render status
 	version := models.Version{RenderStatus: models.Pending}
 	_ = versionService.VersionRepository.Create(&version)
 
 	// Set paths in filesystem
-	versionService.Filesystem.SetCurrentVersion(version.ID, postID)
+	versionService.Filesystem.SetCurrentVersion(version.ID)
 
 	// Save zip file
 	if err := versionService.Filesystem.SaveRepository(c, file); err != nil {
@@ -227,7 +227,7 @@ func (versionService *VersionService) IsValidProject() bool {
 	return true
 }
 
-func (versionService *VersionService) GetRenderFile(versionID, postID uint) (string, error, error) {
+func (versionService *VersionService) GetRenderFile(versionID uint) (string, error, error) {
 	version, err := versionService.VersionRepository.GetByID(versionID)
 
 	var filePath string
@@ -247,7 +247,7 @@ func (versionService *VersionService) GetRenderFile(versionID, postID uint) (str
 	}
 
 	// Set current version
-	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+	versionService.Filesystem.SetCurrentVersion(versionID)
 
 	// Check that render exists, if not update render status to failed and return 404
 	if exists, _ := versionService.Filesystem.RenderExists(); !exists {
@@ -260,9 +260,9 @@ func (versionService *VersionService) GetRenderFile(versionID, postID uint) (str
 	return versionService.Filesystem.GetCurrentRenderDirPath(), nil, nil
 }
 
-func (versionService *VersionService) GetRepositoryFile(versionID, postID uint) (string, error) {
+func (versionService *VersionService) GetRepositoryFile(versionID uint) (string, error) {
 	// Set current version
-	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+	versionService.Filesystem.SetCurrentVersion(versionID)
 
 	// Check that render exists, if not update render status to failed and return 404
 	if exists := utils.FileExists(versionService.Filesystem.GetCurrentZipFilePath()); !exists {
@@ -274,9 +274,9 @@ func (versionService *VersionService) GetRepositoryFile(versionID, postID uint) 
 	return absFilepath, nil
 }
 
-func (versionService *VersionService) GetTreeFromRepository(versionID, postID uint) (map[string]int64, error, error) {
+func (versionService *VersionService) GetTreeFromRepository(versionID uint) (map[string]int64, error, error) {
 	// Set current version
-	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+	versionService.Filesystem.SetCurrentVersion(versionID)
 
 	// Check that render exists, if not update render status to failed and return 404
 	if exists := utils.FileExists(versionService.Filesystem.GetCurrentQuartoDirPath()); !exists {
@@ -288,13 +288,13 @@ func (versionService *VersionService) GetTreeFromRepository(versionID, postID ui
 	return fileTree, nil, err
 }
 
-func (versionService *VersionService) GetFileFromRepository(versionID, postID uint, relFilepath string) (string, error) {
+func (versionService *VersionService) GetFileFromRepository(versionID uint, relFilepath string) (string, error) {
 	if strings.Contains(relFilepath, "..") {
 		return "", fmt.Errorf("file is outside of repository")
 	}
 
 	// Set current version
-	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+	versionService.Filesystem.SetCurrentVersion(versionID)
 	absFilepath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), relFilepath)
 
 	// Check that file exists, if not return 404

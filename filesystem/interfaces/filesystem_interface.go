@@ -9,7 +9,7 @@ import (
 //go:generate mockgen -package=mocks -source=./filesystem_interface.go -destination=../../mocks/filesystem_mock.go
 
 type Filesystem interface {
-	SetCurrentVersion(versionID, postID uint)
+	SetCurrentVersion(versionID uint)
 	SaveRepository(c *gin.Context, file *multipart.FileHeader) error
 	Unzip() error
 	RenderExists() (bool, string)

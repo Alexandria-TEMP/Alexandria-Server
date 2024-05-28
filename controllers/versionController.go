@@ -11,17 +11,15 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
-// @BasePath /api/v2
+// @BasePath /api/v2/versions
+
+const headerSize = 512
 
 type VersionController struct {
 	VersionService interfaces.VersionService
 }
 
-const headerSize = 512
-
-const headerSize = 512
-
-// GetVersion godoc
+// GetVersion
 // @Summary 	Get version
 // @Description Get a version by version ID
 // @Param		versionID		path		string			true	"Version ID"
@@ -29,21 +27,21 @@ const headerSize = 512
 // @Success 	200 		{object}	models.VersionDTO
 // @Failure		400 		{object} 	utils.HTTPError
 // @Failure		404 		{object} 	utils.HTTPError
-// @Router 		/version/{versionID}	[get]
+// @Router 		/{versionID}	[get]
 func (versionController *VersionController) GetVersion(_ *gin.Context) {
 
 }
 
-// CreateVersion godoc
+// CreateVersion
 // @Summary 	Create new version
-// @Description Create a new version with discussions and repository
+// @Description Create a new version with discussions and repository from zipped file in body
 // @Accept  	multipart/form-data
-// @Param		repository	body		file				true	"Repository to create"
+// @Param		repository			body		file				true	"Repository to create"
 // @Produce		application/json
 // @Success 	200		{object}	models.Version
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/version	[post]
+// @Router 				[post]
 func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	// extract file
 	file, err := c.FormFile("file")
@@ -54,18 +52,8 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 		return
 	}
 
-	// extract post id
-	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseUint(postIDStr, 10, 64)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
-
-		return
-	}
-
 	// Create Version
-	version, err := versionController.VersionService.CreateVersion(c, file, uint(postID))
+	version, err := versionController.VersionService.CreateVersion(c, file)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create version"})
 
@@ -77,7 +65,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, version)
 }
 
-// GetRender godoc specs are subject to change
+// GetRender
 // @Summary 	Get the render of a version
 // @Description Get the render of the repository underlying a version if it exists and has been rendered successfully
 // @Param		versionID	path		string				true	"Version ID"
@@ -86,18 +74,8 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 // @Success		202
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
-// @Router 		/version/{versionID}/render	[get]
+// @Router 		/{versionID}/render	[get]
 func (versionController *VersionController) GetRender(c *gin.Context) {
-	// extract post id
-	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseUint(postIDStr, 10, 64)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
-
-		return
-	}
-
 	// extract version id
 	versionIDstr := c.Param("versionID")
 	versionID, err := strconv.ParseUint(versionIDstr, 10, 64)
@@ -109,7 +87,7 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 	}
 
 	// get render filepath
-	filePath, err202, err404 := versionController.VersionService.GetRenderFile(uint(versionID), uint(postID))
+	filePath, err202, err404 := versionController.VersionService.GetRenderFile(uint(versionID))
 
 	// if render is pending return 202 accepted
 	if err202 != nil {
@@ -141,18 +119,8 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/version/{postID}/{versionID}/repository	[get]
+// @Router 		/{versionID}/repository	[get]
 func (versionController *VersionController) GetRepository(c *gin.Context) {
-	// extract post id
-	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseUint(postIDStr, 10, 64)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
-
-		return
-	}
-
 	// extract version id
 	versionIDstr := c.Param("versionID")
 	versionID, err := strconv.ParseUint(versionIDstr, 10, 64)
@@ -164,7 +132,7 @@ func (versionController *VersionController) GetRepository(c *gin.Context) {
 	}
 
 	// get repository filepath
-	filePath, err := versionController.VersionService.GetRepositoryFile(uint(versionID), uint(postID))
+	filePath, err := versionController.VersionService.GetRepositoryFile(uint(versionID))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "no such repository found"})
@@ -205,18 +173,8 @@ func (versionController *VersionController) GetRepository(c *gin.Context) {
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/version/{versionID}/tree		[get]
+// @Router 		/{versionID}/tree		[get]
 func (versionController *VersionController) GetFileTree(c *gin.Context) {
-	// extract post id
-	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseUint(postIDStr, 10, 64)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
-
-		return
-	}
-
 	// extract version id
 	versionIDstr := c.Param("versionID")
 	versionID, err := strconv.ParseUint(versionIDstr, 10, 64)
@@ -227,7 +185,7 @@ func (versionController *VersionController) GetFileTree(c *gin.Context) {
 		return
 	}
 
-	fileTree, err1, err2 := versionController.VersionService.GetTreeFromRepository(uint(versionID), uint(postID))
+	fileTree, err1, err2 := versionController.VersionService.GetTreeFromRepository(uint(versionID))
 
 	// if repository doesnt exist throw 404 not found
 	if err1 != nil {
@@ -251,24 +209,14 @@ func (versionController *VersionController) GetFileTree(c *gin.Context) {
 // GetFileFromRepository godoc specs are subject to change
 // @Summary 	Get a file from a repository
 // @Description Get the contents of a single file from a repository of a version
-// @Param		postID		path		string				true	"Parent Post ID"
 // @Param		versionID	path		string				true	"Version ID"
 // @Param		filepath	path		string				true	"Filepath"
-// @Success 	200		[]byte
+// @Produce		application/octet-stream
+// @Success 	200		{object}	[]byte
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/{postID}/{versionID}/blob/{filepath}	[get]
+// @Router 		/{versionID}/file/{filepath}	[get]
 func (versionController *VersionController) GetFileFromRepository(c *gin.Context) {
-	// extract post id
-	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseUint(postIDStr, 10, 64)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
-
-		return
-	}
-
 	// extract version id
 	versionIDstr := c.Param("versionID")
 	versionID, err := strconv.ParseUint(versionIDstr, 10, 64)
@@ -280,7 +228,7 @@ func (versionController *VersionController) GetFileFromRepository(c *gin.Context
 	}
 
 	relFilepath := c.Param("filepath")
-	absFilepath, err := versionController.VersionService.GetFileFromRepository(uint(versionID), uint(postID), relFilepath)
+	absFilepath, err := versionController.VersionService.GetFileFromRepository(uint(versionID), relFilepath)
 
 	// if files doesnt exist return 404 not found
 	if err != nil {
@@ -311,4 +259,21 @@ func (versionController *VersionController) GetFileFromRepository(c *gin.Context
 	c.Header("Content-Type", fileContentType.String())
 	c.Header("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
 	c.File(absFilepath)
+}
+
+// GetDiscussions godoc
+// @Summary Returns all level 1 discussions associated with the version
+// @Description Returns all discussions on this version that are not a reply to another discussion
+// @Description Endpoint is offset-paginated
+// @Param		versionID	path		string			true	"version ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
+// @Produce		application/json
+// @Success 	200		{array}		models.DiscussionDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router		/{versionID}/discussions 	[get]
+func (versionController *VersionController) GetDiscussions(_ *gin.Context) {
+
 }

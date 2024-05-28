@@ -17,23 +17,23 @@ type VersionService interface {
 	// 4. unzip file
 	// 5. render project and update render status
 	// TODO: persist data
-	CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (*models.Version, error)
+	CreateVersion(c *gin.Context, file *multipart.FileHeader) (*models.Version, error)
 
 	// GetRender returns filepath of rendered repository.
 	// Error 1 is for status 202.
 	// Error 2 is for status 404.
-	GetRenderFile(versionID, postID uint) (string, error, error)
+	GetRenderFile(versionID uint) (string, error, error)
 
 	// GetRender returns filepath of zipped repository.
 	// Error is for status 404.
-	GetRepositoryFile(versionID, postID uint) (string, error)
+	GetRepositoryFile(versionID uint) (string, error)
 
 	// GetTreeFromRepository returns a map of all filepaths in a quarto project and their size in bytes
 	// Error 1 is for status 404.
 	// Error 2 is for status 500.
-	GetTreeFromRepository(versionID, postID uint) (map[string]int64, error, error)
+	GetTreeFromRepository(versionID uint) (map[string]int64, error, error)
 
 	// GetFileFromRepository returns absolute filepath of file.
 	// Error is for status 404.
-	GetFileFromRepository(versionID, postID uint, relFilepath string) (string, error)
+	GetFileFromRepository(versionID uint, relFilepath string) (string, error)
 }
