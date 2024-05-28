@@ -11,7 +11,7 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
-// @BasePath /api/v1
+// @BasePath /api/v2
 
 type PostController struct {
 	PostService interfaces.PostService
@@ -26,7 +26,8 @@ type PostController struct {
 // @Success 	200 		{object}	models.PostDTO
 // @Failure		400 		{object} 	utils.HTTPError
 // @Failure		404 		{object} 	utils.HTTPError
-// @Router 		/post/{postID}	[get]
+// @Failure		500 		{object} 	utils.HTTPError
+// @Router 		/posts/{postID}	[get]
 func (postController *PostController) GetPost(c *gin.Context) {
 	// extract postID
 	postIDStr := c.Param("postID")
@@ -60,7 +61,8 @@ func (postController *PostController) GetPost(c *gin.Context) {
 // @Produce		json
 // @Success 	200 	{object} 	models.PostDTO
 // @Failure		400 	{object} 	utils.HTTPError
-// @Router 		/post 		[post]
+// @Failure		500 	{object} 	utils.HTTPError
+// @Router 		/posts 		[post]
 func (postController *PostController) CreatePost(c *gin.Context) {
 	// extract post
 	form := forms.PostCreationForm{}
@@ -89,7 +91,8 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 // @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
-// @Router 		/ 		[put]
+// @Failure		500 		{object} 	utils.HTTPError
+// @Router 		/posts 		[put]
 func (postController *PostController) UpdatePost(c *gin.Context) {
 	// extract post
 	updatedPost := models.Post{}
@@ -115,99 +118,69 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// GetProjectPost godoc
-// @Summary 	Get project post
-// @Description Get a project post by post ID
+// DeletePost godoc
+// @Summary 	Delete a post
+// @Description Delete a post with given ID from database
 // @Accept  	json
-// @Param		postID		path		string			true	"Post ID"
-// @Produce		json
-// @Success 	200 		{object}	models.ProjectPostDTO
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		404 		{object} 	utils.HTTPError
-// @Router 		/projectPost/{postID}	[get]
-func (postController *PostController) GetProjectPost(c *gin.Context) {
-	// extract postID
-	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseUint(postIDStr, 10, 64)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr)})
-
-		return
-	}
-
-	post, err := postController.PostService.GetProjectPost(postID)
-
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "cannot get project post because no post with this ID exists"})
-
-		return
-	}
-
-	// response
-	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, post)
-}
-
-// CreateProjectPost godoc
-// @Summary 	Create new project post
-// @Description Create a new project post
-// @Accept  	json
-// @Param		form	body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
-// @Produce		json
-// @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Router 		/projectPost 		[post]
-func (postController *PostController) CreateProjectPost(c *gin.Context) {
-	// extract post
-	form := forms.ProjectPostCreationForm{}
-	err := c.BindJSON(&form)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind ProjectPostCreationForm from request body"})
-
-		return
-	}
-
-	// Create and add post to database here. For now just do this to test.
-	post := postController.PostService.CreateProjectPost(&form)
-
-	// response
-	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, &post)
-}
-
-// UpdateProjectPost godoc
-// @Summary 	Update project post
-// @Description Update any number of the aspects of project post
-// @Accept  	json
-// @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
+// @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
-// @Router 		/ 		[put]
-func (postController *PostController) UpdateProjectPost(c *gin.Context) {
-	// extract post
-	updatedProjectPost := models.ProjectPost{}
-	err := c.BindJSON(&updatedProjectPost)
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/posts/{postID} 		[delete]
+func (postController *PostController) DeletePost(_ *gin.Context) {
+	// delete method goes here
+}
 
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated ProjectPost from request body"})
+// CreatePostFromGithub godoc
+// @Summary 	Create new post with the version imported from github
+// @Description Create a new question or discussion post
+// @Description Creates a post in the same way as CreatePost
+// @Description However, the post files are imported from the given Github repository
+// @Accept  	json
+// @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
+// @Param		url		query	string					true	"Github repository url"
+// @Produce		json
+// @Success 	200 	{object} 	models.PostDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		500 	{object} 	utils.HTTPError
+// @Failure 	502 	{object}	utils.HTTPError
+// @Router 		/posts/from-github 		[post]
+func (postController *PostController) CreatePostFromGithub(_ *gin.Context) {
 
-		return
-	}
+}
 
-	// Update and add post to database here. For now just do this to test.
-	err = postController.PostService.UpdateProjectPost(&updatedProjectPost)
+// AddPostReport godoc
+// @Summary 	Add a new report to a post
+// @Description Create a new report for a post
+// @Accept  	json
+// @Param		form	body	forms.ReportCreationForm	true	"Report Creation Form"
+// @Param		postID	path	string						true	"Post ID"
+// @Produce		json
+// @Success 	200 	{object} 	models.ReportDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500 	{object} 	utils.HTTPError
+// @Router 		/posts/{postID}/reports 		[post]
+func (postController *PostController) AddPostReport(_ *gin.Context) {
 
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "cannot update post because no ProjectPost with this ID exists"})
+}
 
-		return
-	}
-
-	// response
-	c.Header("Content-Type", "application/json")
-	c.Status(http.StatusOK)
+// GetPostReports godoc
+// @Summary		Get all reports of this post
+// @Description	Get all reports that have been added to this post
+// @Description Endpoint is offset-paginated
+// @Accept 		json
+// @Param		postID		path		string			true	"Post ID"
+// @Param 		page		query		uint			false	"page query"
+// @Param		pageSize	query		uint			false	"page size"
+// @Produce		json
+// @Success 	200		{array}		models.ReportDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router 		/posts/{postID}/reports 		[get]
+func (postController *PostController) GetPostReports(_ *gin.Context) {
+	// TODO: make paginated
 }

@@ -18,13 +18,18 @@ type RepositoryEnv struct {
 type ServiceEnv struct {
 	postService    services.PostService
 	versionService services.VersionService
-	userService    services.UserService
+	memberService  services.MemberService
 }
 
 type ControllerEnv struct {
-	postController    controllers.PostController
-	versionController controllers.VersionController
-	userController    controllers.UserController
+	postController         controllers.PostController
+	memberController       controllers.MemberController
+	projectPostController  controllers.ProjectPostController
+	discussionController   controllers.DiscussionController
+	filterController       controllers.FilterController
+	mergeRequestController controllers.MergeRequestController
+	tagController          controllers.TagController
+	versionController      controllers.VersionController
 }
 
 func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
@@ -35,20 +40,22 @@ func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 
 func initServiceEnv(repositoryEnv RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
 	return ServiceEnv{
-		postService: services.PostService{},
-		versionService: services.VersionService{
-			VersionRepository: repositoryEnv.versionRepository,
-			Filesystem:        fs,
-		},
-		userService: services.UserService{},
+		postService:    services.PostService{},
+		versionService: services.VersionService{Filesystem: fs},
+		memberService:  services.MemberService{},
 	}
 }
 
 func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 	return ControllerEnv{
-		postController:    controllers.PostController{PostService: &serviceEnv.postService},
-		versionController: controllers.VersionController{VersionService: &serviceEnv.versionService},
-		userController:    controllers.UserController{UserService: &serviceEnv.userService},
+		postController:         controllers.PostController{PostService: &serviceEnv.postService},
+		memberController:       controllers.MemberController{MemberService: &serviceEnv.memberService},
+		projectPostController:  controllers.ProjectPostController{},
+		discussionController:   controllers.DiscussionController{},
+		filterController:       controllers.FilterController{},
+		mergeRequestController: controllers.MergeRequestController{},
+		tagController:          controllers.TagController{},
+		versionController:      controllers.VersionController{},
 	}
 }
 

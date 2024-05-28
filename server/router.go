@@ -17,38 +17,91 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	}
 
 	// Setup swagger documentation
-	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.BasePath = "/api/v2"
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Setup routing
-	v1 := router.Group("/api/v1")
+	v2 := router.Group("/api/v2")
 
-	postRouter := v1.Group("/post")
+	postRouter(v2, controllers)
+
+	projectPostRouter(v2, controllers)
+
+	memberRouter(v2, controllers)
+
+	mergeRequestRouter := v2.Group("/merge-requests")
+	mergeRequestRouter.GET("/:mergeRequestID", controllers.mergeRequestController.GetMergeRequest)
+	mergeRequestRouter.POST("/", controllers.mergeRequestController.CreateMergeRequest)
+	mergeRequestRouter.PUT("/", controllers.mergeRequestController.UpdateMergeRequest)
+	mergeRequestRouter.DELETE("/:mergeRequestID", controllers.mergeRequestController.DeleteMergeRequest)
+	mergeRequestRouter.GET("/:mergeRequestID/reviews", controllers.mergeRequestController.GetReviewStatus)
+	mergeRequestRouter.GET("/:mergeRequestID/reviews/:reviewID", controllers.mergeRequestController.GetReview)
+	mergeRequestRouter.POST("/:mergeRequestID/reviews", controllers.mergeRequestController.CreateReview)
+	mergeRequestRouter.GET("/:mergeRequestID/can-review/:userID", controllers.mergeRequestController.UserCanReview)
+
+	discussionRouter := v2.Group("/discussions")
+	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
+	discussionRouter.POST("/", controllers.discussionController.CreateDiscussion)
+	discussionRouter.DELETE("/:discussionID", controllers.discussionController.DeleteDiscussion)
+	discussionRouter.GET("/:discussionID/replies", controllers.discussionController.GetDiscussionReplies)
+	discussionRouter.POST("/:discussionID/reports", controllers.discussionController.AddDiscussionReport)
+	discussionRouter.GET("/:discussionID/reports", controllers.discussionController.GetDiscussionReports)
+
+	filterRouter := v2.Group("/filter")
+	filterRouter.GET("/posts", controllers.filterController.FilterPosts)
+	filterRouter.GET("/project-posts", controllers.filterController.FilterProjectPosts)
+
+	tagRouter := v2.Group("/tags")
+	tagRouter.GET("/scientific", controllers.tagController.GetScientificTags)
+
+	versionRouter := v2.Group("/versions")
+	versionRouter.GET("/:versionID", controllers.versionController.GetVersion)
+	versionRouter.POST("/", controllers.versionController.CreateVersion)
+	versionRouter.GET("/:versionID/render", controllers.versionController.GetRender)
+	versionRouter.GET("/:versionID/repository", controllers.versionController.GetRepository)
+	versionRouter.GET("/:versionID/tree", controllers.versionController.GetFileTree)
+	versionRouter.GET("/:versionID/file/*filepath", controllers.versionController.GetFileFromrepository)
+	versionRouter.GET("/:versionID/discussions", controllers.versionController.GetDiscussions)
+
+	return router
+}
+
+func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+	memberRouter := v2.Group("/members")
+	memberRouter.GET("/:userID", controllers.memberController.GetMember)
+	memberRouter.POST("/", controllers.memberController.CreateMember)
+	memberRouter.PUT("/", controllers.memberController.UpdateMember)
+	memberRouter.DELETE("/:userID", controllers.memberController.DeleteMember)
+	memberRouter.GET("/:userID/posts", controllers.memberController.GetMemberPosts)
+	memberRouter.GET("/:userID/project-posts", controllers.memberController.GetMemberProjectPosts)
+	memberRouter.GET("/:userID/merge-requests", controllers.memberController.GetMemberMergeRequests)
+	memberRouter.GET("/:userID/discussions", controllers.memberController.GetMemberDiscussions)
+	memberRouter.POST("/:userID/saved-posts", controllers.memberController.AddMemberSavedPost)
+	memberRouter.POST("/:userID/saved-project-posts", controllers.memberController.AddMemberSavedProjectPost)
+	memberRouter.GET("/:userID/saved-posts", controllers.memberController.GetMemberSavedPosts)
+	memberRouter.GET("/:userID/saved-project-posts", controllers.memberController.GetMemberSavedProjectPosts)
+}
+
+func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+	projectPostRouter := v2.Group("/project-posts")
+	projectPostRouter.GET("/:postID", controllers.projectPostController.GetProjectPost)
+	projectPostRouter.POST("/", controllers.projectPostController.CreateProjectPost)
+	projectPostRouter.PUT("/", controllers.projectPostController.UpdateProjectPost)
+	projectPostRouter.DELETE("/:postID", controllers.projectPostController.DeleteProjectPost)
+	projectPostRouter.POST("/from-github", controllers.projectPostController.CreateProjectPostFromGithub)
+	projectPostRouter.GET("/:postID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
+	projectPostRouter.GET("/:postID/open-merge-requests", controllers.projectPostController.GetProjectPostOpenMergeRequests)
+	projectPostRouter.GET("/:postID/closed-merge-requests", controllers.projectPostController.GetProjectPostClosedMergeRequests)
+}
+
+func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+	postRouter := v2.Group("/posts")
 	postRouter.GET("/:postID", controllers.postController.GetPost)
 	postRouter.POST("/", controllers.postController.CreatePost)
 	postRouter.PUT("/", controllers.postController.UpdatePost)
-
-	projectPostRouter := v1.Group("/projectPost")
-	projectPostRouter.GET("/:postID", controllers.postController.GetProjectPost)
-	projectPostRouter.POST("", controllers.postController.CreateProjectPost)
-
-	versionRouter := v1.Group("/version")
-	versionRouter.POST("/:postID", controllers.versionController.CreateVersion)
-	versionRouter.GET("/:postID/:versionID/render", controllers.versionController.GetRender)
-	versionRouter.GET("/:postID/:versionID/repository", controllers.versionController.GetRepository)
-	versionRouter.GET("/:postID/:versionID/tree", controllers.versionController.GetTreeFromRepository)
-	versionRouter.GET("/:postID/:versionID/blob/*filepath", controllers.versionController.GetFileFromRepository)
-
-	memberRouter := v1.Group("/member")
-	memberRouter.GET("/:userID", controllers.userController.GetMember)
-	memberRouter.POST("/", controllers.userController.CreateMember)
-	memberRouter.PUT("/", controllers.userController.UpdateMember)
-
-	collaboratorRouter := v1.Group("/collaborator")
-	collaboratorRouter.GET("/:userID", controllers.userController.GetCollaborator)
-	collaboratorRouter.POST("/", controllers.userController.CreateCollaborator)
-	collaboratorRouter.PUT("/", controllers.userController.UpdateCollaborator)
-
-	return router
+	postRouter.DELETE("/:postID", controllers.postController.DeletePost)
+	postRouter.POST("/from-github", controllers.postController.CreatePostFromGithub)
+	postRouter.POST("/:postID/reports", controllers.postController.AddPostReport)
+	postRouter.GET("/:postID/reports", controllers.postController.GetPostReports)
 }

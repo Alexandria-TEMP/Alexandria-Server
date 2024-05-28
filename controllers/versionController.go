@@ -11,7 +11,7 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
-// @BasePath /api/v1
+// @BasePath /api/v2
 
 type VersionController struct {
 	VersionService interfaces.VersionService
@@ -19,17 +19,31 @@ type VersionController struct {
 
 const headerSize = 512
 
-// CreateVersion godoc specs are subject to change
+const headerSize = 512
+
+// GetVersion godoc
+// @Summary 	Get version
+// @Description Get a version by version ID
+// @Param		versionID		path		string			true	"Version ID"
+// @Produce		application/json
+// @Success 	200 		{object}	models.VersionDTO
+// @Failure		400 		{object} 	utils.HTTPError
+// @Failure		404 		{object} 	utils.HTTPError
+// @Router 		/version/{versionID}	[get]
+func (versionController *VersionController) GetVersion(_ *gin.Context) {
+
+}
+
+// CreateVersion godoc
 // @Summary 	Create new version
 // @Description Create a new version with discussions and repository
 // @Accept  	multipart/form-data
-// @Param		postID		path		string				true	"Parent Post ID"
-// @Param		repository	body		models.Repository	true	"Repository to create"
+// @Param		repository	body		file				true	"Repository to create"
 // @Produce		application/json
 // @Success 	200		{object}	models.Version
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/version/{postID}	[post]
+// @Router 		/version	[post]
 func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	// extract file
 	file, err := c.FormFile("file")
@@ -66,14 +80,13 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 // GetRender godoc specs are subject to change
 // @Summary 	Get the render of a version
 // @Description Get the render of the repository underlying a version if it exists and has been rendered successfully
-// @Param		postID		path		string				true	"Parent Post ID"
 // @Param		versionID	path		string				true	"Version ID"
 // @Produce		text/html
-// @Success 	200		[]byte
+// @Success 	200		{object}	[]byte
 // @Success		202
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
-// @Router 		/version/{postID}/{versionID}/render	[get]
+// @Router 		/version/{versionID}/render	[get]
 func (versionController *VersionController) GetRender(c *gin.Context) {
 	// extract post id
 	postIDStr := c.Param("postID")
@@ -122,10 +135,9 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 // GetRepository godoc specs are subject to change
 // @Summary 	Get the repository of a version
 // @Description Get the entire zipped repository of a version
-// @Param		postID		path		string				true	"Parent Post ID"
 // @Param		versionID	path		string				true	"Version ID"
 // @Produce		application/zip
-// @Success 	200		[]byte
+// @Success 	200		{object}	[]byte
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
@@ -184,18 +196,17 @@ func (versionController *VersionController) GetRepository(c *gin.Context) {
 	c.File(filePath)
 }
 
-// GetTreeFromRepository godoc specs are subject to change
+// GetFileTree godoc specs are subject to change
 // @Summary 	Get the file tree of a repository
 // @Description Get the file tree of a repository of a version
-// @Param		postID		path		string				true	"Parent Post ID"
 // @Param		versionID	path		string				true	"Version ID"
 // @Produce		application/json
 // @Success 	200		{object}	map[string]int64
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/{postID}/{versionID}/tree		[get]
-func (versionController *VersionController) GetTreeFromRepository(c *gin.Context) {
+// @Router 		/version/{versionID}/tree		[get]
+func (versionController *VersionController) GetFileTree(c *gin.Context) {
 	// extract post id
 	postIDStr := c.Param("postID")
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
