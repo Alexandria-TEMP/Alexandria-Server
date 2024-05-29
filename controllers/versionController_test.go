@@ -152,7 +152,7 @@ func TestGetRender404(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
 
-func TestGetReposiotry200(t *testing.T) {
+func TestGetRepository200(t *testing.T) {
 	beforeEachVersion(t)
 
 	mockVersionService.EXPECT().GetRepositoryFile(uint(1)).Return("../utils/test_files/good_repository_setup/quarto_project.zip", nil)
@@ -174,7 +174,7 @@ func TestGetReposiotry200(t *testing.T) {
 	assert.Equal(t, fileContentType, "application/zip")
 }
 
-func TestGetReposiotry4041(t *testing.T) {
+func TestGetRepository4041(t *testing.T) {
 	beforeEachVersion(t)
 
 	mockVersionService.EXPECT().GetRepositoryFile(gomock.Any()).Return("../utils/test_files/good_repository_setup/quarto_project.zip", nil).Times(0)
@@ -187,7 +187,7 @@ func TestGetReposiotry4041(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
-func TestGetReposiotry4042(t *testing.T) {
+func TestGetRepository4042(t *testing.T) {
 	beforeEachVersion(t)
 
 	mockVersionService.EXPECT().GetRepositoryFile(gomock.Any()).Return("../utils/test_files/good_repository_setup/quarto_project.zip", nil).Times(0)
