@@ -11,11 +11,11 @@ type Branch struct {
 	gorm.Model
 
 	/////////////////////////////////////////////
-	// The MR's proposed changes:
+	// The branch's proposed changes:
 
-	// Branch belongs to Version
-	NewVersion   Version `gorm:"foreignKey:NewVersionID"`
-	NewVersionID uint
+	// // Branch belongs to Version
+	// NewVersion   Version `gorm:"foreignKey:NewVersionID"`
+	// NewVersionID uint
 
 	NewPostTitle string
 
@@ -23,7 +23,7 @@ type Branch struct {
 	UpdatedScientificFields []tags.ScientificField `gorm:"serializer:json"`
 
 	/////////////////////////////////////////////
-	// The MR's metadata:
+	// The branch's metadata:
 
 	// Branch has many BranchCollaborator
 	Collaborators []*BranchCollaborator `gorm:"foreignKey:BranchID"`
@@ -34,9 +34,9 @@ type Branch struct {
 	// ProjectPost has many Branch
 	ProjectPostID uint
 
-	// Branch belongs to Version (previous version)
-	PreviousVersion   Version `gorm:"foreignKey:PreviousVersionID"`
-	PreviousVersionID uint
+	// // Branch belongs to Version (previous version)
+	// PreviousVersion   Version `gorm:"foreignKey:PreviousVersionID"`
+	// PreviousVersionID uint
 
 	BranchTitle string
 
@@ -46,17 +46,15 @@ type Branch struct {
 type BranchDTO struct {
 	ID uint
 	// MR's proposed changes
-	NewVersionID            uint
 	NewPostTitle            string
 	UpdatedCompletionStatus tags.CompletionStatus
 	UpdatedScientificFields []tags.ScientificField
 	// MR metadata
-	CollaboratorIDs   []uint
-	ReviewIDs         []uint
-	ProjectPostID     uint
-	PreviousVersionID uint
-	BranchTitle       string
-	Anonymous         bool
+	CollaboratorIDs []uint
+	ReviewIDs       []uint
+	ProjectPostID   uint
+	BranchTitle     string
+	Anonymous       bool
 }
 
 func (model *Branch) GetID() uint {
@@ -66,14 +64,12 @@ func (model *Branch) GetID() uint {
 func (model *Branch) IntoDTO() BranchDTO {
 	return BranchDTO{
 		model.ID,
-		model.NewVersionID,
 		model.NewPostTitle,
 		model.UpdatedCompletionStatus,
 		model.UpdatedScientificFields,
 		branchCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
 		model.ProjectPostID,
-		model.PreviousVersionID,
 		model.BranchTitle,
 		model.Anonymous,
 	}

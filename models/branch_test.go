@@ -12,9 +12,7 @@ import (
 func TestBranchJSONMarshaling(t *testing.T) {
 	// This model...
 	model := Branch{
-		Model:        gorm.Model{ID: 44},
-		NewVersion:   Version{},
-		NewVersionID: 99,
+		Model: gorm.Model{ID: 44},
 		Collaborators: []*BranchCollaborator{
 			{Model: gorm.Model{ID: 100}},
 			{Model: gorm.Model{ID: 50}},
@@ -30,8 +28,6 @@ func TestBranchJSONMarshaling(t *testing.T) {
 			},
 		},
 		ProjectPostID:           45,
-		PreviousVersion:         Version{},
-		PreviousVersionID:       20,
 		BranchTitle:             "My Cool MR",
 		NewPostTitle:            "Updated Post Title",
 		UpdatedCompletionStatus: tags.Idea,
@@ -42,11 +38,9 @@ func TestBranchJSONMarshaling(t *testing.T) {
 	// should equal this DTO!
 	targetDTO := BranchDTO{
 		ID:                      44,
-		NewVersionID:            99,
 		CollaboratorIDs:         []uint{100, 50},
 		ReviewIDs:               []uint{2},
 		ProjectPostID:           45,
-		PreviousVersionID:       20,
 		BranchTitle:             "My Cool MR",
 		NewPostTitle:            "Updated Post Title",
 		UpdatedCompletionStatus: tags.Idea,

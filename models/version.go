@@ -17,6 +17,10 @@ const (
 type Version struct {
 	gorm.Model
 
+	// Version has one Branch
+	Branch   Branch `gorm:"foreignKey:BranchID"`
+	BranchID uint
+
 	// Version has many Discussion
 	Discussions  []*Discussion `gorm:"foreignKey:VersionID"`
 	RenderStatus RenderStatus
