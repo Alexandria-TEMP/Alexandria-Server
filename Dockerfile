@@ -12,7 +12,6 @@ COPY . ./
 
 # Get module dependencies
 RUN go mod download
-RUN go mod download
 
 # Developer tools
 # TODO for prod these can be removed
