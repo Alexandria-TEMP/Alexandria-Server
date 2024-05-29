@@ -236,18 +236,21 @@ func TestGetRenderFileSuccess(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
 
+	renderDirPath := filepath.Join(cwd, "..", "utils", "test_files", "good_repository_setup", "render")
+	renderFilePath := filepath.Join(cwd, "..", "utils", "test_files", "good_repository_setup", "render", "test.html")
+
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
-	mockFilesystem.EXPECT().RenderExists().Return(true, "").Times(1)
-	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("test").Times(1)
+	mockFilesystem.EXPECT().RenderExists().Return(true, "test.html").Times(1)
+	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(renderDirPath).Times(1)
 
 	mockVersionRepository.EXPECT().GetByID(successVersion.ID).Return(&successVersion, nil).Times(1)
 	mockVersionRepository.EXPECT().Update(gomock.Any()).Times(0)
 
-	path, err202, err404 := versionService.GetRenderFile(successVersion.ID)
+	returnedPath, err202, err404 := versionService.GetRenderFile(successVersion.ID)
 
 	assert.Nil(t, err202)
 	assert.Nil(t, err404)
-	assert.Equal(t, "test", path)
+	assert.Equal(t, renderFilePath, returnedPath)
 }
 
 func TestGetRenderFileFailure1(t *testing.T) {
@@ -382,7 +385,7 @@ func TestGetFileFromRepositorySuccess(t *testing.T) {
 	assert.Equal(t, filepath.Join(cwd, "..", "utils", "test_files", "file_tree", "child_dir", "test.txt"), absFilepath)
 }
 
-func TestGetFileFromRepositoryFailure(t *testing.T) {
+func TestGetFileFromRepositoryFailure1(t *testing.T) {
 	beforeEach(t)
 	defer cleanup(t)
 
@@ -390,6 +393,18 @@ func TestGetFileFromRepositoryFailure(t *testing.T) {
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", "file_tree")).Times(1)
 
 	_, err := versionService.GetFileFromRepository(successVersion.ID, "../../../.env")
+
+	assert.NotNil(t, err)
+}
+
+func TestGetFileFromRepositoryFailure2(t *testing.T) {
+	beforeEach(t)
+	defer cleanup(t)
+
+	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
+	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", "file_tree")).Times(1)
+
+	_, err := versionService.GetFileFromRepository(successVersion.ID, "testingbadpath")
 
 	assert.NotNil(t, err)
 }

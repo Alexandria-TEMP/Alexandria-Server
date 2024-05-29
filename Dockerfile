@@ -29,4 +29,7 @@ EXPOSE 8080
 FROM build AS run
 
 # Start server on run
-ENTRYPOINT /usr/bin/alexandria-backend
+# ENTRYPOINT /usr/bin/alexandria-backend
+
+# TODO: Remove
+ENTRYPOINT ["tail", "-f", "/dev/null"]

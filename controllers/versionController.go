@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"strconv"
@@ -14,6 +15,8 @@ import (
 // @BasePath /api/v2/versions
 
 const headerSize = 512
+
+var logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
 type VersionController struct {
 	VersionService interfaces.VersionService
@@ -106,7 +109,7 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 	c.Header("Content-Description", "File Transfer")
 	c.Header("Content-Transfer-Encoding", "binary")
 	c.Header("Content-Disposition", "attachment; filename=render.html")
-	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.Header("Content-Type", "text/html")
 	c.File(filePath)
 }
 
@@ -140,27 +143,11 @@ func (versionController *VersionController) GetRepository(c *gin.Context) {
 		return
 	}
 
-	fileContentType, err1 := mimetype.DetectFile(filePath)
-
-	fileData, err2 := os.Open(filePath)
-
-	// Get the file info
-	fileInfo, err3 := fileData.Stat()
-
-	if err1 != nil || err2 != nil || err3 != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file"})
-
-		return
-	}
-
-	defer fileData.Close()
-
 	// Set the headers for the file transfer and return the file
 	c.Header("Content-Description", "File Transfer")
 	c.Header("Content-Transfer-Encoding", "binary")
-	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileInfo.Name()))
-	c.Header("Content-Type", fileContentType.String())
-	c.Header("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
+	c.Header("Content-Disposition", "attachment; filename=quarto_project.zip")
+	c.Header("Content-Type", "application/zip")
 	c.File(filePath)
 }
 

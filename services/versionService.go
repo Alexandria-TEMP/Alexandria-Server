@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"mime/multipart"
 	"os"
 	"os/exec"
@@ -18,12 +19,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+
 type VersionService struct {
 	VersionRepository database.RepositoryInterface[*models.Version]
 	Filesystem        filesysteminterface.Filesystem
 }
 
 func (versionService *VersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader) (*models.Version, error) {
+	logger.Debug("Creating new version")
 	// Create version, with pending render status
 	version := models.Version{RenderStatus: models.Pending}
 	_ = versionService.VersionRepository.Create(&version)
@@ -34,9 +38,12 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 	// Save zip file
 	if err := versionService.Filesystem.SaveRepository(c, file); err != nil {
 		versionService.FailAndRemoveVersion(&version)
+		logger.Warn("Failed to save repository")
 
 		return &version, err
 	}
+
+	logger.Debug("Created version successfully")
 
 	// This goroutine runs parallel to our response being sent, and will likely finish at a later point in time.
 	// If it fails before rendering we will remove the repository entirely.
@@ -45,6 +52,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		// Unzip saved file
 		if err := versionService.Filesystem.Unzip(); err != nil {
 			versionService.FailAndRemoveVersion(&version)
+			logger.Warn("Failed to unzip")
 
 			return
 		}
@@ -52,6 +60,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		// Validate project
 		if valid := versionService.IsValidProject(); !valid {
 			versionService.FailAndRemoveVersion(&version)
+			logger.Warn("Failed to validate")
 
 			return
 		}
@@ -59,12 +68,14 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		// Install dependencies
 		if err := versionService.InstallRenderDependencies(); err != nil {
 			versionService.FailAndRemoveVersion(&version)
+			logger.Warn("Failed to get dependencies")
 
 			return
 		}
 
 		if err := versionService.SetProjectConfig(); err != nil {
 			versionService.FailAndRemoveVersion(&version)
+			logger.Warn("Failed to set project config")
 
 			return
 		}
@@ -73,12 +84,14 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 		if err := versionService.RenderProject(); err != nil {
 			version.RenderStatus = models.Failure
 			_, _ = versionService.VersionRepository.Update(&version)
+			logger.Warn(err.Error())
 
 			return
 		}
 
 		// Verify that a render was produced in the form of a single file
 		if exists, _ := versionService.Filesystem.RenderExists(); !exists {
+			logger.Warn("Failed to render as expected")
 			version.RenderStatus = models.Failure
 			_, _ = versionService.VersionRepository.Update(&version)
 
@@ -93,6 +106,8 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 			return
 		}
 	}()
+
+	logger.Debug("Rendered and unzipped successfuly")
 
 	return &version, nil
 }
@@ -250,14 +265,16 @@ func (versionService *VersionService) GetRenderFile(versionID uint) (string, err
 	versionService.Filesystem.SetCurrentVersion(versionID)
 
 	// Check that render exists, if not update render status to failed and return 404
-	if exists, _ := versionService.Filesystem.RenderExists(); !exists {
+	exists, fileName := versionService.Filesystem.RenderExists()
+
+	if !exists {
 		version.RenderStatus = models.Failure
 		_, _ = versionService.VersionRepository.Update(version)
 
 		return filePath, nil, fmt.Errorf("version failed to render")
 	}
 
-	return versionService.Filesystem.GetCurrentRenderDirPath(), nil, nil
+	return filepath.Join(versionService.Filesystem.GetCurrentRenderDirPath(), fileName), nil, nil
 }
 
 func (versionService *VersionService) GetRepositoryFile(versionID uint) (string, error) {
