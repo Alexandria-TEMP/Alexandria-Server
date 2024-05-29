@@ -11,8 +11,7 @@ import (
 func TestVersionJSONMarshaling(t *testing.T) {
 	// This model...
 	model := Version{
-		Model:      gorm.Model{ID: 20},
-		Repository: Repository{},
+		Model: gorm.Model{ID: 20},
 		Discussions: []*Discussion{
 			{
 				Model:     gorm.Model{ID: 99},
@@ -23,12 +22,14 @@ func TestVersionJSONMarshaling(t *testing.T) {
 				VersionID: 20,
 			},
 		},
+		RenderStatus: Pending,
 	}
 
 	// should equal this DTO!
 	targetDTO := VersionDTO{
 		ID:            20,
 		DiscussionIDs: []uint{99, 59},
+		RenderStatus:  Pending,
 	}
 
 	dto := VersionDTO{}

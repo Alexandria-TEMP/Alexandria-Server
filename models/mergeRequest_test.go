@@ -16,12 +16,8 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 		NewVersion:   Version{},
 		NewVersionID: 99,
 		Collaborators: []*MergeRequestCollaborator{
-			{
-				Model: gorm.Model{ID: 100},
-			},
-			{
-				Model: gorm.Model{ID: 50},
-			},
+			{Model: gorm.Model{ID: 100}},
+			{Model: gorm.Model{ID: 50}},
 		},
 		Reviews: []*MergeRequestReview{
 			{
@@ -34,8 +30,12 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 			},
 		},
 		ProjectPostID:           45,
+		PreviousVersion:         Version{},
+		PreviousVersionID:       20,
+		MergeRequestTitle:       "My Cool MR",
+		NewPostTitle:            "Updated Post Title",
 		UpdatedCompletionStatus: tags.Idea,
-		UpdatedScientificFields: tags.Mathematics,
+		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
 		Anonymous:               false,
 	}
 
@@ -46,8 +46,11 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 		CollaboratorIDs:         []uint{100, 50},
 		ReviewIDs:               []uint{2},
 		ProjectPostID:           45,
+		PreviousVersionID:       20,
+		MergeRequestTitle:       "My Cool MR",
+		NewPostTitle:            "Updated Post Title",
 		UpdatedCompletionStatus: tags.Idea,
-		UpdatedScientificFields: tags.Mathematics,
+		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
 		Anonymous:               false,
 	}
 

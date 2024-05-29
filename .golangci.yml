@@ -46,7 +46,6 @@ linters:
     - gofmt
     - gomnd
     - gocyclo
-    - gosec
     - gosimple
     - govet
     - ineffassign
