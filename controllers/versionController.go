@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"log/slog"
 	"net/http"
 	"os"
 	"strconv"
@@ -15,8 +14,6 @@ import (
 // @BasePath /api/v2/versions
 
 const headerSize = 512
-
-var logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
 type VersionController struct {
 	VersionService interfaces.VersionService
