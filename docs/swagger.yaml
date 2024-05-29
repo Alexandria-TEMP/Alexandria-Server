@@ -20,7 +20,7 @@ definitions:
           TODO: some hashing or semblance of security
         type: string
     type: object
-  forms.MergeRequestCreationForm:
+  forms.BranchCreationForm:
     type: object
   forms.PostCreationForm:
     properties:
@@ -76,7 +76,7 @@ definitions:
       password:
         type: string
     type: object
-  models.MergeRequestDTO:
+  models.BranchDTO:
     properties:
       anonymous:
         type: boolean
@@ -118,7 +118,7 @@ definitions:
     type: object
   models.ProjectPostDTO:
     properties:
-      closedMergeRequestIDs:
+      closedBranchIDs:
         items:
           type: integer
         type: array
@@ -128,7 +128,7 @@ definitions:
         $ref: '#/definitions/tags.FeedbackPreference'
       id:
         type: integer
-      openMergeRequestIDs:
+      openBranchIDs:
         items:
           type: integer
         type: array
@@ -636,7 +636,7 @@ paths:
       consumes:
       - application/json
       description: |-
-        Get all merge requests that this member is a collaborator of
+        Get all branches that this member is a collaborator of
         Endpoint is offset-paginated
       parameters:
       - description: user ID
@@ -673,13 +673,13 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Get all merge requests of this member
-  /members/{userID}/merge-requests:
+      summary: Get all branches of this member
+  /members/{userID}/branches:
     get:
       consumes:
       - application/json
       description: |-
-        Get all merge requests that this member is a collaborator of
+        Get all branches that this member is a collaborator of
         Endpoint is offset-paginated
       parameters:
       - description: user ID
@@ -702,7 +702,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.MergeRequestDTO'
+              $ref: '#/definitions/models.BranchDTO'
             type: array
         "400":
           description: Bad Request
@@ -716,7 +716,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Get all merge requests of this member
+      summary: Get all branches of this member
   /members/{userID}/posts:
     get:
       consumes:
@@ -949,25 +949,25 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Adds new saved project post
-  /merge-requests:
+  /branches:
     post:
       consumes:
       - application/json
-      description: Create a new question or discussion merge request
+      description: Create a new question or discussion branch
       parameters:
-      - description: MergeRequest Creation Form
+      - description: Branch Creation Form
         in: body
         name: form
         required: true
         schema:
-          $ref: '#/definitions/forms.MergeRequestCreationForm'
+          $ref: '#/definitions/forms.BranchCreationForm'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.MergeRequestDTO'
+            $ref: '#/definitions/models.BranchDTO'
         "400":
           description: Bad Request
           schema:
@@ -976,18 +976,18 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Create new merge request
+      summary: Create new branch
     put:
       consumes:
       - application/json
-      description: Update any number of the aspects of a merge request
+      description: Update any number of the aspects of a branch
       parameters:
-      - description: Updated MergeRequest
+      - description: Updated Branch
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.MergeRequestDTO'
+          $ref: '#/definitions/models.BranchDTO'
       produces:
       - application/json
       responses:
@@ -1005,16 +1005,16 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Update merge request
-  /merge-requests/{mergeRequestID}:
+      summary: Update branch
+  /branches/{branchID}:
     delete:
       consumes:
       - application/json
-      description: Delete a merge request with given ID from database
+      description: Delete a branch with given ID from database
       parameters:
-      - description: merge request ID
+      - description: branch ID
         in: path
-        name: mergeRequestID
+        name: branchID
         required: true
         type: string
       produces:
@@ -1034,15 +1034,15 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Delete a merge request
+      summary: Delete a branch
     get:
       consumes:
       - application/json
-      description: Get a merge request by merge request ID
+      description: Get a branch by branch ID
       parameters:
-      - description: MergeRequest ID
+      - description: Branch ID
         in: path
-        name: mergeRequestID
+        name: branchID
         required: true
         type: string
       produces:
@@ -1051,7 +1051,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.MergeRequestDTO'
+            $ref: '#/definitions/models.BranchDTO'
         "400":
           description: Bad Request
           schema:
@@ -1064,18 +1064,18 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Get merge request
-  /merge-requests/{mergeRequestID}/can-review/{userID}:
+      summary: Get branch
+  /branches/{branchID}/can-review/{userID}:
     get:
       consumes:
       - application/json
       description: |-
-        Returns true if the user fulfills the requirements to review the merge request
-        Returns false if user is unauthorized to review the merge request
+        Returns true if the user fulfills the requirements to review the branch
+        Returns false if user is unauthorized to review the branch
       parameters:
-      - description: merge request ID
+      - description: branch ID
         in: path
-        name: mergeRequestID
+        name: branchID
         required: true
         type: string
       - description: user ID
@@ -1104,17 +1104,17 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Returns whether the user is allowed to review this merge request
-  /merge-requests/{mergeRequestID}/reviews:
+      summary: Returns whether the user is allowed to review this branch
+  /branches/{branchID}/reviews:
     get:
       consumes:
       - application/json
       description: Returns an array of the statuses of all the reviews of this merge
         request
       parameters:
-      - description: merge request ID
+      - description: branch ID
         in: path
-        name: mergeRequestID
+        name: branchID
         required: true
         type: string
       produces:
@@ -1138,15 +1138,15 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Returns status of all merge request reviews
+      summary: Returns status of all branch reviews
     post:
       consumes:
       - application/json
-      description: Adds a review to a merge request
+      description: Adds a review to a branch
       parameters:
-      - description: merge request ID
+      - description: branch ID
         in: path
-        name: mergeRequestID
+        name: branchID
         required: true
         type: string
       - description: review creation form
@@ -1172,17 +1172,17 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Adds a review to a merge request
-  /merge-requests/{mergeRequestID}/reviews/{reviewID}:
+      summary: Adds a review to a branch
+  /branches/{branchID}/reviews/{reviewID}:
     get:
       consumes:
       - application/json
-      description: Returns a review with the given ID of the merge request with the
+      description: Returns a review with the given ID of the branch with the
         given ID
       parameters:
-      - description: merge request ID
+      - description: branch ID
         in: path
-        name: mergeRequestID
+        name: branchID
         required: true
         type: string
       - description: review ID
@@ -1209,7 +1209,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Returns a review of a merge request
+      summary: Returns a review of a branch
   /posts:
     post:
       consumes:
@@ -1570,7 +1570,7 @@ paths:
       consumes:
       - application/json
       description: |-
-        Returns all discussions on this project post and all of it's merge requests
+        Returns all discussions on this project post and all of it's branches
         Endpoint is offset-paginated
       parameters:
       - description: post ID
@@ -1608,12 +1608,12 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns all discussions associated with the project post
-  /project-posts/{postID}/closed-merge-requests:
+  /project-posts/{postID}/closed-branches:
     get:
       consumes:
       - application/json
       description: |-
-        Get all closed merge requests associated with the given project post
+        Get all closed branches associated with the given project post
         Endpoint is offset-paginated
       parameters:
       - description: post ID
@@ -1636,7 +1636,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.MergeRequestDTO'
+              $ref: '#/definitions/models.BranchDTO'
             type: array
         "400":
           description: Bad Request
@@ -1650,13 +1650,13 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Get all closed merge requests of a project post
-  /project-posts/{postID}/open-merge-requests:
+      summary: Get all closed branches of a project post
+  /project-posts/{postID}/open-branches:
     get:
       consumes:
       - application/json
       description: |-
-        Get all open merge requests associated with the given project post
+        Get all open branches associated with the given project post
         Endpoint is offset-paginated
       parameters:
       - description: post ID
@@ -1679,7 +1679,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.MergeRequestDTO'
+              $ref: '#/definitions/models.BranchDTO'
             type: array
         "400":
           description: Bad Request
@@ -1693,7 +1693,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Get all open merge requests of a project post
+      summary: Get all open branches of a project post
   /project-posts/from-github:
     post:
       consumes:

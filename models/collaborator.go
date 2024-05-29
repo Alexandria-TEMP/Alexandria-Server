@@ -52,40 +52,40 @@ func (model *PostCollaborator) MarshalJSON() ([]byte, error) {
 	return json.Marshal(model.IntoDTO())
 }
 
-// A member that has collaborated on a merge request.
-type MergeRequestCollaborator struct {
+// A member that has collaborated on a branch.
+type BranchCollaborator struct {
 	gorm.Model
 
 	// Belongs to Member
 	Member   Member `gorm:"foreignKey:MemberID"`
 	MemberID uint
 
-	// MergeRequest has many MergeRequestCollaborator
-	MergeRequestID uint
+	// Branch has many BranchCollaborator
+	BranchID uint
 
 	CollaborationType CollaborationType
 }
 
-type MergeRequestCollaboratorDTO struct {
+type BranchCollaboratorDTO struct {
 	ID                uint
 	MemberID          uint
-	MergeRequestID    uint
+	BranchID          uint
 	CollaborationType CollaborationType
 }
 
-func (model *MergeRequestCollaborator) GetID() uint {
+func (model *BranchCollaborator) GetID() uint {
 	return model.Model.ID
 }
 
-func (model *MergeRequestCollaborator) IntoDTO() MergeRequestCollaboratorDTO {
-	return MergeRequestCollaboratorDTO{
+func (model *BranchCollaborator) IntoDTO() BranchCollaboratorDTO {
+	return BranchCollaboratorDTO{
 		model.ID,
 		model.MemberID,
-		model.MergeRequestID,
+		model.BranchID,
 		model.CollaborationType,
 	}
 }
 
-func (model *MergeRequestCollaborator) MarshalJSON() ([]byte, error) {
+func (model *BranchCollaborator) MarshalJSON() ([]byte, error) {
 	return json.Marshal(model.IntoDTO())
 }

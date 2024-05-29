@@ -162,7 +162,7 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 
 // GetProjectPostDiscussions godoc
 // @Summary Returns all discussions associated with the project post
-// @Description Returns all discussions on this project post and all of it's merge requests
+// @Description Returns all discussions on this project post and all of it's branches
 // @Description Endpoint is offset-paginated
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
@@ -178,40 +178,40 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ 
 
 }
 
-// GetProjectPostOpenMergeRequests godoc
-// @Summary		Get all open merge requests of a project post
-// @Description	Get all open merge requests associated with the given project post
+// GetProjectPostOpenBranchs godoc
+// @Summary		Get all open branches of a project post
+// @Description	Get all open branches associated with the given project post
 // @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		postID		path		string			true	"post ID"
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.MergeRequestDTO
+// @Success 	200		{array}		models.BranchDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/project-posts/{postID}/open-merge-requests 		[get]
-func (projectPostController *ProjectPostController) GetProjectPostOpenMergeRequests(_ *gin.Context) {
-	// return all the merge requests associated with this project post that are open
+// @Router 		/project-posts/{postID}/open-branches 		[get]
+func (projectPostController *ProjectPostController) GetProjectPostOpenBranchs(_ *gin.Context) {
+	// return all the branches associated with this project post that are open
 	// TODO: make endpoint paginated
 }
 
-// GetProjectPostClosedMergeRequests godoc
-// @Summary		Get all closed merge requests of a project post
-// @Description	Get all closed merge requests associated with the given project post
+// GetProjectPostClosedBranchs godoc
+// @Summary		Get all closed branches of a project post
+// @Description	Get all closed branches associated with the given project post
 // @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		postID		path		string			true	"post ID"
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.MergeRequestDTO
+// @Success 	200		{array}		models.BranchDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/project-posts/{postID}/closed-merge-requests 		[get]
-func (projectPostController *ProjectPostController) GetProjectPostClosedMergeRequests(_ *gin.Context) {
-	// return all the merge requests associated with this project post that are closed
+// @Router 		/project-posts/{postID}/closed-branches 		[get]
+func (projectPostController *ProjectPostController) GetProjectPostClosedBranchs(_ *gin.Context) {
+	// return all the branches associated with this project post that are closed
 	// TODO: make endpoint paginated
 }

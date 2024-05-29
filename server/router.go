@@ -32,15 +32,15 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 
 	memberRouter(v2, controllers)
 
-	mergeRequestRouter := v2.Group("/merge-requests")
-	mergeRequestRouter.GET("/:mergeRequestID", controllers.mergeRequestController.GetMergeRequest)
-	mergeRequestRouter.POST("/", controllers.mergeRequestController.CreateMergeRequest)
-	mergeRequestRouter.PUT("/", controllers.mergeRequestController.UpdateMergeRequest)
-	mergeRequestRouter.DELETE("/:mergeRequestID", controllers.mergeRequestController.DeleteMergeRequest)
-	mergeRequestRouter.GET("/:mergeRequestID/reviews", controllers.mergeRequestController.GetReviewStatus)
-	mergeRequestRouter.GET("/:mergeRequestID/reviews/:reviewID", controllers.mergeRequestController.GetReview)
-	mergeRequestRouter.POST("/:mergeRequestID/reviews", controllers.mergeRequestController.CreateReview)
-	mergeRequestRouter.GET("/:mergeRequestID/can-review/:userID", controllers.mergeRequestController.UserCanReview)
+	branchRouter := v2.Group("/branches")
+	branchRouter.GET("/:branchID", controllers.branchController.GetBranch)
+	branchRouter.POST("/", controllers.branchController.CreateBranch)
+	branchRouter.PUT("/", controllers.branchController.UpdateBranch)
+	branchRouter.DELETE("/:branchID", controllers.branchController.DeleteBranch)
+	branchRouter.GET("/:branchID/reviews", controllers.branchController.GetReviewStatus)
+	branchRouter.GET("/:branchID/reviews/:reviewID", controllers.branchController.GetReview)
+	branchRouter.POST("/:branchID/reviews", controllers.branchController.CreateReview)
+	branchRouter.GET("/:branchID/can-review/:userID", controllers.branchController.UserCanReview)
 
 	discussionRouter := v2.Group("/discussions")
 	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
@@ -77,7 +77,7 @@ func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	memberRouter.DELETE("/:userID", controllers.memberController.DeleteMember)
 	memberRouter.GET("/:userID/posts", controllers.memberController.GetMemberPosts)
 	memberRouter.GET("/:userID/project-posts", controllers.memberController.GetMemberProjectPosts)
-	memberRouter.GET("/:userID/merge-requests", controllers.memberController.GetMemberMergeRequests)
+	memberRouter.GET("/:userID/branches", controllers.memberController.GetMemberBranchs)
 	memberRouter.GET("/:userID/discussions", controllers.memberController.GetMemberDiscussions)
 	memberRouter.POST("/:userID/saved-posts", controllers.memberController.AddMemberSavedPost)
 	memberRouter.POST("/:userID/saved-project-posts", controllers.memberController.AddMemberSavedProjectPost)
@@ -93,8 +93,8 @@ func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	projectPostRouter.DELETE("/:postID", controllers.projectPostController.DeleteProjectPost)
 	projectPostRouter.POST("/from-github", controllers.projectPostController.CreateProjectPostFromGithub)
 	projectPostRouter.GET("/:postID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
-	projectPostRouter.GET("/:postID/open-merge-requests", controllers.projectPostController.GetProjectPostOpenMergeRequests)
-	projectPostRouter.GET("/:postID/closed-merge-requests", controllers.projectPostController.GetProjectPostClosedMergeRequests)
+	projectPostRouter.GET("/:postID/open-branches", controllers.projectPostController.GetProjectPostOpenBranchs)
+	projectPostRouter.GET("/:postID/closed-branches", controllers.projectPostController.GetProjectPostClosedBranchs)
 }
 
 func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {

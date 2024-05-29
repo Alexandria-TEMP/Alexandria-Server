@@ -184,29 +184,29 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 	// TODO: make endpoint paginated
 }
 
-// GetMemberMergeRequests godoc
-// @Summary		Get all merge requests of this member
-// @Description	Get all merge requests that this member is a collaborator of
+// GetMemberBranchs godoc
+// @Summary		Get all branches of this member
+// @Description	Get all branches that this member is a collaborator of
 // @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.MergeRequestDTO
+// @Success 	200		{array}		models.BranchDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID}/merge-requests 		[get]
-func (memberController *MemberController) GetMemberMergeRequests(_ *gin.Context) {
-	// return all the merge requests
+// @Router 		/members/{userID}/branches 		[get]
+func (memberController *MemberController) GetMemberBranchs(_ *gin.Context) {
+	// return all the branches
 	// that this member is a collaborator/author of
 	// TODO: make endpoint paginated
 }
 
 // GetMemberDiscussions godoc
-// @Summary		Get all merge requests of this member
-// @Description	Get all merge requests that this member is a collaborator of
+// @Summary		Get all branches of this member
+// @Description	Get all branches that this member is a collaborator of
 // @Description Endpoint is offset-paginated
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"

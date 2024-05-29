@@ -7,28 +7,28 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestClosedMergeRequestJSONMarshaling(t *testing.T) {
+func TestClosedBranchJSONMarshaling(t *testing.T) {
 	// This model...
-	model := ClosedMergeRequest{
+	model := ClosedBranch{
 		Model:                   gorm.Model{ID: 55},
-		MergeRequest:            MergeRequest{},
-		MergeRequestID:          33,
+		Branch:                  Branch{},
+		BranchID:                33,
 		MainVersionWhenClosed:   Version{},
 		MainVersionWhenClosedID: 87,
 		ProjectPostID:           40,
-		MergeRequestDecision:    Rejected,
+		BranchDecision:          Rejected,
 	}
 
 	// should equal this DTO!
-	targetDTO := ClosedMergeRequestDTO{
+	targetDTO := ClosedBranchDTO{
 		ID:                      55,
-		MergeRequestID:          33,
+		BranchID:                33,
 		MainVersionWhenClosedID: 87,
 		ProjectPostID:           40,
-		MergeRequestDecision:    Rejected,
+		BranchDecision:          Rejected,
 	}
 
-	dto := ClosedMergeRequestDTO{}
+	dto := ClosedBranchDTO{}
 
 	bytes, err := model.MarshalJSON()
 	if err != nil {

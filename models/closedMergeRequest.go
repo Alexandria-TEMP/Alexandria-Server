@@ -6,46 +6,46 @@ import (
 	"gorm.io/gorm"
 )
 
-// A merge request that is no longer open, including merged and non-merged.
-type ClosedMergeRequest struct {
+// A branch that is no longer open, including merged and non-merged.
+type ClosedBranch struct {
 	gorm.Model
 
-	// ClosedMergeRequest belongs to MergeRequest
-	MergeRequest   MergeRequest `gorm:"foreignKey:MergeRequestID"`
-	MergeRequestID uint
+	// ClosedBranch belongs to Branch
+	Branch   Branch `gorm:"foreignKey:BranchID"`
+	BranchID uint
 
-	// ClosedMergeRequest belongs to Version
+	// ClosedBranch belongs to Version
 	MainVersionWhenClosed   Version `gorm:"foreignKey:MainVersionWhenClosedID"`
 	MainVersionWhenClosedID uint
 
-	// ProjectPost has many ClosedMergeRequest
+	// ProjectPost has many ClosedBranch
 	ProjectPostID uint
 
-	MergeRequestDecision MergeRequestDecision
+	BranchDecision BranchDecision
 }
 
-type ClosedMergeRequestDTO struct {
+type ClosedBranchDTO struct {
 	ID                      uint
-	MergeRequestID          uint
+	BranchID                uint
 	MainVersionWhenClosedID uint
 	ProjectPostID           uint
-	MergeRequestDecision    MergeRequestDecision
+	BranchDecision          BranchDecision
 }
 
-func (model *ClosedMergeRequest) GetID() uint {
+func (model *ClosedBranch) GetID() uint {
 	return model.Model.ID
 }
 
-func (model *ClosedMergeRequest) IntoDTO() ClosedMergeRequestDTO {
-	return ClosedMergeRequestDTO{
+func (model *ClosedBranch) IntoDTO() ClosedBranchDTO {
+	return ClosedBranchDTO{
 		model.ID,
-		model.MergeRequestID,
+		model.BranchID,
 		model.MainVersionWhenClosedID,
 		model.ProjectPostID,
-		model.MergeRequestDecision,
+		model.BranchDecision,
 	}
 }
 
-func (model *ClosedMergeRequest) MarshalJSON() ([]byte, error) {
+func (model *ClosedBranch) MarshalJSON() ([]byte, error) {
 	return json.Marshal(model.IntoDTO())
 }

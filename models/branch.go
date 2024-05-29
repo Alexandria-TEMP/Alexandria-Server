@@ -7,13 +7,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type MergeRequest struct {
+type Branch struct {
 	gorm.Model
 
 	/////////////////////////////////////////////
 	// The MR's proposed changes:
 
-	// MergeRequest belongs to Version
+	// Branch belongs to Version
 	NewVersion   Version `gorm:"foreignKey:NewVersionID"`
 	NewVersionID uint
 
@@ -25,25 +25,25 @@ type MergeRequest struct {
 	/////////////////////////////////////////////
 	// The MR's metadata:
 
-	// MergeRequest has many MergeRequestCollaborator
-	Collaborators []*MergeRequestCollaborator `gorm:"foreignKey:MergeRequestID"`
+	// Branch has many BranchCollaborator
+	Collaborators []*BranchCollaborator `gorm:"foreignKey:BranchID"`
 
-	// MergeRequest has many MergeRequestReview
-	Reviews []*MergeRequestReview `gorm:"foreignKey:MergeRequestID"`
+	// Branch has many BranchReview
+	Reviews []*BranchReview `gorm:"foreignKey:BranchID"`
 
-	// ProjectPost has many MergeRequest
+	// ProjectPost has many Branch
 	ProjectPostID uint
 
-	// MergeRequest belongs to Version (previous version)
+	// Branch belongs to Version (previous version)
 	PreviousVersion   Version `gorm:"foreignKey:PreviousVersionID"`
 	PreviousVersionID uint
 
-	MergeRequestTitle string
+	BranchTitle string
 
 	Anonymous bool
 }
 
-type MergeRequestDTO struct {
+type BranchDTO struct {
 	ID uint
 	// MR's proposed changes
 	NewVersionID            uint
@@ -55,36 +55,36 @@ type MergeRequestDTO struct {
 	ReviewIDs         []uint
 	ProjectPostID     uint
 	PreviousVersionID uint
-	MergeRequestTitle string
+	BranchTitle       string
 	Anonymous         bool
 }
 
-func (model *MergeRequest) GetID() uint {
+func (model *Branch) GetID() uint {
 	return model.Model.ID
 }
 
-func (model *MergeRequest) IntoDTO() MergeRequestDTO {
-	return MergeRequestDTO{
+func (model *Branch) IntoDTO() BranchDTO {
+	return BranchDTO{
 		model.ID,
 		model.NewVersionID,
 		model.NewPostTitle,
 		model.UpdatedCompletionStatus,
 		model.UpdatedScientificFields,
-		mergeRequestCollaboratorsToIDs(model.Collaborators),
+		branchCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
 		model.ProjectPostID,
 		model.PreviousVersionID,
-		model.MergeRequestTitle,
+		model.BranchTitle,
 		model.Anonymous,
 	}
 }
 
-func (model *MergeRequest) MarshalJSON() ([]byte, error) {
+func (model *Branch) MarshalJSON() ([]byte, error) {
 	return json.Marshal(model.IntoDTO())
 }
 
 // Helper function for JSON marshaling
-func mergeRequestCollaboratorsToIDs(collaborators []*MergeRequestCollaborator) []uint {
+func branchCollaboratorsToIDs(collaborators []*BranchCollaborator) []uint {
 	ids := make([]uint, len(collaborators))
 
 	for i, collaborator := range collaborators {
@@ -95,7 +95,7 @@ func mergeRequestCollaboratorsToIDs(collaborators []*MergeRequestCollaborator) [
 }
 
 // Helper function for JSON marshaling
-func reviewsToIDs(reviews []*MergeRequestReview) []uint {
+func reviewsToIDs(reviews []*BranchReview) []uint {
 	ids := make([]uint, len(reviews))
 
 	for i, review := range reviews {

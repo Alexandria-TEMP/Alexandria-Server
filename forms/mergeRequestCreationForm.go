@@ -1,4 +1,4 @@
 package forms
 
-type MergeRequestCreationForm struct {
+type BranchCreationForm struct {
 }

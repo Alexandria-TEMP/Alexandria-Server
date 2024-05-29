@@ -637,14 +637,14 @@ const docTemplate = `{
         },
         "/members/{userID}/discussions": {
             "get": {
-                "description": "Get all merge requests that this member is a collaborator of\nEndpoint is offset-paginated",
+                "description": "Get all branches that this member is a collaborator of\nEndpoint is offset-paginated",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get all merge requests of this member",
+                "summary": "Get all branches of this member",
                 "parameters": [
                     {
                         "type": "string",
@@ -697,16 +697,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}/merge-requests": {
+        "/members/{userID}/branches": {
             "get": {
-                "description": "Get all merge requests that this member is a collaborator of\nEndpoint is offset-paginated",
+                "description": "Get all branches that this member is a collaborator of\nEndpoint is offset-paginated",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get all merge requests of this member",
+                "summary": "Get all branches of this member",
                 "parameters": [
                     {
                         "type": "string",
@@ -734,7 +734,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.MergeRequestDTO"
+                                "$ref": "#/definitions/models.BranchDTO"
                             }
                         }
                     },
@@ -1097,24 +1097,24 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests": {
+        "/branches": {
             "put": {
-                "description": "Update any number of the aspects of a merge request",
+                "description": "Update any number of the aspects of a branch",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Update merge request",
+                "summary": "Update branch",
                 "parameters": [
                     {
-                        "description": "Updated MergeRequest",
+                        "description": "Updated Branch",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.MergeRequestDTO"
+                            "$ref": "#/definitions/models.BranchDTO"
                         }
                     }
                 ],
@@ -1143,22 +1143,22 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create a new question or discussion merge request",
+                "description": "Create a new question or discussion branch",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Create new merge request",
+                "summary": "Create new branch",
                 "parameters": [
                     {
-                        "description": "MergeRequest Creation Form",
+                        "description": "Branch Creation Form",
                         "name": "form",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.MergeRequestCreationForm"
+                            "$ref": "#/definitions/forms.BranchCreationForm"
                         }
                     }
                 ],
@@ -1166,7 +1166,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.MergeRequestDTO"
+                            "$ref": "#/definitions/models.BranchDTO"
                         }
                     },
                     "400": {
@@ -1184,21 +1184,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests/{mergeRequestID}": {
+        "/branches/{branchID}": {
             "get": {
-                "description": "Get a merge request by merge request ID",
+                "description": "Get a branch by branch ID",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get merge request",
+                "summary": "Get branch",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "MergeRequest ID",
-                        "name": "mergeRequestID",
+                        "description": "Branch ID",
+                        "name": "branchID",
                         "in": "path",
                         "required": true
                     }
@@ -1207,7 +1207,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.MergeRequestDTO"
+                            "$ref": "#/definitions/models.BranchDTO"
                         }
                     },
                     "400": {
@@ -1231,19 +1231,19 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete a merge request with given ID from database",
+                "description": "Delete a branch with given ID from database",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Delete a merge request",
+                "summary": "Delete a branch",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "merge request ID",
-                        "name": "mergeRequestID",
+                        "description": "branch ID",
+                        "name": "branchID",
                         "in": "path",
                         "required": true
                     }
@@ -1273,21 +1273,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests/{mergeRequestID}/can-review/{userID}": {
+        "/branches/{branchID}/can-review/{userID}": {
             "get": {
-                "description": "Returns true if the user fulfills the requirements to review the merge request\nReturns false if user is unauthorized to review the merge request",
+                "description": "Returns true if the user fulfills the requirements to review the branch\nReturns false if user is unauthorized to review the branch",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Returns whether the user is allowed to review this merge request",
+                "summary": "Returns whether the user is allowed to review this branch",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "merge request ID",
-                        "name": "mergeRequestID",
+                        "description": "branch ID",
+                        "name": "branchID",
                         "in": "path",
                         "required": true
                     },
@@ -1330,21 +1330,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests/{mergeRequestID}/reviews": {
+        "/branches/{branchID}/reviews": {
             "get": {
-                "description": "Returns an array of the statuses of all the reviews of this merge request",
+                "description": "Returns an array of the statuses of all the reviews of this branch",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Returns status of all merge request reviews",
+                "summary": "Returns status of all branch reviews",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "merge request ID",
-                        "name": "mergeRequestID",
+                        "description": "branch ID",
+                        "name": "branchID",
                         "in": "path",
                         "required": true
                     }
@@ -1380,19 +1380,19 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Adds a review to a merge request",
+                "description": "Adds a review to a branch",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Adds a review to a merge request",
+                "summary": "Adds a review to a branch",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "merge request ID",
-                        "name": "mergeRequestID",
+                        "description": "branch ID",
+                        "name": "branchID",
                         "in": "path",
                         "required": true
                     },
@@ -1431,21 +1431,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests/{mergeRequestID}/reviews/{reviewID}": {
+        "/branches/{branchID}/reviews/{reviewID}": {
             "get": {
-                "description": "Returns a review with the given ID of the merge request with the given ID",
+                "description": "Returns a review with the given ID of the branch with the given ID",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Returns a review of a merge request",
+                "summary": "Returns a review of a branch",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "merge request ID",
-                        "name": "mergeRequestID",
+                        "description": "branch ID",
+                        "name": "branchID",
                         "in": "path",
                         "required": true
                     },
@@ -2073,7 +2073,7 @@ const docTemplate = `{
         },
         "/project-posts/{postID}/all-discussions": {
             "get": {
-                "description": "Returns all discussions on this project post and all of it's merge requests\nEndpoint is offset-paginated",
+                "description": "Returns all discussions on this project post and all of it's branches\nEndpoint is offset-paginated",
                 "consumes": [
                     "application/json"
                 ],
@@ -2133,16 +2133,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/project-posts/{postID}/closed-merge-requests": {
+        "/project-posts/{postID}/closed-branches": {
             "get": {
-                "description": "Get all closed merge requests associated with the given project post\nEndpoint is offset-paginated",
+                "description": "Get all closed branches associated with the given project post\nEndpoint is offset-paginated",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get all closed merge requests of a project post",
+                "summary": "Get all closed branches of a project post",
                 "parameters": [
                     {
                         "type": "string",
@@ -2170,7 +2170,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.MergeRequestDTO"
+                                "$ref": "#/definitions/models.BranchDTO"
                             }
                         }
                     },
@@ -2195,16 +2195,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/project-posts/{postID}/open-merge-requests": {
+        "/project-posts/{postID}/open-branches": {
             "get": {
-                "description": "Get all open merge requests associated with the given project post\nEndpoint is offset-paginated",
+                "description": "Get all open branches associated with the given project post\nEndpoint is offset-paginated",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get all open merge requests of a project post",
+                "summary": "Get all open branches of a project post",
                 "parameters": [
                     {
                         "type": "string",
@@ -2232,7 +2232,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.MergeRequestDTO"
+                                "$ref": "#/definitions/models.BranchDTO"
                             }
                         }
                     },
@@ -2677,7 +2677,7 @@ const docTemplate = `{
                 }
             }
         },
-        "forms.MergeRequestCreationForm": {
+        "forms.BranchCreationForm": {
             "type": "object"
         },
         "forms.PostCreationForm": {
@@ -2765,7 +2765,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.MergeRequestDTO": {
+        "models.BranchDTO": {
             "type": "object",
             "properties": {
                 "anonymous": {
@@ -2829,7 +2829,7 @@ const docTemplate = `{
         "models.ProjectPostDTO": {
             "type": "object",
             "properties": {
-                "closedMergeRequestIDs": {
+                "closedBranchIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -2844,7 +2844,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "openMergeRequestIDs": {
+                "openBranchIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"

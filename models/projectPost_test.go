@@ -24,11 +24,11 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 	}
 
 	model := ProjectPost{
-		Model:             gorm.Model{ID: 42},
-		Post:              post,
-		PostID:            88,
-		OpenMergeRequests: []*MergeRequest{{Model: gorm.Model{ID: 44}}},
-		ClosedMergeRequests: []*ClosedMergeRequest{
+		Model:       gorm.Model{ID: 42},
+		Post:        post,
+		PostID:      88,
+		OpenBranchs: []*Branch{{Model: gorm.Model{ID: 44}}},
+		ClosedBranchs: []*ClosedBranch{
 			{Model: gorm.Model{ID: 59}},
 			{Model: gorm.Model{ID: 20}},
 		},
@@ -47,11 +47,11 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			PostType:            tags.Project,
 			ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
 		},
-		OpenMergeRequestIDs:   []uint{44},
-		ClosedMergeRequestIDs: []uint{59, 20},
-		CompletionStatus:      tags.Completed,
-		FeedbackPreference:    tags.FormalFeedback,
-		PostReviewStatusTag:   tags.RevisionNeeded,
+		OpenBranchIDs:       []uint{44},
+		ClosedBranchIDs:     []uint{59, 20},
+		CompletionStatus:    tags.Completed,
+		FeedbackPreference:  tags.FormalFeedback,
+		PostReviewStatusTag: tags.RevisionNeeded,
 	}
 
 	dto := ProjectPostDTO{}

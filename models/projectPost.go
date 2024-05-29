@@ -14,11 +14,11 @@ type ProjectPost struct {
 	Post   Post `gorm:"foreignKey:PostID"`
 	PostID uint
 
-	// ProjectPost has many MergeRequest
-	OpenMergeRequests []*MergeRequest `gorm:"foreignKey:ProjectPostID"`
+	// ProjectPost has many Branch
+	OpenBranchs []*Branch `gorm:"foreignKey:ProjectPostID"`
 
-	// ProjectPost has many ClosedMergeRequest
-	ClosedMergeRequests []*ClosedMergeRequest `gorm:"foreignKey:ProjectPostID"`
+	// ProjectPost has many ClosedBranch
+	ClosedBranchs []*ClosedBranch `gorm:"foreignKey:ProjectPostID"`
 
 	CompletionStatus    tags.CompletionStatus
 	FeedbackPreference  tags.FeedbackPreference
@@ -26,13 +26,13 @@ type ProjectPost struct {
 }
 
 type ProjectPostDTO struct {
-	ID                    uint
-	PostDTO               PostDTO
-	OpenMergeRequestIDs   []uint
-	ClosedMergeRequestIDs []uint
-	CompletionStatus      tags.CompletionStatus
-	FeedbackPreference    tags.FeedbackPreference
-	PostReviewStatusTag   tags.PostReviewStatus
+	ID                  uint
+	PostDTO             PostDTO
+	OpenBranchIDs       []uint
+	ClosedBranchIDs     []uint
+	CompletionStatus    tags.CompletionStatus
+	FeedbackPreference  tags.FeedbackPreference
+	PostReviewStatusTag tags.PostReviewStatus
 }
 
 func (model *ProjectPost) GetID() uint {
@@ -43,8 +43,8 @@ func (model *ProjectPost) IntoDTO() ProjectPostDTO {
 	return ProjectPostDTO{
 		model.ID,
 		model.Post.IntoDTO(),
-		mergeRequestsToIDs(model.OpenMergeRequests),
-		closedMergeRequestsToIDs(model.ClosedMergeRequests),
+		branchsToIDs(model.OpenBranchs),
+		closedBranchsToIDs(model.ClosedBranchs),
 		model.CompletionStatus,
 		model.FeedbackPreference,
 		model.PostReviewStatusTag,
@@ -56,22 +56,22 @@ func (model *ProjectPost) MarshalJSON() ([]byte, error) {
 }
 
 // Helper function for JSON marshaling
-func mergeRequestsToIDs(mergeRequests []*MergeRequest) []uint {
-	ids := make([]uint, len(mergeRequests))
+func branchsToIDs(branchs []*Branch) []uint {
+	ids := make([]uint, len(branchs))
 
-	for i, mergeRequests := range mergeRequests {
-		ids[i] = mergeRequests.ID
+	for i, branchs := range branchs {
+		ids[i] = branchs.ID
 	}
 
 	return ids
 }
 
 // Helper function for JSON marshaling
-func closedMergeRequestsToIDs(mergeRequests []*ClosedMergeRequest) []uint {
-	ids := make([]uint, len(mergeRequests))
+func closedBranchsToIDs(branchs []*ClosedBranch) []uint {
+	ids := make([]uint, len(branchs))
 
-	for i, mergeRequests := range mergeRequests {
-		ids[i] = mergeRequests.ID
+	for i, branchs := range branchs {
+		ids[i] = branchs.ID
 	}
 
 	return ids
