@@ -46,7 +46,7 @@ func (versionController *VersionController) GetVersion(_ *gin.Context) {
 // @Success 	200		{object}	models.VersionDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/version/{postID}	[post]
+// @Router 		/versions/{postID}	[post]
 func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	// extract file
 	incomingFileForm := forms.IncomingFileForm{}
@@ -108,7 +108,7 @@ func (versionController *VersionController) GetRender(_ *gin.Context) {
 // @Success 	200		{object}	[]byte
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/version/{versionID}/repository	[get]
+// @Router 		/versions/{versionID}/repository	[get]
 func (versionController *VersionController) GetRepository(_ *gin.Context) {
 
 }

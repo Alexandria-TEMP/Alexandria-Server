@@ -1834,7 +1834,7 @@ paths:
       summary: Returns all scientific tags
       tags:
       - scientific-field-tags
-  /version/{postID}:
+  /versions/{postID}:
     post:
       consumes:
       - multipart/form-data
@@ -1867,35 +1867,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new version
-      tags:
-      - versions
-  /version/{versionID}/repository:
-    get:
-      description: Get the entire zipped repository of a version
-      parameters:
-      - description: Version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      produces:
-      - application/zip
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get the repository of a version
       tags:
       - versions
   /versions/{versionID}:
@@ -1999,6 +1970,35 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get the render of a version
+      tags:
+      - versions
+  /versions/{versionID}/repository:
+    get:
+      description: Get the entire zipped repository of a version
+      parameters:
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/zip
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get the repository of a version
       tags:
       - versions
   /versions/{versionID}/tree:

@@ -2325,7 +2325,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/version/{postID}": {
+        "/versions/{postID}": {
             "post": {
                 "description": "Create a new version with discussions and repository",
                 "consumes": [
@@ -2365,50 +2365,6 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/version/{versionID}/repository": {
-            "get": {
-                "description": "Get the entire zipped repository of a version",
-                "produces": [
-                    "application/zip"
-                ],
-                "tags": [
-                    "versions"
-                ],
-                "summary": "Get the repository of a version",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Version ID",
-                        "name": "versionID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
@@ -2561,6 +2517,50 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/versions/{versionID}/repository": {
+            "get": {
+                "description": "Get the entire zipped repository of a version",
+                "produces": [
+                    "application/zip"
+                ],
+                "tags": [
+                    "versions"
+                ],
+                "summary": "Get the repository of a version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
                         }
                     },
                     "404": {
