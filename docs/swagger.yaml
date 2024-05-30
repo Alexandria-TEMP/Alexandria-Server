@@ -31,6 +31,27 @@ definitions:
         type: string
     type: object
   forms.MergeRequestCreationForm:
+    properties:
+      anonymous:
+        type: boolean
+      collaboratingMemberIDs:
+        description: The MR's metadata
+        items:
+          type: integer
+        type: array
+      mergeRequestTitle:
+        type: string
+      projectPostID:
+        type: integer
+      updatedCompletionStatus:
+        $ref: '#/definitions/tags.CompletionStatus'
+      updatedPostTitle:
+        description: Changes made by the MR
+        type: string
+      updatedScientificFields:
+        items:
+          $ref: '#/definitions/tags.ScientificField'
+        type: array
     type: object
   forms.PostCreationForm:
     properties:
@@ -100,8 +121,6 @@ definitions:
     type: object
   models.MergeRequestCollaboratorDTO:
     properties:
-      collaborationType:
-        $ref: '#/definitions/models.CollaborationType'
       id:
         type: integer
       memberID:
@@ -1020,7 +1039,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new merge request linked to a project post
+      description: |-
+        Create a new merge request linked to a project post.
+        Note that Member IDs passed here, get converted to Collaborator IDs.
       parameters:
       - description: MergeRequest Creation Form
         in: body

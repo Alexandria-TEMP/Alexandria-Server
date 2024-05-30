@@ -1147,7 +1147,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create a new merge request linked to a project post",
+                "description": "Create a new merge request linked to a project post.\nNote that Member IDs passed here, get converted to Collaborator IDs.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2682,7 +2682,38 @@ const docTemplate = `{
             }
         },
         "forms.MergeRequestCreationForm": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "anonymous": {
+                    "type": "boolean"
+                },
+                "collaboratingMemberIDs": {
+                    "description": "The MR's metadata",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "mergeRequestTitle": {
+                    "type": "string"
+                },
+                "projectPostID": {
+                    "type": "integer"
+                },
+                "updatedCompletionStatus": {
+                    "$ref": "#/definitions/tags.CompletionStatus"
+                },
+                "updatedPostTitle": {
+                    "description": "Changes made by the MR",
+                    "type": "string"
+                },
+                "updatedScientificFields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificField"
+                    }
+                }
+            }
         },
         "forms.PostCreationForm": {
             "type": "object",
@@ -2788,9 +2819,6 @@ const docTemplate = `{
         "models.MergeRequestCollaboratorDTO": {
             "type": "object",
             "properties": {
-                "collaborationType": {
-                    "$ref": "#/definitions/models.CollaborationType"
-                },
                 "id": {
                     "type": "integer"
                 },

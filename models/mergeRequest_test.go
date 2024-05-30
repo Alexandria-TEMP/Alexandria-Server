@@ -33,7 +33,7 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 		PreviousVersion:         Version{},
 		PreviousVersionID:       20,
 		MergeRequestTitle:       "My Cool MR",
-		NewPostTitle:            "Updated Post Title",
+		UpdatedPostTitle:        "Updated Post Title",
 		UpdatedCompletionStatus: tags.Idea,
 		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
 		Anonymous:               false,

@@ -17,7 +17,7 @@ type MergeRequest struct {
 	NewVersion   Version `gorm:"foreignKey:NewVersionID"`
 	NewVersionID uint
 
-	NewPostTitle string
+	UpdatedPostTitle string
 
 	UpdatedCompletionStatus tags.CompletionStatus
 	UpdatedScientificFields []tags.ScientificField `gorm:"serializer:json"`
@@ -67,7 +67,7 @@ func (model *MergeRequest) IntoDTO() MergeRequestDTO {
 	return MergeRequestDTO{
 		model.ID,
 		model.NewVersionID,
-		model.NewPostTitle,
+		model.UpdatedPostTitle,
 		model.UpdatedCompletionStatus,
 		model.UpdatedScientificFields,
 		mergeRequestCollaboratorsToIDs(model.Collaborators),
