@@ -14,12 +14,15 @@ import (
 
 type RepositoryEnv struct {
 	versionRepository database.RepositoryInterface[*models.Version]
+	branchRepository  database.RepositoryInterface[*models.Branch]
+	postRepository    database.RepositoryInterface[*models.Post]
 }
 
 type ServiceEnv struct {
 	postService    interfaces.PostService
 	versionService interfaces.VersionService
 	memberService  interfaces.MemberService
+	branchService  interfaces.BranchService
 }
 
 type ControllerEnv struct {
@@ -36,6 +39,8 @@ type ControllerEnv struct {
 func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 	return RepositoryEnv{
 		versionRepository: &database.ModelRepository[*models.Version]{Database: db},
+		branchRepository:  &database.ModelRepository[*models.Branch]{Database: db},
+		postRepository:    &database.ModelRepository[*models.Post]{Database: db},
 	}
 }
 
@@ -47,6 +52,11 @@ func initServiceEnv(repositoryEnv RepositoryEnv, fs *filesystem.Filesystem) Serv
 			Filesystem:        fs,
 		},
 		memberService: &services.MemberService{},
+		branchService: &services.BranchService{
+			PostRepository:   repositoryEnv.postRepository,
+			BranchRepository: repositoryEnv.branchRepository,
+			Filesystem:       fs,
+		},
 	}
 }
 
@@ -57,7 +67,7 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 		projectPostController: &controllers.ProjectPostController{},
 		discussionController:  &controllers.DiscussionController{},
 		filterController:      &controllers.FilterController{},
-		branchController:      &controllers.BranchController{},
+		branchController:      &controllers.BranchController{BranchService: serviceEnv.branchService},
 		tagController:         &controllers.TagController{},
 		versionController:     &controllers.VersionController{VersionService: serviceEnv.versionService},
 	}

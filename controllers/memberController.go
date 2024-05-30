@@ -184,7 +184,7 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 	// TODO: make endpoint paginated
 }
 
-// GetMemberBranchs godoc
+// GetMemberBranches godoc
 // @Summary		Get all branches of this member
 // @Description	Get all branches that this member is a collaborator of
 // @Description Endpoint is offset-paginated
@@ -198,7 +198,7 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/branches 		[get]
-func (memberController *MemberController) GetMemberBranchs(_ *gin.Context) {
+func (memberController *MemberController) GetMemberBranches(_ *gin.Context) {
 	// return all the branches
 	// that this member is a collaborator/author of
 	// TODO: make endpoint paginated

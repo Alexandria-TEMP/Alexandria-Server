@@ -77,7 +77,7 @@ func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	memberRouter.DELETE("/:userID", controllers.memberController.DeleteMember)
 	memberRouter.GET("/:userID/posts", controllers.memberController.GetMemberPosts)
 	memberRouter.GET("/:userID/project-posts", controllers.memberController.GetMemberProjectPosts)
-	memberRouter.GET("/:userID/branches", controllers.memberController.GetMemberBranchs)
+	memberRouter.GET("/:userID/branches", controllers.memberController.GetMemberBranches)
 	memberRouter.GET("/:userID/discussions", controllers.memberController.GetMemberDiscussions)
 	memberRouter.POST("/:userID/saved-posts", controllers.memberController.AddMemberSavedPost)
 	memberRouter.POST("/:userID/saved-project-posts", controllers.memberController.AddMemberSavedProjectPost)
@@ -93,8 +93,8 @@ func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	projectPostRouter.DELETE("/:postID", controllers.projectPostController.DeleteProjectPost)
 	projectPostRouter.POST("/from-github", controllers.projectPostController.CreateProjectPostFromGithub)
 	projectPostRouter.GET("/:postID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
-	projectPostRouter.GET("/:postID/open-branches", controllers.projectPostController.GetProjectPostOpenBranchs)
-	projectPostRouter.GET("/:postID/closed-branches", controllers.projectPostController.GetProjectPostClosedBranchs)
+	projectPostRouter.GET("/:postID/open-branches", controllers.projectPostController.GetProjectPostOpenBranches)
+	projectPostRouter.GET("/:postID/closed-branches", controllers.projectPostController.GetProjectPostClosedBranches)
 }
 
 func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {

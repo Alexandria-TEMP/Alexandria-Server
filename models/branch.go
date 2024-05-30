@@ -13,10 +13,6 @@ type Branch struct {
 	/////////////////////////////////////////////
 	// The branch's proposed changes:
 
-	// // Branch belongs to Version
-	// NewVersion   Version `gorm:"foreignKey:NewVersionID"`
-	// NewVersionID uint
-
 	NewPostTitle string
 
 	UpdatedCompletionStatus tags.CompletionStatus
@@ -31,12 +27,10 @@ type Branch struct {
 	// Branch has many BranchReview
 	Reviews []*BranchReview `gorm:"foreignKey:BranchID"`
 
-	// ProjectPost has many Branch
-	ProjectPostID uint
+	// Post has many Branch
+	PostID uint
 
-	// // Branch belongs to Version (previous version)
-	// PreviousVersion   Version `gorm:"foreignKey:PreviousVersionID"`
-	// PreviousVersionID uint
+	FromBranchID uint
 
 	BranchTitle string
 
@@ -52,7 +46,8 @@ type BranchDTO struct {
 	// MR metadata
 	CollaboratorIDs []uint
 	ReviewIDs       []uint
-	ProjectPostID   uint
+	PostID          uint
+	FromBranchId    uint
 	BranchTitle     string
 	Anonymous       bool
 }
@@ -69,7 +64,8 @@ func (model *Branch) IntoDTO() BranchDTO {
 		model.UpdatedScientificFields,
 		branchCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
-		model.ProjectPostID,
+		model.PostID,
+		model.FromBranchID,
 		model.BranchTitle,
 		model.Anonymous,
 	}

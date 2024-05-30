@@ -178,7 +178,7 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ 
 
 }
 
-// GetProjectPostOpenBranchs godoc
+// GetProjectPostOpenBranches godoc
 // @Summary		Get all open branches of a project post
 // @Description	Get all open branches associated with the given project post
 // @Description Endpoint is offset-paginated
@@ -192,12 +192,12 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ 
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/project-posts/{postID}/open-branches 		[get]
-func (projectPostController *ProjectPostController) GetProjectPostOpenBranchs(_ *gin.Context) {
+func (projectPostController *ProjectPostController) GetProjectPostOpenBranches(_ *gin.Context) {
 	// return all the branches associated with this project post that are open
 	// TODO: make endpoint paginated
 }
 
-// GetProjectPostClosedBranchs godoc
+// GetProjectPostClosedBranches godoc
 // @Summary		Get all closed branches of a project post
 // @Description	Get all closed branches associated with the given project post
 // @Description Endpoint is offset-paginated
@@ -211,7 +211,7 @@ func (projectPostController *ProjectPostController) GetProjectPostOpenBranchs(_ 
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/project-posts/{postID}/closed-branches 		[get]
-func (projectPostController *ProjectPostController) GetProjectPostClosedBranchs(_ *gin.Context) {
+func (projectPostController *ProjectPostController) GetProjectPostClosedBranches(_ *gin.Context) {
 	// return all the branches associated with this project post that are closed
 	// TODO: make endpoint paginated
 }

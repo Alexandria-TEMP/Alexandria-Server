@@ -15,10 +15,10 @@ type ProjectPost struct {
 	PostID uint
 
 	// ProjectPost has many Branch
-	OpenBranchs []*Branch `gorm:"foreignKey:ProjectPostID"`
+	OpenBranches []*Branch `gorm:"foreignKey:ProjectPostID"`
 
 	// ProjectPost has many ClosedBranch
-	ClosedBranchs []*ClosedBranch `gorm:"foreignKey:ProjectPostID"`
+	ClosedBranches []*ClosedBranch `gorm:"foreignKey:ProjectPostID"`
 
 	CompletionStatus    tags.CompletionStatus
 	FeedbackPreference  tags.FeedbackPreference
@@ -43,8 +43,8 @@ func (model *ProjectPost) IntoDTO() ProjectPostDTO {
 	return ProjectPostDTO{
 		model.ID,
 		model.Post.IntoDTO(),
-		branchsToIDs(model.OpenBranchs),
-		closedBranchsToIDs(model.ClosedBranchs),
+		branchesToIDs(model.OpenBranches),
+		closedBranchesToIDs(model.ClosedBranches),
 		model.CompletionStatus,
 		model.FeedbackPreference,
 		model.PostReviewStatusTag,
@@ -56,22 +56,22 @@ func (model *ProjectPost) MarshalJSON() ([]byte, error) {
 }
 
 // Helper function for JSON marshaling
-func branchsToIDs(branchs []*Branch) []uint {
-	ids := make([]uint, len(branchs))
+func branchesToIDs(branches []*Branch) []uint {
+	ids := make([]uint, len(branches))
 
-	for i, branchs := range branchs {
-		ids[i] = branchs.ID
+	for i, branches := range branches {
+		ids[i] = branches.ID
 	}
 
 	return ids
 }
 
 // Helper function for JSON marshaling
-func closedBranchsToIDs(branchs []*ClosedBranch) []uint {
-	ids := make([]uint, len(branchs))
+func closedBranchesToIDs(branches []*ClosedBranch) []uint {
+	ids := make([]uint, len(branches))
 
-	for i, branchs := range branchs {
-		ids[i] = branchs.ID
+	for i, branches := range branches {
+		ids[i] = branches.ID
 	}
 
 	return ids

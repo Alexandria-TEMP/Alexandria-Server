@@ -1,10 +1,17 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
+)
 
 // @BasePath /api/v2
 
 type BranchController struct {
+	BranchService interfaces.BranchService
 }
 
 // GetBranch godoc
@@ -30,10 +37,37 @@ func (branchController *BranchController) GetBranch(_ *gin.Context) {
 // @Produce		json
 // @Success 	200 	{object} 	models.BranchDTO
 // @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/branches 		[post]
-func (branchController *BranchController) CreateBranch(_ *gin.Context) {
+func (branchController *BranchController) CreateBranch(c *gin.Context) {
+	// extract branchCreationForm
+	form := forms.BranchCreationForm{}
+	err := c.BindJSON(&form)
 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind BranchCreationForm from request body"})
+
+		return
+	}
+
+	branch, err404, err500 := branchController.BranchService.CreateBranch(form)
+
+	if err404 != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	if err500 != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	// response
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, &branch)
 }
 
 // UpdateBranch godoc

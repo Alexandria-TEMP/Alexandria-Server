@@ -12,7 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
-	filesysteminterface "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
+	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 	"gopkg.in/yaml.v3"
@@ -20,10 +20,11 @@ import (
 
 type VersionService struct {
 	VersionRepository database.RepositoryInterface[*models.Version]
-	Filesystem        filesysteminterface.Filesystem
+	Filesystem        filesystemInterfaces.Filesystem
 }
 
-func (versionService *VersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader) (*models.Version, error) {
+func (versionService *VersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader, fromVersionID uint) (*models.Version, error) {
+
 	// Create version, with pending render status
 	version := models.Version{RenderStatus: models.Pending}
 	_ = versionService.VersionRepository.Create(&version)

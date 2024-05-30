@@ -1,4 +1,4 @@
-package filesysteminterface
+package interfaces
 
 import (
 	"mime/multipart"
@@ -19,4 +19,7 @@ type Filesystem interface {
 	GetCurrentZipFilePath() string
 	GetCurrentRenderDirPath() string
 	GetFileTree() (map[string]int64, error)
+
+	CreateRepository(postID uint) error
+	CheckoutRepository(postID uint) error
 }

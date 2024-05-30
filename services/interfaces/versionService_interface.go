@@ -17,7 +17,7 @@ type VersionService interface {
 	// 4. unzip file
 	// 5. render project and update render status
 	// TODO: persist data
-	CreateVersion(c *gin.Context, file *multipart.FileHeader) (*models.Version, error)
+	CreateVersion(c *gin.Context, file *multipart.FileHeader, fromVersionID uint) (*models.Version, error)
 
 	// GetRender returns filepath of rendered repository.
 	// Error 1 is for status 202.

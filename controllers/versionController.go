@@ -36,12 +36,13 @@ func (versionController *VersionController) GetVersion(_ *gin.Context) {
 // @Summary 	Create new version
 // @Description Create a new version with discussions and repository from zipped file in body
 // @Accept  	multipart/form-data
+// @Param		fromVersionID		path		string			true	"Version ID"
 // @Param		repository			body		file				true	"Repository to create"
 // @Produce		application/json
 // @Success 	200		{object}	models.Version
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 				[post]
+// @Router 		/{fromVersionID}		[post]
 func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	// extract file
 	file, err := c.FormFile("file")
@@ -52,8 +53,18 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 		return
 	}
 
+	// extract version id
+	fromVersionIDstr := c.Param("fromVersionIDs")
+	fromVersionID, err := strconv.ParseUint(fromVersionIDstr, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", fromVersionID)})
+
+		return
+	}
+
 	// Create Version
-	version, err := versionController.VersionService.CreateVersion(c, file)
+	version, err := versionController.VersionService.CreateVersion(c, file, uint(fromVersionID))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create version"})
 
