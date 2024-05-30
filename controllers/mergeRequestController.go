@@ -25,7 +25,7 @@ func (mergeRequestController *MergeRequestController) GetMergeRequest(_ *gin.Con
 
 // CreateMergeRequest godoc
 // @Summary 	Create new merge request
-// @Description Create a new question or discussion merge request
+// @Description Create a new merge request linked to a project post
 // @Tags 		merge-requests
 // @Accept  	json
 // @Param		form	body	forms.MergeRequestCreationForm	true	"MergeRequest Creation Form"

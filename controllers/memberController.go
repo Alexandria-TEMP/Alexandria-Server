@@ -211,8 +211,8 @@ func (memberController *MemberController) GetMemberMergeRequests(_ *gin.Context)
 }
 
 // GetMemberDiscussions godoc
-// @Summary		Get all merge requests of this member
-// @Description	Get all merge requests that this member is a collaborator of
+// @Summary		Get all discussions
+// @Description	Get all discussions that this member has participated in
 // @Description Endpoint is offset-paginated
 // @Tags 		members
 // @Accept 		json
