@@ -19,7 +19,7 @@ type Post struct {
 
 	Title               string
 	PostType            tags.PostType
-	ScientificFieldTags []tags.ScientificField `gorm:"serializer:json"`
+	ScientificFieldTags []*tags.ScientificFieldTag
 }
 
 type PostDTO struct {
@@ -28,7 +28,7 @@ type PostDTO struct {
 	VersionID           uint
 	Title               string
 	PostType            tags.PostType
-	ScientificFieldTags []tags.ScientificField
+	ScientificFieldTagIDs []uint
 }
 
 func (model *Post) GetID() uint {
@@ -42,7 +42,7 @@ func (model *Post) IntoDTO() PostDTO {
 		model.CurrentVersionID,
 		model.Title,
 		model.PostType,
-		model.ScientificFieldTags,
+		tags.ScientificFieldTagIntoIDs(model.ScientificFieldTags),
 	}
 }
 

@@ -16,7 +16,8 @@ import (
 // @BasePath /api/v2
 
 type MemberController struct {
-	MemberService interfaces.MemberService
+	MemberService 	interfaces.MemberService
+	TagService 		interfaces.TagService
 }
 
 // GetMember godoc
@@ -31,23 +32,29 @@ type MemberController struct {
 // @Failure		500			{object}	utils.HTTPError
 // @Router 		/members/{userID}	[get]
 func (memberController *MemberController) GetMember(c *gin.Context) {
+
 	// extract the id of the member
 	userIDStr := c.Param("userID")
-	userID, err := strconv.ParseUint(userIDStr, 10, 64)
-	// if this caused an error, print it
+	initUserID, err := strconv.ParseUint(userIDStr, 10, 64)
+
+	// if this caused an error, print it and return status 400: bad input
 	if err != nil {
 		fmt.Println(err)
 		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr))
 
 		return
 	}
+	
+	//cast user ID as uint instead of uint64, because database only accepts those
+	userID := uint(initUserID)
+
 	// get the user through the service
 	member, err := memberController.MemberService.GetMember(userID)
 
-	// if there was an error, print it and return
+	// if there was an error, print it and return status 404: not found
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusNotFound, errors.New("cannot get member because no user with this ID exists"))
+		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("Cannot get member because no user with this ID exists, id=%d", userID))
 
 		return
 	}
@@ -81,8 +88,13 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 		return
 	}
 
+	//get array of strings, create array of tags
+	tagIDs := form.ScientificFieldTagIDs
+	//call the method from the tag service
+	tags, err := memberController.TagService.GetTagsFromIDs(tagIDs)
+
 	// create and add to database(not done yet) through the memberService
-	member := memberController.MemberService.CreateMember(&form)
+	member := memberController.MemberService.CreateMember(&form, tags)
 
 	// send back a positive response with the created member
 	c.Header("Content-Type", "application/json")

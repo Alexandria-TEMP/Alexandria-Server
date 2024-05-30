@@ -16,17 +16,17 @@ type Member struct {
 	Email               string
 	Password            string // TODO hmmmmmm maybe not
 	Institution         string
-	ScientificFieldTags []tags.ScientificField `gorm:"serializer:json"`
+	ScientificFieldTags []*tags.ScientificFieldTag
 }
 
 type MemberDTO struct {
-	ID                  uint
-	FirstName           string
-	LastName            string
-	Email               string
-	Password            string
-	Institution         string
-	ScientificFieldTags []tags.ScientificField
+	ID                  	uint
+	FirstName           	string
+	LastName            	string
+	Email               	string
+	Password            	string
+	Institution         	string
+	ScientificFieldTagIDs	[]uint
 }
 
 func (model *Member) GetID() uint {
@@ -41,7 +41,7 @@ func (model *Member) IntoDTO() MemberDTO {
 		model.Email,
 		model.Password,
 		model.Institution,
-		model.ScientificFieldTags,
+		tags.ScientificFieldTagIntoIDs(model.ScientificFieldTags),
 	}
 }
 

@@ -1,18 +1,51 @@
 package tags
 
-type ScientificFieldTag struct {
-}
-type ScientificField string
+import (
+	"encoding/json"
 
-const (
-	Mathematics     ScientificField = "mathematics"
-	ComputerScience ScientificField = "computer science"
+	"gorm.io/gorm"
 )
 
-func (tag *ScientificField) GetLabel() string {
-	return string(*tag)
+// a scientific field tag is a tag representing a specific scientific field
+type ScientificFieldTag struct {
+	gorm.Model
+
+	ScientificField		string
+	// Tag can optionally have many subtags, or many ScientificFieldTag
+	Subtags  []*ScientificFieldTag `gorm:"foreignKey:ParentID"`
+	ParentID *uint
 }
 
-func (tag *ScientificField) GetType() TagType {
-	return ScientificFieldType
+type ScientificFieldTagDTO struct {
+	ID 					uint
+	ScientificField 	string
+	SubtagIDs 			[]uint
+}
+
+
+func (model *ScientificFieldTag) GetID() uint {
+	return model.Model.ID
+}
+
+func (model *ScientificFieldTag) IntoDTO() ScientificFieldTagDTO {
+	return ScientificFieldTagDTO{
+		model.ID,
+		model.ScientificField,
+		ScientificFieldTagIntoIDs(model.Subtags),
+	}
+}
+
+func (model *ScientificFieldTag) MarshalJSON() ([]byte, error) {
+	return json.Marshal(model.IntoDTO())
+}
+
+// Helper function for JSON marshaling
+func ScientificFieldTagIntoIDs(subtags []*ScientificFieldTag) []uint {
+	ids := make([]uint, len(subtags))
+
+	for i, subtag := range subtags {
+		ids[i] = subtag.ID
+	}
+
+	return ids
 }

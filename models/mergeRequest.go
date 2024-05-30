@@ -20,7 +20,7 @@ type MergeRequest struct {
 	NewPostTitle string
 
 	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields []tags.ScientificField `gorm:"serializer:json"`
+	UpdatedScientificFields []*tags.ScientificFieldTag
 
 	/////////////////////////////////////////////
 	// The MR's metadata:
@@ -49,7 +49,7 @@ type MergeRequestDTO struct {
 	NewVersionID            uint
 	NewPostTitle            string
 	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields []tags.ScientificField
+	UpdatedScientificFieldTagIDs []uint
 	// MR metadata
 	CollaboratorIDs   []uint
 	ReviewIDs         []uint
@@ -69,7 +69,7 @@ func (model *MergeRequest) IntoDTO() MergeRequestDTO {
 		model.NewVersionID,
 		model.NewPostTitle,
 		model.UpdatedCompletionStatus,
-		model.UpdatedScientificFields,
+		tags.ScientificFieldTagIntoIDs(model.UpdatedScientificFields),
 		mergeRequestCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
 		model.ProjectPostID,

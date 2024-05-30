@@ -8,4 +8,5 @@ type MemberCreationForm struct {
 	// TODO: some hashing or semblance of security
 	Password    string
 	Institution string
+	ScientificFieldTagIDs []string
 }
