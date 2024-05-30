@@ -23,6 +23,7 @@ type ProjectPostController struct {
 // GetProjectPost godoc
 // @Summary 	Get project post
 // @Description Get a project post by ID
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
@@ -60,6 +61,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 // CreateProjectPost godoc
 // @Summary 	Create new project post
 // @Description Create a new project post
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		form			body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
 // @Param 		parentPostID	query		string							false	"Parent post ID"
@@ -91,6 +93,7 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 // UpdateProjectPost godoc
 // @Summary 	Update project post
 // @Description Update any number of the aspects of a project post
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
 // @Produce		json
@@ -130,6 +133,7 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 // DeleteProjectPost godoc
 // @Summary 	Delete a project post
 // @Description Delete a project post with given ID from database
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
@@ -147,6 +151,7 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Con
 // @Description Create a new project post
 // @Description Creates a project post in the same way as CreateProjectPost
 // @Description However, the post files are imported from the given Github repository
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		form	body	forms.ProjectPostCreationForm	true	"Post Creation Form"
 // @Param		url		query	string							true	"Github repository url"
@@ -164,6 +169,7 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Summary Returns all discussions associated with the project post
 // @Description Returns all discussions on this project post and all of it's merge requests
 // @Description Endpoint is offset-paginated
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
 // @Param 		page		query		uint			false	"page query"
@@ -182,6 +188,7 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ 
 // @Summary		Get all open merge requests of a project post
 // @Description	Get all open merge requests associated with the given project post
 // @Description Endpoint is offset-paginated
+// @Tags 		project-posts
 // @Accept 		json
 // @Param		postID		path		string			true	"post ID"
 // @Param 		page		query		uint			false	"page query"
@@ -201,6 +208,7 @@ func (projectPostController *ProjectPostController) GetProjectPostOpenMergeReque
 // @Summary		Get all closed merge requests of a project post
 // @Description	Get all closed merge requests associated with the given project post
 // @Description Endpoint is offset-paginated
+// @Tags 		project-posts
 // @Accept 		json
 // @Param		postID		path		string			true	"post ID"
 // @Param 		page		query		uint			false	"page query"

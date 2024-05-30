@@ -24,6 +24,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "discussions"
+                ],
                 "summary": "Create new discussion",
                 "parameters": [
                     {
@@ -73,6 +76,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "discussions"
+                ],
                 "summary": "Get discussion",
                 "parameters": [
                     {
@@ -118,6 +124,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "discussions"
+                ],
                 "summary": "Delete a discussion",
                 "parameters": [
                     {
@@ -161,6 +170,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "discussions"
                 ],
                 "summary": "Get all the replies of a discussion",
                 "parameters": [
@@ -224,6 +236,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "discussions"
+                ],
                 "summary": "Get all reports of this discussion",
                 "parameters": [
                     {
@@ -284,6 +299,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "discussions"
+                ],
                 "summary": "Add a new report to a discussion",
                 "parameters": [
                     {
@@ -339,6 +357,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "filtering"
                 ],
                 "summary": "Filters all posts",
                 "parameters": [
@@ -404,6 +425,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "filtering"
+                ],
                 "summary": "Filters all project posts",
                 "parameters": [
                     {
@@ -468,6 +492,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "members"
+                ],
                 "summary": "Update a member",
                 "parameters": [
                     {
@@ -476,7 +503,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Member"
+                            "$ref": "#/definitions/models.MemberDTO"
                         }
                     }
                 ],
@@ -511,6 +538,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "members"
                 ],
                 "summary": "Create a new member",
                 "parameters": [
@@ -554,6 +584,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "members"
                 ],
                 "summary": "Get member from database",
                 "parameters": [
@@ -600,6 +633,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "members"
+                ],
                 "summary": "Delete a member",
                 "parameters": [
                     {
@@ -643,6 +679,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "members"
                 ],
                 "summary": "Get all merge requests of this member",
                 "parameters": [
@@ -706,6 +745,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "members"
+                ],
                 "summary": "Get all merge requests of this member",
                 "parameters": [
                     {
@@ -767,6 +809,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "members"
                 ],
                 "summary": "Get all posts of this member",
                 "parameters": [
@@ -830,6 +875,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "members"
+                ],
                 "summary": "Get all project posts of this member",
                 "parameters": [
                     {
@@ -891,6 +939,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "members"
                 ],
                 "summary": "Get all saved posts of this member",
                 "parameters": [
@@ -954,6 +1005,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "members"
+                ],
                 "summary": "Adds new saved post",
                 "parameters": [
                     {
@@ -998,6 +1052,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "members"
                 ],
                 "summary": "Get all saved project posts of this member",
                 "parameters": [
@@ -1061,6 +1118,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "members"
+                ],
                 "summary": "Adds new saved project post",
                 "parameters": [
                     {
@@ -1106,6 +1166,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "merge-requests"
+                ],
                 "summary": "Update merge request",
                 "parameters": [
                     {
@@ -1150,6 +1213,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "merge-requests"
+                ],
                 "summary": "Create new merge request",
                 "parameters": [
                     {
@@ -1192,6 +1258,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "merge-requests"
                 ],
                 "summary": "Get merge request",
                 "parameters": [
@@ -1238,6 +1307,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "merge-requests"
+                ],
                 "summary": "Delete a merge request",
                 "parameters": [
                     {
@@ -1281,6 +1353,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "merge-requests"
                 ],
                 "summary": "Returns whether the user is allowed to review this merge request",
                 "parameters": [
@@ -1339,6 +1414,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "merge-requests"
+                ],
                 "summary": "Returns status of all merge request reviews",
                 "parameters": [
                     {
@@ -1386,6 +1464,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "merge-requests"
                 ],
                 "summary": "Adds a review to a merge request",
                 "parameters": [
@@ -1439,6 +1520,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "merge-requests"
                 ],
                 "summary": "Returns a review of a merge request",
                 "parameters": [
@@ -1494,6 +1578,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "posts"
+                ],
                 "summary": "Update post",
                 "parameters": [
                     {
@@ -1538,6 +1625,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "posts"
+                ],
                 "summary": "Create new post",
                 "parameters": [
                     {
@@ -1580,6 +1670,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "posts"
                 ],
                 "summary": "Create new post with the version imported from github",
                 "parameters": [
@@ -1637,6 +1730,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "posts"
+                ],
                 "summary": "Get post",
                 "parameters": [
                     {
@@ -1682,6 +1778,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "posts"
+                ],
                 "summary": "Delete a post",
                 "parameters": [
                     {
@@ -1725,6 +1824,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "posts"
                 ],
                 "summary": "Get all reports of this post",
                 "parameters": [
@@ -1786,6 +1888,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "posts"
+                ],
                 "summary": "Add a new report to a post",
                 "parameters": [
                     {
@@ -1842,6 +1947,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "project-posts"
+                ],
                 "summary": "Update project post",
                 "parameters": [
                     {
@@ -1885,6 +1993,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "project-posts"
                 ],
                 "summary": "Create new project post",
                 "parameters": [
@@ -1934,6 +2045,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "project-posts"
                 ],
                 "summary": "Create new project post with the version imported from github",
                 "parameters": [
@@ -1991,6 +2105,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "project-posts"
+                ],
                 "summary": "Get project post",
                 "parameters": [
                     {
@@ -2036,6 +2153,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "project-posts"
+                ],
                 "summary": "Delete a project post",
                 "parameters": [
                     {
@@ -2079,6 +2199,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "project-posts"
                 ],
                 "summary": "Returns all discussions associated with the project post",
                 "parameters": [
@@ -2142,6 +2265,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "project-posts"
+                ],
                 "summary": "Get all closed merge requests of a project post",
                 "parameters": [
                     {
@@ -2204,6 +2330,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "project-posts"
+                ],
                 "summary": "Get all open merge requests of a project post",
                 "parameters": [
                     {
@@ -2263,6 +2392,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "scientific-field-tags"
+                ],
                 "summary": "Returns all scientific tags",
                 "responses": {
                     "200": {
@@ -2295,11 +2427,67 @@ const docTemplate = `{
                 }
             }
         },
+        "/version/{postID}": {
+            "post": {
+                "description": "Create a new version with discussions and repository",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "versions"
+                ],
+                "summary": "Create new version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Parent Post ID",
+                        "name": "postID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Repository to create",
+                        "name": "repository",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.IncomingFileForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.VersionDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/version/{versionID}/repository": {
             "get": {
                 "description": "Get the entire zipped repository of a version",
                 "produces": [
                     "application/zip"
+                ],
+                "tags": [
+                    "versions"
                 ],
                 "summary": "Get the repository of a version",
                 "parameters": [
@@ -2336,56 +2524,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/versions": {
-            "post": {
-                "description": "Create a new version with discussions and repository",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Create new version",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Parent Post ID",
-                        "name": "postID",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "description": "Repository to create",
-                        "name": "repository",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Repository"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.VersionDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
         "/versions/{versionID}": {
             "get": {
                 "description": "Get a version by version ID",
@@ -2394,6 +2532,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "versions"
                 ],
                 "summary": "Get version",
                 "parameters": [
@@ -2441,6 +2582,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "versions"
                 ],
                 "summary": "Returns all level 1 discussions associated with the version",
                 "parameters": [
@@ -2498,8 +2642,8 @@ const docTemplate = `{
         "/versions/{versionID}/file": {
             "get": {
                 "description": "Get the contents of a single file from a repository of a version",
-                "produces": [
-                    "application/zip"
+                "tags": [
+                    "versions"
                 ],
                 "summary": "Get a file from a repository",
                 "parameters": [
@@ -2557,6 +2701,9 @@ const docTemplate = `{
                 "produces": [
                     "text/html"
                 ],
+                "tags": [
+                    "versions"
+                ],
                 "summary": "Get the render of a version",
                 "parameters": [
                     {
@@ -2607,6 +2754,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "versions"
+                ],
                 "summary": "Get the file tree of a repository",
                 "parameters": [
                     {
@@ -2654,6 +2804,9 @@ const docTemplate = `{
             "type": "object"
         },
         "forms.FilterForm": {
+            "type": "object"
+        },
+        "forms.IncomingFileForm": {
             "type": "object"
         },
         "forms.MemberCreationForm": {
@@ -2739,9 +2892,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Member": {
-            "type": "object"
-        },
         "models.MemberDTO": {
             "type": "object",
             "properties": {
@@ -2762,6 +2912,12 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                },
+                "scientificFieldTags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificField"
+                    }
                 }
             }
         },
@@ -2772,6 +2928,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "collaboratorIDs": {
+                    "description": "MR metadata",
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -2780,7 +2937,17 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "mergeRequestTitle": {
+                    "type": "string"
+                },
+                "newPostTitle": {
+                    "type": "string"
+                },
                 "newVersionID": {
+                    "description": "MR's proposed changes",
+                    "type": "integer"
+                },
+                "previousVersionID": {
                     "type": "integer"
                 },
                 "projectPostID": {
@@ -2796,7 +2963,10 @@ const docTemplate = `{
                     "$ref": "#/definitions/tags.CompletionStatus"
                 },
                 "updatedScientificFields": {
-                    "$ref": "#/definitions/tags.ScientificField"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificField"
+                    }
                 }
             }
         },
@@ -2820,6 +2990,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/tags.ScientificField"
                     }
+                },
+                "title": {
+                    "type": "string"
                 },
                 "versionID": {
                     "type": "integer"
@@ -2858,10 +3031,20 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ReportDTO": {
-            "type": "object"
+        "models.RenderStatus": {
+            "type": "string",
+            "enum": [
+                "success",
+                "pending",
+                "failure"
+            ],
+            "x-enum-varnames": [
+                "Success",
+                "Pending",
+                "Failure"
+            ]
         },
-        "models.Repository": {
+        "models.ReportDTO": {
             "type": "object"
         },
         "models.ReviewDTO": {
@@ -2878,6 +3061,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "renderStatus": {
+                    "$ref": "#/definitions/models.RenderStatus"
                 }
             }
         },
@@ -2934,10 +3120,12 @@ const docTemplate = `{
         "tags.ScientificField": {
             "type": "string",
             "enum": [
-                "mathematics"
+                "mathematics",
+                "computer science"
             ],
             "x-enum-varnames": [
-                "Mathematics"
+                "Mathematics",
+                "ComputerScience"
             ]
         },
         "tags.ScientificFieldTag": {

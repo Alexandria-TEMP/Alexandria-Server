@@ -4,6 +4,8 @@ definitions:
     type: object
   forms.FilterForm:
     type: object
+  forms.IncomingFileForm:
+    type: object
   forms.MemberCreationForm:
     properties:
       email:
@@ -59,8 +61,6 @@ definitions:
       versionID:
         type: integer
     type: object
-  models.Member:
-    type: object
   models.MemberDTO:
     properties:
       email:
@@ -75,18 +75,30 @@ definitions:
         type: string
       password:
         type: string
+      scientificFieldTags:
+        items:
+          $ref: '#/definitions/tags.ScientificField'
+        type: array
     type: object
   models.MergeRequestDTO:
     properties:
       anonymous:
         type: boolean
       collaboratorIDs:
+        description: MR metadata
         items:
           type: integer
         type: array
       id:
         type: integer
+      mergeRequestTitle:
+        type: string
+      newPostTitle:
+        type: string
       newVersionID:
+        description: MR's proposed changes
+        type: integer
+      previousVersionID:
         type: integer
       projectPostID:
         type: integer
@@ -97,7 +109,9 @@ definitions:
       updatedCompletionStatus:
         $ref: '#/definitions/tags.CompletionStatus'
       updatedScientificFields:
-        $ref: '#/definitions/tags.ScientificField'
+        items:
+          $ref: '#/definitions/tags.ScientificField'
+        type: array
     type: object
   models.PostDTO:
     properties:
@@ -113,6 +127,8 @@ definitions:
         items:
           $ref: '#/definitions/tags.ScientificField'
         type: array
+      title:
+        type: string
       versionID:
         type: integer
     type: object
@@ -137,9 +153,17 @@ definitions:
       postReviewStatusTag:
         $ref: '#/definitions/tags.PostReviewStatus'
     type: object
+  models.RenderStatus:
+    enum:
+    - success
+    - pending
+    - failure
+    type: string
+    x-enum-varnames:
+    - Success
+    - Pending
+    - Failure
   models.ReportDTO:
-    type: object
-  models.Repository:
     type: object
   models.ReviewDTO:
     type: object
@@ -151,6 +175,8 @@ definitions:
         type: array
       id:
         type: integer
+      renderStatus:
+        $ref: '#/definitions/models.RenderStatus'
     type: object
   tags.CompletionStatus:
     enum:
@@ -193,9 +219,11 @@ definitions:
   tags.ScientificField:
     enum:
     - mathematics
+    - computer science
     type: string
     x-enum-varnames:
     - Mathematics
+    - ComputerScience
   tags.ScientificFieldTag:
     type: object
   utils.HTTPError:
@@ -246,6 +274,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new discussion
+      tags:
+      - discussions
   /discussions/{discussionID}:
     delete:
       consumes:
@@ -275,6 +305,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Delete a discussion
+      tags:
+      - discussions
     get:
       consumes:
       - application/json
@@ -305,6 +337,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get discussion
+      tags:
+      - discussions
   /discussions/{discussionID}/replies:
     get:
       consumes:
@@ -348,6 +382,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all the replies of a discussion
+      tags:
+      - discussions
   /discussions/{discussionID}/reports:
     get:
       consumes:
@@ -391,6 +427,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all reports of this discussion
+      tags:
+      - discussions
     post:
       consumes:
       - application/json
@@ -427,6 +465,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Add a new report to a discussion
+      tags:
+      - discussions
   /filter/posts:
     get:
       consumes:
@@ -471,6 +511,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Filters all posts
+      tags:
+      - filtering
   /filter/project-posts:
     get:
       consumes:
@@ -515,6 +557,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Filters all project posts
+      tags:
+      - filtering
   /members:
     post:
       consumes:
@@ -543,6 +587,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create a new member
+      tags:
+      - members
     put:
       consumes:
       - application/json
@@ -553,7 +599,7 @@ paths:
         name: member
         required: true
         schema:
-          $ref: '#/definitions/models.Member'
+          $ref: '#/definitions/models.MemberDTO'
       produces:
       - application/json
       responses:
@@ -572,6 +618,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Update a member
+      tags:
+      - members
   /members/{userID}:
     delete:
       consumes:
@@ -601,6 +649,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Delete a member
+      tags:
+      - members
     get:
       consumes:
       - application/json
@@ -631,6 +681,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get member from database
+      tags:
+      - members
   /members/{userID}/discussions:
     get:
       consumes:
@@ -674,6 +726,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all merge requests of this member
+      tags:
+      - members
   /members/{userID}/merge-requests:
     get:
       consumes:
@@ -717,6 +771,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all merge requests of this member
+      tags:
+      - members
   /members/{userID}/posts:
     get:
       consumes:
@@ -760,6 +816,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all posts of this member
+      tags:
+      - members
   /members/{userID}/project-posts:
     get:
       consumes:
@@ -803,6 +861,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all project posts of this member
+      tags:
+      - members
   /members/{userID}/saved-posts:
     get:
       consumes:
@@ -846,6 +906,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all saved posts of this member
+      tags:
+      - members
   /members/{userID}/saved-posts/{postID}:
     post:
       consumes:
@@ -876,6 +938,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Adds new saved post
+      tags:
+      - members
   /members/{userID}/saved-project-posts:
     get:
       consumes:
@@ -919,6 +983,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all saved project posts of this member
+      tags:
+      - members
   /members/{userID}/saved-project-posts/{postID}:
     post:
       consumes:
@@ -949,6 +1015,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Adds new saved project post
+      tags:
+      - members
   /merge-requests:
     post:
       consumes:
@@ -977,6 +1045,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new merge request
+      tags:
+      - merge-requests
     put:
       consumes:
       - application/json
@@ -1006,6 +1076,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Update merge request
+      tags:
+      - merge-requests
   /merge-requests/{mergeRequestID}:
     delete:
       consumes:
@@ -1035,6 +1107,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Delete a merge request
+      tags:
+      - merge-requests
     get:
       consumes:
       - application/json
@@ -1065,6 +1139,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get merge request
+      tags:
+      - merge-requests
   /merge-requests/{mergeRequestID}/can-review/{userID}:
     get:
       consumes:
@@ -1105,6 +1181,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns whether the user is allowed to review this merge request
+      tags:
+      - merge-requests
   /merge-requests/{mergeRequestID}/reviews:
     get:
       consumes:
@@ -1139,6 +1217,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns status of all merge request reviews
+      tags:
+      - merge-requests
     post:
       consumes:
       - application/json
@@ -1173,6 +1253,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Adds a review to a merge request
+      tags:
+      - merge-requests
   /merge-requests/{mergeRequestID}/reviews/{reviewID}:
     get:
       consumes:
@@ -1210,6 +1292,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns a review of a merge request
+      tags:
+      - merge-requests
   /posts:
     post:
       consumes:
@@ -1238,6 +1322,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new post
+      tags:
+      - posts
     put:
       consumes:
       - application/json
@@ -1267,6 +1353,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Update post
+      tags:
+      - posts
   /posts/{postID}:
     delete:
       consumes:
@@ -1296,6 +1384,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Delete a post
+      tags:
+      - posts
     get:
       consumes:
       - application/json
@@ -1326,6 +1416,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get post
+      tags:
+      - posts
   /posts/{postID}/reports:
     get:
       consumes:
@@ -1369,6 +1461,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all reports of this post
+      tags:
+      - posts
     post:
       consumes:
       - application/json
@@ -1405,6 +1499,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Add a new report to a post
+      tags:
+      - posts
   /posts/from-github:
     post:
       consumes:
@@ -1445,6 +1541,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new post with the version imported from github
+      tags:
+      - posts
   /project-posts:
     post:
       consumes:
@@ -1477,6 +1575,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new project post
+      tags:
+      - project-posts
     put:
       consumes:
       - application/json
@@ -1506,6 +1606,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Update project post
+      tags:
+      - project-posts
   /project-posts/{postID}:
     delete:
       consumes:
@@ -1535,6 +1637,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Delete a project post
+      tags:
+      - project-posts
     get:
       consumes:
       - application/json
@@ -1565,6 +1669,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get project post
+      tags:
+      - project-posts
   /project-posts/{postID}/all-discussions:
     get:
       consumes:
@@ -1608,6 +1714,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns all discussions associated with the project post
+      tags:
+      - project-posts
   /project-posts/{postID}/closed-merge-requests:
     get:
       consumes:
@@ -1651,6 +1759,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all closed merge requests of a project post
+      tags:
+      - project-posts
   /project-posts/{postID}/open-merge-requests:
     get:
       consumes:
@@ -1694,6 +1804,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all open merge requests of a project post
+      tags:
+      - project-posts
   /project-posts/from-github:
     post:
       consumes:
@@ -1734,6 +1846,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new project post with the version imported from github
+      tags:
+      - project-posts
   /tags/scientific:
     get:
       description: Returns all scientific tags in the database
@@ -1759,6 +1873,43 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns all scientific tags
+      tags:
+      - scientific-field-tags
+  /version/{postID}:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new version with discussions and repository
+      parameters:
+      - description: Parent Post ID
+        in: query
+        name: postID
+        required: true
+        type: string
+      - description: Repository to create
+        in: body
+        name: repository
+        required: true
+        schema:
+          $ref: '#/definitions/forms.IncomingFileForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.VersionDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Create new version
+      tags:
+      - versions
   /version/{versionID}/repository:
     get:
       description: Get the entire zipped repository of a version
@@ -1786,39 +1937,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get the repository of a version
-  /versions:
-    post:
-      consumes:
-      - multipart/form-data
-      description: Create a new version with discussions and repository
-      parameters:
-      - description: Parent Post ID
-        in: query
-        name: postID
-        required: true
-        type: string
-      - description: Repository to create
-        in: body
-        name: repository
-        required: true
-        schema:
-          $ref: '#/definitions/models.Repository'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.VersionDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Create new version
+      tags:
+      - versions
   /versions/{versionID}:
     get:
       consumes:
@@ -1850,6 +1970,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get version
+      tags:
+      - versions
   /versions/{versionID}/discussions:
     get:
       consumes:
@@ -1893,6 +2015,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns all level 1 discussions associated with the version
+      tags:
+      - versions
   /versions/{versionID}/file:
     get:
       description: Get the contents of a single file from a repository of a version
@@ -1908,8 +2032,6 @@ paths:
         required: true
         schema:
           type: string
-      produces:
-      - application/zip
       responses:
         "200":
           description: OK
@@ -1930,6 +2052,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get a file from a repository
+      tags:
+      - versions
   /versions/{versionID}/render:
     get:
       description: Get the render of the repository underlying a version
@@ -1961,6 +2085,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get the render of a version
+      tags:
+      - versions
   /versions/{versionID}/tree:
     get:
       consumes:
@@ -1994,4 +2120,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get the file tree of a repository
+      tags:
+      - versions
 swagger: "2.0"

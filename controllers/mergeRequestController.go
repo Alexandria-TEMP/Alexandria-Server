@@ -10,6 +10,7 @@ type MergeRequestController struct {
 // GetMergeRequest godoc
 // @Summary 	Get merge request
 // @Description Get a merge request by merge request ID
+// @Tags 		merge-requests
 // @Accept  	json
 // @Param		mergeRequestID		path		string			true	"MergeRequest ID"
 // @Produce		json
@@ -25,6 +26,7 @@ func (mergeRequestController *MergeRequestController) GetMergeRequest(_ *gin.Con
 // CreateMergeRequest godoc
 // @Summary 	Create new merge request
 // @Description Create a new question or discussion merge request
+// @Tags 		merge-requests
 // @Accept  	json
 // @Param		form	body	forms.MergeRequestCreationForm	true	"MergeRequest Creation Form"
 // @Produce		json
@@ -39,6 +41,7 @@ func (mergeRequestController *MergeRequestController) CreateMergeRequest(_ *gin.
 // UpdateMergeRequest godoc
 // @Summary 	Update merge request
 // @Description Update any number of the aspects of a merge request
+// @Tags 		merge-requests
 // @Accept  	json
 // @Param		merge request	body		models.MergeRequestDTO		true	"Updated MergeRequest"
 // @Produce		json
@@ -54,6 +57,7 @@ func (mergeRequestController *MergeRequestController) UpdateMergeRequest(_ *gin.
 // DeleteMergeRequest godoc
 // @Summary 	Delete a merge request
 // @Description Delete a merge request with given ID from database
+// @Tags 		merge-requests
 // @Accept  	json
 // @Param		mergeRequestID		path		string			true	"merge request ID"
 // @Produce		json
@@ -69,6 +73,7 @@ func (mergeRequestController *MergeRequestController) DeleteMergeRequest(_ *gin.
 // GetReviewStatus godoc
 // @Summary 	Returns status of all merge request reviews
 // @Description Returns an array of the statuses of all the reviews of this merge request
+// @Tags 		merge-requests
 // @Accept  	json
 // @Param		mergeRequestID		path		string			true	"merge request ID"
 // @Produce		json
@@ -84,6 +89,7 @@ func (mergeRequestController *MergeRequestController) GetReviewStatus(_ *gin.Con
 // GetReview godoc
 // @Summary 	Returns a review of a merge request
 // @Description Returns a review with the given ID of the merge request with the given ID
+// @Tags 		merge-requests
 // @Accept  	json
 // @Param		mergeRequestID		path		string			true	"merge request ID"
 // @Param		reviewID			path		string			true	"review ID"
@@ -100,6 +106,7 @@ func (mergeRequestController *MergeRequestController) GetReview(_ *gin.Context) 
 // CreateReview godoc
 // @Summary 	Adds a review to a merge request
 // @Description Adds a review to a merge request
+// @Tags 		merge-requests
 // @Accept  	json
 // @Param		mergeRequestID		path		string			true	"merge request ID"
 // @Param		form	body	forms.ReviewCreationForm	true	"review creation form"
@@ -117,6 +124,7 @@ func (mergeRequestController *MergeRequestController) CreateReview(_ *gin.Contex
 // @Summary 	Returns whether the user is allowed to review this merge request
 // @Description Returns true if the user fulfills the requirements to review the merge request
 // @Description Returns false if user is unauthorized to review the merge request
+// @Tags 		merge-requests
 // @Accept  	json
 // @Param		mergeRequestID		path		string			true	"merge request ID"
 // @Param		userID			path		string			true	"user ID"

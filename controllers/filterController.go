@@ -11,6 +11,7 @@ type FilterController struct {
 // @Summary 	Filters all posts
 // @Description Returns all posts that meet the requirements in the form
 // @Description Endpoint is offset-paginated
+// @Tags 		filtering
 // @Accept  	json
 // @Param		form	body	forms.FilterForm	true	"Filter form"
 // @Param 		page		query		uint			false	"page query"
@@ -29,6 +30,7 @@ func (filterController *FilterController) FilterPosts(_ *gin.Context) {
 // @Summary 	Filters all project posts
 // @Description Returns all project posts that meet the requirements in the form
 // @Description Endpoint is offset-paginated
+// @Tags 		filtering
 // @Accept  	json
 // @Param		form	body	forms.FilterForm	true	"Filter form"
 // @Param 		page		query		uint			false	"page query"

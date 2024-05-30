@@ -22,6 +22,7 @@ type VersionController struct {
 // GetVersion godoc
 // @Summary 	Get version
 // @Description Get a version by version ID
+// @Tags 		versions
 // @Accept  	json
 // @Param		versionID		path		string			true	"Version ID"
 // @Produce		json
@@ -37,6 +38,7 @@ func (versionController *VersionController) GetVersion(_ *gin.Context) {
 // CreateVersion godoc
 // @Summary 	Create new version
 // @Description Create a new version with discussions and repository
+// @Tags 		versions
 // @Accept  	multipart/form-data
 // @Param		postID		query		string					true	"Parent Post ID"
 // @Param		repository	body		forms.IncomingFileForm	true	"Repository to create"
@@ -85,6 +87,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 // GetRender godoc
 // @Summary Get the render of a version
 // @Description Get the render of the repository underlying a version
+// @Tags 		versions
 // @Param		versionID		path		string			true	"version ID"
 // @Produce		text/html
 // @Success 	200		{object}	[]byte
@@ -99,6 +102,7 @@ func (versionController *VersionController) GetRender(_ *gin.Context) {
 // GetRepository godoc specs
 // @Summary 	Get the repository of a version
 // @Description Get the entire zipped repository of a version
+// @Tags 		versions
 // @Param		versionID	path		string				true	"Version ID"
 // @Produce		application/zip
 // @Success 	200		{object}	[]byte
@@ -112,6 +116,7 @@ func (versionController *VersionController) GetRepository(_ *gin.Context) {
 // GetFileTree godoc
 // @Summary 	Get the file tree of a repository
 // @Description Get the file tree of a repository of a version
+// @Tags 		versions
 // @Accept  	json
 // @Param		versionID		path		string			true	"version ID"
 // @Produce		application/json
@@ -127,6 +132,7 @@ func (versionController *VersionController) GetFileTree(_ *gin.Context) {
 // GetFileFromrepository godoc
 // @Summary 	Get a file from a repository
 // @Description Get the contents of a single file from a repository of a version
+// @Tags 		versions
 // @Param		versionID		path		string			true	"version ID"
 // @Param		filePath		body		string			true	"file path"
 // @Success 	200		{object}	[]byte
@@ -142,6 +148,7 @@ func (versionController *VersionController) GetFileFromrepository(_ *gin.Context
 // @Summary Returns all level 1 discussions associated with the version
 // @Description Returns all discussions on this version that are not a reply to another discussion
 // @Description Endpoint is offset-paginated
+// @Tags 		versions
 // @Accept  	json
 // @Param		versionID		path		string			true	"version ID"
 // @Param 		page		query		uint			false	"page query"
