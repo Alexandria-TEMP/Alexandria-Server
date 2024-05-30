@@ -12,21 +12,14 @@ type MemberService struct {
 }
 
 func (memberService *MemberService) GetMember(userID uint) (*models.Member, error) {
-	//get member by this id
+	// get member by this id
 	member, err := memberService.MemberRepository.GetByID(userID)
 	return member, err
 }
 
-func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm, tags []*tags.ScientificFieldTag) *models.Member {
-	// creating a member
-	// := is declaration + assignment
-
-	//for now no input sanitization for the strings - so first name, last name, email, institution, etc.
-	//however have to get tags somehow
-
-	//okay okay so for all form ids
-	//should get tags and add them by ids
-	  
+func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm, tags []*tags.ScientificFieldTag) (*models.Member, error) {
+	// for now no input sanitization for the strings - so first name, last name, email, institution, etc.
+	// however have to get tags somehow
 
 	member := &models.Member{
 		FirstName:   		form.FirstName,
@@ -37,9 +30,9 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 		ScientificFieldTags: 	tags,
 	}
 
-	// TODO: add new member to repository
+	err := memberService.MemberRepository.Create(member)
 
-	return member
+	return member, err
 }
 
 func (memberService *MemberService) UpdateMember(_ *models.Member) error {

@@ -81,6 +81,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	err := c.BindJSON(&form)
 
 	// check for errors
+	// if there is an error, return a 400 bad request status
 	if err != nil {
 		fmt.Println(err)
 		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind userCreationForm from request body"))
@@ -93,10 +94,27 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	//call the method from the tag service
 	tags, err := memberController.TagService.GetTagsFromIDs(tagIDs)
 
-	// create and add to database(not done yet) through the memberService
-	member := memberController.MemberService.CreateMember(&form, tags)
+	// check for errors in the tags
+	// if there is an error, return a 400 bad request status
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind tag ids from request body"))
 
-	// send back a positive response with the created member
+		return
+	}
+
+	// create and add to database through the memberService
+	member, err := memberController.MemberService.CreateMember(&form, tags)
+
+	// if the member service throws an error, return a 400 Bad request status
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("A member with this id already exists"))
+
+		return
+	}
+
+	// send back a positive response 200 status with the created member
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, &member)
 }
