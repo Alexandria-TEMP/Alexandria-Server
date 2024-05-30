@@ -87,18 +87,17 @@ func (mergeRequestController *MergeRequestController) GetReviewStatus(_ *gin.Con
 }
 
 // GetReview godoc
-// @Summary 	Returns a review of a merge request
-// @Description Returns a review with the given ID of the merge request with the given ID
+// @Summary 	Returns a merge request review by ID
+// @Description Returns a review of a merge request with the given ID
 // @Tags 		merge-requests
 // @Accept  	json
-// @Param		mergeRequestID		path		string			true	"merge request ID"
 // @Param		reviewID			path		string			true	"review ID"
 // @Produce		json
 // @Success 	200		{object}	models.ReviewDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/merge-requests/{mergeRequestID}/reviews/{reviewID}		[get]
+// @Router 		/merge-requests/reviews/{reviewID}		[get]
 func (mergeRequestController *MergeRequestController) GetReview(_ *gin.Context) {
 
 }

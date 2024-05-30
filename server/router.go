@@ -36,7 +36,7 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	mergeRequestRouter.PUT("/", controllers.mergeRequestController.UpdateMergeRequest)
 	mergeRequestRouter.DELETE("/:mergeRequestID", controllers.mergeRequestController.DeleteMergeRequest)
 	mergeRequestRouter.GET("/:mergeRequestID/reviews", controllers.mergeRequestController.GetReviewStatus)
-	mergeRequestRouter.GET("/:mergeRequestID/reviews/:reviewID", controllers.mergeRequestController.GetReview)
+	mergeRequestRouter.GET("/reviews/:reviewID", controllers.mergeRequestController.GetReview)
 	mergeRequestRouter.POST("/:mergeRequestID/reviews", controllers.mergeRequestController.CreateReview)
 	mergeRequestRouter.GET("/:mergeRequestID/can-review/:userID", controllers.mergeRequestController.UserCanReview)
 
@@ -44,7 +44,6 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
 	discussionRouter.POST("/", controllers.discussionController.CreateDiscussion)
 	discussionRouter.DELETE("/:discussionID", controllers.discussionController.DeleteDiscussion)
-	discussionRouter.GET("/:discussionID/replies", controllers.discussionController.GetDiscussionReplies)
 	discussionRouter.POST("/:discussionID/reports", controllers.discussionController.AddDiscussionReport)
 	discussionRouter.GET("/:discussionID/reports", controllers.discussionController.GetDiscussionReports)
 
@@ -62,7 +61,6 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	versionRouter.GET("/:versionID/repository", controllers.versionController.GetRepository)
 	versionRouter.GET("/:versionID/tree", controllers.versionController.GetFileTree)
 	versionRouter.GET("/:versionID/file", controllers.versionController.GetFileFromrepository)
-	versionRouter.GET("/:versionID/discussions", controllers.versionController.GetDiscussions)
 
 	return router
 }
@@ -91,8 +89,6 @@ func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	projectPostRouter.DELETE("/:postID", controllers.projectPostController.DeleteProjectPost)
 	projectPostRouter.POST("/from-github", controllers.projectPostController.CreateProjectPostFromGithub)
 	projectPostRouter.GET("/:postID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
-	projectPostRouter.GET("/:postID/open-merge-requests", controllers.projectPostController.GetProjectPostOpenMergeRequests)
-	projectPostRouter.GET("/:postID/closed-merge-requests", controllers.projectPostController.GetProjectPostClosedMergeRequests)
 }
 
 func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
