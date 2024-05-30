@@ -118,14 +118,13 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 
 	// TODO update and add the member to the database
 	// err = memberController.MemberService.UpdateMember(&updatedMember)
-
 	// check for errors again
-	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update user because no user with this ID exists"))
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update user because no user with this ID exists"))
 
-		return
-	}
+	// 	return
+	// }
 
 	// send back a positive response if member updated successfully
 	c.Header("Content-Type", "application/json")
