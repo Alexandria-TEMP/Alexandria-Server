@@ -94,7 +94,7 @@ func (mergeRequestController *MergeRequestController) GetReviewStatus(_ *gin.Con
 // @Accept  	json
 // @Param		reviewID			path		string			true	"review ID"
 // @Produce		json
-// @Success 	200		{object}	models.ReviewDTO
+// @Success 	200		{object}	models.MergeRequestReviewDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
