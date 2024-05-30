@@ -162,71 +162,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/discussions/{discussionID}/replies": {
-            "get": {
-                "description": "Gets an array of all the first-level replies of a discussion\nEndpoint is offset-paginated",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "discussions"
-                ],
-                "summary": "Get all the replies of a discussion",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "discussion ID",
-                        "name": "discussionID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.DiscussionDTO"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
         "/discussions/{discussionID}/reports": {
             "get": {
                 "description": "Get all reports that have been added to this discussion\nEndpoint is offset-paginated",
@@ -673,7 +608,7 @@ const docTemplate = `{
         },
         "/members/{userID}/discussions": {
             "get": {
-                "description": "Get all merge requests that this member is a collaborator of\nEndpoint is offset-paginated",
+                "description": "Get all discussions that this member has participated in\nEndpoint is offset-paginated",
                 "consumes": [
                     "application/json"
                 ],
@@ -683,7 +618,7 @@ const docTemplate = `{
                 "tags": [
                     "members"
                 ],
-                "summary": "Get all merge requests of this member",
+                "summary": "Get all discussions",
                 "parameters": [
                     {
                         "type": "string",
@@ -1206,7 +1141,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create a new question or discussion merge request",
+                "description": "Create a new merge request linked to a project post",
                 "consumes": [
                     "application/json"
                 ],
@@ -1237,6 +1172,56 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/merge-requests/reviews/{reviewID}": {
+            "get": {
+                "description": "Returns a review of a merge request with the given ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "merge-requests"
+                ],
+                "summary": "Returns a merge request review by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "review ID",
+                        "name": "reviewID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ReviewDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
@@ -1490,63 +1475,6 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/merge-requests/{mergeRequestID}/reviews/{reviewID}": {
-            "get": {
-                "description": "Returns a review with the given ID of the merge request with the given ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "merge-requests"
-                ],
-                "summary": "Returns a review of a merge request",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "merge request ID",
-                        "name": "mergeRequestID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "review ID",
-                        "name": "reviewID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ReviewDTO"
-                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -2193,7 +2121,7 @@ const docTemplate = `{
         },
         "/project-posts/{postID}/all-discussions": {
             "get": {
-                "description": "Returns all discussions on this project post and all of it's merge requests\nEndpoint is offset-paginated",
+                "description": "Returns all discussion IDs on this project post over all its previous versions, instead of only the current version\nEndpoint is offset-paginated",
                 "consumes": [
                     "application/json"
                 ],
@@ -2203,7 +2131,7 @@ const docTemplate = `{
                 "tags": [
                     "project-posts"
                 ],
-                "summary": "Returns all discussions associated with the project post",
+                "summary": "Returns all discussion IDs associated with the project post",
                 "parameters": [
                     {
                         "type": "string",
@@ -2231,137 +2159,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.DiscussionDTO"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/project-posts/{postID}/closed-merge-requests": {
-            "get": {
-                "description": "Get all closed merge requests associated with the given project post\nEndpoint is offset-paginated",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "project-posts"
-                ],
-                "summary": "Get all closed merge requests of a project post",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "post ID",
-                        "name": "postID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.MergeRequestDTO"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/project-posts/{postID}/open-merge-requests": {
-            "get": {
-                "description": "Get all open merge requests associated with the given project post\nEndpoint is offset-paginated",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "project-posts"
-                ],
-                "summary": "Get all open merge requests of a project post",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "post ID",
-                        "name": "postID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.MergeRequestDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -2551,71 +2349,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.VersionDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/versions/{versionID}/discussions": {
-            "get": {
-                "description": "Returns all discussions on this version that are not a reply to another discussion\nEndpoint is offset-paginated",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "versions"
-                ],
-                "summary": "Returns all level 1 discussions associated with the version",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "version ID",
-                        "name": "versionID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.DiscussionDTO"
-                            }
                         }
                     },
                     "400": {

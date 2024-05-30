@@ -339,51 +339,6 @@ paths:
       summary: Get discussion
       tags:
       - discussions
-  /discussions/{discussionID}/replies:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        Gets an array of all the first-level replies of a discussion
-        Endpoint is offset-paginated
-      parameters:
-      - description: discussion ID
-        in: path
-        name: discussionID
-        required: true
-        type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.DiscussionDTO'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get all the replies of a discussion
-      tags:
-      - discussions
   /discussions/{discussionID}/reports:
     get:
       consumes:
@@ -688,7 +643,7 @@ paths:
       consumes:
       - application/json
       description: |-
-        Get all merge requests that this member is a collaborator of
+        Get all discussions that this member has participated in
         Endpoint is offset-paginated
       parameters:
       - description: user ID
@@ -725,7 +680,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Get all merge requests of this member
+      summary: Get all discussions
       tags:
       - members
   /members/{userID}/merge-requests:
@@ -1021,7 +976,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new question or discussion merge request
+      description: Create a new merge request linked to a project post
       parameters:
       - description: MergeRequest Creation Form
         in: body
@@ -1255,18 +1210,12 @@ paths:
       summary: Adds a review to a merge request
       tags:
       - merge-requests
-  /merge-requests/{mergeRequestID}/reviews/{reviewID}:
+  /merge-requests/reviews/{reviewID}:
     get:
       consumes:
       - application/json
-      description: Returns a review with the given ID of the merge request with the
-        given ID
+      description: Returns a review of a merge request with the given ID
       parameters:
-      - description: merge request ID
-        in: path
-        name: mergeRequestID
-        required: true
-        type: string
       - description: review ID
         in: path
         name: reviewID
@@ -1291,7 +1240,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Returns a review of a merge request
+      summary: Returns a merge request review by ID
       tags:
       - merge-requests
   /posts:
@@ -1676,7 +1625,7 @@ paths:
       consumes:
       - application/json
       description: |-
-        Returns all discussions on this project post and all of it's merge requests
+        Returns all discussion IDs on this project post over all its previous versions, instead of only the current version
         Endpoint is offset-paginated
       parameters:
       - description: post ID
@@ -1699,7 +1648,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.DiscussionDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
@@ -1713,97 +1662,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Returns all discussions associated with the project post
-      tags:
-      - project-posts
-  /project-posts/{postID}/closed-merge-requests:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        Get all closed merge requests associated with the given project post
-        Endpoint is offset-paginated
-      parameters:
-      - description: post ID
-        in: path
-        name: postID
-        required: true
-        type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.MergeRequestDTO'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get all closed merge requests of a project post
-      tags:
-      - project-posts
-  /project-posts/{postID}/open-merge-requests:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        Get all open merge requests associated with the given project post
-        Endpoint is offset-paginated
-      parameters:
-      - description: post ID
-        in: path
-        name: postID
-        required: true
-        type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.MergeRequestDTO'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get all open merge requests of a project post
+      summary: Returns all discussion IDs associated with the project post
       tags:
       - project-posts
   /project-posts/from-github:
@@ -1970,51 +1829,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get version
-      tags:
-      - versions
-  /versions/{versionID}/discussions:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        Returns all discussions on this version that are not a reply to another discussion
-        Endpoint is offset-paginated
-      parameters:
-      - description: version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.DiscussionDTO'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Returns all level 1 discussions associated with the version
       tags:
       - versions
   /versions/{versionID}/file:
