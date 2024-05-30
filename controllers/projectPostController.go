@@ -166,8 +166,8 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 }
 
 // GetProjectPostDiscussions godoc
-// @Summary Returns all discussions associated with the project post
-// @Description Returns all discussions on this project post and all of it's merge requests
+// @Summary Returns all discussion IDs associated with the project post
+// @Description Returns all discussion IDs on this project post over all its previous versions, instead of only the current version
 // @Description Endpoint is offset-paginated
 // @Tags 		project-posts
 // @Accept  	json
@@ -175,7 +175,7 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.DiscussionDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
