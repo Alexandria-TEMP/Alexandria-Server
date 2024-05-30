@@ -18,10 +18,7 @@ func TestMemberJSONMarshaling(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
-		ScientificFieldTags: []tags.ScientificField{
-			tags.Mathematics,
-			tags.ComputerScience,
-		},
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	// should equal this DTO!
@@ -32,10 +29,7 @@ func TestMemberJSONMarshaling(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
-		ScientificFieldTags: []tags.ScientificField{
-			tags.Mathematics,
-			tags.ComputerScience,
-		},
+		ScientificFieldTagIDs: []uint{},
 	}
 
 	dto := MemberDTO{}

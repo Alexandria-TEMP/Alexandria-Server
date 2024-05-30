@@ -20,7 +20,7 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 		CurrentVersion:      Version{},
 		CurrentVersionID:    49,
 		PostType:            tags.Project,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	model := ProjectPost{
@@ -45,7 +45,7 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			CollaboratorIDs:     []uint{1, 60},
 			VersionID:           49,
 			PostType:            tags.Project,
-			ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+			ScientificFieldTagIDs: []uint{},
 		},
 		OpenMergeRequestIDs:   []uint{44},
 		ClosedMergeRequestIDs: []uint{59, 20},

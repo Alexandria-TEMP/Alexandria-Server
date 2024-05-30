@@ -35,7 +35,7 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 		MergeRequestTitle:       "My Cool MR",
 		NewPostTitle:            "Updated Post Title",
 		UpdatedCompletionStatus: tags.Idea,
-		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
+		UpdatedScientificFields: []*tags.ScientificFieldTag{},
 		Anonymous:               false,
 	}
 
@@ -50,7 +50,7 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 		MergeRequestTitle:       "My Cool MR",
 		NewPostTitle:            "Updated Post Title",
 		UpdatedCompletionStatus: tags.Idea,
-		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
+		UpdatedScientificFieldTagIDs: []uint{},
 		Anonymous:               false,
 	}
 

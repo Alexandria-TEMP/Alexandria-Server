@@ -317,7 +317,7 @@ func TestCreateWithAssociation(t *testing.T) {
 		Collaborators:       []*models.PostCollaborator{},
 		CurrentVersion:      version,
 		PostType:            tags.Question,
-		ScientificFieldTags: []tags.ScientificField{},
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	postRepository := ModelRepository[*models.Post]{Database: testDB}

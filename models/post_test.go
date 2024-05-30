@@ -33,7 +33,7 @@ func TestPostJSONMarshaling(t *testing.T) {
 		CurrentVersion:      Version{},
 		CurrentVersionID:    49,
 		PostType:            tags.Question,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	// should equal this DTO!
@@ -43,7 +43,7 @@ func TestPostJSONMarshaling(t *testing.T) {
 		Title:               "Nice Post",
 		VersionID:           49,
 		PostType:            tags.Question,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+		ScientificFieldTagIDs: []uint{},
 	}
 
 	dto := PostDTO{}
