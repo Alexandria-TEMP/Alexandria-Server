@@ -6,8 +6,15 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
+	"gorm.io/gorm"
 )
+
+type RepositoryEnv struct {
+	memberRepository database.ModelRepository[*models.Member]
+	versionRepository database.ModelRepository[*models.Version]
+}
 
 type ServiceEnv struct {
 	postService    services.PostService
@@ -26,13 +33,22 @@ type ControllerEnv struct {
 	versionController      controllers.VersionController
 }
 
-func initServiceEnv() ServiceEnv {
-	fs := filesystem.InitFilesystem()
+func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
+	return RepositoryEnv{
+		memberRepository: database.ModelRepository[*models.Member]{Database: db},
+		versionRepository: database.ModelRepository[*models.Version]{Database: db},
+	}
+}
 
+func initServiceEnv(repositoryEnv RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
 	return ServiceEnv{
 		postService:    services.PostService{},
-		versionService: services.VersionService{Filesystem: fs},
-		memberService:  services.MemberService{},
+		versionService: services.VersionService{
+			VersionRepository: repositoryEnv.versionRepository,
+			Filesystem: fs},
+		memberService:  services.MemberService{
+			MemberRepository: repositoryEnv.memberRepository,
+		},
 	}
 }
 
@@ -50,13 +66,16 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 }
 
 func Init() {
-	_, err := database.InitializeDatabase()
+	db, err := database.InitializeDatabase()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	serviceEnv := initServiceEnv()
+	fs := filesystem.InitFilesystem()
+
+	repositoryEnv := initRepositoryEnv(db)
+	serviceEnv := initServiceEnv(repositoryEnv, fs)
 	controllerEnv := initControllerEnv(&serviceEnv)
 
 	router := SetUpRouter(controllerEnv)

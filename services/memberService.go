@@ -1,13 +1,13 @@
 package services
 
 import (
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 )
 
 type MemberService struct {
-	// dont know how to do database connections?
-	// but i think they go in here
+	MemberRepository database.ModelRepository[*models.Member]
 }
 
 func (memberService *MemberService) GetMember(_ uint64) (*models.Member, error) {
