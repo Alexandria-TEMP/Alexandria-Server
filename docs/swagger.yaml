@@ -42,6 +42,16 @@ definitions:
     type: object
   forms.ReviewCreationForm:
     type: object
+  models.CollaborationType:
+    enum:
+    - author
+    - contributor
+    - reviewer
+    type: string
+    x-enum-varnames:
+    - Author
+    - Contributor
+    - Reviewer
   models.DiscussionDTO:
     properties:
       anonymous:
@@ -80,6 +90,17 @@ definitions:
           $ref: '#/definitions/tags.ScientificField'
         type: array
     type: object
+  models.MergeRequestCollaboratorDTO:
+    properties:
+      collaborationType:
+        $ref: '#/definitions/models.CollaborationType'
+      id:
+        type: integer
+      memberID:
+        type: integer
+      mergeRequestID:
+        type: integer
+    type: object
   models.MergeRequestDTO:
     properties:
       anonymous:
@@ -112,6 +133,17 @@ definitions:
         items:
           $ref: '#/definitions/tags.ScientificField'
         type: array
+    type: object
+  models.PostCollaboratorDTO:
+    properties:
+      collaborationType:
+        $ref: '#/definitions/models.CollaborationType'
+      id:
+        type: integer
+      memberID:
+        type: integer
+      postID:
+        type: integer
     type: object
   models.PostDTO:
     properties:
@@ -1210,6 +1242,40 @@ paths:
       summary: Adds a review to a merge request
       tags:
       - merge-requests
+  /merge-requests/collaborators/{collaboratorID}:
+    get:
+      consumes:
+      - application/json
+      description: Get a merge request collaborator by ID, a member who has collaborated
+        on a merge request
+      parameters:
+      - description: Collaborator ID
+        in: path
+        name: collaboratorID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MergeRequestCollaboratorDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get a merge request collaborator by ID
+      tags:
+      - merge-requests
   /merge-requests/reviews/{reviewID}:
     get:
       consumes:
@@ -1448,6 +1514,40 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Add a new report to a post
+      tags:
+      - posts
+  /posts/collaborators/{collaboratorID}:
+    get:
+      consumes:
+      - application/json
+      description: Get a post collaborator by ID, a member who has collaborated on
+        a post
+      parameters:
+      - description: Collaborator ID
+        in: path
+        name: collaboratorID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PostCollaboratorDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get a post collaborator by ID
       tags:
       - posts
   /posts/from-github:

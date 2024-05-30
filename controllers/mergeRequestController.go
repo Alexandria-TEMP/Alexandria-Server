@@ -146,3 +146,19 @@ func (mergeRequestController *MergeRequestController) UserCanReview(_ *gin.Conte
 //   - `/:id/reviews/:id` `GET` (gets specific review)
 //   - `/:id/reviews` `POST` (does the merge - make sure to refresh page)
 //   - `/:id/reviews/can-review` `GET` (utility endpoint for front-end - allowed to review?)
+
+// GetCollaborator godoc
+// @Summary 	Get a merge request collaborator by ID
+// @Description	Get a merge request collaborator by ID, a member who has collaborated on a merge request
+// @Tags		merge-requests
+// @Accept  	json
+// @Param		collaboratorID	path	string	true	"Collaborator ID"
+// @Produce		json
+// @Success 	200 		{object}	models.MergeRequestCollaboratorDTO
+// @Failure		400 		{object} 	utils.HTTPError
+// @Failure		404 		{object} 	utils.HTTPError
+// @Failure		500 		{object} 	utils.HTTPError
+// @Router 		/merge-requests/collaborators/{collaboratorID}	[get]
+func (mergeRequestController *MergeRequestController) GetMergeRequestCollaborator(_ *gin.Context) {
+	// TODO return collaborator by ID
+}

@@ -1185,6 +1185,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/merge-requests/collaborators/{collaboratorID}": {
+            "get": {
+                "description": "Get a merge request collaborator by ID, a member who has collaborated on a merge request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "merge-requests"
+                ],
+                "summary": "Get a merge request collaborator by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Collaborator ID",
+                        "name": "collaboratorID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.MergeRequestCollaboratorDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/merge-requests/reviews/{reviewID}": {
             "get": {
                 "description": "Returns a review of a merge request with the given ID",
@@ -1577,6 +1627,56 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/posts/collaborators/{collaboratorID}": {
+            "get": {
+                "description": "Get a post collaborator by ID, a member who has collaborated on a post",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get a post collaborator by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Collaborator ID",
+                        "name": "collaboratorID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.PostCollaboratorDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
@@ -2596,6 +2696,19 @@ const docTemplate = `{
         "forms.ReviewCreationForm": {
             "type": "object"
         },
+        "models.CollaborationType": {
+            "type": "string",
+            "enum": [
+                "author",
+                "contributor",
+                "reviewer"
+            ],
+            "x-enum-varnames": [
+                "Author",
+                "Contributor",
+                "Reviewer"
+            ]
+        },
         "models.DiscussionDTO": {
             "type": "object",
             "properties": {
@@ -2654,6 +2767,23 @@ const docTemplate = `{
                 }
             }
         },
+        "models.MergeRequestCollaboratorDTO": {
+            "type": "object",
+            "properties": {
+                "collaborationType": {
+                    "$ref": "#/definitions/models.CollaborationType"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memberID": {
+                    "type": "integer"
+                },
+                "mergeRequestID": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.MergeRequestDTO": {
             "type": "object",
             "properties": {
@@ -2700,6 +2830,23 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/tags.ScientificField"
                     }
+                }
+            }
+        },
+        "models.PostCollaboratorDTO": {
+            "type": "object",
+            "properties": {
+                "collaborationType": {
+                    "$ref": "#/definitions/models.CollaborationType"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memberID": {
+                    "type": "integer"
+                },
+                "postID": {
+                    "type": "integer"
                 }
             }
         },

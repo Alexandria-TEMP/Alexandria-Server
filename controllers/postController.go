@@ -198,3 +198,19 @@ func (postController *PostController) AddPostReport(_ *gin.Context) {
 func (postController *PostController) GetPostReports(_ *gin.Context) {
 	// TODO: make paginated
 }
+
+// GetCollaborator godoc
+// @Summary 	Get a post collaborator by ID
+// @Description	Get a post collaborator by ID, a member who has collaborated on a post
+// @Tags		posts
+// @Accept  	json
+// @Param		collaboratorID	path	string	true	"Collaborator ID"
+// @Produce		json
+// @Success 	200 		{object}	models.PostCollaboratorDTO
+// @Failure		400 		{object} 	utils.HTTPError
+// @Failure		404 		{object} 	utils.HTTPError
+// @Failure		500 		{object} 	utils.HTTPError
+// @Router 		/posts/collaborators/{collaboratorID}	[get]
+func (postController *PostController) GetPostCollaborator(_ *gin.Context) {
+	// TODO return collaborator by ID
+}

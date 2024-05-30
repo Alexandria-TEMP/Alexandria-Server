@@ -39,6 +39,7 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	mergeRequestRouter.GET("/reviews/:reviewID", controllers.mergeRequestController.GetReview)
 	mergeRequestRouter.POST("/:mergeRequestID/reviews", controllers.mergeRequestController.CreateReview)
 	mergeRequestRouter.GET("/:mergeRequestID/can-review/:userID", controllers.mergeRequestController.UserCanReview)
+	mergeRequestRouter.GET("/collaborators/:collaboratorID", controllers.mergeRequestController.GetMergeRequestCollaborator)
 
 	discussionRouter := v2.Group("/discussions")
 	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
@@ -100,4 +101,5 @@ func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	postRouter.POST("/from-github", controllers.postController.CreatePostFromGithub)
 	postRouter.POST("/:postID/reports", controllers.postController.AddPostReport)
 	postRouter.GET("/:postID/reports", controllers.postController.GetPostReports)
+	postRouter.GET("/collaborators/:collaboratorID", controllers.postController.GetPostCollaborator)
 }
