@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/discussions": {
             "post": {
-                "description": "Create a new discussion\nIf parent ID field is used, the discussion will be a reply",
+                "description": "Create a new discussion\nEither parent ID or version ID must be specified. This determines whether it's a reply or not, respectively.",
                 "consumes": [
                     "application/json"
                 ],
@@ -42,6 +42,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Parent ID",
                         "name": "parentID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Version ID",
+                        "name": "versionID",
                         "in": "query"
                     }
                 ],
@@ -2634,7 +2640,19 @@ const docTemplate = `{
     },
     "definitions": {
         "forms.DiscussionCreationForm": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "anonymous": {
+                    "description": "If anonymous, the discussion will ignore member ID",
+                    "type": "boolean"
+                },
+                "memberID": {
+                    "type": "integer"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
         },
         "forms.FilterForm": {
             "type": "object"

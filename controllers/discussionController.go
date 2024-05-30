@@ -26,11 +26,12 @@ func (discussionController *DiscussionController) GetDiscussion(_ *gin.Context) 
 // CreateDiscussion godoc
 // @Summary 	Create new discussion
 // @Description Create a new discussion
-// @Description If parent ID field is used, the discussion will be a reply
+// @Description Either parent ID or version ID must be specified. This determines whether it's a reply or not, respectively.
 // @Tags 		discussions
 // @Accept  	json
 // @Param		form	body	forms.DiscussionCreationForm	true	"Discussion Creation Form"
 // @Param 		parentID			query		string			false	"Parent ID"
+// @Param 		versionID			query		string			false	"Version ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.DiscussionDTO
 // @Failure		400 	{object} 	utils.HTTPError

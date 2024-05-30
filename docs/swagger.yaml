@@ -1,6 +1,14 @@
 basePath: /api/v2
 definitions:
   forms.DiscussionCreationForm:
+    properties:
+      anonymous:
+        description: If anonymous, the discussion will ignore member ID
+        type: boolean
+      memberID:
+        type: integer
+      text:
+        type: string
     type: object
   forms.FilterForm:
     type: object
@@ -278,7 +286,7 @@ paths:
       - application/json
       description: |-
         Create a new discussion
-        If parent ID field is used, the discussion will be a reply
+        Either parent ID or version ID must be specified. This determines whether it's a reply or not, respectively.
       parameters:
       - description: Discussion Creation Form
         in: body
@@ -289,6 +297,10 @@ paths:
       - description: Parent ID
         in: query
         name: parentID
+        type: string
+      - description: Version ID
+        in: query
+        name: versionID
         type: string
       produces:
       - application/json
