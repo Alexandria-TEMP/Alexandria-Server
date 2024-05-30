@@ -12,7 +12,6 @@ COPY . ./
 
 # Get module dependencies
 RUN go mod download
-RUN go mod download
 
 # Developer tools
 # TODO for prod these can be removed
@@ -22,6 +21,9 @@ RUN go install go.uber.org/mock/mockgen@v0.4.0
 
 # Build binary
 RUN go build -o /usr/bin/alexandria-backend -v ./
+
+# Generate API spec
+RUN swag init -g alexandria.go
 
 # Expose port
 EXPOSE 8080
