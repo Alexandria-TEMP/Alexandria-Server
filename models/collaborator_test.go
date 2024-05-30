@@ -45,19 +45,17 @@ func TestPostCollaboratorJSONMarshaling(t *testing.T) {
 func TestMergeRequestCollaboratorJSONMarshaling(t *testing.T) {
 	// This model...
 	model := MergeRequestCollaborator{
-		Model:             gorm.Model{ID: 55},
-		Member:            Member{},
-		MemberID:          32,
-		MergeRequestID:    87,
-		CollaborationType: Author,
+		Model:          gorm.Model{ID: 55},
+		Member:         Member{},
+		MemberID:       32,
+		MergeRequestID: 87,
 	}
 
 	// should equal this DTO!
 	targetDTO := MergeRequestCollaboratorDTO{
-		ID:                55,
-		MemberID:          32,
-		MergeRequestID:    87,
-		CollaborationType: Author,
+		ID:             55,
+		MemberID:       32,
+		MergeRequestID: 87,
 	}
 
 	dto := MergeRequestCollaboratorDTO{}

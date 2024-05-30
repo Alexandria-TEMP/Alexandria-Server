@@ -63,14 +63,14 @@ type MergeRequestCollaborator struct {
 	// MergeRequest has many MergeRequestCollaborator
 	MergeRequestID uint
 
-	CollaborationType CollaborationType
+	// Merge request collaborators don't have a collaboration type,
+	// because there is no concept of contributor/reviewer.
 }
 
 type MergeRequestCollaboratorDTO struct {
-	ID                uint
-	MemberID          uint
-	MergeRequestID    uint
-	CollaborationType CollaborationType
+	ID             uint
+	MemberID       uint
+	MergeRequestID uint
 }
 
 func (model *MergeRequestCollaborator) GetID() uint {
@@ -82,7 +82,6 @@ func (model *MergeRequestCollaborator) IntoDTO() MergeRequestCollaboratorDTO {
 		model.ID,
 		model.MemberID,
 		model.MergeRequestID,
-		model.CollaborationType,
 	}
 }
 
