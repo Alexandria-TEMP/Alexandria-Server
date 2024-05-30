@@ -129,7 +129,7 @@ func (mergeRequestController *MergeRequestController) CreateReview(_ *gin.Contex
 // @Param		mergeRequestID		path		string			true	"merge request ID"
 // @Param		userID			path		string			true	"user ID"
 // @Produce		json
-// @Success 	200		{array}		boolean
+// @Success 	200		{object}		boolean
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError

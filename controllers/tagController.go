@@ -9,7 +9,7 @@ type TagController struct {
 
 // FilterPosts godoc
 // @Summary 	Returns all scientific tags
-// @Description Returns all scientific tags in the database
+// @Description Returns all scientific tags (an array of strings) in the database
 // @Tags 		scientific-field-tags
 // @Produce		json
 // @Success 	200		{array}		tags.ScientificFieldTag

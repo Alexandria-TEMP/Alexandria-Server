@@ -64,7 +64,6 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 // @Tags 		project-posts
 // @Accept  	json
 // @Param		form			body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
-// @Param 		parentPostID	query		string							false	"Parent post ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
 // @Failure		400 		{object} 	utils.HTTPError

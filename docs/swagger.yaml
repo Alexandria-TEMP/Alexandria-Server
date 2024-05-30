@@ -55,21 +55,39 @@ definitions:
     type: object
   forms.PostCreationForm:
     properties:
-      collaborators:
+      authorMemberIDs:
+        description: Members that are authors of the post
         items:
           type: integer
         type: array
+      postType:
+        $ref: '#/definitions/tags.PostType'
+      scientificFieldTags:
+        items:
+          $ref: '#/definitions/tags.ScientificField'
+        type: array
+      title:
+        type: string
     type: object
   forms.ProjectPostCreationForm:
     properties:
+      completionStatus:
+        $ref: '#/definitions/tags.CompletionStatus'
+      feedbackPreference:
+        $ref: '#/definitions/tags.FeedbackPreference'
       postCreationForm:
-        allOf:
-        - $ref: '#/definitions/forms.PostCreationForm'
-        description: TODO add fields
+        $ref: '#/definitions/forms.PostCreationForm'
     type: object
   forms.ReportCreationForm:
     type: object
   forms.ReviewCreationForm:
+    properties:
+      feedback:
+        type: string
+      mergeRequestDecision:
+        $ref: '#/definitions/models.MergeRequestDecision'
+      reviewingMemberID:
+        type: integer
     type: object
   models.CollaborationType:
     enum:
@@ -161,6 +179,27 @@ definitions:
           $ref: '#/definitions/tags.ScientificField'
         type: array
     type: object
+  models.MergeRequestDecision:
+    enum:
+    - rejected
+    - approved
+    type: string
+    x-enum-varnames:
+    - Rejected
+    - Approved
+  models.MergeRequestReviewDTO:
+    properties:
+      feedback:
+        type: string
+      id:
+        type: integer
+      memberID:
+        type: integer
+      mergeRequestDecision:
+        $ref: '#/definitions/models.MergeRequestDecision'
+      mergeRequestID:
+        type: integer
+    type: object
   models.PostCollaboratorDTO:
     properties:
       collaborationType:
@@ -223,8 +262,6 @@ definitions:
     - Pending
     - Failure
   models.ReportDTO:
-    type: object
-  models.ReviewDTO:
     type: object
   models.VersionDTO:
     properties:
@@ -1185,9 +1222,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              type: boolean
-            type: array
+            type: boolean
         "400":
           description: Bad Request
           schema:
@@ -1326,7 +1361,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ReviewDTO'
+            $ref: '#/definitions/models.MergeRequestReviewDTO'
         "400":
           description: Bad Request
           schema:
@@ -1637,10 +1672,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/forms.ProjectPostCreationForm'
-      - description: Parent post ID
-        in: query
-        name: parentPostID
-        type: string
       produces:
       - application/json
       responses:

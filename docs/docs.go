@@ -1267,7 +1267,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ReviewDTO"
+                            "$ref": "#/definitions/models.MergeRequestReviewDTO"
                         }
                     },
                     "400": {
@@ -1419,10 +1419,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "boolean"
-                            }
+                            "type": "boolean"
                         }
                     },
                     "400": {
@@ -2041,12 +2038,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/forms.ProjectPostCreationForm"
                         }
-                    },
-                    {
-                        "type": "string",
-                        "description": "Parent post ID",
-                        "name": "parentPostID",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2718,24 +2709,38 @@ const docTemplate = `{
         "forms.PostCreationForm": {
             "type": "object",
             "properties": {
-                "collaborators": {
+                "authorMemberIDs": {
+                    "description": "Members that are authors of the post",
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
+                },
+                "postType": {
+                    "$ref": "#/definitions/tags.PostType"
+                },
+                "scientificFieldTags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificField"
+                    }
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },
         "forms.ProjectPostCreationForm": {
             "type": "object",
             "properties": {
+                "completionStatus": {
+                    "$ref": "#/definitions/tags.CompletionStatus"
+                },
+                "feedbackPreference": {
+                    "$ref": "#/definitions/tags.FeedbackPreference"
+                },
                 "postCreationForm": {
-                    "description": "TODO add fields",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/forms.PostCreationForm"
-                        }
-                    ]
+                    "$ref": "#/definitions/forms.PostCreationForm"
                 }
             }
         },
@@ -2743,7 +2748,18 @@ const docTemplate = `{
             "type": "object"
         },
         "forms.ReviewCreationForm": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "feedback": {
+                    "type": "string"
+                },
+                "mergeRequestDecision": {
+                    "$ref": "#/definitions/models.MergeRequestDecision"
+                },
+                "reviewingMemberID": {
+                    "type": "integer"
+                }
+            }
         },
         "models.CollaborationType": {
             "type": "string",
@@ -2879,6 +2895,37 @@ const docTemplate = `{
                 }
             }
         },
+        "models.MergeRequestDecision": {
+            "type": "string",
+            "enum": [
+                "rejected",
+                "approved"
+            ],
+            "x-enum-varnames": [
+                "Rejected",
+                "Approved"
+            ]
+        },
+        "models.MergeRequestReviewDTO": {
+            "type": "object",
+            "properties": {
+                "feedback": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memberID": {
+                    "type": "integer"
+                },
+                "mergeRequestDecision": {
+                    "$ref": "#/definitions/models.MergeRequestDecision"
+                },
+                "mergeRequestID": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.PostCollaboratorDTO": {
             "type": "object",
             "properties": {
@@ -2971,9 +3018,6 @@ const docTemplate = `{
             ]
         },
         "models.ReportDTO": {
-            "type": "object"
-        },
-        "models.ReviewDTO": {
             "type": "object"
         },
         "models.VersionDTO": {
