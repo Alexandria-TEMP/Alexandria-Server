@@ -56,25 +56,6 @@ func (discussionController *DiscussionController) DeleteDiscussion(_ *gin.Contex
 	// delete method goes here
 }
 
-// GetDiscussionReplies godoc
-// @Summary 	Get all the replies of a discussion
-// @Description Gets an array of all the first-level replies of a discussion
-// @Description Endpoint is offset-paginated
-// @Tags 		discussions
-// @Accept  	json
-// @Param		discussionID		path		string			true	"discussion ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
-// @Produce		json
-// @Success 	200		{array}		models.DiscussionDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
-// @Router 		/discussions/{discussionID}/replies 		[get]
-func (discussionController *DiscussionController) GetDiscussionReplies(_ *gin.Context) {
-	//TODO: make paginated
-}
-
 // AddDiscussionReport godoc
 // @Summary 	Add a new report to a discussion
 // @Description Create a new report for a discussion

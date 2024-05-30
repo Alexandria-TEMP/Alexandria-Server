@@ -143,22 +143,3 @@ func (versionController *VersionController) GetFileTree(_ *gin.Context) {
 func (versionController *VersionController) GetFileFromrepository(_ *gin.Context) {
 	// TODO: find out if this response type is correct
 }
-
-// GetDiscussions godoc
-// @Summary Returns all level 1 discussions associated with the version
-// @Description Returns all discussions on this version that are not a reply to another discussion
-// @Description Endpoint is offset-paginated
-// @Tags 		versions
-// @Accept  	json
-// @Param		versionID		path		string			true	"version ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
-// @Produce		json
-// @Success 	200		{array}		models.DiscussionDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
-// @Router		/versions/{versionID}/discussions 	[get]
-func (versionController *VersionController) GetDiscussions(_ *gin.Context) {
-
-}
