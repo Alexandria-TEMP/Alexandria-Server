@@ -36,7 +36,7 @@ func (versionController *VersionController) GetVersion(_ *gin.Context) {
 // @Summary 	Create new version
 // @Description Create a new version with discussions and repository from zipped file in body
 // @Accept  	multipart/form-data
-// @Param		repository			body		file				true	"Repository to create"
+// @Param		repository			formData		file				true	"Repository to create"
 // @Produce		application/json
 // @Success 	200		{object}	models.Version
 // @Failure		400 	{object} 	utils.HTTPError
@@ -71,7 +71,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 // @Param		versionID	path		string				true	"Version ID"
 // @Produce		text/html
 // @Success 	200		{object}	[]byte
-// @Success		202
+// @Success		202		{object}	string
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Router 		/{versionID}/render	[get]
@@ -91,7 +91,7 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 
 	// if render is pending return 202 accepted
 	if err202 != nil {
-		c.Status(http.StatusAccepted)
+		c.String(http.StatusAccepted, "text/plain", "pending")
 		return
 	}
 
