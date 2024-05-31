@@ -38,14 +38,15 @@ type ControllerEnv struct {
 
 func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 	return RepositoryEnv{
-		memberRepository: database.RepositoryInterface[*models.Member]{Database: db},
+		memberRepository: &database.ModelRepository[*models.Member]{Database: db},
 		//memberRepository: database.ModelRepository[*models.Member]{Database: db},
-		versionRepository: database.RepositoryInterface[*models.Member]{Database: db},
-		tagRepository: database.ModelRepository[*tags.ScientificFieldTag]{Database: db},
+		versionRepository: &database.ModelRepository[*models.Version]{Database: db},
+		tagRepository: &database.ModelRepository[*tags.ScientificFieldTag]{Database: db},
 	}
 }
 
-func initServiceEnv(repositoryEnv RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
+
+func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
 	return ServiceEnv{
 		postService:    services.PostService{},
 		versionService: services.VersionService{
@@ -83,7 +84,7 @@ func Init() {
 	fs := filesystem.InitFilesystem()
 
 	repositoryEnv := initRepositoryEnv(db)
-	serviceEnv := initServiceEnv(repositoryEnv, fs)
+	serviceEnv := initServiceEnv(&repositoryEnv, fs)
 	controllerEnv := initControllerEnv(&serviceEnv)
 
 	router := SetUpRouter(&controllerEnv)

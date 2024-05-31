@@ -16,7 +16,7 @@ import (
 
 type VersionService struct {
 	Filesystem filesysteminterface.Filesystem
-	VersionRepository database.ModelRepository[*models.Version]
+	VersionRepository database.RepositoryInterface[*models.Version]
 }
 
 // CreateVersion orchestrates the version creation.
