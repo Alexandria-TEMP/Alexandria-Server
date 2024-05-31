@@ -3,9 +3,9 @@ package services
 import (
 	"testing"
 
-	gomock "github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
+	gomock "go.uber.org/mock/gomock"
 )
 
 func beforeEachMember(t *testing.T) {
