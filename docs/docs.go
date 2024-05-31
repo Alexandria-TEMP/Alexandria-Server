@@ -2674,6 +2674,12 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificFieldTag"
+                    }
+                },
                 "firstName": {
                     "type": "string"
                 },
@@ -2726,6 +2732,9 @@ const docTemplate = `{
         "forms.PostCreationForm": {
             "type": "object",
             "properties": {
+                "anonymous": {
+                    "type": "boolean"
+                },
                 "authorMemberIDs": {
                     "description": "Members that are authors of the post",
                     "type": "array",
@@ -2963,6 +2972,9 @@ const docTemplate = `{
         "models.PostDTO": {
             "type": "object",
             "properties": {
+                "anonymous": {
+                    "type": "boolean"
+                },
                 "collaboratorIDs": {
                     "type": "array",
                     "items": {

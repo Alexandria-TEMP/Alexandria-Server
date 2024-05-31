@@ -6,9 +6,10 @@ type MergeRequestCreationForm struct {
 	// TODO New files to add to the version
 
 	// Changes made by the MR
-	UpdatedPostTitle        string
-	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields []tags.ScientificField
+	UpdatedPostTitle           string
+	UpdatedCompletionStatus    tags.CompletionStatus
+	UpdatedScientificFields    []tags.ScientificField
+	UpdatedFeedbackPreferences tags.FeedbackPreference
 
 	// The MR's metadata
 	CollaboratingMemberIDs []uint // Get converted to MergeRequestCollaborators

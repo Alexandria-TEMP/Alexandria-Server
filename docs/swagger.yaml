@@ -18,6 +18,10 @@ definitions:
     properties:
       email:
         type: string
+      fields:
+        items:
+          $ref: '#/definitions/tags.ScientificFieldTag'
+        type: array
       firstName:
         type: string
       institution:
@@ -55,6 +59,8 @@ definitions:
     type: object
   forms.PostCreationForm:
     properties:
+      anonymous:
+        type: boolean
       authorMemberIDs:
         description: Members that are authors of the post
         items:
@@ -213,6 +219,8 @@ definitions:
     type: object
   models.PostDTO:
     properties:
+      anonymous:
+        type: boolean
       collaboratorIDs:
         items:
           type: integer

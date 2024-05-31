@@ -2668,6 +2668,12 @@
                 "email": {
                     "type": "string"
                 },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificFieldTag"
+                    }
+                },
                 "firstName": {
                     "type": "string"
                 },
@@ -2720,6 +2726,9 @@
         "forms.PostCreationForm": {
             "type": "object",
             "properties": {
+                "anonymous": {
+                    "type": "boolean"
+                },
                 "authorMemberIDs": {
                     "description": "Members that are authors of the post",
                     "type": "array",
@@ -2957,6 +2966,9 @@
         "models.PostDTO": {
             "type": "object",
             "properties": {
+                "anonymous": {
+                    "type": "boolean"
+                },
                 "collaboratorIDs": {
                     "type": "array",
                     "items": {
