@@ -202,7 +202,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ReportDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -326,7 +326,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.PostDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -393,7 +393,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ProjectPostDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -2322,18 +2322,6 @@
                             "items": {
                                 "$ref": "#/definitions/tags.ScientificFieldTag"
                             }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
                         }
                     },
                     "500": {

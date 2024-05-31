@@ -208,7 +208,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ReportDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -332,7 +332,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.PostDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -399,7 +399,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ProjectPostDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -2328,18 +2328,6 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/tags.ScientificFieldTag"
                             }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
                         }
                     },
                     "500": {

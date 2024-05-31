@@ -467,7 +467,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ReportDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
@@ -551,7 +551,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.PostDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
@@ -597,7 +597,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ProjectPostDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
@@ -1902,14 +1902,6 @@ paths:
             items:
               $ref: '#/definitions/tags.ScientificFieldTag'
             type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
           schema:

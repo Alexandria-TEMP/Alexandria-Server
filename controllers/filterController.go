@@ -13,11 +13,11 @@ type FilterController struct {
 // @Description Endpoint is offset-paginated
 // @Tags 		filtering
 // @Accept  	json
-// @Param		form	body	forms.FilterForm	true	"Filter form"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
+// @Param		form		body		forms.FilterForm	true	"Filter form"
+// @Param 		page		query		uint				false	"page query"
+// @Param		pageSize	query		uint				false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.PostDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -32,11 +32,11 @@ func (filterController *FilterController) FilterPosts(_ *gin.Context) {
 // @Description Endpoint is offset-paginated
 // @Tags 		filtering
 // @Accept  	json
-// @Param		form	body	forms.FilterForm	true	"Filter form"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
+// @Param		form		body		forms.FilterForm	true	"Filter form"
+// @Param 		page		query		uint				false	"page query"
+// @Param		pageSize	query		uint				false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.ProjectPostDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
