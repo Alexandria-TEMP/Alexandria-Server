@@ -16,7 +16,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func beforeEach(t *testing.T) {
+func BeforeEachVersion(t *testing.T) {
 	t.Helper()
 
 	mockCtrl := gomock.NewController(t)
@@ -77,7 +77,7 @@ func TestCreateVersionDelayedFailure4(t *testing.T) {
 // }
 
 func TestCreateVersionImmediateFailure(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	file := &multipart.FileHeader{}
@@ -99,7 +99,7 @@ func TestCreateVersionImmediateFailure(t *testing.T) {
 
 func testGoodProjectTemplate(t *testing.T, dirName string) {
 	t.Helper()
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	file := &multipart.FileHeader{}
@@ -130,7 +130,7 @@ func testGoodProjectTemplate(t *testing.T, dirName string) {
 
 func testBadProjectTemplate(t *testing.T, dirName string) {
 	t.Helper()
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
