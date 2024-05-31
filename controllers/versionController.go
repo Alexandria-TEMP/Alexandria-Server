@@ -41,7 +41,7 @@ func (versionController *VersionController) GetVersion(_ *gin.Context) {
 // @Success 	200		{object}	models.VersionDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 				[post]
+// @Router 		/		[post]
 func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	// extract file
 	file, err := c.FormFile("file")
