@@ -20,11 +20,11 @@ var (
 	exampleVersion models.Version
 	cwd            string
 
-	memberService 		MemberService
-	mockTagService	 	*mocks.MockTagService
-	exampleMember 		models.Member
-	exampleSTag1		*tags.ScientificFieldTag
-	exampleSTag2		*tags.ScientificFieldTag
+	memberService 			MemberService
+	mockTagService	 		*mocks.MockTagService
+	exampleMember 			models.Member
+	exampleSTag1			*tags.ScientificFieldTag
+	exampleSTag2			*tags.ScientificFieldTag
 )
 
 func TestMain(m *testing.M) {
