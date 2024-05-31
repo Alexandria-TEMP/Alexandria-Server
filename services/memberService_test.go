@@ -1,11 +1,14 @@
 package services
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -20,14 +23,17 @@ func beforeEachMember(t *testing.T) {
 	mockMemberRepository = mocks.NewMockRepositoryInterface[*models.Member](mockCtrl)
 
 	//need to mock repository here, how?
-	memberService = MemberService{
+	memberService = MemberService {
 		MemberRepository: mockMemberRepository,
 	}
 }
 
 
-func testGetMember(t *testing.T, id uint) {
+func testGetMemberSuccessful(t *testing.T, id uint) {
+	id = 5
+
 	// mock member repository here to return member when get by id called
+	mockMemberRepository.EXPECT().GetByID(1).Return(exampleMember, nil)
 
 	// call service method
 	member, err := memberService.GetMember(id)
@@ -35,417 +41,70 @@ func testGetMember(t *testing.T, id uint) {
 	assert.Equal(t, exampleMember, member)
 	// assert there was no error
 	assert.Nil(t, err)
-
 }
 
-
-// package services
-
-// import (
-// 	"errors"
-// 	"mime/multipart"
-// 	"os"
-// 	"path/filepath"
-// 	"testing"
-
-// 	"github.com/stretchr/testify/assert"
-// 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
-// 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-// 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
-// 	"go.uber.org/mock/gomock"
-// )
-
-// func beforeEach(t *testing.T) {
-// 	t.Helper()
-
-// 	// Setup mock DB
-// 	mockCtrl := gomock.NewController(t)
-// 	defer mockCtrl.Finish()
-// 	mockVersionRepository = mocks.NewMockRepositoryInterface[*models.Version](mockCtrl)
-
-// 	// Setup mock filesystem
-// 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
-
-// 	// Cretae version service
-// 	versionService = VersionService{
-// 		VersionRepository: mockVersionRepository,
-// 		Filesystem:        mockFilesystem,
-// 	}
-// }
-
-// func cleanup(t *testing.T) {
-// 	t.Helper()
-
-// 	os.RemoveAll(filepath.Join(cwd, "render"))
-// }
-
-// func TestCreateVersionSuccess1(t *testing.T) {
-// 	if testing.Short() {
-// 		t.Skip()
-// 	}
-
-// 	testGoodProjectTemplate(t, "good_quarto_project_1")
-// }
-
-// func TestCreateVersionSuccess2(t *testing.T) {
-// 	if testing.Short() {
-// 		t.Skip()
-// 	}
-
-// 	testGoodProjectTemplate(t, "good_quarto_project_2")
-// }
-
-// func TestCreateVersionSuccess3(t *testing.T) {
-// 	if testing.Short() {
-// 		t.Skip()
-// 	}
-
-// 	testGoodProjectTemplate(t, "good_quarto_project_3")
-// }
-
-// func TestCreateVersionDelayedFailure1(t *testing.T) {
-// 	testBadProjectTemplate(t, "bad_quarto_project_1")
-// }
-
-// func TestCreateVersionDelayedFailure2(t *testing.T) {
-// 	testBadProjectTemplate(t, "bad_quarto_project_2")
-// }
-
-// func TestCreateVersionDelayedFailure3(t *testing.T) {
-// 	testBadProjectTemplate(t, "bad_quarto_project_3")
-// }
-
-// func TestCreateVersionDelayedFailure4(t *testing.T) {
-// 	testBadProjectTemplate(t, "bad_quarto_project_4")
-// }
-
-// func TestCreateVersionDelayedFailure5(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	file := &multipart.FileHeader{}
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(gomock.Any()).Times(1)
-// 	mockFilesystem.EXPECT().SaveRepository(c, file).Return(nil).Times(1)
-// 	mockFilesystem.EXPECT().Unzip().Return(errors.New("err")).Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", "bad_quarto_project_1")).AnyTimes()
-// 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
-// 	mockFilesystem.EXPECT().RenderExists().Times(0)
-// 	mockFilesystem.EXPECT().RemoveRepository().Times(1)
-
-// 	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending}).Times(1)
-// 	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Failure}).Times(1)
-
-// 	version, err := versionService.CreateVersion(c, file)
-
-// 	assert.Nil(t, err)
-
-// 	assert.Equal(t, models.Pending, version.RenderStatus)
-
-// 	// Wait until model has completed rendering
-// 	for version.RenderStatus == models.Pending {
-// 		print()
-// 	}
-// 	assert.Equal(t, models.Failure, version.RenderStatus)
-// }
-
-// func TestCreateVersionDelayedFailure6(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	file := &multipart.FileHeader{}
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(gomock.Any()).Times(1)
-// 	mockFilesystem.EXPECT().SaveRepository(c, file).Return(nil).Times(1)
-// 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", "good_quarto_project_1")).AnyTimes()
-// 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
-// 	mockFilesystem.EXPECT().RenderExists().Return(false, "").Times(1)
-// 	mockFilesystem.EXPECT().RemoveRepository().Times(0)
-
-// 	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending})
-// 	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Failure}).Times(1)
-
-// 	version, err := versionService.CreateVersion(c, file)
-
-// 	assert.Nil(t, err)
-
-// 	assert.Equal(t, models.Pending, version.RenderStatus)
-
-// 	// Wait until model has completed rendering
-// 	for version.RenderStatus == models.Pending {
-// 		print()
-// 	}
-// 	assert.Equal(t, models.Failure, version.RenderStatus)
-
-// 	renderDirPath := filepath.Join(cwd, "render", "quarto_project.html")
-// 	assert.Equal(t, false, utils.FileExists(renderDirPath))
-// }
-
-// func TestCreateVersionImmediateFailure(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	file := &multipart.FileHeader{}
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(gomock.Any()).Times(1)
-// 	mockFilesystem.EXPECT().SaveRepository(c, file).Return(errors.New("")).Times(1)
-// 	mockFilesystem.EXPECT().RemoveRepository().Return(nil).Times(1)
-// 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(0)
-
-// 	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending})
-// 	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Failure}).Times(1)
-
-// 	_, err := versionService.CreateVersion(c, file)
-
-// 	assert.NotNil(t, err)
-
-// 	renderDirPath := filepath.Join(cwd, "render")
-// 	_, err = os.Stat(renderDirPath)
-// 	assert.NotNil(t, err)
-// }
-
-// func testGoodProjectTemplate(t *testing.T, dirName string) {
-// 	t.Helper()
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	file := &multipart.FileHeader{}
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(gomock.Any()).Times(1)
-// 	mockFilesystem.EXPECT().SaveRepository(c, file).Return(nil).Times(1)
-// 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
-// 	mockFilesystem.EXPECT().RenderExists().Return(true, "").Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", dirName)).AnyTimes()
-// 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
-// 	mockFilesystem.EXPECT().RemoveRepository().Times(0)
-
-// 	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending}).Times(1)
-// 	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Success}).Times(1)
-
-// 	version, err := versionService.CreateVersion(c, file)
-
-// 	assert.Nil(t, err)
-// 	assert.Equal(t, models.Pending, version.RenderStatus)
-
-// 	// Wait until model has completed rendering
-// 	for version.RenderStatus == models.Pending {
-// 		print()
-// 	}
-// 	assert.Equal(t, models.Success, version.RenderStatus)
-
-// 	renderDirPath := filepath.Join(cwd, "render")
-// 	_, err = os.Stat(renderDirPath)
-// 	assert.Nil(t, err)
-// }
-
-// func testBadProjectTemplate(t *testing.T, dirName string) {
-// 	t.Helper()
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	file := &multipart.FileHeader{}
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(gomock.Any()).Times(1)
-// 	mockFilesystem.EXPECT().SaveRepository(c, file).Return(nil).Times(1)
-// 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", dirName)).AnyTimes()
-// 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
-// 	mockFilesystem.EXPECT().RenderExists().Times(0)
-// 	mockFilesystem.EXPECT().RemoveRepository().Times(1)
-
-// 	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending})
-// 	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Failure}).Times(1)
-
-// 	version, err := versionService.CreateVersion(c, file)
-
-// 	assert.Nil(t, err)
-
-// 	assert.Equal(t, models.Pending, version.RenderStatus)
-
-// 	// Wait until model has completed rendering
-// 	for version.RenderStatus == models.Pending {
-// 		print()
-// 	}
-// 	assert.Equal(t, models.Failure, version.RenderStatus)
-
-// 	renderDirPath := filepath.Join(cwd, "render", "quarto_project.html")
-// 	assert.Equal(t, false, utils.FileExists(renderDirPath))
-// }
-
-// func TestGetRenderFileSuccess(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	renderDirPath := filepath.Join(cwd, "..", "utils", "test_files", "good_repository_setup", "render")
-// 	renderFilePath := filepath.Join(cwd, "..", "utils", "test_files", "good_repository_setup", "render", "test.html")
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
-// 	mockFilesystem.EXPECT().RenderExists().Return(true, "test.html").Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(renderDirPath).Times(1)
-
-// 	mockVersionRepository.EXPECT().GetByID(successVersion.ID).Return(&successVersion, nil).Times(1)
-// 	mockVersionRepository.EXPECT().Update(gomock.Any()).Times(0)
-
-// 	returnedPath, err202, err404 := versionService.GetRenderFile(successVersion.ID)
-
-// 	assert.Nil(t, err202)
-// 	assert.Nil(t, err404)
-// 	assert.Equal(t, renderFilePath, returnedPath)
-// }
-
-// func TestGetRenderFileFailure1(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(pendingVersion.ID).Times(0)
-// 	mockFilesystem.EXPECT().RenderExists().Times(0)
-// 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("").Times(0)
-
-// 	mockVersionRepository.EXPECT().GetByID(pendingVersion.ID).Return(&pendingVersion, nil).Times(1)
-// 	mockVersionRepository.EXPECT().Update(gomock.Any()).Times(0)
-
-// 	_, err202, err404 := versionService.GetRenderFile(pendingVersion.ID)
-
-// 	assert.NotNil(t, err202)
-// 	assert.Nil(t, err404)
-// }
-
-// func TestGetRenderFileFailure2(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(failureVersion.ID).Times(0)
-// 	mockFilesystem.EXPECT().RenderExists().Times(0)
-// 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("").Times(0)
-
-// 	mockVersionRepository.EXPECT().GetByID(failureVersion.ID).Return(&failureVersion, nil).Times(1)
-// 	mockVersionRepository.EXPECT().Update(gomock.Any()).Times(0)
-
-// 	_, err202, err404 := versionService.GetRenderFile(failureVersion.ID)
-
-// 	assert.Nil(t, err202)
-// 	assert.NotNil(t, err404)
-// }
-
-// func TestGetRenderFileFailure3(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
-// 	mockFilesystem.EXPECT().RenderExists().Return(false, "").Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("test").Times(0)
-
-// 	mockVersionRepository.EXPECT().GetByID(successVersion.ID).Return(&successVersion, nil).Times(1)
-// 	mockVersionRepository.EXPECT().Update(&successVersion).Times(1)
-
-// 	_, err202, err404 := versionService.GetRenderFile(successVersion.ID)
-
-// 	assert.Nil(t, err202)
-// 	assert.NotNil(t, err404)
-// }
-
-// func TestGetTreeFromRepositorySuccess(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return("../utils/test_files/file_tree").Times(1)
-// 	mockFilesystem.EXPECT().GetFileTree().Return(map[string]int64{"child_dir/test.txt": 0, "example.qmd": 0}, nil).Times(1)
-
-// 	tree, err404, err500 := versionService.GetTreeFromRepository(successVersion.ID)
-
-// 	assert.Nil(t, err404)
-// 	assert.Nil(t, err500)
-// 	assert.Equal(t, map[string]int64{"child_dir/test.txt": 0, "example.qmd": 0}, tree)
-// }
-
-// func TestGetTreeFromRepositoryFailure1(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return("doesntexist").Times(1)
-// 	mockFilesystem.EXPECT().GetFileTree().Return(map[string]int64{"child_dir/test.txt": 0, "example.qmd": 0}, nil).Times(0)
-
-// 	_, err404, err500 := versionService.GetTreeFromRepository(successVersion.ID)
-
-// 	assert.NotNil(t, err404)
-// 	assert.Nil(t, err500)
-// }
-
-// func TestGetTreeFromRepositoryFailure2(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return("../utils/test_files/file_tree").Times(1)
-// 	mockFilesystem.EXPECT().GetFileTree().Return(nil, errors.New("err")).Times(1)
-
-// 	_, err404, err500 := versionService.GetTreeFromRepository(successVersion.ID)
-
-// 	assert.Nil(t, err404)
-// 	assert.NotNil(t, err500)
-// }
-
-// func TestGetRepositoryFileSuccess(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentZipFilePath().Return("../utils/test_files/good_repository_setup/quarto_project.zip").Times(2)
-
-// 	path, err := versionService.GetRepositoryFile(successVersion.ID)
-
-// 	assert.Nil(t, err)
-// 	assert.Equal(t, filepath.Join(cwd, "..", "utils", "test_files", "good_repository_setup", "quarto_project.zip"), path)
-// }
-
-// func TestGetRepositoryFileFailure(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentZipFilePath().Return("doesntexist").Times(1)
-
-// 	_, err := versionService.GetRepositoryFile(successVersion.ID)
-
-// 	assert.NotNil(t, err)
-// }
-
-// func TestGetFileFromRepositorySuccess(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", "file_tree")).Times(1)
-
-// 	absFilepath, err := versionService.GetFileFromRepository(successVersion.ID, "/child_dir/test.txt")
-
-// 	assert.Nil(t, err)
-// 	assert.Equal(t, filepath.Join(cwd, "..", "utils", "test_files", "file_tree", "child_dir", "test.txt"), absFilepath)
-// }
-
-// func TestGetFileFromRepositoryFailure1(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", "file_tree")).Times(1)
-
-// 	_, err := versionService.GetFileFromRepository(successVersion.ID, "../../../.env")
-
-// 	assert.NotNil(t, err)
-// }
-
-// func TestGetFileFromRepositoryFailure2(t *testing.T) {
-// 	beforeEach(t)
-// 	defer cleanup(t)
-
-// 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
-// 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(filepath.Join(cwd, "..", "utils", "test_files", "file_tree")).Times(1)
-
-// 	_, err := versionService.GetFileFromRepository(successVersion.ID, "testingbadpath")
-
-// 	assert.NotNil(t, err)
-// }
+func testGetMemberUnsuccessful(t *testing.T, id uint) {
+	id = 5
+	expectedErr := fmt.Errorf("error")
+	// mock member repository here to return member when get by id called
+	mockMemberRepository.EXPECT().GetByID(id).Return(nil, expectedErr)
+
+	// call service method
+	member, err := memberService.GetMember(id)
+	// assert member was returned correctly
+	assert.NotEqual(t, exampleMember, member)
+	// assert there was no error
+	assert.Equal(t, expectedErr, err)
+}
+
+func TestCreateUserSuccessful(t *testing.T) {    
+	// set up repository mock to create members correctly
+	mockMemberRepository.EXPECT().Create(exampleMember).Return(exampleMember, nil)
+
+	// set up a member creation form
+	memberForm := forms.MemberCreationForm {
+		FirstName:		"John",
+		LastName:		"Smith",
+		Email:			"john.smith@gmail.com",
+		Password:		"password",
+		Institution:	"TU Delft",
+	}
+
+	// manually set up the member tags
+	tags := []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2}
+
+	// call service method under test
+	member, err := memberService.CreateMember(&memberForm, tags)
+
+    // verify that the member object was created correctly
+	assert.Equal(t, exampleMember, member)
+	// verify that there was no error
+	assert.Nil(t, err)
+}
+
+func TestCreateUserUnsuccessful(t *testing.T) {
+    expectedErr := fmt.Errorf("error")
+
+	// set up repository mock to create members correctly
+	mockMemberRepository.EXPECT().Create(exampleMember).Return(nil, expectedErr)
+
+	// set up a member creation form
+	memberForm := forms.MemberCreationForm {
+		FirstName:		"John",
+		LastName:		"Smith",
+		Email:			"john.smith@gmail.com",
+		Password:		"password",
+		Institution:	"TU Delft",
+	}
+
+	// manually set up the member tags
+	tags := []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2}
+
+	// call service method under test
+	member, err := memberService.CreateMember(&memberForm, tags)
+
+    // verify that the member object was not created
+	assert.Nil(t, member)
+	// verify the error was returned correctly
+	assert.Equal(t, expectedErr, err)
+}
