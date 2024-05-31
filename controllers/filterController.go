@@ -9,7 +9,7 @@ type FilterController struct {
 
 // FilterPosts godoc
 // @Summary 	Filters all posts
-// @Description Returns all posts that meet the requirements in the form
+// @Description Returns all post IDs that meet the requirements in the form
 // @Description Endpoint is offset-paginated
 // @Tags 		filtering
 // @Accept  	json
@@ -28,7 +28,7 @@ func (filterController *FilterController) FilterPosts(_ *gin.Context) {
 
 // FilterProjectPosts godoc
 // @Summary 	Filters all project posts
-// @Description Returns all project posts that meet the requirements in the form
+// @Description Returns all project post IDs that meet the requirements in the form
 // @Description Endpoint is offset-paginated
 // @Tags 		filtering
 // @Accept  	json

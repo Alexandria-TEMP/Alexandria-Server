@@ -49,6 +49,8 @@ definitions:
         type: integer
       updatedCompletionStatus:
         $ref: '#/definitions/tags.CompletionStatus'
+      updatedFeedbackPreferences:
+        $ref: '#/definitions/tags.FeedbackPreference'
       updatedPostTitle:
         description: Changes made by the MR
         type: string
@@ -566,7 +568,7 @@ paths:
       consumes:
       - application/json
       description: |-
-        Returns all posts that meet the requirements in the form
+        Returns all post IDs that meet the requirements in the form
         Endpoint is offset-paginated
       parameters:
       - description: Filter form
@@ -612,7 +614,7 @@ paths:
       consumes:
       - application/json
       description: |-
-        Returns all project posts that meet the requirements in the form
+        Returns all project post IDs that meet the requirements in the form
         Endpoint is offset-paginated
       parameters:
       - description: Filter form

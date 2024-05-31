@@ -327,7 +327,7 @@ const docTemplate = `{
         },
         "/filter/posts": {
             "get": {
-                "description": "Returns all posts that meet the requirements in the form\nEndpoint is offset-paginated",
+                "description": "Returns all post IDs that meet the requirements in the form\nEndpoint is offset-paginated",
                 "consumes": [
                     "application/json"
                 ],
@@ -394,7 +394,7 @@ const docTemplate = `{
         },
         "/filter/project-posts": {
             "get": {
-                "description": "Returns all project posts that meet the requirements in the form\nEndpoint is offset-paginated",
+                "description": "Returns all project post IDs that meet the requirements in the form\nEndpoint is offset-paginated",
                 "consumes": [
                     "application/json"
                 ],
@@ -2716,6 +2716,9 @@ const docTemplate = `{
                 },
                 "updatedCompletionStatus": {
                     "$ref": "#/definitions/tags.CompletionStatus"
+                },
+                "updatedFeedbackPreferences": {
+                    "$ref": "#/definitions/tags.FeedbackPreference"
                 },
                 "updatedPostTitle": {
                     "description": "Changes made by the MR",
