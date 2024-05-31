@@ -167,12 +167,9 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // GetProjectPostDiscussions godoc
 // @Summary Returns all discussion IDs associated with the project post
 // @Description Returns all discussion IDs on this project post over all its previous versions, instead of only the current version
-// @Description Endpoint is offset-paginated
 // @Tags 		project-posts
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
@@ -180,5 +177,5 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/project-posts/{postID}/all-discussions 	[get]
 func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ *gin.Context) {
-
+	// TODO implement
 }

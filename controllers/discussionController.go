@@ -77,12 +77,9 @@ func (discussionController *DiscussionController) AddDiscussionReport(_ *gin.Con
 // GetDiscussionReports godoc
 // @Summary		Get all reports of this discussion
 // @Description	Get all reports that have been added to this discussion
-// @Description Endpoint is offset-paginated
 // @Tags 		discussions
 // @Accept 		json
 // @Param		discussionID		path		string			true	"Discussion ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
@@ -90,7 +87,7 @@ func (discussionController *DiscussionController) AddDiscussionReport(_ *gin.Con
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/discussions/{discussionID}/reports 		[get]
 func (discussionController *DiscussionController) GetDiscussionReports(_ *gin.Context) {
-	//TODO: make paginated
+	// TODO implement
 }
 
 // GetDiscussionReport godoc

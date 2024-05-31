@@ -183,12 +183,9 @@ func (postController *PostController) AddPostReport(_ *gin.Context) {
 // GetPostReports godoc
 // @Summary		Get all reports of this post
 // @Description	Get all reports that have been added to this post
-// @Description Endpoint is offset-paginated
 // @Tags 		posts
 // @Accept 		json
 // @Param		postID		path		string			true	"Post ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
@@ -196,7 +193,7 @@ func (postController *PostController) AddPostReport(_ *gin.Context) {
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/posts/{postID}/reports 		[get]
 func (postController *PostController) GetPostReports(_ *gin.Context) {
-	// TODO: make paginated
+	// TODO implement
 }
 
 // GetCollaborator godoc

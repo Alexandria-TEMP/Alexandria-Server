@@ -150,12 +150,9 @@ func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 // GetMemberPosts godoc
 // @Summary		Get all posts of this member
 // @Description	Get all posts that this member is a collaborator of
-// @Description Endpoint is offset-paginated
 // @Tags 		members
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
@@ -165,18 +162,15 @@ func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 	// return all the posts
 	// that this member is a collaborator/author of
-	// TODO: make endpoint paginated
+	// TODO implement
 }
 
 // GetMemberProjectPosts godoc
 // @Summary		Get all project posts of this member
 // @Description	Get all project posts that this member is a collaborator of
-// @Description Endpoint is offset-paginated
 // @Tags 		members
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
@@ -186,18 +180,15 @@ func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) {
 	// return all the project posts
 	// that this member is a collaborator/author of
-	// TODO: make endpoint paginated
+	// TODO implement
 }
 
 // GetMemberMergeRequests godoc
 // @Summary		Get all merge requests of this member
 // @Description	Get all merge requests that this member is a collaborator of
-// @Description Endpoint is offset-paginated
 // @Tags 		members
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
@@ -207,18 +198,15 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 func (memberController *MemberController) GetMemberMergeRequests(_ *gin.Context) {
 	// return all the merge requests
 	// that this member is a collaborator/author of
-	// TODO: make endpoint paginated
+	// TODO implement
 }
 
 // GetMemberDiscussions godoc
 // @Summary		Get all discussions
 // @Description	Get all discussions that this member has participated in
-// @Description Endpoint is offset-paginated
 // @Tags 		members
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
@@ -227,7 +215,7 @@ func (memberController *MemberController) GetMemberMergeRequests(_ *gin.Context)
 // @Router 		/members/{userID}/discussions		[get]
 func (memberController *MemberController) GetMemberDiscussions(_ *gin.Context) {
 	// returns all the discussions this member is a part of
-	// TODO: make paginated
+	// TODO implement
 }
 
 // AddMemberSavedPost godoc
@@ -265,12 +253,9 @@ func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Conte
 // GetMemberSavedPosts godoc
 // @Summary		Get all saved posts of this member
 // @Description	Get all posts that this member has saved
-// @Description Endpoint is offset-paginated
 // @Tags 		members
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
@@ -279,18 +264,15 @@ func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Conte
 // @Router 		/members/{userID}/saved-posts 		[get]
 func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
 	// return all saved posts of this member
-	// TODO: make endpoint paginated
+	// TODO implement
 }
 
 // GetMemberProjectPosts godoc
 // @Summary		Get all saved project posts of this member
 // @Description	Get all project posts that this member has saved
-// @Description Endpoint is offset-paginated
 // @Tags 		members
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
@@ -299,5 +281,5 @@ func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
 // @Router 		/members/{userID}/saved-project-posts 		[get]
 func (memberController *MemberController) GetMemberSavedProjectPosts(_ *gin.Context) {
 	// return all the project posts that this member has saved
-	// TODO: make endpoint paginated
+	// TODO implement
 }

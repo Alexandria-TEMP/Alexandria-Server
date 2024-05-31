@@ -138,16 +138,6 @@ func (mergeRequestController *MergeRequestController) UserCanReview(_ *gin.Conte
 
 }
 
-// - `/merge-requests`
-//   - `POST`
-//   - `PUT` (?)
-//   - `/:id` `GET`
-//   - `/:id` `DELETE`
-//   - `/:id/reviews` `GET` (gets acceptance status of all reviews)
-//   - `/:id/reviews/:id` `GET` (gets specific review)
-//   - `/:id/reviews` `POST` (does the merge - make sure to refresh page)
-//   - `/:id/reviews/can-review` `GET` (utility endpoint for front-end - allowed to review?)
-
 // GetCollaborator godoc
 // @Summary 	Get a merge request collaborator by ID
 // @Description	Get a merge request collaborator by ID, a member who has collaborated on a merge request

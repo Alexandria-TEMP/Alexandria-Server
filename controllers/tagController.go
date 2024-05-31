@@ -13,6 +13,7 @@ type TagController struct {
 // @Tags 		tags
 // @Produce		json
 // @Success 	200		{array}		tags.ScientificFieldTag
+// @Failure		400 	{object}	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/tags/scientific	[get]
 func (tagController *TagController) GetScientificTags(_ *gin.Context) {
@@ -24,8 +25,9 @@ func (tagController *TagController) GetScientificTags(_ *gin.Context) {
 // @Description Returns every possible completion status that a Post can have
 // @Tags		tags
 // @Produce		json
-// @Success		200		{array}			tags.CompletionStatus
-// @Failure		500		{object}		utils.HTTPError
+// @Success		200		{array}		tags.CompletionStatus
+// @Failure		400 	{object}	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
 // @Router		/tags/completion-status	[get]
 func (tagController *TagController) GetCompletionStatusTags(_ *gin.Context) {
 	// TODO implement
