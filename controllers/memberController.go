@@ -32,7 +32,6 @@ type MemberController struct {
 // @Failure		500			{object}	utils.HTTPError
 // @Router 		/members/{userID}	[get]
 func (memberController *MemberController) GetMember(c *gin.Context) {
-
 	// extract the id of the member
 	userIDStr := c.Param("userID")
 	initUserID, err := strconv.ParseUint(userIDStr, 10, 64)
@@ -45,7 +44,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 		return
 	}
 	
-	//cast user ID as uint instead of uint64, because database only accepts those
+	// cast user ID as uint instead of uint64, because database only accepts those
 	userID := uint(initUserID)
 
 	// get the user through the service
@@ -54,7 +53,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 	// if there was an error, print it and return status 404: not found
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("Cannot get member because no user with this ID exists, id=%d", userID))
+		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("cannot get member because no user with this ID exists, id=%d", userID))
 
 		return
 	}
@@ -89,9 +88,9 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 		return
 	}
 
-	//get array of strings, create array of tags
+	// get array of strings, create array of tags
 	tagIDs := form.ScientificFieldTagIDs
-	//call the method from the tag service
+	// call the method from the tag service
 	tags, err := memberController.TagService.GetTagsFromIDs(tagIDs)
 
 	// check for errors in the tags
@@ -109,7 +108,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	// if the member service throws an error, return a 400 Bad request status
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("A member with this id already exists"))
+		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("a member with this id already exists"))
 
 		return
 	}

@@ -7,7 +7,7 @@ import (
 	docs "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/docs"
 )
 
-func SetUpRouter(controllers ControllerEnv) *gin.Engine {
+func SetUpRouter(controllers *ControllerEnv) *gin.Engine {
 	// Get router
 	router := gin.Default()
 	err := router.SetTrustedProxies(nil)
@@ -67,7 +67,7 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	return router
 }
 
-func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+func memberRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	memberRouter := v2.Group("/members")
 	memberRouter.GET("/:userID", controllers.memberController.GetMember)
 	memberRouter.POST("/", controllers.memberController.CreateMember)
@@ -83,7 +83,7 @@ func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	memberRouter.GET("/:userID/saved-project-posts", controllers.memberController.GetMemberSavedProjectPosts)
 }
 
-func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+func projectPostRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	projectPostRouter := v2.Group("/project-posts")
 	projectPostRouter.GET("/:postID", controllers.projectPostController.GetProjectPost)
 	projectPostRouter.POST("/", controllers.projectPostController.CreateProjectPost)
@@ -95,7 +95,7 @@ func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	projectPostRouter.GET("/:postID/closed-merge-requests", controllers.projectPostController.GetProjectPostClosedMergeRequests)
 }
 
-func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+func postRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	postRouter := v2.Group("/posts")
 	postRouter.GET("/:postID", controllers.postController.GetPost)
 	postRouter.POST("/", controllers.postController.CreatePost)

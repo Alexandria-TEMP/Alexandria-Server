@@ -85,7 +85,7 @@ func Init() {
 	serviceEnv := initServiceEnv(repositoryEnv, fs)
 	controllerEnv := initControllerEnv(&serviceEnv)
 
-	router := SetUpRouter(controllerEnv)
+	router := SetUpRouter(&controllerEnv)
 	err = router.Run(":8080")
 
 	if err != nil {
