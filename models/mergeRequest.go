@@ -8,12 +8,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type MergeRequestDecision string
+type MergeRequestReviewStatus string
 
 const (
-	MergeRequestOpenForReview MergeRequestDecision = "open for review"
-	MergeRequestPeerReviewed  MergeRequestDecision = "peer reviewed"
-	MergeRequestRejected      MergeRequestDecision = "rejected"
+	MergeRequestOpenForReview MergeRequestReviewStatus = "open for review"
+	MergeRequestPeerReviewed  MergeRequestReviewStatus = "peer reviewed"
+	MergeRequestRejected      MergeRequestReviewStatus = "rejected"
 )
 
 type MergeRequest struct {
@@ -49,7 +49,7 @@ type MergeRequest struct {
 
 	MergeRequestTitle    string
 	Anonymous            bool
-	MergeRequestDecision MergeRequestDecision
+	MergeRequestDecision MergeRequestReviewStatus
 }
 
 type MergeRequestDTO struct {
@@ -66,7 +66,7 @@ type MergeRequestDTO struct {
 	PreviousVersionID    uint
 	MergeRequestTitle    string
 	Anonymous            bool
-	MergeRequestDecision MergeRequestDecision
+	MergeRequestDecision MergeRequestReviewStatus
 	CreatedAt            time.Time
 	UpdatedAt            time.Time
 }
