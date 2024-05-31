@@ -9,7 +9,8 @@ type TagService struct {
 
 func (tagService *TagService) GetTagsFromIDs(_ []string) ([]*tags.ScientificFieldTag, error) {
 	tagPointers := []*tags.ScientificFieldTag{}
+
 	var err error
-	err = nil
+
 	return tagPointers, err
 }

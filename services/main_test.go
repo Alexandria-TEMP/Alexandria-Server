@@ -21,7 +21,6 @@ var (
 	cwd            string
 
 	memberService        MemberService
-	mockTagService       *mocks.MockTagService
 	exampleMember        models.Member
 	exampleSTag1         *tags.ScientificFieldTag
 	exampleSTag2         *tags.ScientificFieldTag
