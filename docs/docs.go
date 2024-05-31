@@ -217,7 +217,7 @@ const docTemplate = `{
         },
         "/discussions/{discussionID}/reports": {
             "get": {
-                "description": "Get all reports that have been added to this discussion\nEndpoint is offset-paginated",
+                "description": "Get all reports that have been added to this discussion",
                 "consumes": [
                     "application/json"
                 ],
@@ -235,18 +235,6 @@ const docTemplate = `{
                         "name": "discussionID",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -661,7 +649,7 @@ const docTemplate = `{
         },
         "/members/{userID}/discussions": {
             "get": {
-                "description": "Get all discussions that this member has participated in\nEndpoint is offset-paginated",
+                "description": "Get all discussions that this member has participated in",
                 "consumes": [
                     "application/json"
                 ],
@@ -679,18 +667,6 @@ const docTemplate = `{
                         "name": "userID",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -726,7 +702,7 @@ const docTemplate = `{
         },
         "/members/{userID}/merge-requests": {
             "get": {
-                "description": "Get all merge requests that this member is a collaborator of\nEndpoint is offset-paginated",
+                "description": "Get all merge requests that this member is a collaborator of",
                 "consumes": [
                     "application/json"
                 ],
@@ -744,18 +720,6 @@ const docTemplate = `{
                         "name": "userID",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -791,7 +755,7 @@ const docTemplate = `{
         },
         "/members/{userID}/posts": {
             "get": {
-                "description": "Get all posts that this member is a collaborator of\nEndpoint is offset-paginated",
+                "description": "Get all posts that this member is a collaborator of",
                 "consumes": [
                     "application/json"
                 ],
@@ -809,18 +773,6 @@ const docTemplate = `{
                         "name": "userID",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -856,7 +808,7 @@ const docTemplate = `{
         },
         "/members/{userID}/project-posts": {
             "get": {
-                "description": "Get all project posts that this member is a collaborator of\nEndpoint is offset-paginated",
+                "description": "Get all project posts that this member is a collaborator of",
                 "consumes": [
                     "application/json"
                 ],
@@ -874,18 +826,6 @@ const docTemplate = `{
                         "name": "userID",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -921,7 +861,7 @@ const docTemplate = `{
         },
         "/members/{userID}/saved-posts": {
             "get": {
-                "description": "Get all posts that this member has saved\nEndpoint is offset-paginated",
+                "description": "Get all posts that this member has saved",
                 "consumes": [
                     "application/json"
                 ],
@@ -939,18 +879,6 @@ const docTemplate = `{
                         "name": "userID",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1034,7 +962,7 @@ const docTemplate = `{
         },
         "/members/{userID}/saved-project-posts": {
             "get": {
-                "description": "Get all project posts that this member has saved\nEndpoint is offset-paginated",
+                "description": "Get all project posts that this member has saved",
                 "consumes": [
                     "application/json"
                 ],
@@ -1052,18 +980,6 @@ const docTemplate = `{
                         "name": "userID",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1945,7 +1861,7 @@ const docTemplate = `{
         },
         "/posts/{postID}/reports": {
             "get": {
-                "description": "Get all reports that have been added to this post\nEndpoint is offset-paginated",
+                "description": "Get all reports that have been added to this post",
                 "consumes": [
                     "application/json"
                 ],
@@ -1963,18 +1879,6 @@ const docTemplate = `{
                         "name": "postID",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2314,7 +2218,7 @@ const docTemplate = `{
         },
         "/project-posts/{postID}/all-discussions": {
             "get": {
-                "description": "Returns all discussion IDs on this project post over all its previous versions, instead of only the current version\nEndpoint is offset-paginated",
+                "description": "Returns all discussion IDs on this project post over all its previous versions, instead of only the current version",
                 "consumes": [
                     "application/json"
                 ],
@@ -2332,18 +2236,6 @@ const docTemplate = `{
                         "name": "postID",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2397,6 +2289,12 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -2424,6 +2322,12 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/tags.ScientificFieldTag"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
                         }
                     },
                     "500": {

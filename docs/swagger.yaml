@@ -453,23 +453,13 @@ paths:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all reports that have been added to this discussion
-        Endpoint is offset-paginated
+      description: Get all reports that have been added to this discussion
       parameters:
       - description: Discussion ID
         in: path
         name: discussionID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -783,23 +773,13 @@ paths:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all discussions that this member has participated in
-        Endpoint is offset-paginated
+      description: Get all discussions that this member has participated in
       parameters:
       - description: user ID
         in: path
         name: userID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -828,23 +808,13 @@ paths:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all merge requests that this member is a collaborator of
-        Endpoint is offset-paginated
+      description: Get all merge requests that this member is a collaborator of
       parameters:
       - description: user ID
         in: path
         name: userID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -873,23 +843,13 @@ paths:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all posts that this member is a collaborator of
-        Endpoint is offset-paginated
+      description: Get all posts that this member is a collaborator of
       parameters:
       - description: user ID
         in: path
         name: userID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -918,23 +878,13 @@ paths:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all project posts that this member is a collaborator of
-        Endpoint is offset-paginated
+      description: Get all project posts that this member is a collaborator of
       parameters:
       - description: user ID
         in: path
         name: userID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -963,23 +913,13 @@ paths:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all posts that this member has saved
-        Endpoint is offset-paginated
+      description: Get all posts that this member has saved
       parameters:
       - description: user ID
         in: path
         name: userID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -1040,23 +980,13 @@ paths:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all project posts that this member has saved
-        Endpoint is offset-paginated
+      description: Get all project posts that this member has saved
       parameters:
       - description: user ID
         in: path
         name: userID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -1547,23 +1477,13 @@ paths:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all reports that have been added to this post
-        Endpoint is offset-paginated
+      description: Get all reports that have been added to this post
       parameters:
       - description: Post ID
         in: path
         name: postID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -1861,23 +1781,14 @@ paths:
     get:
       consumes:
       - application/json
-      description: |-
-        Returns all discussion IDs on this project post over all its previous versions, instead of only the current version
-        Endpoint is offset-paginated
+      description: Returns all discussion IDs on this project post over all its previous
+        versions, instead of only the current version
       parameters:
       - description: post ID
         in: path
         name: postID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -1956,6 +1867,10 @@ paths:
             items:
               $ref: '#/definitions/tags.CompletionStatus'
             type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
           schema:
@@ -1975,6 +1890,10 @@ paths:
             items:
               $ref: '#/definitions/tags.ScientificFieldTag'
             type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
           schema:

@@ -7,6 +7,7 @@ type PostCreationForm struct {
 
 	AuthorMemberIDs     []uint // Members that are authors of the post
 	Title               string
+	Anonymous           bool
 	PostType            tags.PostType
 	ScientificFieldTags []tags.ScientificField
 }
