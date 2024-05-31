@@ -766,7 +766,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.DiscussionDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
@@ -811,7 +811,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.MergeRequestDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
@@ -856,7 +856,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.PostDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
@@ -901,7 +901,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ProjectPostDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
@@ -946,7 +946,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.PostDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
@@ -1023,7 +1023,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ProjectPostDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
@@ -1238,7 +1238,7 @@ paths:
       summary: Returns whether the user is allowed to review this merge request
       tags:
       - merge-requests
-  /merge-requests/{mergeRequestID}/reviews:
+  /merge-requests/{mergeRequestID}/review-statuses:
     get:
       consumes:
       - application/json
@@ -1274,6 +1274,7 @@ paths:
       summary: Returns status of all merge request reviews
       tags:
       - merge-requests
+  /merge-requests/{mergeRequestID}/reviews:
     post:
       consumes:
       - application/json

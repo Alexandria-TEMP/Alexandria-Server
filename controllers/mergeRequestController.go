@@ -82,7 +82,7 @@ func (mergeRequestController *MergeRequestController) DeleteMergeRequest(_ *gin.
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/merge-requests/{mergeRequestID}/reviews		[get]
+// @Router 		/merge-requests/{mergeRequestID}/review-statuses		[get]
 func (mergeRequestController *MergeRequestController) GetReviewStatus(_ *gin.Context) {
 	// delete method goes here
 }

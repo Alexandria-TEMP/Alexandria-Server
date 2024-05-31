@@ -35,7 +35,7 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	mergeRequestRouter.POST("/", controllers.mergeRequestController.CreateMergeRequest)
 	mergeRequestRouter.PUT("/", controllers.mergeRequestController.UpdateMergeRequest)
 	mergeRequestRouter.DELETE("/:mergeRequestID", controllers.mergeRequestController.DeleteMergeRequest)
-	mergeRequestRouter.GET("/:mergeRequestID/reviews", controllers.mergeRequestController.GetReviewStatus)
+	mergeRequestRouter.GET("/:mergeRequestID/review-statuses", controllers.mergeRequestController.GetReviewStatus)
 	mergeRequestRouter.GET("/reviews/:reviewID", controllers.mergeRequestController.GetReview)
 	mergeRequestRouter.POST("/:mergeRequestID/reviews", controllers.mergeRequestController.CreateReview)
 	mergeRequestRouter.GET("/:mergeRequestID/can-review/:userID", controllers.mergeRequestController.UserCanReview)

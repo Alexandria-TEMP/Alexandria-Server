@@ -652,7 +652,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.DiscussionDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -717,7 +717,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.MergeRequestDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -782,7 +782,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.PostDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -847,7 +847,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ProjectPostDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -912,7 +912,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.PostDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -1025,7 +1025,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ProjectPostDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -1443,7 +1443,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests/{mergeRequestID}/reviews": {
+        "/merge-requests/{mergeRequestID}/review-statuses": {
             "get": {
                 "description": "Returns an array of the statuses of all the reviews of this merge request",
                 "consumes": [
@@ -1494,7 +1494,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/merge-requests/{mergeRequestID}/reviews": {
             "post": {
                 "description": "Adds a review to a merge request",
                 "consumes": [
