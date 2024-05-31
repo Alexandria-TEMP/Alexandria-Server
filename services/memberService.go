@@ -8,7 +8,7 @@ import (
 )
 
 type MemberService struct {
-	MemberRepository database.ModelRepository[*models.Member]
+	MemberRepository database.RepositoryInterface[*models.Member]
 }
 
 func (memberService *MemberService) GetMember(userID uint) (*models.Member, error) {
@@ -31,6 +31,9 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 	}
 
 	err := memberService.MemberRepository.Create(member)
+	if (err != nil) {
+		return nil, err
+	}
 
 	return member, err
 }

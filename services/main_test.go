@@ -25,7 +25,7 @@ var (
 	exampleMember 			models.Member
 	exampleSTag1			*tags.ScientificFieldTag
 	exampleSTag2			*tags.ScientificFieldTag
-	mockMemberRepository *mocks.MockRepositoryInterface[*models.Member]
+	mockMemberRepository 	*mocks.MockRepositoryInterface[*models.Member]
 )
 
 func TestMain(m *testing.M) {
