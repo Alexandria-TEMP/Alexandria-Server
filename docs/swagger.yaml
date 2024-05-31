@@ -1530,7 +1530,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ReportDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request

@@ -1889,7 +1889,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ReportDTO"
+                                "type": "integer"
                             }
                         }
                     },
