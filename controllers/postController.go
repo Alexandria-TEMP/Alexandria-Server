@@ -214,3 +214,18 @@ func (postController *PostController) GetPostReports(_ *gin.Context) {
 func (postController *PostController) GetPostCollaborator(_ *gin.Context) {
 	// TODO return collaborator by ID
 }
+
+// GetPostReport godoc
+// @Summary		Gets a post report by ID
+// @Description	Gets a post report by its ID
+// @Tags		posts
+// @Param		reportID	path	string	true	"Report ID"
+// @Produce		json
+// @Success		200		{object}	reports.PostReportDTO
+// @Failure		400		{object}	utils.HTTPError
+// @Failure		404		{object}	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router		/posts/reports/{reportID}				[get]
+func (postController *PostController) GetPostReport(_ *gin.Context) {
+	// TODO implement
+}

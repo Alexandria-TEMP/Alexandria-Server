@@ -279,6 +279,11 @@ definitions:
       discussionID:
         type: integer
     type: object
+  reports.PostReportDTO:
+    properties:
+      postID:
+        type: integer
+    type: object
   tags.CompletionStatus:
     enum:
     - idea
@@ -1695,6 +1700,37 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new post with the version imported from github
+      tags:
+      - posts
+  /posts/reports/{reportID}:
+    get:
+      description: Gets a post report by its ID
+      parameters:
+      - description: Report ID
+        in: path
+        name: reportID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/reports.PostReportDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Gets a post report by ID
       tags:
       - posts
   /project-posts:

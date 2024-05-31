@@ -1801,6 +1801,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/posts/reports/{reportID}": {
+            "get": {
+                "description": "Gets a post report by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Gets a post report by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Report ID",
+                        "name": "reportID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/reports.PostReportDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/posts/{postID}": {
             "get": {
                 "description": "Get a post by post ID",
@@ -3107,6 +3154,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "discussionID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "reports.PostReportDTO": {
+            "type": "object",
+            "properties": {
+                "postID": {
                     "type": "integer"
                 }
             }
