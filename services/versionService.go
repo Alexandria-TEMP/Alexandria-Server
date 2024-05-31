@@ -27,7 +27,7 @@ type VersionService struct {
 // TODO: persist data
 func (versionService *VersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (*models.Version, error) {
 	version := models.Version{
-		RenderStatus: models.Pending,
+		RenderStatus: models.RenderPending,
 	}
 	versionID := version.ID
 
@@ -46,7 +46,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 	go func() {
 		// Unzip saved file
 		if err := versionService.Filesystem.Unzip(); err != nil {
-			version.RenderStatus = models.Failure
+			version.RenderStatus = models.RenderFailure
 			_ = versionService.Filesystem.RemoveRepository()
 
 			return
@@ -54,7 +54,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 
 		// Validate project
 		if valid := versionService.IsValidProject(); !valid {
-			version.RenderStatus = models.Failure
+			version.RenderStatus = models.RenderFailure
 			_ = versionService.Filesystem.RemoveRepository()
 
 			return
@@ -62,7 +62,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 
 		// Install dependencies
 		if err := versionService.InstallRenderDependencies(); err != nil {
-			version.RenderStatus = models.Failure
+			version.RenderStatus = models.RenderFailure
 			_ = versionService.Filesystem.RemoveRepository()
 
 			return
@@ -70,7 +70,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 
 		// Render quarto project
 		if err := versionService.RenderProject(); err != nil {
-			version.RenderStatus = models.Failure
+			version.RenderStatus = models.RenderFailure
 			_ = versionService.Filesystem.RemoveRepository()
 
 			return
@@ -78,19 +78,19 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 
 		// Verify that a render was produced in the form of a single file
 		if numFiles := versionService.Filesystem.CountRenderFiles(); numFiles != 1 {
-			version.RenderStatus = models.Failure
+			version.RenderStatus = models.RenderFailure
 			_ = versionService.Filesystem.RemoveRepository()
 		}
 
 		// Remove unzipped project file
 		if err := versionService.Filesystem.RemoveProjectDirectory(); err != nil {
-			version.RenderStatus = models.Failure
+			version.RenderStatus = models.RenderFailure
 			_ = versionService.Filesystem.RemoveRepository()
 
 			return
 		}
 
-		version.RenderStatus = models.Success
+		version.RenderStatus = models.RenderSuccess
 	}()
 
 	return &version, nil

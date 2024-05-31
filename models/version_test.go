@@ -22,14 +22,14 @@ func TestVersionJSONMarshaling(t *testing.T) {
 				VersionID: 20,
 			},
 		},
-		RenderStatus: Pending,
+		RenderStatus: RenderPending,
 	}
 
 	// should equal this DTO!
 	targetDTO := VersionDTO{
 		ID:            20,
 		DiscussionIDs: []uint{99, 59},
-		RenderStatus:  Pending,
+		RenderStatus:  RenderPending,
 	}
 
 	dto := VersionDTO{}

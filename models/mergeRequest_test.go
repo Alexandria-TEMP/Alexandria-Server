@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
-func TestMergeRequestJSONMarshaling(t *testing.T) {
-	// This model...
-	model := MergeRequest{
-		Model:        gorm.Model{ID: 44},
+func createTestMR(createdAt, updatedAt time.Time) MergeRequest {
+	return MergeRequest{
+		Model:        gorm.Model{ID: 44, CreatedAt: createdAt, UpdatedAt: updatedAt},
 		NewVersion:   Version{},
 		NewVersionID: 99,
 		Collaborators: []*MergeRequestCollaborator{
@@ -25,7 +25,7 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 				MergeRequestID:       44,
 				Member:               Member{},
 				MemberID:             88,
-				MergeRequestDecision: Approved,
+				MergeRequestDecision: ReviewApproved,
 				Feedback:             "LGTM",
 			},
 		},
@@ -37,7 +37,16 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 		UpdatedCompletionStatus: tags.Idea,
 		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
 		Anonymous:               false,
+		MergeRequestDecision:    MergeRequestOpenForReview,
 	}
+}
+
+func TestMergeRequestJSONMarshaling(t *testing.T) {
+	createdAt := time.Now().UTC()
+	updatedAt := time.Now().Add(time.Hour).UTC()
+
+	// This model...
+	model := createTestMR(createdAt, updatedAt)
 
 	// should equal this DTO!
 	targetDTO := MergeRequestDTO{
@@ -52,6 +61,9 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 		UpdatedCompletionStatus: tags.Idea,
 		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
 		Anonymous:               false,
+		MergeRequestDecision:    MergeRequestOpenForReview,
+		CreatedAt:               createdAt,
+		UpdatedAt:               updatedAt,
 	}
 
 	dto := MergeRequestDTO{}

@@ -14,7 +14,7 @@ func TestMergeRequestReviewJSONMarshaling(t *testing.T) {
 		MergeRequestID:       40,
 		Member:               Member{},
 		MemberID:             50,
-		MergeRequestDecision: Approved,
+		MergeRequestDecision: ReviewApproved,
 		Feedback:             "Nice!",
 	}
 
@@ -23,7 +23,7 @@ func TestMergeRequestReviewJSONMarshaling(t *testing.T) {
 		ID:                   88,
 		MergeRequestID:       40,
 		MemberID:             50,
-		MergeRequestDecision: Approved,
+		MergeRequestDecision: ReviewApproved,
 		Feedback:             "Nice!",
 	}
 

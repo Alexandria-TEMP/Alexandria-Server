@@ -6,6 +6,6 @@ type ReviewCreationForm struct {
 	// Merge request ID is part of endpoint
 
 	ReviewingMemberID    uint
-	MergeRequestDecision models.MergeRequestDecision
+	MergeRequestDecision models.MergeRequestReviewDecision
 	Feedback             string
 }

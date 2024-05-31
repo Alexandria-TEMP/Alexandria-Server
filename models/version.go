@@ -9,9 +9,9 @@ import (
 type RenderStatus string
 
 const (
-	Success RenderStatus = "success"
-	Pending RenderStatus = "pending"
-	Failure RenderStatus = "failure"
+	RenderSuccess RenderStatus = "success"
+	RenderPending RenderStatus = "pending"
+	RenderFailure RenderStatus = "failure"
 )
 
 type Version struct {

@@ -118,10 +118,10 @@ func testGoodProjectTemplate(t *testing.T, dirName string) {
 	assert.Equal(t, &exampleVersion, version)
 
 	// Wait until model has completed rendering
-	for version.RenderStatus == models.Pending {
+	for version.RenderStatus == models.RenderPending {
 		print()
 	}
-	assert.Equal(t, models.Success, version.RenderStatus)
+	assert.Equal(t, models.RenderSuccess, version.RenderStatus)
 
 	renderDirPath := filepath.Join(cwd, "render")
 	_, err = os.Stat(renderDirPath)
@@ -150,10 +150,10 @@ func testBadProjectTemplate(t *testing.T, dirName string) {
 	assert.Equal(t, &exampleVersion, version)
 
 	// Wait until model has completed rendering
-	for version.RenderStatus == models.Pending {
+	for version.RenderStatus == models.RenderPending {
 		print()
 	}
-	assert.Equal(t, models.Failure, version.RenderStatus)
+	assert.Equal(t, models.RenderFailure, version.RenderStatus)
 
 	renderDirPath := filepath.Join(cwd, "render", "quarto_project.html")
 	assert.Equal(t, false, filesystem.FileExists(renderDirPath))

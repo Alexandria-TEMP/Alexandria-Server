@@ -2,9 +2,18 @@ package models
 
 import (
 	"encoding/json"
+	"time"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
+)
+
+type MergeRequestDecision string
+
+const (
+	MergeRequestOpenForReview MergeRequestDecision = "open for review"
+	MergeRequestPeerReviewed  MergeRequestDecision = "peer reviewed"
+	MergeRequestRejected      MergeRequestDecision = "rejected"
 )
 
 type MergeRequest struct {
@@ -38,9 +47,9 @@ type MergeRequest struct {
 	PreviousVersion   Version `gorm:"foreignKey:PreviousVersionID"`
 	PreviousVersionID uint
 
-	MergeRequestTitle string
-
-	Anonymous bool
+	MergeRequestTitle    string
+	Anonymous            bool
+	MergeRequestDecision MergeRequestDecision
 }
 
 type MergeRequestDTO struct {
@@ -51,12 +60,15 @@ type MergeRequestDTO struct {
 	UpdatedCompletionStatus tags.CompletionStatus
 	UpdatedScientificFields []tags.ScientificField
 	// MR metadata
-	CollaboratorIDs   []uint
-	ReviewIDs         []uint
-	ProjectPostID     uint
-	PreviousVersionID uint
-	MergeRequestTitle string
-	Anonymous         bool
+	CollaboratorIDs      []uint
+	ReviewIDs            []uint
+	ProjectPostID        uint
+	PreviousVersionID    uint
+	MergeRequestTitle    string
+	Anonymous            bool
+	MergeRequestDecision MergeRequestDecision
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
 }
 
 func (model *MergeRequest) GetID() uint {
@@ -76,6 +88,9 @@ func (model *MergeRequest) IntoDTO() MergeRequestDTO {
 		model.PreviousVersionID,
 		model.MergeRequestTitle,
 		model.Anonymous,
+		model.MergeRequestDecision,
+		model.CreatedAt,
+		model.UpdatedAt,
 	}
 }
 

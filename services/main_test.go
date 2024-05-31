@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 	exampleVersion = models.Version{
 		Model:        gorm.Model{ID: 0},
 		Discussions:  nil,
-		RenderStatus: models.Pending,
+		RenderStatus: models.RenderPending,
 	}
 
 	cwd, _ = os.Getwd()
