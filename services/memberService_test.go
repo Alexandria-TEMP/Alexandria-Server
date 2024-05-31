@@ -22,11 +22,10 @@ func beforeEachMember(t *testing.T) {
 	mockMemberRepository = mocks.NewMockRepositoryInterface[*models.Member](mockCtrl)
 
 	//need to mock repository here, how?
-	memberService = MemberService {
+	memberService = MemberService{
 		MemberRepository: mockMemberRepository,
 	}
 }
-
 
 func TestGetMemberSuccessful(t *testing.T) {
 	beforeEachMember(t)
@@ -60,18 +59,18 @@ func TestGetMemberUnsuccessful(t *testing.T) {
 	assert.Equal(t, expectedErr, err)
 }
 
-func TestCreateMemberSuccessful(t *testing.T) {   
-	beforeEachMember(t) 
+func TestCreateMemberSuccessful(t *testing.T) {
+	beforeEachMember(t)
 	// set up repository mock to create members correctly
 	mockMemberRepository.EXPECT().Create(&exampleMember).Return(nil)
 
 	// set up a member creation form
-	memberForm := forms.MemberCreationForm {
-		FirstName:		"John",
-		LastName:		"Smith",
-		Email:			"john.smith@gmail.com",
-		Password:		"password",
-		Institution:	"TU Delft",
+	memberForm := forms.MemberCreationForm{
+		FirstName:   "John",
+		LastName:    "Smith",
+		Email:       "john.smith@gmail.com",
+		Password:    "password",
+		Institution: "TU Delft",
 	}
 
 	// manually set up the member tags
@@ -80,7 +79,7 @@ func TestCreateMemberSuccessful(t *testing.T) {
 	// call service method under test
 	member, err := memberService.CreateMember(&memberForm, tags)
 
-    // verify that the member object was created correctly
+	// verify that the member object was created correctly
 	assert.Equal(t, &exampleMember, member)
 	// verify that there was no error
 	assert.Nil(t, err)
@@ -88,18 +87,18 @@ func TestCreateMemberSuccessful(t *testing.T) {
 
 func TestCreateMemberUnsuccessful(t *testing.T) {
 	beforeEachMember(t)
-    expectedErr := fmt.Errorf("error")
+	expectedErr := fmt.Errorf("error")
 
 	// set up repository mock to create members correctly
 	mockMemberRepository.EXPECT().Create(&exampleMember).Return(expectedErr)
 
 	// set up a member creation form
-	memberForm := forms.MemberCreationForm {
-		FirstName:		"John",
-		LastName:		"Smith",
-		Email:			"john.smith@gmail.com",
-		Password:		"password",
-		Institution:	"TU Delft",
+	memberForm := forms.MemberCreationForm{
+		FirstName:   "John",
+		LastName:    "Smith",
+		Email:       "john.smith@gmail.com",
+		Password:    "password",
+		Institution: "TU Delft",
 	}
 
 	// manually set up the member tags
@@ -108,7 +107,7 @@ func TestCreateMemberUnsuccessful(t *testing.T) {
 	// call service method under test
 	member, err := memberService.CreateMember(&memberForm, tags)
 
-    // verify that the member object was not created
+	// verify that the member object was not created
 	assert.Nil(t, member)
 	// verify the error was returned correctly
 	assert.Equal(t, expectedErr, err)

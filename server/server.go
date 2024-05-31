@@ -13,9 +13,9 @@ import (
 )
 
 type RepositoryEnv struct {
-	memberRepository 	database.RepositoryInterface[*models.Member]
-	versionRepository 	database.RepositoryInterface[*models.Version]
-	tagRepository		database.RepositoryInterface[*tags.ScientificFieldTag]
+	memberRepository  database.RepositoryInterface[*models.Member]
+	versionRepository database.RepositoryInterface[*models.Version]
+	tagRepository     database.RepositoryInterface[*tags.ScientificFieldTag]
 }
 
 type ServiceEnv struct {
@@ -41,18 +41,17 @@ func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 		memberRepository: &database.ModelRepository[*models.Member]{Database: db},
 		//memberRepository: database.ModelRepository[*models.Member]{Database: db},
 		versionRepository: &database.ModelRepository[*models.Version]{Database: db},
-		tagRepository: &database.ModelRepository[*tags.ScientificFieldTag]{Database: db},
+		tagRepository:     &database.ModelRepository[*tags.ScientificFieldTag]{Database: db},
 	}
 }
 
-
 func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
 	return ServiceEnv{
-		postService:    services.PostService{},
+		postService: services.PostService{},
 		versionService: services.VersionService{
 			VersionRepository: repositoryEnv.versionRepository,
-			Filesystem: fs},
-		memberService:  services.MemberService{
+			Filesystem:        fs},
+		memberService: services.MemberService{
 			MemberRepository: repositoryEnv.memberRepository,
 		},
 	}
@@ -60,10 +59,10 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 
 func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 	return ControllerEnv{
-		postController:         controllers.PostController{PostService: &serviceEnv.postService},
-		memberController:       controllers.MemberController {
-			MemberService: &serviceEnv.memberService, 
-			TagService: &serviceEnv.tagService,
+		postController: controllers.PostController{PostService: &serviceEnv.postService},
+		memberController: controllers.MemberController{
+			MemberService: &serviceEnv.memberService,
+			TagService:    &serviceEnv.tagService,
 		},
 		projectPostController:  controllers.ProjectPostController{},
 		discussionController:   controllers.DiscussionController{},

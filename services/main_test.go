@@ -20,12 +20,12 @@ var (
 	exampleVersion models.Version
 	cwd            string
 
-	memberService 			MemberService
-	mockTagService	 		*mocks.MockTagService
-	exampleMember 			models.Member
-	exampleSTag1			*tags.ScientificFieldTag
-	exampleSTag2			*tags.ScientificFieldTag
-	mockMemberRepository 	*mocks.MockRepositoryInterface[*models.Member]
+	memberService        MemberService
+	mockTagService       *mocks.MockTagService
+	exampleMember        models.Member
+	exampleSTag1         *tags.ScientificFieldTag
+	exampleSTag2         *tags.ScientificFieldTag
+	mockMemberRepository *mocks.MockRepositoryInterface[*models.Member]
 )
 
 func TestMain(m *testing.M) {
@@ -35,24 +35,24 @@ func TestMain(m *testing.M) {
 		RenderStatus: models.Pending,
 	}
 	tag1 := tags.ScientificFieldTag{
-		ScientificField:	"Mathematics",
-		Subtags:  []*tags.ScientificFieldTag{},
-		ParentID: nil,
+		ScientificField: "Mathematics",
+		Subtags:         []*tags.ScientificFieldTag{},
+		ParentID:        nil,
 	}
 	exampleSTag1 = &tag1
 	tag2 := tags.ScientificFieldTag{
-		ScientificField:	"",
-		Subtags:  []*tags.ScientificFieldTag{},
-		ParentID: nil,
+		ScientificField: "",
+		Subtags:         []*tags.ScientificFieldTag{},
+		ParentID:        nil,
 	}
 	exampleSTag2 = &tag2
 
 	exampleMember = models.Member{
-		FirstName:		"John",
-		LastName:		"Smith",
-		Email:			"john.smith@gmail.com",
-		Password:		"password",
-		Institution:	"TU Delft",
+		FirstName:           "John",
+		LastName:            "Smith",
+		Email:               "john.smith@gmail.com",
+		Password:            "password",
+		Institution:         "TU Delft",
 		ScientificFieldTags: []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2},
 	}
 

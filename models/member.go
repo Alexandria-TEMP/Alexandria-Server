@@ -20,13 +20,13 @@ type Member struct {
 }
 
 type MemberDTO struct {
-	ID                  	uint
-	FirstName           	string
-	LastName            	string
-	Email               	string
-	Password            	string
-	Institution         	string
-	ScientificFieldTagIDs	[]uint
+	ID                    uint
+	FirstName             string
+	LastName              string
+	Email                 string
+	Password              string
+	Institution           string
+	ScientificFieldTagIDs []uint
 }
 
 func (model *Member) GetID() uint {

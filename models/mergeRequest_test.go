@@ -41,17 +41,17 @@ func TestMergeRequestJSONMarshaling(t *testing.T) {
 
 	// should equal this DTO!
 	targetDTO := MergeRequestDTO{
-		ID:                      44,
-		NewVersionID:            99,
-		CollaboratorIDs:         []uint{100, 50},
-		ReviewIDs:               []uint{2},
-		ProjectPostID:           45,
-		PreviousVersionID:       20,
-		MergeRequestTitle:       "My Cool MR",
-		NewPostTitle:            "Updated Post Title",
-		UpdatedCompletionStatus: tags.Idea,
+		ID:                           44,
+		NewVersionID:                 99,
+		CollaboratorIDs:              []uint{100, 50},
+		ReviewIDs:                    []uint{2},
+		ProjectPostID:                45,
+		PreviousVersionID:            20,
+		MergeRequestTitle:            "My Cool MR",
+		NewPostTitle:                 "Updated Post Title",
+		UpdatedCompletionStatus:      tags.Idea,
 		UpdatedScientificFieldTagIDs: []uint{},
-		Anonymous:               false,
+		Anonymous:                    false,
 	}
 
 	dto := MergeRequestDTO{}

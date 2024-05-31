@@ -41,10 +41,10 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 	targetDTO := ProjectPostDTO{
 		ID: 42,
 		PostDTO: PostDTO{
-			ID:                  88,
-			CollaboratorIDs:     []uint{1, 60},
-			VersionID:           49,
-			PostType:            tags.Project,
+			ID:                    88,
+			CollaboratorIDs:       []uint{1, 60},
+			VersionID:             49,
+			PostType:              tags.Project,
 			ScientificFieldTagIDs: []uint{},
 		},
 		OpenMergeRequestIDs:   []uint{44},

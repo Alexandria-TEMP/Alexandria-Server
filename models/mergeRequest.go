@@ -46,9 +46,9 @@ type MergeRequest struct {
 type MergeRequestDTO struct {
 	ID uint
 	// MR's proposed changes
-	NewVersionID            uint
-	NewPostTitle            string
-	UpdatedCompletionStatus tags.CompletionStatus
+	NewVersionID                 uint
+	NewPostTitle                 string
+	UpdatedCompletionStatus      tags.CompletionStatus
 	UpdatedScientificFieldTagIDs []uint
 	// MR metadata
 	CollaboratorIDs   []uint

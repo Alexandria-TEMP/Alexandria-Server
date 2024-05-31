@@ -16,8 +16,8 @@ import (
 // @BasePath /api/v2
 
 type MemberController struct {
-	MemberService 	interfaces.MemberService
-	TagService 		interfaces.TagService
+	MemberService interfaces.MemberService
+	TagService    interfaces.TagService
 }
 
 // GetMember godoc
@@ -43,7 +43,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 
 		return
 	}
-	
+
 	// cast user ID as uint instead of uint64, because database only accepts those
 	userID := uint(initUserID)
 

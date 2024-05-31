@@ -23,11 +23,11 @@ type Post struct {
 }
 
 type PostDTO struct {
-	ID                  uint
-	CollaboratorIDs     []uint
-	VersionID           uint
-	Title               string
-	PostType            tags.PostType
+	ID                    uint
+	CollaboratorIDs       []uint
+	VersionID             uint
+	Title                 string
+	PostType              tags.PostType
 	ScientificFieldTagIDs []uint
 }
 

@@ -10,18 +10,17 @@ import (
 type ScientificFieldTag struct {
 	gorm.Model
 
-	ScientificField		string
+	ScientificField string
 	// Tag can optionally have many subtags, or many ScientificFieldTag
 	Subtags  []*ScientificFieldTag `gorm:"foreignKey:ParentID"`
 	ParentID *uint
 }
 
 type ScientificFieldTagDTO struct {
-	ID 					uint
-	ScientificField 	string
-	SubtagIDs 			[]uint
+	ID              uint
+	ScientificField string
+	SubtagIDs       []uint
 }
-
 
 func (model *ScientificFieldTag) GetID() uint {
 	return model.Model.ID

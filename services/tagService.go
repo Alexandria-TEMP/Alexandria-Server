@@ -5,7 +5,6 @@ import (
 )
 
 type TagService struct {
-	
 }
 
 func (tagService *TagService) GetTagsFromIDs(_ []string) ([]*tags.ScientificFieldTag, error) {

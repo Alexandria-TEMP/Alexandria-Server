@@ -22,16 +22,16 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 	// however have to get tags somehow
 
 	member := &models.Member{
-		FirstName:   		form.FirstName,
-		LastName:    		form.LastName,
-		Email:       		form.Email,
-		Password:    		form.Password,
-		Institution: 		form.Institution,
-		ScientificFieldTags: 	tags,
+		FirstName:           form.FirstName,
+		LastName:            form.LastName,
+		Email:               form.Email,
+		Password:            form.Password,
+		Institution:         form.Institution,
+		ScientificFieldTags: tags,
 	}
 
 	err := memberService.MemberRepository.Create(member)
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 
