@@ -11,8 +11,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
-// @BasePath /api/v2/versions
-
 const headerSize = 512
 
 type VersionController struct {
@@ -27,7 +25,7 @@ type VersionController struct {
 // @Success 	200 		{object}	models.VersionDTO
 // @Failure		400 		{object} 	utils.HTTPError
 // @Failure		404 		{object} 	utils.HTTPError
-// @Router 		/{versionID}	[get]
+// @Router 		/versions/{versionID}	[get]
 func (versionController *VersionController) GetVersion(_ *gin.Context) {
 
 }
@@ -41,7 +39,7 @@ func (versionController *VersionController) GetVersion(_ *gin.Context) {
 // @Success 	200		{object}	models.VersionDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/		[post]
+// @Router 		/versions		[post]
 func (versionController *VersionController) CreateVersion(c *gin.Context) {
 	// extract file
 	file, err := c.FormFile("file")
@@ -74,7 +72,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 // @Success		202		{object}	string
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
-// @Router 		/{versionID}/render	[get]
+// @Router 		/versions/{versionID}/render	[get]
 func (versionController *VersionController) GetRender(c *gin.Context) {
 	// extract version id
 	versionIDstr := c.Param("versionID")
@@ -119,7 +117,7 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/{versionID}/repository	[get]
+// @Router 		/versions/{versionID}/repository	[get]
 func (versionController *VersionController) GetRepository(c *gin.Context) {
 	// extract version id
 	versionIDstr := c.Param("versionID")
@@ -157,7 +155,7 @@ func (versionController *VersionController) GetRepository(c *gin.Context) {
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/{versionID}/tree		[get]
+// @Router 		/versions/{versionID}/tree		[get]
 func (versionController *VersionController) GetFileTree(c *gin.Context) {
 	// extract version id
 	versionIDstr := c.Param("versionID")
@@ -199,7 +197,7 @@ func (versionController *VersionController) GetFileTree(c *gin.Context) {
 // @Success 	200		{object}	[]byte
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/{versionID}/file/{filepath}	[get]
+// @Router 		/versions/{versionID}/file/{filepath}	[get]
 func (versionController *VersionController) GetFileFromRepository(c *gin.Context) {
 	// extract version id
 	versionIDstr := c.Param("versionID")
@@ -257,7 +255,7 @@ func (versionController *VersionController) GetFileFromRepository(c *gin.Context
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router		/{versionID}/discussions 	[get]
+// @Router		/versions/{versionID}/discussions 	[get]
 func (versionController *VersionController) GetDiscussions(_ *gin.Context) {
 
 }
