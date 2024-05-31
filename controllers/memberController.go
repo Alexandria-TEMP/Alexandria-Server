@@ -157,7 +157,7 @@ func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.PostDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -178,7 +178,7 @@ func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.ProjectPostDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -199,7 +199,7 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.MergeRequestDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -220,7 +220,7 @@ func (memberController *MemberController) GetMemberMergeRequests(_ *gin.Context)
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.DiscussionDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -272,7 +272,7 @@ func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Conte
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.PostDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -292,7 +292,7 @@ func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.ProjectPostDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
