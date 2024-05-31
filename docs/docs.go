@@ -2281,14 +2281,43 @@ const docTemplate = `{
                 }
             }
         },
-        "/tags/scientific": {
+        "/tags/completion-status": {
             "get": {
-                "description": "Returns all scientific tags in the database",
+                "description": "Returns every possible completion status that a Post can have",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "scientific-field-tags"
+                    "tags"
+                ],
+                "summary": "Returns all completion statuses",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/tags.CompletionStatus"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/tags/scientific": {
+            "get": {
+                "description": "Returns all scientific tags (an array of strings) in the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
                 ],
                 "summary": "Returns all scientific tags",
                 "responses": {
