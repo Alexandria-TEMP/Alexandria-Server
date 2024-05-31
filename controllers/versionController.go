@@ -38,7 +38,7 @@ func (versionController *VersionController) GetVersion(_ *gin.Context) {
 // @Accept  	multipart/form-data
 // @Param		repository			formData		file				true	"Repository to create"
 // @Produce		application/json
-// @Success 	200		{object}	models.Version
+// @Success 	200		{object}	models.VersionDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 				[post]
@@ -62,7 +62,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 
 	// response
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, version)
+	c.JSON(http.StatusOK, version.IntoDTO)
 }
 
 // GetRender
