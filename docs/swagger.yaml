@@ -274,6 +274,11 @@ definitions:
       renderStatus:
         $ref: '#/definitions/models.RenderStatus'
     type: object
+  reports.DiscussionReportDTO:
+    properties:
+      discussionID:
+        type: integer
+    type: object
   tags.CompletionStatus:
     enum:
     - idea
@@ -520,6 +525,37 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Add a new report to a discussion
+      tags:
+      - discussions
+  /discussions/reports/{reportID}:
+    get:
+      description: Gets a discussion report by its ID
+      parameters:
+      - description: Report ID
+        in: path
+        name: reportID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/reports.DiscussionReportDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Gets a discussion report by ID
       tags:
       - discussions
   /filter/posts:

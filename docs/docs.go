@@ -73,6 +73,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/discussions/reports/{reportID}": {
+            "get": {
+                "description": "Gets a discussion report by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "discussions"
+                ],
+                "summary": "Gets a discussion report by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Report ID",
+                        "name": "reportID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/reports.DiscussionReportDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/discussions/{discussionID}": {
             "get": {
                 "description": "Get a discussion by discussion ID",
@@ -3053,6 +3100,14 @@ const docTemplate = `{
                 },
                 "renderStatus": {
                     "$ref": "#/definitions/models.RenderStatus"
+                }
+            }
+        },
+        "reports.DiscussionReportDTO": {
+            "type": "object",
+            "properties": {
+                "discussionID": {
+                    "type": "integer"
                 }
             }
         },

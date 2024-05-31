@@ -47,6 +47,7 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	discussionRouter.DELETE("/:discussionID", controllers.discussionController.DeleteDiscussion)
 	discussionRouter.POST("/:discussionID/reports", controllers.discussionController.AddDiscussionReport)
 	discussionRouter.GET("/:discussionID/reports", controllers.discussionController.GetDiscussionReports)
+	discussionRouter.GET("/reports/:reportID", controllers.discussionController.GetDiscussionReport)
 
 	filterRouter := v2.Group("/filter")
 	filterRouter.GET("/posts", controllers.filterController.FilterPosts)

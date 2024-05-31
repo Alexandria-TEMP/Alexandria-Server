@@ -92,3 +92,18 @@ func (discussionController *DiscussionController) AddDiscussionReport(_ *gin.Con
 func (discussionController *DiscussionController) GetDiscussionReports(_ *gin.Context) {
 	//TODO: make paginated
 }
+
+// GetDiscussionReport godoc
+// @Summary		Gets a discussion report by ID
+// @Description	Gets a discussion report by its ID
+// @Tags		discussions
+// @Param		reportID	path	string	true	"Report ID"
+// @Produce		json
+// @Success		200		{object}	reports.DiscussionReportDTO
+// @Failure		400		{object}	utils.HTTPError
+// @Failure		404		{object}	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router		/discussions/reports/{reportID}				[get]
+func (discussionController *DiscussionController) GetDiscussionReport(_ *gin.Context) {
+	// TODO implement
+}
