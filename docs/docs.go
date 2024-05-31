@@ -1434,7 +1434,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.MergeRequestDecision"
+                                "$ref": "#/definitions/models.MergeRequestReviewStatus"
                             }
                         }
                     },
@@ -2895,7 +2895,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "mergeRequestDecision": {
-                    "$ref": "#/definitions/models.MergeRequestDecision"
+                    "$ref": "#/definitions/models.MergeRequestReviewStatus"
                 },
                 "mergeRequestTitle": {
                     "type": "string"
@@ -2933,19 +2933,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.MergeRequestDecision": {
-            "type": "string",
-            "enum": [
-                "open for review",
-                "peer reviewed",
-                "rejected"
-            ],
-            "x-enum-varnames": [
-                "MergeRequestOpenForReview",
-                "MergeRequestPeerReviewed",
-                "MergeRequestRejected"
-            ]
-        },
         "models.MergeRequestReviewDTO": {
             "type": "object",
             "properties": {
@@ -2975,6 +2962,19 @@ const docTemplate = `{
             "x-enum-varnames": [
                 "ReviewRejected",
                 "ReviewApproved"
+            ]
+        },
+        "models.MergeRequestReviewStatus": {
+            "type": "string",
+            "enum": [
+                "open for review",
+                "peer reviewed",
+                "rejected"
+            ],
+            "x-enum-varnames": [
+                "MergeRequestOpenForReview",
+                "MergeRequestPeerReviewed",
+                "MergeRequestRejected"
             ]
         },
         "models.PostCollaboratorDTO": {

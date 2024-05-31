@@ -168,7 +168,7 @@ definitions:
       id:
         type: integer
       mergeRequestDecision:
-        $ref: '#/definitions/models.MergeRequestDecision'
+        $ref: '#/definitions/models.MergeRequestReviewStatus'
       mergeRequestTitle:
         type: string
       newPostTitle:
@@ -193,16 +193,6 @@ definitions:
           $ref: '#/definitions/tags.ScientificField'
         type: array
     type: object
-  models.MergeRequestDecision:
-    enum:
-    - open for review
-    - peer reviewed
-    - rejected
-    type: string
-    x-enum-varnames:
-    - MergeRequestOpenForReview
-    - MergeRequestPeerReviewed
-    - MergeRequestRejected
   models.MergeRequestReviewDTO:
     properties:
       feedback:
@@ -224,6 +214,16 @@ definitions:
     x-enum-varnames:
     - ReviewRejected
     - ReviewApproved
+  models.MergeRequestReviewStatus:
+    enum:
+    - open for review
+    - peer reviewed
+    - rejected
+    type: string
+    x-enum-varnames:
+    - MergeRequestOpenForReview
+    - MergeRequestPeerReviewed
+    - MergeRequestRejected
   models.PostCollaboratorDTO:
     properties:
       collaborationType:
@@ -1254,7 +1254,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.MergeRequestDecision'
+              $ref: '#/definitions/models.MergeRequestReviewStatus'
             type: array
         "400":
           description: Bad Request

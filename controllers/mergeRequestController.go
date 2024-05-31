@@ -78,7 +78,7 @@ func (mergeRequestController *MergeRequestController) DeleteMergeRequest(_ *gin.
 // @Accept  	json
 // @Param		mergeRequestID		path		string			true	"merge request ID"
 // @Produce		json
-// @Success 	200		{array}		models.MergeRequestDecision
+// @Success 	200		{array}		models.MergeRequestReviewStatus
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError

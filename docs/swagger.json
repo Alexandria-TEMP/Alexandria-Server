@@ -1428,7 +1428,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.MergeRequestDecision"
+                                "$ref": "#/definitions/models.MergeRequestReviewStatus"
                             }
                         }
                     },
@@ -2889,7 +2889,7 @@
                     "type": "integer"
                 },
                 "mergeRequestDecision": {
-                    "$ref": "#/definitions/models.MergeRequestDecision"
+                    "$ref": "#/definitions/models.MergeRequestReviewStatus"
                 },
                 "mergeRequestTitle": {
                     "type": "string"
@@ -2927,19 +2927,6 @@
                 }
             }
         },
-        "models.MergeRequestDecision": {
-            "type": "string",
-            "enum": [
-                "open for review",
-                "peer reviewed",
-                "rejected"
-            ],
-            "x-enum-varnames": [
-                "MergeRequestOpenForReview",
-                "MergeRequestPeerReviewed",
-                "MergeRequestRejected"
-            ]
-        },
         "models.MergeRequestReviewDTO": {
             "type": "object",
             "properties": {
@@ -2969,6 +2956,19 @@
             "x-enum-varnames": [
                 "ReviewRejected",
                 "ReviewApproved"
+            ]
+        },
+        "models.MergeRequestReviewStatus": {
+            "type": "string",
+            "enum": [
+                "open for review",
+                "peer reviewed",
+                "rejected"
+            ],
+            "x-enum-varnames": [
+                "MergeRequestOpenForReview",
+                "MergeRequestPeerReviewed",
+                "MergeRequestRejected"
             ]
         },
         "models.PostCollaboratorDTO": {
