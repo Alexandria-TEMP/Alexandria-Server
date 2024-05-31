@@ -62,7 +62,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 
 	// response
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, version.IntoDTO)
+	c.JSON(http.StatusOK, version.IntoDTO())
 }
 
 // GetRender
