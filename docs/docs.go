@@ -1434,7 +1434,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "string"
+                                "$ref": "#/definitions/models.MergeRequestDecision"
                             }
                         }
                     },
@@ -2783,7 +2783,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "mergeRequestDecision": {
-                    "$ref": "#/definitions/models.MergeRequestDecision"
+                    "$ref": "#/definitions/models.MergeRequestReviewDecision"
                 },
                 "reviewingMemberID": {
                     "type": "integer"
@@ -2888,8 +2888,14 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
+                "createdAt": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
+                },
+                "mergeRequestDecision": {
+                    "$ref": "#/definitions/models.MergeRequestDecision"
                 },
                 "mergeRequestTitle": {
                     "type": "string"
@@ -2913,6 +2919,9 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
+                "updatedAt": {
+                    "type": "string"
+                },
                 "updatedCompletionStatus": {
                     "$ref": "#/definitions/tags.CompletionStatus"
                 },
@@ -2927,12 +2936,14 @@ const docTemplate = `{
         "models.MergeRequestDecision": {
             "type": "string",
             "enum": [
-                "rejected",
-                "approved"
+                "open for review",
+                "peer reviewed",
+                "rejected"
             ],
             "x-enum-varnames": [
-                "Rejected",
-                "Approved"
+                "MergeRequestOpenForReview",
+                "MergeRequestPeerReviewed",
+                "MergeRequestRejected"
             ]
         },
         "models.MergeRequestReviewDTO": {
@@ -2948,12 +2959,23 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "mergeRequestDecision": {
-                    "$ref": "#/definitions/models.MergeRequestDecision"
+                    "$ref": "#/definitions/models.MergeRequestReviewDecision"
                 },
                 "mergeRequestID": {
                     "type": "integer"
                 }
             }
+        },
+        "models.MergeRequestReviewDecision": {
+            "type": "string",
+            "enum": [
+                "rejected",
+                "approved"
+            ],
+            "x-enum-varnames": [
+                "ReviewRejected",
+                "ReviewApproved"
+            ]
         },
         "models.PostCollaboratorDTO": {
             "type": "object",
@@ -3044,9 +3066,9 @@ const docTemplate = `{
                 "failure"
             ],
             "x-enum-varnames": [
-                "Success",
-                "Pending",
-                "Failure"
+                "RenderSuccess",
+                "RenderPending",
+                "RenderFailure"
             ]
         },
         "models.ReportDTO": {

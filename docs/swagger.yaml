@@ -93,7 +93,7 @@ definitions:
       feedback:
         type: string
       mergeRequestDecision:
-        $ref: '#/definitions/models.MergeRequestDecision'
+        $ref: '#/definitions/models.MergeRequestReviewDecision'
       reviewingMemberID:
         type: integer
     type: object
@@ -163,8 +163,12 @@ definitions:
         items:
           type: integer
         type: array
+      createdAt:
+        type: string
       id:
         type: integer
+      mergeRequestDecision:
+        $ref: '#/definitions/models.MergeRequestDecision'
       mergeRequestTitle:
         type: string
       newPostTitle:
@@ -180,6 +184,8 @@ definitions:
         items:
           type: integer
         type: array
+      updatedAt:
+        type: string
       updatedCompletionStatus:
         $ref: '#/definitions/tags.CompletionStatus'
       updatedScientificFields:
@@ -189,12 +195,14 @@ definitions:
     type: object
   models.MergeRequestDecision:
     enum:
+    - open for review
+    - peer reviewed
     - rejected
-    - approved
     type: string
     x-enum-varnames:
-    - Rejected
-    - Approved
+    - MergeRequestOpenForReview
+    - MergeRequestPeerReviewed
+    - MergeRequestRejected
   models.MergeRequestReviewDTO:
     properties:
       feedback:
@@ -204,10 +212,18 @@ definitions:
       memberID:
         type: integer
       mergeRequestDecision:
-        $ref: '#/definitions/models.MergeRequestDecision'
+        $ref: '#/definitions/models.MergeRequestReviewDecision'
       mergeRequestID:
         type: integer
     type: object
+  models.MergeRequestReviewDecision:
+    enum:
+    - rejected
+    - approved
+    type: string
+    x-enum-varnames:
+    - ReviewRejected
+    - ReviewApproved
   models.PostCollaboratorDTO:
     properties:
       collaborationType:
@@ -268,9 +284,9 @@ definitions:
     - failure
     type: string
     x-enum-varnames:
-    - Success
-    - Pending
-    - Failure
+    - RenderSuccess
+    - RenderPending
+    - RenderFailure
   models.ReportDTO:
     type: object
   models.VersionDTO:
@@ -1238,7 +1254,7 @@ paths:
           description: OK
           schema:
             items:
-              type: string
+              $ref: '#/definitions/models.MergeRequestDecision'
             type: array
         "400":
           description: Bad Request
