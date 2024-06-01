@@ -15,47 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/": {
-            "post": {
-                "description": "Create a new version with discussions and repository from zipped file in body",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Create new version",
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "Repository to create",
-                        "name": "repository",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.VersionDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
         "/discussions": {
             "post": {
                 "description": "Create a new discussion\nIf parent ID field is used, the discussion will be a reply",
@@ -2336,7 +2295,48 @@ const docTemplate = `{
                 }
             }
         },
-        "/{versionID}": {
+        "/versions": {
+            "post": {
+                "description": "Create a new version with discussions and repository from zipped file in body",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create new version",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Repository to create",
+                        "name": "repository",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.VersionDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/versions/{versionID}": {
             "get": {
                 "description": "Get a version by version ID",
                 "produces": [
@@ -2374,7 +2374,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/{versionID}/discussions": {
+        "/versions/{versionID}/discussions": {
             "get": {
                 "description": "Returns all discussions on this version that are not a reply to another discussion\nEndpoint is offset-paginated",
                 "produces": [
@@ -2433,7 +2433,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/{versionID}/file/{filepath}": {
+        "/versions/{versionID}/file/{filepath}": {
             "get": {
                 "description": "Get the contents of a single file from a repository of a version",
                 "produces": [
@@ -2481,7 +2481,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/{versionID}/render": {
+        "/versions/{versionID}/render": {
             "get": {
                 "description": "Get the render of the repository underlying a version if it exists and has been rendered successfully",
                 "produces": [
@@ -2528,7 +2528,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/{versionID}/repository": {
+        "/versions/{versionID}/repository": {
             "get": {
                 "description": "Get the entire zipped repository of a version",
                 "produces": [
@@ -2575,7 +2575,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/{versionID}/tree": {
+        "/versions/{versionID}/tree": {
             "get": {
                 "description": "Get the file tree of a repository of a version",
                 "produces": [

@@ -240,226 +240,6 @@ info:
   title: Alexandria API
   version: "2.0"
 paths:
-  /:
-    post:
-      consumes:
-      - multipart/form-data
-      description: Create a new version with discussions and repository from zipped
-        file in body
-      parameters:
-      - description: Repository to create
-        in: formData
-        name: repository
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.VersionDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Create new version
-  /{versionID}:
-    get:
-      description: Get a version by version ID
-      parameters:
-      - description: Version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.VersionDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get version
-  /{versionID}/discussions:
-    get:
-      description: |-
-        Returns all discussions on this version that are not a reply to another discussion
-        Endpoint is offset-paginated
-      parameters:
-      - description: version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.DiscussionDTO'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Returns all level 1 discussions associated with the version
-  /{versionID}/file/{filepath}:
-    get:
-      description: Get the contents of a single file from a repository of a version
-      parameters:
-      - description: Version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      - description: Filepath
-        in: path
-        name: filepath
-        required: true
-        type: string
-      produces:
-      - application/octet-stream
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get a file from a repository
-  /{versionID}/render:
-    get:
-      description: Get the render of the repository underlying a version if it exists
-        and has been rendered successfully
-      parameters:
-      - description: Version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      produces:
-      - text/html
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "202":
-          description: Accepted
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get the render of a version
-  /{versionID}/repository:
-    get:
-      description: Get the entire zipped repository of a version
-      parameters:
-      - description: Version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      produces:
-      - application/zip
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get the repository of a version
-  /{versionID}/tree:
-    get:
-      description: Get the file tree of a repository of a version
-      parameters:
-      - description: Version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: integer
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get the file tree of a repository
   /discussions:
     post:
       consumes:
@@ -2007,4 +1787,224 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns all scientific tags
+  /versions:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new version with discussions and repository from zipped
+        file in body
+      parameters:
+      - description: Repository to create
+        in: formData
+        name: repository
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.VersionDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Create new version
+  /versions/{versionID}:
+    get:
+      description: Get a version by version ID
+      parameters:
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.VersionDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get version
+  /versions/{versionID}/discussions:
+    get:
+      description: |-
+        Returns all discussions on this version that are not a reply to another discussion
+        Endpoint is offset-paginated
+      parameters:
+      - description: version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      - description: page query
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.DiscussionDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Returns all level 1 discussions associated with the version
+  /versions/{versionID}/file/{filepath}:
+    get:
+      description: Get the contents of a single file from a repository of a version
+      parameters:
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      - description: Filepath
+        in: path
+        name: filepath
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get a file from a repository
+  /versions/{versionID}/render:
+    get:
+      description: Get the render of the repository underlying a version if it exists
+        and has been rendered successfully
+      parameters:
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "202":
+          description: Accepted
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get the render of a version
+  /versions/{versionID}/repository:
+    get:
+      description: Get the entire zipped repository of a version
+      parameters:
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/zip
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get the repository of a version
+  /versions/{versionID}/tree:
+    get:
+      description: Get the file tree of a repository of a version
+      parameters:
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get the file tree of a repository
 swagger: "2.0"

@@ -20,6 +20,9 @@ RUN go get github.com/golangci/golangci-lint
 RUN go install github.com/swaggo/swag/cmd/swag@v1.16.3
 RUN go install go.uber.org/mock/mockgen@v0.4.0
 
+# Generate API spec
+RUN swag init -g alexandria.go 
+
 # Build binary
 RUN go build -o /usr/bin/alexandria-backend -v ./
 
