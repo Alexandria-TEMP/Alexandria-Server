@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-git/go-git/v5"
 )
 
 type Filesystem struct {
@@ -20,6 +21,7 @@ type Filesystem struct {
 	CurrentQuartoDirPath string
 	CurrentZipFilePath   string
 	CurrentRenderDirPath string
+	CurrentRepository    *git.Repository
 }
 
 var (
@@ -45,8 +47,8 @@ func (filesystem *Filesystem) GetCurrentRenderDirPath() string {
 	return filesystem.CurrentRenderDirPath
 }
 
-// InitFilesystem initializes a new filesystem by setting the root to the current working directory and assigning default values.
-func InitFilesystem() *Filesystem {
+// NewFilesystem initializes a new filesystem by setting the root to the current working directory and assigning default values.
+func NewFilesystem() *Filesystem {
 	filesystem := &Filesystem{
 		rootPath:            defaultRootPath,
 		zipName:             defaultZipName,
@@ -61,16 +63,24 @@ func InitFilesystem() *Filesystem {
 	return filesystem
 }
 
-// SetCurrentVersion will set the paths the filesystem uses in accordance with the IDs passed.
-func (filesystem *Filesystem) SetCurrentVersion(versionID uint) {
-	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(versionID), 10))
+// SetCurrentRepository will set the paths the filesystem uses in accordance with the IDs passed.
+// If a git repo exists there it will be opened.
+// CurrentDirPath = <cwd>/vfs/<postID>
+// CurrentQuartoDirPath = <cwd>/vfs/<postID>/quarto_project
+// CurrentZipFilePath = <cwd>/vfs/<postID>/quarto_project.zip
+// CurrentRenderDirPath = <cwd>/vfs/<postID>/render/<some_html_file>
+func (filesystem *Filesystem) SetCurrentRepository(postID uint) {
+	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10))
 	filesystem.CurrentQuartoDirPath = filepath.Join(filesystem.CurrentDirPath, filesystem.quartoDirectoryName)
 	filesystem.CurrentZipFilePath = filepath.Join(filesystem.CurrentDirPath, filesystem.zipName)
 	filesystem.CurrentRenderDirPath = filepath.Join(filesystem.CurrentDirPath, "render")
+
+	// try to open repository if it exists
+	filesystem.CurrentRepository, _ = filesystem.OpenRepository()
 }
 
-// SaveRepository saves a zip file to a ./vfs/{versionID} in the filesystem and return the path to the directory.
-func (filesystem *Filesystem) SaveRepository(c *gin.Context, file *multipart.FileHeader) error {
+// SaveZippedRepository saves a zip file to a CurrentZipFilePath in the filesystem.
+func (filesystem *Filesystem) SaveZippedRepository(c *gin.Context, file *multipart.FileHeader) error {
 	// Save zip file
 	err := c.SaveUploadedFile(file, filesystem.CurrentZipFilePath)
 
@@ -81,7 +91,7 @@ func (filesystem *Filesystem) SaveRepository(c *gin.Context, file *multipart.Fil
 	return nil
 }
 
-// Unzip will unzip the quarto_project.zip file, if present, of any post version.
+// Unzip will unzip the quarto_project.zip file, if present.
 // Errors if there is no such file or it can't unzip it.
 func (filesystem *Filesystem) Unzip() error {
 	archive, err := zip.OpenReader(filesystem.CurrentZipFilePath)
@@ -128,7 +138,7 @@ func (filesystem *Filesystem) Unzip() error {
 	return nil
 }
 
-// RemoveRepository entirely removes a version repository
+// RemoveRepository entirely removes a repository
 func (filesystem *Filesystem) RemoveRepository() error {
 	err := os.RemoveAll(filesystem.CurrentDirPath)
 
