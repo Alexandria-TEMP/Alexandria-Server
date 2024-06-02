@@ -179,3 +179,19 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ *gin.Context) {
 	// TODO implement
 }
+
+// GetProjectPostMRsByStatus godoc
+// @Summary 	Returns MR IDs grouped by each MR status
+// @Description Returns all MR IDs of this project post, grouped by each MR's review status
+// @Tags		project-posts
+// @Accept		json
+// @Param		postID	path	string	true	"post ID"
+// @Produce		json
+// @Success		200		{object}	forms.GroupedMergeRequestForm
+// @Failure		400		{object}	utils.HTTPError
+// @Failure		404		{object}	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router		/project-posts/{postID}/merge-requests-by-status	[get]
+func (projectPostController *ProjectPostController) GetProjectPostMRsByStatus(_ *gin.Context) {
+	// TODO implement
+}

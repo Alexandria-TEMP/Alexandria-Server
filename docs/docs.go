@@ -2269,6 +2269,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/project-posts/{postID}/merge-requests-by-status": {
+            "get": {
+                "description": "Returns all MR IDs of this project post, grouped by each MR's review status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project-posts"
+                ],
+                "summary": "Returns MR IDs grouped by each MR status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/forms.GroupedMergeRequestForm"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/tags/completion-status": {
             "get": {
                 "description": "Returns every possible completion status that a Post can have",
@@ -2664,6 +2714,29 @@ const docTemplate = `{
         },
         "forms.FilterForm": {
             "type": "object"
+        },
+        "forms.GroupedMergeRequestForm": {
+            "type": "object",
+            "properties": {
+                "openForReviewIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "peerReviewedIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "rejectedIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "forms.IncomingFileForm": {
             "type": "object"

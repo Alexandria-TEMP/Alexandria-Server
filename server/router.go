@@ -92,6 +92,7 @@ func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	projectPostRouter.DELETE("/:postID", controllers.projectPostController.DeleteProjectPost)
 	projectPostRouter.POST("/from-github", controllers.projectPostController.CreateProjectPostFromGithub)
 	projectPostRouter.GET("/:postID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
+	projectPostRouter.GET("/:postID/merge-requests-by-status", controllers.projectPostController.GetProjectPostMRsByStatus)
 }
 
 func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {

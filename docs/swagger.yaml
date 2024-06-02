@@ -12,6 +12,21 @@ definitions:
     type: object
   forms.FilterForm:
     type: object
+  forms.GroupedMergeRequestForm:
+    properties:
+      openForReviewIDs:
+        items:
+          type: integer
+        type: array
+      peerReviewedIDs:
+        items:
+          type: integer
+        type: array
+      rejectedIDs:
+        items:
+          type: integer
+        type: array
+    type: object
   forms.IncomingFileForm:
     type: object
   forms.MemberCreationForm:
@@ -1837,6 +1852,40 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns all discussion IDs associated with the project post
+      tags:
+      - project-posts
+  /project-posts/{postID}/merge-requests-by-status:
+    get:
+      consumes:
+      - application/json
+      description: Returns all MR IDs of this project post, grouped by each MR's review
+        status
+      parameters:
+      - description: post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/forms.GroupedMergeRequestForm'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Returns MR IDs grouped by each MR status
       tags:
       - project-posts
   /project-posts/from-github:
