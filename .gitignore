@@ -17,4 +17,4 @@ coverage.*
 .env
 
 # Python
-.venv
+.venv/

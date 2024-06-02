@@ -2,8 +2,6 @@ package filesystem
 
 import (
 	"archive/zip"
-	"errors"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
@@ -12,7 +10,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 )
 
 type Filesystem struct {
@@ -65,14 +62,14 @@ func InitFilesystem() *Filesystem {
 }
 
 // SetCurrentVersion will set the paths the filesystem uses in accordance with the IDs passed.
-func (filesystem *Filesystem) SetCurrentVersion(versionID, postID uint) {
-	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), strconv.FormatUint(uint64(versionID), 10))
+func (filesystem *Filesystem) SetCurrentVersion(versionID uint) {
+	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(versionID), 10))
 	filesystem.CurrentQuartoDirPath = filepath.Join(filesystem.CurrentDirPath, filesystem.quartoDirectoryName)
 	filesystem.CurrentZipFilePath = filepath.Join(filesystem.CurrentDirPath, filesystem.zipName)
 	filesystem.CurrentRenderDirPath = filepath.Join(filesystem.CurrentDirPath, "render")
 }
 
-// SaveRepository saves a zip file to a ./vfs/{postID}/{versionID} in the filesystem and return the path to the directory.
+// SaveRepository saves a zip file to a ./vfs/{versionID} in the filesystem and return the path to the directory.
 func (filesystem *Filesystem) SaveRepository(c *gin.Context, file *multipart.FileHeader) error {
 	// Save zip file
 	err := c.SaveUploadedFile(file, filesystem.CurrentZipFilePath)
@@ -131,18 +128,7 @@ func (filesystem *Filesystem) Unzip() error {
 	return nil
 }
 
-// RemoveProjectDirectory only removes the unzipped files, not the zip file or the render
-func (filesystem *Filesystem) RemoveProjectDirectory() error {
-	err := os.RemoveAll(filesystem.CurrentQuartoDirPath)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// RemoveRepository entirely removes a version repository if it is not valid
+// RemoveRepository entirely removes a version repository
 func (filesystem *Filesystem) RemoveRepository() error {
 	err := os.RemoveAll(filesystem.CurrentDirPath)
 
@@ -153,74 +139,61 @@ func (filesystem *Filesystem) RemoveRepository() error {
 	return nil
 }
 
-// CountRenderFiles counts how many files are at the render directory of this version
-func (filesystem *Filesystem) CountRenderFiles() int {
+// RenderExists checks if the render exists and is a single html file
+// Returns a bool and the name of the file if it does exist
+func (filesystem *Filesystem) RenderExists() (exists bool, name string) {
 	files, err := os.ReadDir(filesystem.CurrentRenderDirPath)
 
 	if err != nil {
-		return 0
-	}
-
-	return len(files)
-}
-
-// Returns the rendered project post wrapped in a OutgoingFileForm with the content-type
-func (filesystem *Filesystem) GetRenderFile() (forms.OutgoingFileForm, string, error) {
-	var outgoingFileForm forms.OutgoingFileForm
-
-	// Check if directory exists
-	files, err := os.ReadDir(filesystem.CurrentRenderDirPath)
-
-	if err != nil {
-		return outgoingFileForm, "", errors.New("invalid directory")
+		return false, ""
 	}
 
 	// Check directory contains 1 file exactly
 	if len(files) != 1 {
-		return outgoingFileForm, "", fmt.Errorf("expected 1 file, but found %v", len(files))
+		return false, ""
 	}
 
 	// Get filename and check extension is html
 	fileName := files[0].Name()
 
 	if ext := path.Ext(fileName); ext != ".html" {
-		return outgoingFileForm, "", fmt.Errorf("expected .html file, but found %v", ext)
+		return false, ""
 	}
 
-	// Create multipart file
-	filePath := filepath.Join(filesystem.CurrentRenderDirPath, fileName)
-	rawFile, contentType, err := CreateMultipartFile(filePath)
-
-	if err != nil {
-		return outgoingFileForm, "", err
-	}
-
-	outgoingFileForm = forms.OutgoingFileForm{
-		File: &rawFile,
-	}
-
-	return outgoingFileForm, contentType, nil
+	return true, fileName
 }
 
-// GetRepositoryFile return as zipped quarto project after validating that it exists, together the content type
-func (filesystem *Filesystem) GetRepositoryFile() (forms.OutgoingFileForm, string, error) {
-	var outgoingFileForm forms.OutgoingFileForm
+// GetFileTree returns a map of all filepaths in a quarto project and their size in bytes
+func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
+	fileTree := make(map[string]int64)
 
-	// Check if file exists
-	if !FileExists(filesystem.CurrentZipFilePath) {
-		return outgoingFileForm, "", errors.New("this project doesn't exist")
-	}
+	// Recursively find all files in quarto project and add path and size to map
+	err := filepath.Walk(filesystem.CurrentQuartoDirPath,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
 
-	// Create multipart file
-	rawFile, contentType, err := CreateMultipartFile(filesystem.CurrentZipFilePath)
+			relativePath, err := filepath.Rel(filesystem.CurrentQuartoDirPath, path)
+
+			// If its a directory add it with size -1
+			if info.IsDir() {
+				fileTree[relativePath] = -1
+				return nil
+			}
+
+			if err != nil {
+				return err
+			}
+
+			fileTree[relativePath] = info.Size()
+
+			return nil
+		})
 
 	if err != nil {
-		return outgoingFileForm, "", err
+		return nil, err
 	}
 
-	outgoingFileForm = forms.OutgoingFileForm{
-		File: &rawFile,
-	}
-
-	return outgoingFileForm, contentType, nil
+	return fileTree, nil
 }

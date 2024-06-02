@@ -1,5 +1,5 @@
+format:
+    html:
+        page-layout: custom
 project:
-  title: "computation-cells-options"
-
-
-
+    title: computation-cells-options

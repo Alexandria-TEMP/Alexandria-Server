@@ -2,6 +2,9 @@ package filesystem
 
 import (
 	"bufio"
+	"bytes"
+	"io"
+	"mime/multipart"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
@@ -9,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 var (
@@ -33,12 +37,12 @@ func cleanup(t *testing.T) {
 func TestInitsystem(t *testing.T) {
 	defer cleanup(t)
 
-	CurrentFilesystem.SetCurrentVersion(1, 2)
+	CurrentFilesystem.SetCurrentVersion(1)
 
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "2", "1"), CurrentFilesystem.CurrentDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "2", "1", "quarto_project"), CurrentFilesystem.CurrentQuartoDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "2", "1", "render"), CurrentFilesystem.CurrentRenderDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "2", "1", "quarto_project.zip"), CurrentFilesystem.CurrentZipFilePath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1"), CurrentFilesystem.CurrentDirPath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "quarto_project"), CurrentFilesystem.CurrentQuartoDirPath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "render"), CurrentFilesystem.CurrentRenderDirPath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "quarto_project.zip"), CurrentFilesystem.CurrentZipFilePath)
 }
 
 func TestFileHandling(t *testing.T) {
@@ -47,12 +51,12 @@ func TestFileHandling(t *testing.T) {
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	file, _ := CreateMultipartFileHeader("../utils/test_files/file_handling_test.zip")
 
-	CurrentFilesystem.SetCurrentVersion(1, 2)
+	CurrentFilesystem.SetCurrentVersion(1)
 
 	// Test saving fileheader
 	err := CurrentFilesystem.SaveRepository(c, file)
 	assert.Nil(t, err)
-	assert.True(t, FileExists(CurrentFilesystem.CurrentZipFilePath))
+	assert.True(t, utils.FileExists(CurrentFilesystem.CurrentZipFilePath))
 
 	// Test unzipping succeeds and that contents are correct
 	err = CurrentFilesystem.Unzip()
@@ -69,73 +73,27 @@ func TestFileHandling(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "5678", line)
 
-	// Test removing project directory
-	err = CurrentFilesystem.RemoveProjectDirectory()
+	// Test removing version repository
+	err = CurrentFilesystem.RemoveRepository()
 	assert.Nil(t, err)
-	assert.False(t, FileExists(CurrentFilesystem.CurrentQuartoDirPath))
+	assert.False(t, utils.FileExists(CurrentFilesystem.CurrentDirPath))
 }
 
-func TestGetRenderFileSuccess(t *testing.T) {
-	CurrentFilesystem.CurrentDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup")
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(CurrentFilesystem.CurrentDirPath, "render")
-	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
+func TestGetFileTreeSuccess(t *testing.T) {
+	CurrentFilesystem.CurrentQuartoDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "file_tree")
 
-	// Test GetRenderFile
-	fileForm, contentType, err := CurrentFilesystem.GetRenderFile()
+	files, err := CurrentFilesystem.GetFileTree()
+
 	assert.Nil(t, err)
-	assert.NotNil(t, fileForm)
-	assert.Equal(t, "multipart/form-data; boundary=", contentType[:30])
+
+	assert.Equal(t, map[string]int64{".": -1, "child_dir": -1, "child_dir/test.txt": 0, "example.qmd": 0}, files)
 }
 
-func TestGetRenderFileFailure1(t *testing.T) {
-	CurrentFilesystem.CurrentDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_1")
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(CurrentFilesystem.CurrentDirPath, "render")
-	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
+func TestGetFileTreeFailure(t *testing.T) {
+	CurrentFilesystem.CurrentQuartoDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "file_tree", "doesntexist")
 
-	// Test GetRenderFile
-	_, _, err := CurrentFilesystem.GetRenderFile()
-	assert.NotNil(t, err)
-}
+	_, err := CurrentFilesystem.GetFileTree()
 
-func TestGetRenderFileFailure2(t *testing.T) {
-	CurrentFilesystem.CurrentDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_2")
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(CurrentFilesystem.CurrentDirPath, "render")
-	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
-
-	// Test GetRenderFile
-	_, _, err := CurrentFilesystem.GetRenderFile()
-	assert.NotNil(t, err)
-}
-
-func TestGetRepositoryFileSuccess(t *testing.T) {
-	CurrentFilesystem.CurrentDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup")
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(CurrentFilesystem.CurrentDirPath, "render")
-	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
-
-	// Test GetRepositoryFile
-	fileForm, contentType, err := CurrentFilesystem.GetRepositoryFile()
-	assert.Nil(t, err)
-	assert.NotNil(t, fileForm)
-	assert.Equal(t, "multipart/form-data; boundary=", contentType[:30])
-}
-
-func TestGetRepositoryFileFailure1(t *testing.T) {
-	CurrentFilesystem.CurrentDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_1")
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(CurrentFilesystem.CurrentDirPath, "render")
-	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
-
-	// Test GetRenderFile
-	_, _, err := CurrentFilesystem.GetRepositoryFile()
-	assert.NotNil(t, err)
-}
-
-func TestGetRepositoryFileFailure2(t *testing.T) {
-	CurrentFilesystem.CurrentDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_2")
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(CurrentFilesystem.CurrentDirPath, "render")
-	CurrentFilesystem.CurrentZipFilePath = filepath.Join(CurrentFilesystem.CurrentDirPath, "quarto_project.zip")
-
-	// Test GetRenderFile
-	_, _, err := CurrentFilesystem.GetRepositoryFile()
 	assert.NotNil(t, err)
 }
 
@@ -154,4 +112,55 @@ func Readln(r *bufio.Reader) (string, error) {
 	}
 
 	return string(ln), err
+}
+
+// CreateMultipartFileHeader is used for testing, to simulate an incoming request with a file
+func CreateMultipartFileHeader(filePath string) (*multipart.FileHeader, error) {
+	// open the file
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	// create a buffer to hold the file in memory
+	var buff bytes.Buffer
+	buffWriter := io.Writer(&buff)
+
+	// create a new form and create a new file field
+	formWriter := multipart.NewWriter(buffWriter)
+	formPart, err := formWriter.CreateFormFile("file", filepath.Base(file.Name()))
+
+	if err != nil {
+		return nil, err
+	}
+
+	// copy the content of the file to the form's file field
+	if _, err := io.Copy(formPart, file); err != nil {
+		return nil, err
+	}
+
+	// close the form writer after the copying process is finished
+	// I don't use defer in here to avoid unexpected EOF error
+	formWriter.Close()
+
+	// transform the bytes buffer into a form reader
+	buffReader := bytes.NewReader(buff.Bytes())
+	formReader := multipart.NewReader(buffReader, formWriter.Boundary())
+
+	// read the form components with max stored memory of 1MB
+	maxMemoryBits := 20
+	multipartForm, err := formReader.ReadForm(1 << maxMemoryBits)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// return the multipart file header
+	files, exists := multipartForm.File["file"]
+	if !exists || len(files) == 0 {
+		return nil, err
+	}
+
+	return files[0], nil
 }

@@ -1,2 +1,5 @@
+format:
+    html:
+        page-layout: custom
 project:
-  titles: "test"
+    titles: test
