@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"io"
+	"io/fs"
 	"mime/multipart"
 	"net/http/httptest"
 	"os"
@@ -23,7 +24,7 @@ var (
 func TestMain(m *testing.M) {
 	cwdTest, _ = os.Getwd()
 
-	CurrentFilesystem = *InitFilesystem()
+	CurrentFilesystem = *NewFilesystem()
 
 	os.Exit(m.Run())
 }
@@ -37,12 +38,69 @@ func cleanup(t *testing.T) {
 func TestInitsystem(t *testing.T) {
 	defer cleanup(t)
 
-	CurrentFilesystem.SetCurrentVersion(1)
+	CurrentFilesystem.CheckoutDirectory(1)
 
 	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1"), CurrentFilesystem.CurrentDirPath)
 	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "quarto_project"), CurrentFilesystem.CurrentQuartoDirPath)
 	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "render"), CurrentFilesystem.CurrentRenderDirPath)
 	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "quarto_project.zip"), CurrentFilesystem.CurrentZipFilePath)
+	assert.Nil(t, CurrentFilesystem.CurrentRepository)
+}
+
+func TestGit(t *testing.T) {
+	defer cleanup(t)
+
+	// Set current dir
+	CurrentFilesystem.CheckoutDirectory(99)
+
+	// Create repo
+	assert.Nil(t, CurrentFilesystem.CreateRepository())
+
+	// Create and checkout branch 1 from main
+	assert.Nil(t, CurrentFilesystem.CreateBranch("1"))
+	assert.Nil(t, CurrentFilesystem.CheckoutBranch("1"))
+
+	// Add new file and commit
+	helloFilePath := filepath.Join(CurrentFilesystem.GetCurrentDirPath(), "hello.txt")
+	assert.Nil(t, os.WriteFile(helloFilePath, []byte("world"), fs.ModePerm))
+	assert.Nil(t, CurrentFilesystem.CreateCommit())
+
+	// Check file contents
+	contents, _ := os.ReadFile(helloFilePath)
+	assert.Equal(t, "world", string(contents))
+
+	// Merge 1 into master
+	assert.Nil(t, CurrentFilesystem.Merge("1", "master"))
+	contents, _ = os.ReadFile(helloFilePath)
+	assert.Equal(t, "world", string(contents))
+
+	// Create branch 2 and 3 from main at same time
+	assert.Nil(t, CurrentFilesystem.CreateBranch("2"))
+	assert.Nil(t, CurrentFilesystem.CreateBranch("3"))
+
+	// Checkout branch 2, edit hello.txt, commit, and merge
+	assert.Nil(t, CurrentFilesystem.CheckoutBranch("2"))
+	assert.Nil(t, os.WriteFile(helloFilePath, []byte("alexandria"), fs.ModePerm))
+	assert.Nil(t, CurrentFilesystem.CreateCommit())
+	assert.Nil(t, CurrentFilesystem.Merge("2", "master"))
+
+	// hello.txt has been changed
+	contents, _ = os.ReadFile(helloFilePath)
+	assert.Equal(t, "alexandria", string(contents))
+
+	// Checkout branch 3, delete hello.txt, add "README.md", commit, and merge
+	readmeFilePath := filepath.Join(CurrentFilesystem.GetCurrentDirPath(), "README.md")
+	assert.Nil(t, CurrentFilesystem.CheckoutBranch("3"))
+	assert.Nil(t, os.WriteFile(readmeFilePath, []byte("welcome"), fs.ModePerm))
+	assert.Nil(t, os.Remove(helloFilePath))
+	assert.Nil(t, CurrentFilesystem.CreateCommit())
+	assert.Nil(t, CurrentFilesystem.Merge("3", "master"))
+
+	// hello.txt has been deleted and README.md has been added
+	assert.False(t, utils.FileExists(helloFilePath))
+	contents, _ = os.ReadFile(readmeFilePath)
+	assert.Equal(t, "welcome", string(contents))
+
 }
 
 func TestFileHandling(t *testing.T) {
@@ -51,10 +109,10 @@ func TestFileHandling(t *testing.T) {
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	file, _ := CreateMultipartFileHeader("../utils/test_files/file_handling_test.zip")
 
-	CurrentFilesystem.SetCurrentVersion(1)
+	CurrentFilesystem.CheckoutDirectory(1)
 
 	// Test saving fileheader
-	err := CurrentFilesystem.SaveRepository(c, file)
+	err := CurrentFilesystem.SaveZipFile(c, file)
 	assert.Nil(t, err)
 	assert.True(t, utils.FileExists(CurrentFilesystem.CurrentZipFilePath))
 
@@ -74,7 +132,7 @@ func TestFileHandling(t *testing.T) {
 	assert.Equal(t, "5678", line)
 
 	// Test removing version repository
-	err = CurrentFilesystem.RemoveRepository()
+	err = CurrentFilesystem.DeleteRepository()
 	assert.Nil(t, err)
 	assert.False(t, utils.FileExists(CurrentFilesystem.CurrentDirPath))
 }

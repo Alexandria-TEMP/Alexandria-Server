@@ -24,11 +24,14 @@ func (filesystem *Filesystem) CreateRepository() error {
 	}
 
 	// set CurrentRepository to new repo
-	filesystem.CurrentRepository, err = filesystem.OpenRepository()
+	filesystem.CurrentRepository, err = filesystem.CheckoutRepository()
 
 	if err != nil {
 		return fmt.Errorf("failed to open new repo")
 	}
+
+	// make initial commit
+	filesystem.CreateCommit()
 
 	return nil
 }
@@ -36,7 +39,7 @@ func (filesystem *Filesystem) CreateRepository() error {
 // OpenRepository opens the repository at CurrentDirPath.
 // Do this prior to any operations on a repo.
 // If no repo has been initiated here this will error.
-func (filesystem *Filesystem) OpenRepository() (*git.Repository, error) {
+func (filesystem *Filesystem) CheckoutRepository() (*git.Repository, error) {
 	if r, err := git.PlainOpen(filesystem.CurrentDirPath); err != nil {
 		return nil, fmt.Errorf("failed to open repository")
 	} else {
@@ -47,7 +50,7 @@ func (filesystem *Filesystem) OpenRepository() (*git.Repository, error) {
 // CreateBranch creates a new branch from the last commit on master with branchName as the name.
 func (filesystem *Filesystem) CreateBranch(branchName string) error {
 	// get reference to commit we branch off of
-	fromRef, err := filesystem.GetMasterRef()
+	fromCommit, err := filesystem.GetLastCommit("master")
 
 	if err != nil {
 		return err
@@ -55,12 +58,47 @@ func (filesystem *Filesystem) CreateBranch(branchName string) error {
 
 	// git checkout master
 	// git branch <branchName>
-	toRef := plumbing.NewHashReference(plumbing.ReferenceName(branchName), fromRef.Hash())
+	ref := plumbing.NewHashReference(plumbing.NewBranchReferenceName(branchName), fromCommit.Hash())
 
 	// save branch to .git
-	if err = filesystem.CurrentRepository.Storer.SetReference(toRef); err != nil {
+	if err = filesystem.CurrentRepository.Storer.SetReference(ref); err != nil {
 		return fmt.Errorf("failed to create new branch")
 	}
+
+	return nil
+}
+
+// Megre actually resets master to the last commit on the branch we are merging
+func (filesystem *Filesystem) Merge(toMerge string, mergeInto string) error {
+	// get worktree
+	w, err := filesystem.CurrentRepository.Worktree()
+
+	if err != nil {
+		return fmt.Errorf("failed to open worktree")
+	}
+
+	// checkout master to merge into it
+	filesystem.CheckoutBranch(mergeInto)
+
+	// get last commit on <branchName>
+	lastCommit, err := filesystem.GetLastCommit(toMerge)
+
+	if err != nil {
+		return fmt.Errorf("failed to fetch last commit on %s", toMerge)
+	}
+
+	// git reset --hard <branchName>
+	err = w.Reset(&git.ResetOptions{
+		Commit: lastCommit.Hash(),
+		Mode:   git.HardReset,
+	})
+
+	if err != nil {
+		return fmt.Errorf("failed to reset master to %s", toMerge)
+	}
+
+	// git clean --ffxd
+	w.Clean(&git.CleanOptions{Dir: true})
 
 	return nil
 }
@@ -98,8 +136,8 @@ func (filesystem *Filesystem) CheckoutBranch(branchName string) error {
 
 	// git checkout <branchName>
 	branchCoOpts := git.CheckoutOptions{
-		Branch: plumbing.ReferenceName(branchName),
-		Force:  true,
+		Branch: plumbing.NewBranchReferenceName(branchName),
+		Force:  false,
 	}
 
 	if err := w.Checkout(&branchCoOpts); err != nil {
@@ -116,10 +154,12 @@ func (filesystem *Filesystem) CheckoutBranch(branchName string) error {
 }
 
 // GetMasterRef gets the hash for the last commit on master.
-func (filesystem *Filesystem) GetMasterRef() (*plumbing.Reference, error) {
-	if ref, err := filesystem.CurrentRepository.Reference(plumbing.Master, true); err != nil || ref.Type() == plumbing.InvalidReference {
+func (filesystem *Filesystem) GetLastCommit(branchName string) (*plumbing.Reference, error) {
+	ref, err := filesystem.CurrentRepository.Reference(plumbing.NewBranchReferenceName(branchName), true)
+
+	if err != nil || ref.Type() == plumbing.InvalidReference {
 		return nil, fmt.Errorf("failed to get master ref")
-	} else {
-		return ref, nil
 	}
+
+	return ref, nil
 }

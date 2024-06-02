@@ -31,22 +31,6 @@ var (
 	defaultQuartoDirectoryName = "quarto_project"
 )
 
-func (filesystem *Filesystem) GetCurrentDirPath() string {
-	return filesystem.CurrentDirPath
-}
-
-func (filesystem *Filesystem) GetCurrentQuartoDirPath() string {
-	return filesystem.CurrentQuartoDirPath
-}
-
-func (filesystem *Filesystem) GetCurrentZipFilePath() string {
-	return filesystem.CurrentZipFilePath
-}
-
-func (filesystem *Filesystem) GetCurrentRenderDirPath() string {
-	return filesystem.CurrentRenderDirPath
-}
-
 // NewFilesystem initializes a new filesystem by setting the root to the current working directory and assigning default values.
 func NewFilesystem() *Filesystem {
 	filesystem := &Filesystem{
@@ -63,24 +47,40 @@ func NewFilesystem() *Filesystem {
 	return filesystem
 }
 
+func (filesystem *Filesystem) GetCurrentDirPath() string {
+	return filesystem.CurrentDirPath
+}
+
+func (filesystem *Filesystem) GetCurrentQuartoDirPath() string {
+	return filesystem.CurrentQuartoDirPath
+}
+
+func (filesystem *Filesystem) GetCurrentZipFilePath() string {
+	return filesystem.CurrentZipFilePath
+}
+
+func (filesystem *Filesystem) GetCurrentRenderDirPath() string {
+	return filesystem.CurrentRenderDirPath
+}
+
 // SetCurrentRepository will set the paths the filesystem uses in accordance with the IDs passed.
 // If a git repo exists there it will be opened.
 // CurrentDirPath = <cwd>/vfs/<postID>
 // CurrentQuartoDirPath = <cwd>/vfs/<postID>/quarto_project
 // CurrentZipFilePath = <cwd>/vfs/<postID>/quarto_project.zip
 // CurrentRenderDirPath = <cwd>/vfs/<postID>/render/<some_html_file>
-func (filesystem *Filesystem) SetCurrentRepository(postID uint) {
+func (filesystem *Filesystem) CheckoutDirectory(postID uint) {
 	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10))
 	filesystem.CurrentQuartoDirPath = filepath.Join(filesystem.CurrentDirPath, filesystem.quartoDirectoryName)
 	filesystem.CurrentZipFilePath = filepath.Join(filesystem.CurrentDirPath, filesystem.zipName)
 	filesystem.CurrentRenderDirPath = filepath.Join(filesystem.CurrentDirPath, "render")
 
 	// try to open repository if it exists
-	filesystem.CurrentRepository, _ = filesystem.OpenRepository()
+	filesystem.CurrentRepository, _ = filesystem.CheckoutRepository()
 }
 
 // SaveZippedRepository saves a zip file to a CurrentZipFilePath in the filesystem.
-func (filesystem *Filesystem) SaveZippedRepository(c *gin.Context, file *multipart.FileHeader) error {
+func (filesystem *Filesystem) SaveZipFile(c *gin.Context, file *multipart.FileHeader) error {
 	// Save zip file
 	err := c.SaveUploadedFile(file, filesystem.CurrentZipFilePath)
 
@@ -139,7 +139,7 @@ func (filesystem *Filesystem) Unzip() error {
 }
 
 // RemoveRepository entirely removes a repository
-func (filesystem *Filesystem) RemoveRepository() error {
+func (filesystem *Filesystem) DeleteRepository() error {
 	err := os.RemoveAll(filesystem.CurrentDirPath)
 
 	if err != nil {
