@@ -1,7 +1,6 @@
 basePath: /api/v2
 definitions:
   forms.DiscussionCreationForm:
-<<<<<<< HEAD
     properties:
       anonymous:
         description: If anonymous, the discussion will ignore member ID
@@ -28,24 +27,14 @@ definitions:
           type: integer
         type: array
     type: object
-  forms.IncomingFileForm:
-    type: object
-=======
-    type: object
-  forms.FilterForm:
-    type: object
->>>>>>> main
   forms.MemberCreationForm:
     properties:
       email:
         type: string
-<<<<<<< HEAD
       fields:
         items:
           $ref: '#/definitions/tags.ScientificFieldTag'
         type: array
-=======
->>>>>>> main
       firstName:
         type: string
       institution:
@@ -59,7 +48,6 @@ definitions:
         type: string
     type: object
   forms.MergeRequestCreationForm:
-<<<<<<< HEAD
     properties:
       anonymous:
         type: boolean
@@ -110,27 +98,10 @@ definitions:
         $ref: '#/definitions/tags.FeedbackPreference'
       postCreationForm:
         $ref: '#/definitions/forms.PostCreationForm'
-=======
-    type: object
-  forms.PostCreationForm:
-    properties:
-      collaborators:
-        items:
-          type: integer
-        type: array
-    type: object
-  forms.ProjectPostCreationForm:
-    properties:
-      postCreationForm:
-        allOf:
-        - $ref: '#/definitions/forms.PostCreationForm'
-        description: TODO add fields
->>>>>>> main
     type: object
   forms.ReportCreationForm:
     type: object
   forms.ReviewCreationForm:
-<<<<<<< HEAD
     properties:
       feedback:
         type: string
@@ -149,9 +120,6 @@ definitions:
     - Author
     - Contributor
     - Reviewer
-=======
-    type: object
->>>>>>> main
   models.DiscussionDTO:
     properties:
       anonymous:
@@ -171,11 +139,6 @@ definitions:
       versionID:
         type: integer
     type: object
-<<<<<<< HEAD
-=======
-  models.Member:
-    type: object
->>>>>>> main
   models.MemberDTO:
     properties:
       email:
@@ -195,7 +158,6 @@ definitions:
           $ref: '#/definitions/tags.ScientificField'
         type: array
     type: object
-<<<<<<< HEAD
   models.MergeRequestCollaboratorDTO:
     properties:
       id:
@@ -205,8 +167,6 @@ definitions:
       mergeRequestID:
         type: integer
     type: object
-=======
->>>>>>> main
   models.MergeRequestDTO:
     properties:
       anonymous:
@@ -216,17 +176,12 @@ definitions:
         items:
           type: integer
         type: array
-<<<<<<< HEAD
       createdAt:
         type: string
       id:
         type: integer
       mergeRequestDecision:
         $ref: '#/definitions/models.MergeRequestReviewStatus'
-=======
-      id:
-        type: integer
->>>>>>> main
       mergeRequestTitle:
         type: string
       newPostTitle:
@@ -242,11 +197,8 @@ definitions:
         items:
           type: integer
         type: array
-<<<<<<< HEAD
       updatedAt:
         type: string
-=======
->>>>>>> main
       updatedCompletionStatus:
         $ref: '#/definitions/tags.CompletionStatus'
       updatedScientificFields:
@@ -254,7 +206,6 @@ definitions:
           $ref: '#/definitions/tags.ScientificField'
         type: array
     type: object
-<<<<<<< HEAD
   models.MergeRequestReviewDTO:
     properties:
       createdAt:
@@ -303,10 +254,6 @@ definitions:
     properties:
       anonymous:
         type: boolean
-=======
-  models.PostDTO:
-    properties:
->>>>>>> main
       collaboratorIDs:
         items:
           type: integer
@@ -352,21 +299,11 @@ definitions:
     - failure
     type: string
     x-enum-varnames:
-<<<<<<< HEAD
     - RenderSuccess
     - RenderPending
     - RenderFailure
   models.ReportDTO:
     type: object
-=======
-    - Success
-    - Pending
-    - Failure
-  models.ReportDTO:
-    type: object
-  models.ReviewDTO:
-    type: object
->>>>>>> main
   models.VersionDTO:
     properties:
       discussionIDs:
@@ -378,7 +315,6 @@ definitions:
       renderStatus:
         $ref: '#/definitions/models.RenderStatus'
     type: object
-<<<<<<< HEAD
   reports.DiscussionReportDTO:
     properties:
       discussionID:
@@ -389,8 +325,6 @@ definitions:
       postID:
         type: integer
     type: object
-=======
->>>>>>> main
   tags.CompletionStatus:
     enum:
     - idea
@@ -459,11 +393,7 @@ paths:
       - application/json
       description: |-
         Create a new discussion
-<<<<<<< HEAD
         Either parent ID or version ID must be specified. This determines whether it's a reply or not, respectively.
-=======
-        If parent ID field is used, the discussion will be a reply
->>>>>>> main
       parameters:
       - description: Discussion Creation Form
         in: body
@@ -475,13 +405,10 @@ paths:
         in: query
         name: parentID
         type: string
-<<<<<<< HEAD
       - description: Version ID
         in: query
         name: versionID
         type: string
-=======
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -498,11 +425,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new discussion
-<<<<<<< HEAD
       tags:
       - discussions
-=======
->>>>>>> main
   /discussions/{discussionID}:
     delete:
       consumes:
@@ -532,11 +456,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Delete a discussion
-<<<<<<< HEAD
       tags:
       - discussions
-=======
->>>>>>> main
     get:
       consumes:
       - application/json
@@ -567,7 +488,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get discussion
-<<<<<<< HEAD
       tags:
       - discussions
   /discussions/{discussionID}/reports:
@@ -577,32 +497,10 @@ paths:
       description: Get all reports that have been added to this discussion
       parameters:
       - description: Discussion ID
-=======
-  /discussions/{discussionID}/replies:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        Gets an array of all the first-level replies of a discussion
-        Endpoint is offset-paginated
-      parameters:
-      - description: discussion ID
->>>>>>> main
         in: path
         name: discussionID
         required: true
         type: string
-<<<<<<< HEAD
-=======
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -610,54 +508,7 @@ paths:
           description: OK
           schema:
             items:
-<<<<<<< HEAD
               type: integer
-=======
-              $ref: '#/definitions/models.DiscussionDTO'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get all the replies of a discussion
-  /discussions/{discussionID}/reports:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        Get all reports that have been added to this discussion
-        Endpoint is offset-paginated
-      parameters:
-      - description: Discussion ID
-        in: path
-        name: discussionID
-        required: true
-        type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.ReportDTO'
->>>>>>> main
             type: array
         "400":
           description: Bad Request
@@ -672,11 +523,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all reports of this discussion
-<<<<<<< HEAD
       tags:
       - discussions
-=======
->>>>>>> main
     post:
       consumes:
       - application/json
@@ -713,7 +561,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Add a new report to a discussion
-<<<<<<< HEAD
       tags:
       - discussions
   /discussions/reports/{reportID}:
@@ -747,18 +594,12 @@ paths:
       summary: Gets a discussion report by ID
       tags:
       - discussions
-=======
->>>>>>> main
   /filter/posts:
     get:
       consumes:
       - application/json
       description: |-
-<<<<<<< HEAD
         Returns all post IDs that meet the requirements in the form
-=======
-        Returns all posts that meet the requirements in the form
->>>>>>> main
         Endpoint is offset-paginated
       parameters:
       - description: Filter form
@@ -782,11 +623,7 @@ paths:
           description: OK
           schema:
             items:
-<<<<<<< HEAD
               type: integer
-=======
-              $ref: '#/definitions/models.PostDTO'
->>>>>>> main
             type: array
         "400":
           description: Bad Request
@@ -801,21 +638,14 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Filters all posts
-<<<<<<< HEAD
       tags:
       - filtering
-=======
->>>>>>> main
   /filter/project-posts:
     get:
       consumes:
       - application/json
       description: |-
-<<<<<<< HEAD
         Returns all project post IDs that meet the requirements in the form
-=======
-        Returns all project posts that meet the requirements in the form
->>>>>>> main
         Endpoint is offset-paginated
       parameters:
       - description: Filter form
@@ -839,11 +669,7 @@ paths:
           description: OK
           schema:
             items:
-<<<<<<< HEAD
               type: integer
-=======
-              $ref: '#/definitions/models.ProjectPostDTO'
->>>>>>> main
             type: array
         "400":
           description: Bad Request
@@ -858,7 +684,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Filters all project posts
-<<<<<<< HEAD
       tags:
       - filtering
   /members:
@@ -888,9 +713,6 @@ paths:
       summary: Get IDs of all members
       tags:
       - members
-=======
-  /members:
->>>>>>> main
     post:
       consumes:
       - application/json
@@ -918,11 +740,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create a new member
-<<<<<<< HEAD
       tags:
       - members
-=======
->>>>>>> main
     put:
       consumes:
       - application/json
@@ -933,11 +752,7 @@ paths:
         name: member
         required: true
         schema:
-<<<<<<< HEAD
           $ref: '#/definitions/models.MemberDTO'
-=======
-          $ref: '#/definitions/models.Member'
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -956,11 +771,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Update a member
-<<<<<<< HEAD
       tags:
       - members
-=======
->>>>>>> main
   /members/{userID}:
     delete:
       consumes:
@@ -990,11 +802,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Delete a member
-<<<<<<< HEAD
       tags:
       - members
-=======
->>>>>>> main
     get:
       consumes:
       - application/json
@@ -1025,39 +834,19 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get member from database
-<<<<<<< HEAD
       tags:
       - members
-=======
->>>>>>> main
   /members/{userID}/discussions:
     get:
       consumes:
       - application/json
-<<<<<<< HEAD
       description: Get all discussions that this member has participated in
-=======
-      description: |-
-        Get all merge requests that this member is a collaborator of
-        Endpoint is offset-paginated
->>>>>>> main
       parameters:
       - description: user ID
         in: path
         name: userID
         required: true
         type: string
-<<<<<<< HEAD
-=======
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -1065,7 +854,6 @@ paths:
           description: OK
           schema:
             items:
-<<<<<<< HEAD
               type: integer
             type: array
         "400":
@@ -1102,9 +890,6 @@ paths:
           schema:
             items:
               type: integer
-=======
-              $ref: '#/definitions/models.DiscussionDTO'
->>>>>>> main
             type: array
         "400":
           description: Bad Request
@@ -1119,7 +904,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all merge requests of this member
-<<<<<<< HEAD
       tags:
       - members
   /members/{userID}/posts:
@@ -1127,32 +911,12 @@ paths:
       consumes:
       - application/json
       description: Get all posts that this member is a collaborator of
-=======
-  /members/{userID}/merge-requests:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        Get all merge requests that this member is a collaborator of
-        Endpoint is offset-paginated
->>>>>>> main
       parameters:
       - description: user ID
         in: path
         name: userID
         required: true
         type: string
-<<<<<<< HEAD
-=======
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -1160,54 +924,7 @@ paths:
           description: OK
           schema:
             items:
-<<<<<<< HEAD
               type: integer
-=======
-              $ref: '#/definitions/models.MergeRequestDTO'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get all merge requests of this member
-  /members/{userID}/posts:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        Get all posts that this member is a collaborator of
-        Endpoint is offset-paginated
-      parameters:
-      - description: user ID
-        in: path
-        name: userID
-        required: true
-        type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.PostDTO'
->>>>>>> main
             type: array
         "400":
           description: Bad Request
@@ -1222,39 +939,19 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all posts of this member
-<<<<<<< HEAD
       tags:
       - members
-=======
->>>>>>> main
   /members/{userID}/project-posts:
     get:
       consumes:
       - application/json
-<<<<<<< HEAD
       description: Get all project posts that this member is a collaborator of
-=======
-      description: |-
-        Get all project posts that this member is a collaborator of
-        Endpoint is offset-paginated
->>>>>>> main
       parameters:
       - description: user ID
         in: path
         name: userID
         required: true
         type: string
-<<<<<<< HEAD
-=======
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -1262,11 +959,7 @@ paths:
           description: OK
           schema:
             items:
-<<<<<<< HEAD
               type: integer
-=======
-              $ref: '#/definitions/models.ProjectPostDTO'
->>>>>>> main
             type: array
         "400":
           description: Bad Request
@@ -1281,39 +974,19 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all project posts of this member
-<<<<<<< HEAD
       tags:
       - members
-=======
->>>>>>> main
   /members/{userID}/saved-posts:
     get:
       consumes:
       - application/json
-<<<<<<< HEAD
       description: Get all posts that this member has saved
-=======
-      description: |-
-        Get all posts that this member has saved
-        Endpoint is offset-paginated
->>>>>>> main
       parameters:
       - description: user ID
         in: path
         name: userID
         required: true
         type: string
-<<<<<<< HEAD
-=======
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -1321,11 +994,7 @@ paths:
           description: OK
           schema:
             items:
-<<<<<<< HEAD
               type: integer
-=======
-              $ref: '#/definitions/models.PostDTO'
->>>>>>> main
             type: array
         "400":
           description: Bad Request
@@ -1340,11 +1009,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all saved posts of this member
-<<<<<<< HEAD
       tags:
       - members
-=======
->>>>>>> main
   /members/{userID}/saved-posts/{postID}:
     post:
       consumes:
@@ -1375,39 +1041,19 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Adds new saved post
-<<<<<<< HEAD
       tags:
       - members
-=======
->>>>>>> main
   /members/{userID}/saved-project-posts:
     get:
       consumes:
       - application/json
-<<<<<<< HEAD
       description: Get all project posts that this member has saved
-=======
-      description: |-
-        Get all project posts that this member has saved
-        Endpoint is offset-paginated
->>>>>>> main
       parameters:
       - description: user ID
         in: path
         name: userID
         required: true
         type: string
-<<<<<<< HEAD
-=======
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -1415,11 +1061,7 @@ paths:
           description: OK
           schema:
             items:
-<<<<<<< HEAD
               type: integer
-=======
-              $ref: '#/definitions/models.ProjectPostDTO'
->>>>>>> main
             type: array
         "400":
           description: Bad Request
@@ -1434,11 +1076,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all saved project posts of this member
-<<<<<<< HEAD
       tags:
       - members
-=======
->>>>>>> main
   /members/{userID}/saved-project-posts/{postID}:
     post:
       consumes:
@@ -1469,22 +1108,15 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Adds new saved project post
-<<<<<<< HEAD
       tags:
       - members
-=======
->>>>>>> main
   /merge-requests:
     post:
       consumes:
       - application/json
-<<<<<<< HEAD
       description: |-
         Create a new merge request linked to a project post.
         Note that Member IDs passed here, get converted to Collaborator IDs.
-=======
-      description: Create a new question or discussion merge request
->>>>>>> main
       parameters:
       - description: MergeRequest Creation Form
         in: body
@@ -1508,11 +1140,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new merge request
-<<<<<<< HEAD
       tags:
       - merge-requests
-=======
->>>>>>> main
     put:
       consumes:
       - application/json
@@ -1542,11 +1171,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Update merge request
-<<<<<<< HEAD
       tags:
       - merge-requests
-=======
->>>>>>> main
   /merge-requests/{mergeRequestID}:
     delete:
       consumes:
@@ -1576,11 +1202,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Delete a merge request
-<<<<<<< HEAD
       tags:
       - merge-requests
-=======
->>>>>>> main
     get:
       consumes:
       - application/json
@@ -1611,11 +1234,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get merge request
-<<<<<<< HEAD
       tags:
       - merge-requests
-=======
->>>>>>> main
   /merge-requests/{mergeRequestID}/can-review/{userID}:
     get:
       consumes:
@@ -1640,13 +1260,7 @@ paths:
         "200":
           description: OK
           schema:
-<<<<<<< HEAD
             type: boolean
-=======
-            items:
-              type: boolean
-            type: array
->>>>>>> main
         "400":
           description: Bad Request
           schema:
@@ -1660,13 +1274,9 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns whether the user is allowed to review this merge request
-<<<<<<< HEAD
       tags:
       - merge-requests
   /merge-requests/{mergeRequestID}/review-statuses:
-=======
-  /merge-requests/{mergeRequestID}/reviews:
->>>>>>> main
     get:
       consumes:
       - application/json
@@ -1685,11 +1295,7 @@ paths:
           description: OK
           schema:
             items:
-<<<<<<< HEAD
               $ref: '#/definitions/models.MergeRequestReviewStatus'
-=======
-              type: string
->>>>>>> main
             type: array
         "400":
           description: Bad Request
@@ -1704,12 +1310,9 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns status of all merge request reviews
-<<<<<<< HEAD
       tags:
       - merge-requests
   /merge-requests/{mergeRequestID}/reviews:
-=======
->>>>>>> main
     post:
       consumes:
       - application/json
@@ -1744,7 +1347,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Adds a review to a merge request
-<<<<<<< HEAD
       tags:
       - merge-requests
   /merge-requests/collaborators/{collaboratorID}:
@@ -1787,20 +1389,6 @@ paths:
       - application/json
       description: Returns a review of a merge request with the given ID
       parameters:
-=======
-  /merge-requests/{mergeRequestID}/reviews/{reviewID}:
-    get:
-      consumes:
-      - application/json
-      description: Returns a review with the given ID of the merge request with the
-        given ID
-      parameters:
-      - description: merge request ID
-        in: path
-        name: mergeRequestID
-        required: true
-        type: string
->>>>>>> main
       - description: review ID
         in: path
         name: reviewID
@@ -1812,11 +1400,7 @@ paths:
         "200":
           description: OK
           schema:
-<<<<<<< HEAD
             $ref: '#/definitions/models.MergeRequestReviewDTO'
-=======
-            $ref: '#/definitions/models.ReviewDTO'
->>>>>>> main
         "400":
           description: Bad Request
           schema:
@@ -1829,13 +1413,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-<<<<<<< HEAD
       summary: Returns a merge request review by ID
       tags:
       - merge-requests
-=======
-      summary: Returns a review of a merge request
->>>>>>> main
   /posts:
     post:
       consumes:
@@ -1864,11 +1444,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new post
-<<<<<<< HEAD
       tags:
       - posts
-=======
->>>>>>> main
     put:
       consumes:
       - application/json
@@ -1898,11 +1475,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Update post
-<<<<<<< HEAD
       tags:
       - posts
-=======
->>>>>>> main
   /posts/{postID}:
     delete:
       consumes:
@@ -1932,11 +1506,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Delete a post
-<<<<<<< HEAD
       tags:
       - posts
-=======
->>>>>>> main
     get:
       consumes:
       - application/json
@@ -1967,39 +1538,19 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get post
-<<<<<<< HEAD
       tags:
       - posts
-=======
->>>>>>> main
   /posts/{postID}/reports:
     get:
       consumes:
       - application/json
-<<<<<<< HEAD
       description: Get all reports that have been added to this post
-=======
-      description: |-
-        Get all reports that have been added to this post
-        Endpoint is offset-paginated
->>>>>>> main
       parameters:
       - description: Post ID
         in: path
         name: postID
         required: true
         type: string
-<<<<<<< HEAD
-=======
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -2007,11 +1558,7 @@ paths:
           description: OK
           schema:
             items:
-<<<<<<< HEAD
               type: integer
-=======
-              $ref: '#/definitions/models.ReportDTO'
->>>>>>> main
             type: array
         "400":
           description: Bad Request
@@ -2026,11 +1573,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get all reports of this post
-<<<<<<< HEAD
       tags:
       - posts
-=======
->>>>>>> main
     post:
       consumes:
       - application/json
@@ -2067,7 +1611,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Add a new report to a post
-<<<<<<< HEAD
       tags:
       - posts
   /posts/collaborators/{collaboratorID}:
@@ -2104,8 +1647,6 @@ paths:
       summary: Get a post collaborator by ID
       tags:
       - posts
-=======
->>>>>>> main
   /posts/from-github:
     post:
       consumes:
@@ -2146,7 +1687,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new post with the version imported from github
-<<<<<<< HEAD
       tags:
       - posts
   /posts/reports/{reportID}:
@@ -2180,8 +1720,6 @@ paths:
       summary: Gets a post report by ID
       tags:
       - posts
-=======
->>>>>>> main
   /project-posts:
     post:
       consumes:
@@ -2194,13 +1732,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/forms.ProjectPostCreationForm'
-<<<<<<< HEAD
-=======
-      - description: Parent post ID
-        in: query
-        name: parentPostID
-        type: string
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -2217,11 +1748,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new project post
-<<<<<<< HEAD
       tags:
       - project-posts
-=======
->>>>>>> main
     put:
       consumes:
       - application/json
@@ -2251,11 +1779,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Update project post
-<<<<<<< HEAD
       tags:
       - project-posts
-=======
->>>>>>> main
   /project-posts/{postID}:
     delete:
       consumes:
@@ -2285,11 +1810,8 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Delete a project post
-<<<<<<< HEAD
       tags:
       - project-posts
-=======
->>>>>>> main
     get:
       consumes:
       - application/json
@@ -2320,40 +1842,20 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get project post
-<<<<<<< HEAD
       tags:
       - project-posts
-=======
->>>>>>> main
   /project-posts/{postID}/all-discussions:
     get:
       consumes:
       - application/json
-<<<<<<< HEAD
       description: Returns all discussion IDs on this project post over all its previous
         versions, instead of only the current version
-=======
-      description: |-
-        Returns all discussions on this project post and all of it's merge requests
-        Endpoint is offset-paginated
->>>>>>> main
       parameters:
       - description: post ID
         in: path
         name: postID
         required: true
         type: string
-<<<<<<< HEAD
-=======
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -2361,11 +1863,7 @@ paths:
           description: OK
           schema:
             items:
-<<<<<<< HEAD
               type: integer
-=======
-              $ref: '#/definitions/models.DiscussionDTO'
->>>>>>> main
             type: array
         "400":
           description: Bad Request
@@ -2379,7 +1877,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-<<<<<<< HEAD
       summary: Returns all discussion IDs associated with the project post
       tags:
       - project-posts
@@ -2389,46 +1886,19 @@ paths:
       - application/json
       description: Returns all MR IDs of this project post, grouped by each MR's review
         status
-=======
-      summary: Returns all discussions associated with the project post
-  /project-posts/{postID}/closed-merge-requests:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        Get all closed merge requests associated with the given project post
-        Endpoint is offset-paginated
->>>>>>> main
       parameters:
       - description: post ID
         in: path
         name: postID
         required: true
         type: string
-<<<<<<< HEAD
-=======
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
->>>>>>> main
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-<<<<<<< HEAD
             $ref: '#/definitions/forms.GroupedMergeRequestForm'
-=======
-            items:
-              $ref: '#/definitions/models.MergeRequestDTO'
-            type: array
->>>>>>> main
         "400":
           description: Bad Request
           schema:
@@ -2441,56 +1911,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-<<<<<<< HEAD
       summary: Returns MR IDs grouped by each MR status
       tags:
       - project-posts
-=======
-      summary: Get all closed merge requests of a project post
-  /project-posts/{postID}/open-merge-requests:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        Get all open merge requests associated with the given project post
-        Endpoint is offset-paginated
-      parameters:
-      - description: post ID
-        in: path
-        name: postID
-        required: true
-        type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.MergeRequestDTO'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get all open merge requests of a project post
->>>>>>> main
   /project-posts/from-github:
     post:
       consumes:
@@ -2531,7 +1954,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new project post with the version imported from github
-<<<<<<< HEAD
       tags:
       - project-posts
   /tags/completion-status:
@@ -2578,7 +2000,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Returns all feedbback preferences
+      summary: Returns all feedback preferences
       tags:
       - tags
   /tags/post-type:
@@ -2607,11 +2029,6 @@ paths:
   /tags/scientific:
     get:
       description: Returns all scientific tags (an array of strings) in the database
-=======
-  /tags/scientific:
-    get:
-      description: Returns all scientific tags in the database
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -2625,39 +2042,13 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.HTTPError'
-<<<<<<< HEAD
-=======
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
->>>>>>> main
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns all scientific tags
-<<<<<<< HEAD
       tags:
       - tags
-  /versions/{postID}:
-    post:
-      consumes:
-      - multipart/form-data
-      description: Create a new version with discussions and repository
-      parameters:
-      - description: Parent Post ID
-        in: query
-        name: postID
-        required: true
-        type: string
-      - description: Repository to create
-        in: body
-        name: repository
-        required: true
-        schema:
-          $ref: '#/definitions/forms.IncomingFileForm'
-=======
   /versions:
     post:
       consumes:
@@ -2670,7 +2061,6 @@ paths:
         name: repository
         required: true
         type: file
->>>>>>> main
       produces:
       - application/json
       responses:
@@ -2687,17 +2077,12 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new version
-<<<<<<< HEAD
       tags:
       - versions
   /versions/{versionID}:
     get:
       consumes:
       - application/json
-=======
-  /versions/{versionID}:
-    get:
->>>>>>> main
       description: Get a version by version ID
       parameters:
       - description: Version ID
@@ -2720,39 +2105,20 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/utils.HTTPError'
-<<<<<<< HEAD
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get version
       tags:
       - versions
-  /versions/{versionID}/file:
-    get:
-      description: Get the contents of a single file from a repository of a version
-=======
-      summary: Get version
   /versions/{versionID}/discussions:
     get:
       description: |-
         Returns all discussions on this version that are not a reply to another discussion
         Endpoint is offset-paginated
->>>>>>> main
       parameters:
       - description: version ID
         in: path
         name: versionID
         required: true
         type: string
-<<<<<<< HEAD
-      - description: file path
-        in: body
-        name: filePath
-        required: true
-        schema:
-          type: string
-=======
       - description: page query
         in: query
         name: page
@@ -2763,17 +2129,12 @@ paths:
         type: integer
       produces:
       - application/json
->>>>>>> main
       responses:
         "200":
           description: OK
           schema:
             items:
-<<<<<<< HEAD
-              type: integer
-=======
               $ref: '#/definitions/models.DiscussionDTO'
->>>>>>> main
             type: array
         "400":
           description: Bad Request
@@ -2787,17 +2148,9 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-<<<<<<< HEAD
-      summary: Get a file from a repository
+      summary: Returns all level 1 discussions associated with the version
       tags:
       - versions
-  /versions/{versionID}/render:
-    get:
-      description: Get the render of the repository underlying a version
-      parameters:
-      - description: version ID
-=======
-      summary: Returns all level 1 discussions associated with the version
   /versions/{versionID}/file/{filepath}:
     get:
       description: Get the contents of a single file from a repository of a version
@@ -2830,13 +2183,14 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get a file from a repository
+      tags:
+      - versions
   /versions/{versionID}/render:
     get:
       description: Get the render of the repository underlying a version if it exists
         and has been rendered successfully
       parameters:
       - description: Version ID
->>>>>>> main
         in: path
         name: versionID
         required: true
@@ -2850,13 +2204,10 @@ paths:
             items:
               type: integer
             type: array
-<<<<<<< HEAD
-=======
         "202":
           description: Accepted
           schema:
             type: string
->>>>>>> main
         "400":
           description: Bad Request
           schema:
@@ -2865,17 +2216,9 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/utils.HTTPError'
-<<<<<<< HEAD
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get the render of a version
       tags:
       - versions
-=======
-      summary: Get the render of a version
->>>>>>> main
   /versions/{versionID}/repository:
     get:
       description: Get the entire zipped repository of a version
@@ -2894,13 +2237,10 @@ paths:
             items:
               type: integer
             type: array
-<<<<<<< HEAD
-=======
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.HTTPError'
->>>>>>> main
         "404":
           description: Not Found
           schema:
@@ -2910,7 +2250,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get the repository of a version
-<<<<<<< HEAD
       tags:
       - versions
   /versions/{versionID}/tree:
@@ -2920,13 +2259,6 @@ paths:
       description: Get the file tree of a repository of a version
       parameters:
       - description: version ID
-=======
-  /versions/{versionID}/tree:
-    get:
-      description: Get the file tree of a repository of a version
-      parameters:
-      - description: Version ID
->>>>>>> main
         in: path
         name: versionID
         required: true
@@ -2953,9 +2285,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get the file tree of a repository
-<<<<<<< HEAD
       tags:
       - versions
-=======
->>>>>>> main
 swagger: "2.0"

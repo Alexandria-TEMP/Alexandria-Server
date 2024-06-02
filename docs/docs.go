@@ -2402,7 +2402,7 @@ const docTemplate = `{
                 "tags": [
                     "tags"
                 ],
-                "summary": "Returns all feedbback preferences",
+                "summary": "Returns all feedback preferences",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2498,11 +2498,7 @@ const docTemplate = `{
                 }
             }
         },
-<<<<<<< HEAD
-        "/versions/{postID}": {
-=======
         "/versions": {
->>>>>>> main
             "post": {
                 "description": "Create a new version with discussions and repository from zipped file in body",
                 "consumes": [
@@ -2520,16 +2516,8 @@ const docTemplate = `{
                         "type": "file",
                         "description": "Repository to create",
                         "name": "repository",
-<<<<<<< HEAD
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/forms.IncomingFileForm"
-                        }
-=======
                         "in": "formData",
                         "required": true
->>>>>>> main
                     }
                 ],
                 "responses": {
@@ -2557,6 +2545,9 @@ const docTemplate = `{
         "/versions/{versionID}": {
             "get": {
                 "description": "Get a version by version ID",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2595,18 +2586,14 @@ const docTemplate = `{
                 }
             }
         },
-<<<<<<< HEAD
-        "/versions/{versionID}/file": {
-            "get": {
-                "description": "Get the contents of a single file from a repository of a version",
-                "tags": [
-                    "versions"
-=======
         "/versions/{versionID}/discussions": {
             "get": {
                 "description": "Returns all discussions on this version that are not a reply to another discussion\nEndpoint is offset-paginated",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "versions"
                 ],
                 "summary": "Returns all level 1 discussions associated with the version",
                 "parameters": [
@@ -2666,7 +2653,9 @@ const docTemplate = `{
                 "description": "Get the contents of a single file from a repository of a version",
                 "produces": [
                     "application/octet-stream"
->>>>>>> main
+                ],
+                "tags": [
+                    "versions"
                 ],
                 "summary": "Get a file from a repository",
                 "parameters": [
@@ -2766,6 +2755,9 @@ const docTemplate = `{
                 "produces": [
                     "application/zip"
                 ],
+                "tags": [
+                    "versions"
+                ],
                 "summary": "Get the repository of a version",
                 "parameters": [
                     {
@@ -2807,53 +2799,12 @@ const docTemplate = `{
                 }
             }
         },
-        "/versions/{versionID}/repository": {
-            "get": {
-                "description": "Get the entire zipped repository of a version",
-                "produces": [
-                    "application/zip"
-                ],
-                "tags": [
-                    "versions"
-                ],
-                "summary": "Get the repository of a version",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Version ID",
-                        "name": "versionID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
         "/versions/{versionID}/tree": {
             "get": {
                 "description": "Get the file tree of a repository of a version",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2864,7 +2815,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Version ID",
+                        "description": "version ID",
                         "name": "versionID",
                         "in": "path",
                         "required": true
@@ -2943,9 +2894,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "forms.IncomingFileForm": {
-            "type": "object"
         },
         "forms.MemberCreationForm": {
             "type": "object",
@@ -3137,7 +3085,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/tags.ScientificField"
                     }
-<<<<<<< HEAD
                 }
             }
         },
@@ -3152,8 +3099,6 @@ const docTemplate = `{
                 },
                 "mergeRequestID": {
                     "type": "integer"
-=======
->>>>>>> main
                 }
             }
         },
@@ -3176,12 +3121,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-<<<<<<< HEAD
                 "mergeRequestDecision": {
                     "$ref": "#/definitions/models.MergeRequestReviewStatus"
                 },
-=======
->>>>>>> main
                 "mergeRequestTitle": {
                     "type": "string"
                 },
@@ -3215,7 +3157,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/tags.ScientificField"
                     }
-<<<<<<< HEAD
                 }
             }
         },
@@ -3280,8 +3221,6 @@ const docTemplate = `{
                 },
                 "postID": {
                     "type": "integer"
-=======
->>>>>>> main
                 }
             }
         },
@@ -3357,7 +3296,6 @@ const docTemplate = `{
                 "failure"
             ],
             "x-enum-varnames": [
-<<<<<<< HEAD
                 "RenderSuccess",
                 "RenderPending",
                 "RenderFailure"
@@ -3366,19 +3304,6 @@ const docTemplate = `{
         "models.ReportDTO": {
             "type": "object"
         },
-=======
-                "Success",
-                "Pending",
-                "Failure"
-            ]
-        },
-        "models.ReportDTO": {
-            "type": "object"
-        },
-        "models.ReviewDTO": {
-            "type": "object"
-        },
->>>>>>> main
         "models.VersionDTO": {
             "type": "object",
             "properties": {
@@ -3393,7 +3318,6 @@ const docTemplate = `{
                 },
                 "renderStatus": {
                     "$ref": "#/definitions/models.RenderStatus"
-<<<<<<< HEAD
                 }
             }
         },
@@ -3410,8 +3334,6 @@ const docTemplate = `{
             "properties": {
                 "postID": {
                     "type": "integer"
-=======
->>>>>>> main
                 }
             }
         },
