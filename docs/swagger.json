@@ -11,16 +11,23 @@
     "paths": {
         "/discussions": {
             "post": {
+<<<<<<< HEAD
                 "description": "Create a new discussion\nEither parent ID or version ID must be specified. This determines whether it's a reply or not, respectively.",
+=======
+                "description": "Create a new discussion\nIf parent ID field is used, the discussion will be a reply",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "discussions"
                 ],
+=======
+>>>>>>> main
                 "summary": "Create new discussion",
                 "parameters": [
                     {
@@ -37,12 +44,15 @@
                         "description": "Parent ID",
                         "name": "parentID",
                         "in": "query"
+<<<<<<< HEAD
                     },
                     {
                         "type": "string",
                         "description": "Version ID",
                         "name": "versionID",
                         "in": "query"
+=======
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -67,6 +77,7 @@
                 }
             }
         },
+<<<<<<< HEAD
         "/discussions/reports/{reportID}": {
             "get": {
                 "description": "Gets a discussion report by its ID",
@@ -114,6 +125,8 @@
                 }
             }
         },
+=======
+>>>>>>> main
         "/discussions/{discussionID}": {
             "get": {
                 "description": "Get a discussion by discussion ID",
@@ -123,9 +136,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "discussions"
                 ],
+=======
+>>>>>>> main
                 "summary": "Get discussion",
                 "parameters": [
                     {
@@ -171,9 +187,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "discussions"
                 ],
+=======
+>>>>>>> main
                 "summary": "Delete a discussion",
                 "parameters": [
                     {
@@ -209,17 +228,87 @@
                 }
             }
         },
+<<<<<<< HEAD
         "/discussions/{discussionID}/reports": {
             "get": {
                 "description": "Get all reports that have been added to this discussion",
+=======
+        "/discussions/{discussionID}/replies": {
+            "get": {
+                "description": "Gets an array of all the first-level replies of a discussion\nEndpoint is offset-paginated",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "discussions"
+=======
+                "summary": "Get all the replies of a discussion",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "discussion ID",
+                        "name": "discussionID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.DiscussionDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/discussions/{discussionID}/reports": {
+            "get": {
+                "description": "Get all reports that have been added to this discussion\nEndpoint is offset-paginated",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+>>>>>>> main
                 ],
                 "summary": "Get all reports of this discussion",
                 "parameters": [
@@ -229,6 +318,21 @@
                         "name": "discussionID",
                         "in": "path",
                         "required": true
+<<<<<<< HEAD
+=======
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -237,7 +341,11 @@
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "type": "integer"
+=======
+                                "$ref": "#/definitions/models.ReportDTO"
+>>>>>>> main
                             }
                         }
                     },
@@ -269,9 +377,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "discussions"
                 ],
+=======
+>>>>>>> main
                 "summary": "Add a new report to a discussion",
                 "parameters": [
                     {
@@ -321,16 +432,23 @@
         },
         "/filter/posts": {
             "get": {
+<<<<<<< HEAD
                 "description": "Returns all post IDs that meet the requirements in the form\nEndpoint is offset-paginated",
+=======
+                "description": "Returns all posts that meet the requirements in the form\nEndpoint is offset-paginated",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "filtering"
                 ],
+=======
+>>>>>>> main
                 "summary": "Filters all posts",
                 "parameters": [
                     {
@@ -361,7 +479,11 @@
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "type": "integer"
+=======
+                                "$ref": "#/definitions/models.PostDTO"
+>>>>>>> main
                             }
                         }
                     },
@@ -388,16 +510,23 @@
         },
         "/filter/project-posts": {
             "get": {
+<<<<<<< HEAD
                 "description": "Returns all project post IDs that meet the requirements in the form\nEndpoint is offset-paginated",
+=======
+                "description": "Returns all project posts that meet the requirements in the form\nEndpoint is offset-paginated",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "filtering"
                 ],
+=======
+>>>>>>> main
                 "summary": "Filters all project posts",
                 "parameters": [
                     {
@@ -428,7 +557,11 @@
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "type": "integer"
+=======
+                                "$ref": "#/definitions/models.ProjectPostDTO"
+>>>>>>> main
                             }
                         }
                     },
@@ -454,6 +587,7 @@
             }
         },
         "/members": {
+<<<<<<< HEAD
             "get": {
                 "description": "Get the ID of every member in the database.",
                 "produces": [
@@ -493,6 +627,8 @@
                     }
                 }
             },
+=======
+>>>>>>> main
             "put": {
                 "description": "Update the fields of a member",
                 "consumes": [
@@ -501,9 +637,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "members"
                 ],
+=======
+>>>>>>> main
                 "summary": "Update a member",
                 "parameters": [
                     {
@@ -512,7 +651,11 @@
                         "in": "body",
                         "required": true,
                         "schema": {
+<<<<<<< HEAD
                             "$ref": "#/definitions/models.MemberDTO"
+=======
+                            "$ref": "#/definitions/models.Member"
+>>>>>>> main
                         }
                     }
                 ],
@@ -548,9 +691,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "members"
                 ],
+=======
+>>>>>>> main
                 "summary": "Create a new member",
                 "parameters": [
                     {
@@ -594,9 +740,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "members"
                 ],
+=======
+>>>>>>> main
                 "summary": "Get member from database",
                 "parameters": [
                     {
@@ -642,9 +791,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "members"
                 ],
+=======
+>>>>>>> main
                 "summary": "Delete a member",
                 "parameters": [
                     {
@@ -682,17 +834,25 @@
         },
         "/members/{userID}/discussions": {
             "get": {
+<<<<<<< HEAD
                 "description": "Get all discussions that this member has participated in",
+=======
+                "description": "Get all merge requests that this member is a collaborator of\nEndpoint is offset-paginated",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "members"
                 ],
                 "summary": "Get all discussions",
+=======
+                "summary": "Get all merge requests of this member",
+>>>>>>> main
                 "parameters": [
                     {
                         "type": "string",
@@ -700,6 +860,21 @@
                         "name": "userID",
                         "in": "path",
                         "required": true
+<<<<<<< HEAD
+=======
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -708,7 +883,11 @@
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "type": "integer"
+=======
+                                "$ref": "#/definitions/models.DiscussionDTO"
+>>>>>>> main
                             }
                         }
                     },
@@ -735,16 +914,23 @@
         },
         "/members/{userID}/merge-requests": {
             "get": {
+<<<<<<< HEAD
                 "description": "Get all merge requests that this member is a collaborator of",
+=======
+                "description": "Get all merge requests that this member is a collaborator of\nEndpoint is offset-paginated",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "members"
                 ],
+=======
+>>>>>>> main
                 "summary": "Get all merge requests of this member",
                 "parameters": [
                     {
@@ -753,6 +939,21 @@
                         "name": "userID",
                         "in": "path",
                         "required": true
+<<<<<<< HEAD
+=======
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -761,7 +962,11 @@
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "type": "integer"
+=======
+                                "$ref": "#/definitions/models.MergeRequestDTO"
+>>>>>>> main
                             }
                         }
                     },
@@ -788,16 +993,23 @@
         },
         "/members/{userID}/posts": {
             "get": {
+<<<<<<< HEAD
                 "description": "Get all posts that this member is a collaborator of",
+=======
+                "description": "Get all posts that this member is a collaborator of\nEndpoint is offset-paginated",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "members"
                 ],
+=======
+>>>>>>> main
                 "summary": "Get all posts of this member",
                 "parameters": [
                     {
@@ -806,6 +1018,21 @@
                         "name": "userID",
                         "in": "path",
                         "required": true
+<<<<<<< HEAD
+=======
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -814,7 +1041,11 @@
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "type": "integer"
+=======
+                                "$ref": "#/definitions/models.PostDTO"
+>>>>>>> main
                             }
                         }
                     },
@@ -841,16 +1072,23 @@
         },
         "/members/{userID}/project-posts": {
             "get": {
+<<<<<<< HEAD
                 "description": "Get all project posts that this member is a collaborator of",
+=======
+                "description": "Get all project posts that this member is a collaborator of\nEndpoint is offset-paginated",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "members"
                 ],
+=======
+>>>>>>> main
                 "summary": "Get all project posts of this member",
                 "parameters": [
                     {
@@ -859,6 +1097,21 @@
                         "name": "userID",
                         "in": "path",
                         "required": true
+<<<<<<< HEAD
+=======
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -867,7 +1120,11 @@
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "type": "integer"
+=======
+                                "$ref": "#/definitions/models.ProjectPostDTO"
+>>>>>>> main
                             }
                         }
                     },
@@ -894,16 +1151,23 @@
         },
         "/members/{userID}/saved-posts": {
             "get": {
+<<<<<<< HEAD
                 "description": "Get all posts that this member has saved",
+=======
+                "description": "Get all posts that this member has saved\nEndpoint is offset-paginated",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "members"
                 ],
+=======
+>>>>>>> main
                 "summary": "Get all saved posts of this member",
                 "parameters": [
                     {
@@ -912,6 +1176,21 @@
                         "name": "userID",
                         "in": "path",
                         "required": true
+<<<<<<< HEAD
+=======
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -920,7 +1199,11 @@
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "type": "integer"
+=======
+                                "$ref": "#/definitions/models.PostDTO"
+>>>>>>> main
                             }
                         }
                     },
@@ -954,9 +1237,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "members"
                 ],
+=======
+>>>>>>> main
                 "summary": "Adds new saved post",
                 "parameters": [
                     {
@@ -995,16 +1281,23 @@
         },
         "/members/{userID}/saved-project-posts": {
             "get": {
+<<<<<<< HEAD
                 "description": "Get all project posts that this member has saved",
+=======
+                "description": "Get all project posts that this member has saved\nEndpoint is offset-paginated",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "members"
                 ],
+=======
+>>>>>>> main
                 "summary": "Get all saved project posts of this member",
                 "parameters": [
                     {
@@ -1013,6 +1306,21 @@
                         "name": "userID",
                         "in": "path",
                         "required": true
+<<<<<<< HEAD
+=======
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -1021,7 +1329,11 @@
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "type": "integer"
+=======
+                                "$ref": "#/definitions/models.ProjectPostDTO"
+>>>>>>> main
                             }
                         }
                     },
@@ -1055,9 +1367,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "members"
                 ],
+=======
+>>>>>>> main
                 "summary": "Adds new saved project post",
                 "parameters": [
                     {
@@ -1103,9 +1418,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "merge-requests"
                 ],
+=======
+>>>>>>> main
                 "summary": "Update merge request",
                 "parameters": [
                     {
@@ -1143,16 +1461,23 @@
                 }
             },
             "post": {
+<<<<<<< HEAD
                 "description": "Create a new merge request linked to a project post.\nNote that Member IDs passed here, get converted to Collaborator IDs.",
+=======
+                "description": "Create a new question or discussion merge request",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "merge-requests"
                 ],
+=======
+>>>>>>> main
                 "summary": "Create new merge request",
                 "parameters": [
                     {
@@ -1187,6 +1512,7 @@
                 }
             }
         },
+<<<<<<< HEAD
         "/merge-requests/collaborators/{collaboratorID}": {
             "get": {
                 "description": "Get a merge request collaborator by ID, a member who has collaborated on a merge request",
@@ -1287,6 +1613,8 @@
                 }
             }
         },
+=======
+>>>>>>> main
         "/merge-requests/{mergeRequestID}": {
             "get": {
                 "description": "Get a merge request by merge request ID",
@@ -1296,9 +1624,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "merge-requests"
                 ],
+=======
+>>>>>>> main
                 "summary": "Get merge request",
                 "parameters": [
                     {
@@ -1344,9 +1675,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "merge-requests"
                 ],
+=======
+>>>>>>> main
                 "summary": "Delete a merge request",
                 "parameters": [
                     {
@@ -1391,9 +1725,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "merge-requests"
                 ],
+=======
+>>>>>>> main
                 "summary": "Returns whether the user is allowed to review this merge request",
                 "parameters": [
                     {
@@ -1415,6 +1752,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+<<<<<<< HEAD
                             "type": "boolean"
                         }
                     },
@@ -1468,6 +1806,11 @@
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/models.MergeRequestReviewStatus"
+=======
+                            "type": "array",
+                            "items": {
+                                "type": "boolean"
+>>>>>>> main
                             }
                         }
                     },
@@ -1493,6 +1836,57 @@
             }
         },
         "/merge-requests/{mergeRequestID}/reviews": {
+<<<<<<< HEAD
+=======
+            "get": {
+                "description": "Returns an array of the statuses of all the reviews of this merge request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Returns status of all merge request reviews",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "merge request ID",
+                        "name": "mergeRequestID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            },
+>>>>>>> main
             "post": {
                 "description": "Adds a review to a merge request",
                 "consumes": [
@@ -1501,9 +1895,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "merge-requests"
                 ],
+=======
+>>>>>>> main
                 "summary": "Adds a review to a merge request",
                 "parameters": [
                     {
@@ -1548,6 +1945,63 @@
                 }
             }
         },
+<<<<<<< HEAD
+=======
+        "/merge-requests/{mergeRequestID}/reviews/{reviewID}": {
+            "get": {
+                "description": "Returns a review with the given ID of the merge request with the given ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Returns a review of a merge request",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "merge request ID",
+                        "name": "mergeRequestID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "review ID",
+                        "name": "reviewID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ReviewDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+>>>>>>> main
         "/posts": {
             "put": {
                 "description": "Update any number of the aspects of a question or discussion post",
@@ -1557,9 +2011,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "posts"
                 ],
+=======
+>>>>>>> main
                 "summary": "Update post",
                 "parameters": [
                     {
@@ -1604,9 +2061,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "posts"
                 ],
+=======
+>>>>>>> main
                 "summary": "Create new post",
                 "parameters": [
                     {
@@ -1641,6 +2101,7 @@
                 }
             }
         },
+<<<<<<< HEAD
         "/posts/collaborators/{collaboratorID}": {
             "get": {
                 "description": "Get a post collaborator by ID, a member who has collaborated on a post",
@@ -1691,6 +2152,8 @@
                 }
             }
         },
+=======
+>>>>>>> main
         "/posts/from-github": {
             "post": {
                 "description": "Create a new question or discussion post\nCreates a post in the same way as CreatePost\nHowever, the post files are imported from the given Github repository",
@@ -1700,9 +2163,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "posts"
                 ],
+=======
+>>>>>>> main
                 "summary": "Create new post with the version imported from github",
                 "parameters": [
                     {
@@ -1750,6 +2216,7 @@
                 }
             }
         },
+<<<<<<< HEAD
         "/posts/reports/{reportID}": {
             "get": {
                 "description": "Gets a post report by its ID",
@@ -1797,6 +2264,8 @@
                 }
             }
         },
+=======
+>>>>>>> main
         "/posts/{postID}": {
             "get": {
                 "description": "Get a post by post ID",
@@ -1806,9 +2275,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "posts"
                 ],
+=======
+>>>>>>> main
                 "summary": "Get post",
                 "parameters": [
                     {
@@ -1854,9 +2326,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "posts"
                 ],
+=======
+>>>>>>> main
                 "summary": "Delete a post",
                 "parameters": [
                     {
@@ -1894,16 +2369,23 @@
         },
         "/posts/{postID}/reports": {
             "get": {
+<<<<<<< HEAD
                 "description": "Get all reports that have been added to this post",
+=======
+                "description": "Get all reports that have been added to this post\nEndpoint is offset-paginated",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "posts"
                 ],
+=======
+>>>>>>> main
                 "summary": "Get all reports of this post",
                 "parameters": [
                     {
@@ -1912,6 +2394,21 @@
                         "name": "postID",
                         "in": "path",
                         "required": true
+<<<<<<< HEAD
+=======
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -1920,7 +2417,11 @@
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "type": "integer"
+=======
+                                "$ref": "#/definitions/models.ReportDTO"
+>>>>>>> main
                             }
                         }
                     },
@@ -1952,9 +2453,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "posts"
                 ],
+=======
+>>>>>>> main
                 "summary": "Add a new report to a post",
                 "parameters": [
                     {
@@ -2011,9 +2515,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "project-posts"
                 ],
+=======
+>>>>>>> main
                 "summary": "Update project post",
                 "parameters": [
                     {
@@ -2058,9 +2565,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "project-posts"
                 ],
+=======
+>>>>>>> main
                 "summary": "Create new project post",
                 "parameters": [
                     {
@@ -2071,6 +2581,15 @@
                         "schema": {
                             "$ref": "#/definitions/forms.ProjectPostCreationForm"
                         }
+<<<<<<< HEAD
+=======
+                    },
+                    {
+                        "type": "string",
+                        "description": "Parent post ID",
+                        "name": "parentPostID",
+                        "in": "query"
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -2104,9 +2623,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "project-posts"
                 ],
+=======
+>>>>>>> main
                 "summary": "Create new project post with the version imported from github",
                 "parameters": [
                     {
@@ -2163,9 +2685,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "project-posts"
                 ],
+=======
+>>>>>>> main
                 "summary": "Get project post",
                 "parameters": [
                     {
@@ -2211,9 +2736,12 @@
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "project-posts"
                 ],
+=======
+>>>>>>> main
                 "summary": "Delete a project post",
                 "parameters": [
                     {
@@ -2251,17 +2779,25 @@
         },
         "/project-posts/{postID}/all-discussions": {
             "get": {
+<<<<<<< HEAD
                 "description": "Returns all discussion IDs on this project post over all its previous versions, instead of only the current version",
+=======
+                "description": "Returns all discussions on this project post and all of it's merge requests\nEndpoint is offset-paginated",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "project-posts"
                 ],
                 "summary": "Returns all discussion IDs associated with the project post",
+=======
+                "summary": "Returns all discussions associated with the project post",
+>>>>>>> main
                 "parameters": [
                     {
                         "type": "string",
@@ -2269,6 +2805,21 @@
                         "name": "postID",
                         "in": "path",
                         "required": true
+<<<<<<< HEAD
+=======
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -2277,7 +2828,11 @@
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "type": "integer"
+=======
+                                "$ref": "#/definitions/models.DiscussionDTO"
+>>>>>>> main
                             }
                         }
                     },
@@ -2302,19 +2857,29 @@
                 }
             }
         },
+<<<<<<< HEAD
         "/project-posts/{postID}/merge-requests-by-status": {
             "get": {
                 "description": "Returns all MR IDs of this project post, grouped by each MR's review status",
+=======
+        "/project-posts/{postID}/closed-merge-requests": {
+            "get": {
+                "description": "Get all closed merge requests associated with the given project post\nEndpoint is offset-paginated",
+>>>>>>> main
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "project-posts"
                 ],
                 "summary": "Returns MR IDs grouped by each MR status",
+=======
+                "summary": "Get all closed merge requests of a project post",
+>>>>>>> main
                 "parameters": [
                     {
                         "type": "string",
@@ -2322,13 +2887,35 @@
                         "name": "postID",
                         "in": "path",
                         "required": true
+<<<<<<< HEAD
+=======
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+>>>>>>> main
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
+<<<<<<< HEAD
                             "$ref": "#/definitions/forms.GroupedMergeRequestForm"
+=======
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.MergeRequestDTO"
+                            }
+>>>>>>> main
                         }
                     },
                     "400": {
@@ -2352,6 +2939,7 @@
                 }
             }
         },
+<<<<<<< HEAD
         "/tags/completion-status": {
             "get": {
                 "description": "Returns every possible completion status that a Post can have",
@@ -2397,13 +2985,50 @@
                     "tags"
                 ],
                 "summary": "Returns all feedbback preferences",
+=======
+        "/project-posts/{postID}/open-merge-requests": {
+            "get": {
+                "description": "Get all open merge requests associated with the given project post\nEndpoint is offset-paginated",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all open merge requests of a project post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+>>>>>>> main
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
+<<<<<<< HEAD
                                 "$ref": "#/definitions/tags.FeedbackPreference"
+=======
+                                "$ref": "#/definitions/models.MergeRequestDTO"
+>>>>>>> main
                             }
                         }
                     },
@@ -2413,6 +3038,7 @@
                             "$ref": "#/definitions/utils.HTTPError"
                         }
                     },
+<<<<<<< HEAD
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -2444,6 +3070,10 @@
                     },
                     "400": {
                         "description": "Bad Request",
+=======
+                    "404": {
+                        "description": "Not Found",
+>>>>>>> main
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
@@ -2459,6 +3089,7 @@
         },
         "/tags/scientific": {
             "get": {
+<<<<<<< HEAD
                 "description": "Returns all scientific tags (an array of strings) in the database",
                 "produces": [
                     "application/json"
@@ -2466,6 +3097,12 @@
                 "tags": [
                     "tags"
                 ],
+=======
+                "description": "Returns all scientific tags in the database",
+                "produces": [
+                    "application/json"
+                ],
+>>>>>>> main
                 "summary": "Returns all scientific tags",
                 "responses": {
                     "200": {
@@ -2483,6 +3120,15 @@
                             "$ref": "#/definitions/utils.HTTPError"
                         }
                     },
+<<<<<<< HEAD
+=======
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+>>>>>>> main
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -2492,15 +3138,22 @@
                 }
             }
         },
+<<<<<<< HEAD
         "/versions/{postID}": {
             "post": {
                 "description": "Create a new version with discussions and repository",
+=======
+        "/versions": {
+            "post": {
+                "description": "Create a new version with discussions and repository from zipped file in body",
+>>>>>>> main
                 "consumes": [
                     "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "versions"
                 ],
@@ -2521,6 +3174,16 @@
                         "schema": {
                             "$ref": "#/definitions/forms.IncomingFileForm"
                         }
+=======
+                "summary": "Create new version",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Repository to create",
+                        "name": "repository",
+                        "in": "formData",
+                        "required": true
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -2548,6 +3211,7 @@
         "/versions/{versionID}": {
             "get": {
                 "description": "Get a version by version ID",
+<<<<<<< HEAD
                 "consumes": [
                     "application/json"
                 ],
@@ -2557,6 +3221,11 @@
                 "tags": [
                     "versions"
                 ],
+=======
+                "produces": [
+                    "application/json"
+                ],
+>>>>>>> main
                 "summary": "Get version",
                 "parameters": [
                     {
@@ -2585,6 +3254,62 @@
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
+<<<<<<< HEAD
+=======
+                    }
+                }
+            }
+        },
+        "/versions/{versionID}/discussions": {
+            "get": {
+                "description": "Returns all discussions on this version that are not a reply to another discussion\nEndpoint is offset-paginated",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Returns all level 1 discussions associated with the version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.DiscussionDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+>>>>>>> main
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2595,22 +3320,35 @@
                 }
             }
         },
+<<<<<<< HEAD
         "/versions/{versionID}/file": {
             "get": {
                 "description": "Get the contents of a single file from a repository of a version",
                 "tags": [
                     "versions"
+=======
+        "/versions/{versionID}/file/{filepath}": {
+            "get": {
+                "description": "Get the contents of a single file from a repository of a version",
+                "produces": [
+                    "application/octet-stream"
+>>>>>>> main
                 ],
                 "summary": "Get a file from a repository",
                 "parameters": [
                     {
                         "type": "string",
+<<<<<<< HEAD
                         "description": "version ID",
+=======
+                        "description": "Version ID",
+>>>>>>> main
                         "name": "versionID",
                         "in": "path",
                         "required": true
                     },
                     {
+<<<<<<< HEAD
                         "description": "file path",
                         "name": "filePath",
                         "in": "body",
@@ -2618,6 +3356,13 @@
                         "schema": {
                             "type": "string"
                         }
+=======
+                        "type": "string",
+                        "description": "Filepath",
+                        "name": "filepath",
+                        "in": "path",
+                        "required": true
+>>>>>>> main
                     }
                 ],
                 "responses": {
@@ -2630,12 +3375,15 @@
                             }
                         }
                     },
+<<<<<<< HEAD
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
                     },
+=======
+>>>>>>> main
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -2653,6 +3401,7 @@
         },
         "/versions/{versionID}/render": {
             "get": {
+<<<<<<< HEAD
                 "description": "Get the render of the repository underlying a version",
                 "produces": [
                     "text/html"
@@ -2660,11 +3409,21 @@
                 "tags": [
                     "versions"
                 ],
+=======
+                "description": "Get the render of the repository underlying a version if it exists and has been rendered successfully",
+                "produces": [
+                    "text/html"
+                ],
+>>>>>>> main
                 "summary": "Get the render of a version",
                 "parameters": [
                     {
                         "type": "string",
+<<<<<<< HEAD
                         "description": "version ID",
+=======
+                        "description": "Version ID",
+>>>>>>> main
                         "name": "versionID",
                         "in": "path",
                         "required": true
@@ -2680,6 +3439,15 @@
                             }
                         }
                     },
+<<<<<<< HEAD
+=======
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+>>>>>>> main
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -2691,12 +3459,15 @@
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
+<<<<<<< HEAD
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
+=======
+>>>>>>> main
                     }
                 }
             }
@@ -2707,9 +3478,12 @@
                 "produces": [
                     "application/zip"
                 ],
+<<<<<<< HEAD
                 "tags": [
                     "versions"
                 ],
+=======
+>>>>>>> main
                 "summary": "Get the repository of a version",
                 "parameters": [
                     {
@@ -2730,6 +3504,15 @@
                             }
                         }
                     },
+<<<<<<< HEAD
+=======
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+>>>>>>> main
                     "404": {
                         "description": "Not Found",
                         "schema": {
@@ -2748,6 +3531,7 @@
         "/versions/{versionID}/tree": {
             "get": {
                 "description": "Get the file tree of a repository of a version",
+<<<<<<< HEAD
                 "consumes": [
                     "application/json"
                 ],
@@ -2757,11 +3541,20 @@
                 "tags": [
                     "versions"
                 ],
+=======
+                "produces": [
+                    "application/json"
+                ],
+>>>>>>> main
                 "summary": "Get the file tree of a repository",
                 "parameters": [
                     {
                         "type": "string",
+<<<<<<< HEAD
                         "description": "version ID",
+=======
+                        "description": "Version ID",
+>>>>>>> main
                         "name": "versionID",
                         "in": "path",
                         "required": true
@@ -2801,6 +3594,7 @@
     },
     "definitions": {
         "forms.DiscussionCreationForm": {
+<<<<<<< HEAD
             "type": "object",
             "properties": {
                 "anonymous": {
@@ -2842,6 +3636,11 @@
             }
         },
         "forms.IncomingFileForm": {
+=======
+            "type": "object"
+        },
+        "forms.FilterForm": {
+>>>>>>> main
             "type": "object"
         },
         "forms.MemberCreationForm": {
@@ -2850,12 +3649,15 @@
                 "email": {
                     "type": "string"
                 },
+<<<<<<< HEAD
                 "fields": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/tags.ScientificFieldTag"
                     }
                 },
+=======
+>>>>>>> main
                 "firstName": {
                     "type": "string"
                 },
@@ -2872,6 +3674,7 @@
             }
         },
         "forms.MergeRequestCreationForm": {
+<<<<<<< HEAD
             "type": "object",
             "properties": {
                 "anonymous": {
@@ -2907,19 +3710,27 @@
                     }
                 }
             }
+=======
+            "type": "object"
+>>>>>>> main
         },
         "forms.PostCreationForm": {
             "type": "object",
             "properties": {
+<<<<<<< HEAD
                 "anonymous": {
                     "type": "boolean"
                 },
                 "authorMemberIDs": {
                     "description": "Members that are authors of the post",
+=======
+                "collaborators": {
+>>>>>>> main
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
+<<<<<<< HEAD
                 },
                 "postType": {
                     "$ref": "#/definitions/tags.PostType"
@@ -2932,12 +3743,15 @@
                 },
                 "title": {
                     "type": "string"
+=======
+>>>>>>> main
                 }
             }
         },
         "forms.ProjectPostCreationForm": {
             "type": "object",
             "properties": {
+<<<<<<< HEAD
                 "completionStatus": {
                     "$ref": "#/definitions/tags.CompletionStatus"
                 },
@@ -2946,6 +3760,15 @@
                 },
                 "postCreationForm": {
                     "$ref": "#/definitions/forms.PostCreationForm"
+=======
+                "postCreationForm": {
+                    "description": "TODO add fields",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/forms.PostCreationForm"
+                        }
+                    ]
+>>>>>>> main
                 }
             }
         },
@@ -2953,6 +3776,7 @@
             "type": "object"
         },
         "forms.ReviewCreationForm": {
+<<<<<<< HEAD
             "type": "object",
             "properties": {
                 "feedback": {
@@ -2978,6 +3802,9 @@
                 "Contributor",
                 "Reviewer"
             ]
+=======
+            "type": "object"
+>>>>>>> main
         },
         "models.DiscussionDTO": {
             "type": "object",
@@ -3008,6 +3835,12 @@
                 }
             }
         },
+<<<<<<< HEAD
+=======
+        "models.Member": {
+            "type": "object"
+        },
+>>>>>>> main
         "models.MemberDTO": {
             "type": "object",
             "properties": {
@@ -3037,6 +3870,7 @@
                 }
             }
         },
+<<<<<<< HEAD
         "models.MergeRequestCollaboratorDTO": {
             "type": "object",
             "properties": {
@@ -3051,6 +3885,8 @@
                 }
             }
         },
+=======
+>>>>>>> main
         "models.MergeRequestDTO": {
             "type": "object",
             "properties": {
@@ -3064,6 +3900,7 @@
                         "type": "integer"
                     }
                 },
+<<<<<<< HEAD
                 "createdAt": {
                     "type": "string"
                 },
@@ -3073,6 +3910,11 @@
                 "mergeRequestDecision": {
                     "$ref": "#/definitions/models.MergeRequestReviewStatus"
                 },
+=======
+                "id": {
+                    "type": "integer"
+                },
+>>>>>>> main
                 "mergeRequestTitle": {
                     "type": "string"
                 },
@@ -3095,9 +3937,12 @@
                         "type": "integer"
                     }
                 },
+<<<<<<< HEAD
                 "updatedAt": {
                     "type": "string"
                 },
+=======
+>>>>>>> main
                 "updatedCompletionStatus": {
                     "$ref": "#/definitions/tags.CompletionStatus"
                 },
@@ -3109,6 +3954,7 @@
                 }
             }
         },
+<<<<<<< HEAD
         "models.MergeRequestReviewDTO": {
             "type": "object",
             "properties": {
@@ -3179,6 +4025,11 @@
                 "anonymous": {
                     "type": "boolean"
                 },
+=======
+        "models.PostDTO": {
+            "type": "object",
+            "properties": {
+>>>>>>> main
                 "collaboratorIDs": {
                     "type": "array",
                     "items": {
@@ -3245,14 +4096,26 @@
                 "failure"
             ],
             "x-enum-varnames": [
+<<<<<<< HEAD
                 "RenderSuccess",
                 "RenderPending",
                 "RenderFailure"
+=======
+                "Success",
+                "Pending",
+                "Failure"
+>>>>>>> main
             ]
         },
         "models.ReportDTO": {
             "type": "object"
         },
+<<<<<<< HEAD
+=======
+        "models.ReviewDTO": {
+            "type": "object"
+        },
+>>>>>>> main
         "models.VersionDTO": {
             "type": "object",
             "properties": {
@@ -3270,6 +4133,7 @@
                 }
             }
         },
+<<<<<<< HEAD
         "reports.DiscussionReportDTO": {
             "type": "object",
             "properties": {
@@ -3286,6 +4150,8 @@
                 }
             }
         },
+=======
+>>>>>>> main
         "tags.CompletionStatus": {
             "type": "string",
             "enum": [

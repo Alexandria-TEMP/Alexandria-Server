@@ -13,18 +13,35 @@ import (
 )
 
 var (
-	versionService VersionService
-	c              *gin.Context
-	mockFilesystem *mocks.MockFilesystem
-	exampleVersion models.Version
-	cwd            string
+	versionService        VersionService
+	mockVersionRepository *mocks.MockRepositoryInterface[*models.Version]
+	mockFilesystem        *mocks.MockFilesystem
+
+	c   *gin.Context
+	cwd string
+
+	pendingVersion models.Version
+	failureVersion models.Version
+	successVersion models.Version
 )
 
 func TestMain(m *testing.M) {
-	exampleVersion = models.Version{
+	pendingVersion = models.Version{
 		Model:        gorm.Model{ID: 0},
 		Discussions:  nil,
 		RenderStatus: models.RenderPending,
+	}
+
+	failureVersion = models.Version{
+		Model:        gorm.Model{ID: 1},
+		Discussions:  nil,
+		RenderStatus: models.RenderFailure,
+	}
+
+	successVersion = models.Version{
+		Model:        gorm.Model{ID: 2},
+		Discussions:  nil,
+		RenderStatus: models.RenderSuccess,
 	}
 
 	cwd, _ = os.Getwd()
