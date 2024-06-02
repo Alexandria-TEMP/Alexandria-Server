@@ -74,6 +74,7 @@ func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	memberRouter.POST("/", controllers.memberController.CreateMember)
 	memberRouter.PUT("/", controllers.memberController.UpdateMember)
 	memberRouter.DELETE("/:userID", controllers.memberController.DeleteMember)
+	memberRouter.GET("/", controllers.memberController.GetAllMembers)
 	memberRouter.GET("/:userID/posts", controllers.memberController.GetMemberPosts)
 	memberRouter.GET("/:userID/project-posts", controllers.memberController.GetMemberProjectPosts)
 	memberRouter.GET("/:userID/merge-requests", controllers.memberController.GetMemberMergeRequests)

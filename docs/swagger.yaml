@@ -687,6 +687,32 @@ paths:
       tags:
       - filtering
   /members:
+    get:
+      description: Get the ID of every member in the database.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get IDs of all members
+      tags:
+      - members
     post:
       consumes:
       - application/json

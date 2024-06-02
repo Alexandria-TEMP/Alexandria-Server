@@ -147,6 +147,21 @@ func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 	// delete method goes here
 }
 
+// GetAllMembers godoc
+// @Summary		Get IDs of all members
+// @Description	Get the ID of every member in the database.
+// TODO this should eventually be paginated?
+// @Tags		members
+// @Produce		json
+// @Success		200		{array}		uint
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router		/members	[get]
+func (memberController *MemberController) GetAllMembers(_ *gin.Context) {
+	// TODO implement
+}
+
 // GetMemberPosts godoc
 // @Summary		Get all posts of this member
 // @Description	Get all posts that this member is a collaborator of
