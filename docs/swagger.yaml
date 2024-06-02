@@ -210,6 +210,8 @@ definitions:
     type: object
   models.MergeRequestReviewDTO:
     properties:
+      createdAt:
+        type: string
       feedback:
         type: string
       id:
@@ -1977,6 +1979,53 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns all completion statuses
+      tags:
+      - tags
+  /tags/feedback-preference:
+    get:
+      description: Returns every possible feedback preference that a Project Post
+        can have
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/tags.FeedbackPreference'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Returns all feedbback preferences
+      tags:
+      - tags
+  /tags/post-type:
+    get:
+      description: Returns every possible post type that a Post can have
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/tags.PostType'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Returns all post types
       tags:
       - tags
   /tags/scientific:

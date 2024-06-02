@@ -32,3 +32,29 @@ func (tagController *TagController) GetScientificTags(_ *gin.Context) {
 func (tagController *TagController) GetCompletionStatusTags(_ *gin.Context) {
 	// TODO implement
 }
+
+// GetPostTypeTags godoc
+// @Summary 	Returns all post types
+// @Description Returns every possible post type that a Post can have
+// @Tags		tags
+// @Produce		json
+// @Success		200		{array}		tags.PostType
+// @Failure		400 	{object}	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router		/tags/post-type	[get]
+func (tagController *TagController) GetPostTypeTags(_ *gin.Context) {
+	// TODO implement
+}
+
+// GetFeedbackPreferenceTags godoc
+// @Summary 	Returns all feedback preferences
+// @Description Returns every possible feedback preference that a Project Post can have
+// @Tags		tags
+// @Produce		json
+// @Success		200		{array}		tags.FeedbackPreference
+// @Failure		400 	{object}	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router		/tags/feedback-preference	[get]
+func (tagController *TagController) GetFeedbackPreferenceTags(_ *gin.Context) {
+	// TODO implement
+}

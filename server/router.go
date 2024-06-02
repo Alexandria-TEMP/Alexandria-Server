@@ -56,6 +56,8 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	tagRouter := v2.Group("/tags")
 	tagRouter.GET("/scientific", controllers.tagController.GetScientificTags)
 	tagRouter.GET("/completion-status", controllers.tagController.GetCompletionStatusTags)
+	tagRouter.GET("/post-type", controllers.tagController.GetPostTypeTags)
+	tagRouter.GET("/feedback-preference", controllers.tagController.GetFeedbackPreferenceTags)
 
 	versionRouter := v2.Group("/versions")
 	versionRouter.GET("/:versionID", controllers.versionController.GetVersion)
