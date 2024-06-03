@@ -37,7 +37,7 @@ func (versionController *VersionController) GetVersion(_ *gin.Context) {
 // @Description Create a new version with discussions and repository from zipped file in body
 // @Tags 		versions
 // @Accept  	multipart/form-data
-// @Param		repository			formData		file				true	"Repository to create"
+// @Param		file			formData		file				true	"Repository to create"
 // @Produce		application/json
 // @Success 	200		{object}	models.VersionDTO
 // @Failure		400 	{object} 	utils.HTTPError
