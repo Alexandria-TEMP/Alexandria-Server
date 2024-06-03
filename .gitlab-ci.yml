@@ -34,7 +34,7 @@ test:
     - go get github.com/boumenot/gocover-cobertura
     - go run github.com/boumenot/gocover-cobertura < coverage.out > coverage.xml 
     
-  coverage: '/coverage: \d+.\d+% of statements/'
+  #coverage: '/coverage: \d+.\d+% of statements/'
 
   artifacts:
     name: "$CI_JOB_NAME"
