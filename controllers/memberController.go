@@ -105,6 +105,8 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	// create and add to database through the memberService
 	member, err := memberController.MemberService.CreateMember(&form, tags)
 
+	memberDTO := member.IntoDTO()
+
 	// if the member service throws an error, return a 400 Bad request status
 	if err != nil {
 		fmt.Println(err)
@@ -115,7 +117,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 
 	// send back a positive response 200 status with the created member
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, &member)
+	c.JSON(http.StatusOK, &memberDTO)
 }
 
 // UpdateMember godoc
