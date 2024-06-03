@@ -8,7 +8,7 @@ type MergeRequestCreationForm struct {
 	// Changes made by the MR
 	UpdatedPostTitle           string
 	UpdatedCompletionStatus    tags.CompletionStatus
-	UpdatedScientificFields    []tags.ScientificField
+	UpdatedScientificFields    []*tags.ScientificFieldTag
 	UpdatedFeedbackPreferences tags.FeedbackPreference
 
 	// The MR's metadata

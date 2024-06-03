@@ -9,5 +9,5 @@ type PostCreationForm struct {
 	Title               string
 	Anonymous           bool
 	PostType            tags.PostType
-	ScientificFieldTags []tags.ScientificField
+	ScientificFieldTags []*tags.ScientificFieldTag
 }

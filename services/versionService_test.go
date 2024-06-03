@@ -79,7 +79,7 @@ func TestCreateVersionDelayedFailure4(t *testing.T) {
 }
 
 func TestCreateVersionDelayedFailure5(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	file := &multipart.FileHeader{}
@@ -109,7 +109,7 @@ func TestCreateVersionDelayedFailure5(t *testing.T) {
 }
 
 func TestCreateVersionDelayedFailure6(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	file := &multipart.FileHeader{}
@@ -233,7 +233,7 @@ func testBadProjectTemplate(t *testing.T, dirName string) {
 }
 
 func TestGetRenderFileSuccess(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	renderDirPath := filepath.Join(cwd, "..", "utils", "test_files", "good_repository_setup", "render")
@@ -254,7 +254,7 @@ func TestGetRenderFileSuccess(t *testing.T) {
 }
 
 func TestGetRenderFileFailure1(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(pendingVersion.ID).Times(0)
@@ -271,7 +271,7 @@ func TestGetRenderFileFailure1(t *testing.T) {
 }
 
 func TestGetRenderFileFailure2(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(failureVersion.ID).Times(0)
@@ -288,7 +288,7 @@ func TestGetRenderFileFailure2(t *testing.T) {
 }
 
 func TestGetRenderFileFailure3(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
@@ -305,7 +305,7 @@ func TestGetRenderFileFailure3(t *testing.T) {
 }
 
 func TestGetTreeFromRepositorySuccess(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
@@ -320,7 +320,7 @@ func TestGetTreeFromRepositorySuccess(t *testing.T) {
 }
 
 func TestGetTreeFromRepositoryFailure1(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
@@ -334,7 +334,7 @@ func TestGetTreeFromRepositoryFailure1(t *testing.T) {
 }
 
 func TestGetTreeFromRepositoryFailure2(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
@@ -348,7 +348,7 @@ func TestGetTreeFromRepositoryFailure2(t *testing.T) {
 }
 
 func TestGetRepositoryFileSuccess(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
@@ -361,7 +361,7 @@ func TestGetRepositoryFileSuccess(t *testing.T) {
 }
 
 func TestGetRepositoryFileFailure(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
@@ -373,7 +373,7 @@ func TestGetRepositoryFileFailure(t *testing.T) {
 }
 
 func TestGetFileFromRepositorySuccess(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
@@ -386,7 +386,7 @@ func TestGetFileFromRepositorySuccess(t *testing.T) {
 }
 
 func TestGetFileFromRepositoryFailure1(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)
@@ -398,7 +398,7 @@ func TestGetFileFromRepositoryFailure1(t *testing.T) {
 }
 
 func TestGetFileFromRepositoryFailure2(t *testing.T) {
-	beforeEach(t)
+	BeforeEachVersion(t)
 	defer cleanup(t)
 
 	mockFilesystem.EXPECT().SetCurrentVersion(successVersion.ID).Times(1)

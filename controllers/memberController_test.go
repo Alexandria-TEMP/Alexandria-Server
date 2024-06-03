@@ -77,7 +77,7 @@ func TestCreateMember200(t *testing.T) {
 
 	mockMemberService.EXPECT().CreateMember(&exampleMemberForm, []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2}).Return(&exampleMember, nil).Times(1)
 
-	exampleMemberFormJSON, _ := json.Marshal(exampleMemberForm, )
+	exampleMemberFormJSON, _ := json.Marshal(exampleMemberForm)
 	req, _ := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(exampleMemberFormJSON))
 	router.ServeHTTP(responseRecorder, req)
 
@@ -102,6 +102,3 @@ func TestCreateMember400(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
-
-
-
