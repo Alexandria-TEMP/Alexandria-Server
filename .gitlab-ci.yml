@@ -25,21 +25,25 @@ lint:
     script:
       - golangci-lint run -vc .golangci.yml
 
-test:
+build:
+  stage: build
+  script:
+    - mkdir -p $OUTPUT_NAME
+    - go build -o $OUTPUT_NAME ./...
+  artifacts:
+    paths:
+      - $OUTPUT_NAME
+
+test_reports:
   stage: test
   script:
-    # TODO alexandria-backend [nothing else]
-    - pkgs=$(go list ./... | grep -v docs | grep -v interfaces | grep -v forms | grep -v mocks | grep -v server | grep -v vfs)
-    - go test $pkgs -short -coverprofile=coverage.out -covermode count
-    
+    - go test ./... -short -coverprofile=coverage.out -covermode count
     - go get github.com/boumenot/gocover-cobertura
     - go run github.com/boumenot/gocover-cobertura < coverage.out > coverage.xml 
     
     - go install gotest.tools/gotestsum@v1.12.0
     - gotestsum --junitfile junit.xml --format testname
     
-  #coverage: '/coverage: \d+.\d+% of statements/'
-
   artifacts:
     name: "$CI_JOB_NAME"
     when: always
@@ -52,12 +56,20 @@ test:
         coverage_format: cobertura
         path: coverage.xml
 
-build:
-  stage: build
-  script:
-    - mkdir -p $OUTPUT_NAME
-    - go build -o $OUTPUT_NAME ./...
-  artifacts:
-    paths:
-      - $OUTPUT_NAME
+.package_tests:
+  stage: test
+  coverage: '/coverage: \d+.\d+% of statements/'
+  script: go test $(go list ./... | grep '$PKG') -cover
+
+test_controllers:
+  extends: .package_tests
+  variables:
+    PKG: controllers
+
+test_filesystem:
+  extends: .package_tests
+  variables:
+    PKG: filesystem
+
+
 
