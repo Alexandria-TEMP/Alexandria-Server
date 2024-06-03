@@ -66,11 +66,6 @@ test_pkg_controllers:
   variables:
     PKG: controllers
 
-test_pkg_database:
-  extends: .package_tests
-  variables:
-    PKG: database
-
 test_pkg_filesystem:
   extends: .package_tests
   variables:
