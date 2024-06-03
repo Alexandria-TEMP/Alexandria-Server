@@ -13,19 +13,26 @@ import (
 )
 
 var (
+	cwd    string
 	router *gin.Engine
 
-	mockMemberService *mock_interfaces.MockMemberService
-	mockTagService *mock_interfaces.MockTagService
-	memberController  *MemberController
+	mockMemberService  *mock_interfaces.MockMemberService
+	mockTagService     *mock_interfaces.MockTagService
+	memberController   *MemberController
+	versionController  *VersionController
+	mockVersionService *mock_interfaces.MockVersionService
 
 	responseRecorder *httptest.ResponseRecorder
 
-	exampleMember           models.Member
-	exampleMemberDTO		models.MemberDTO
-	exampleMemberForm       forms.MemberCreationForm
-	exampleSTag1			*tags.ScientificFieldTag
-	exampleSTag2			*tags.ScientificFieldTag
+	exampleMember     models.Member
+	exampleMemberDTO  models.MemberDTO
+	exampleMemberForm forms.MemberCreationForm
+	exampleSTag1      *tags.ScientificFieldTag
+	exampleSTag2      *tags.ScientificFieldTag
+
+	examplePendingVersion models.Version
+	exampleSuccessVersion models.Version
+	exampleFailureVersion models.Version
 )
 
 // TestMain is a keyword function, this is run by the testing package before other tests
@@ -34,14 +41,11 @@ func TestMain(m *testing.M) {
 	router = gin.Default()
 	gin.SetMode(gin.TestMode)
 
-	
-	router.GET("/api/v2/members/:userID", func(c *gin.Context) {
-		memberController.GetMember(c)
-	})
-	router.POST("/api/v2/members", func(c *gin.Context) {
-		memberController.CreateMember(c)
-	})
+	router = SetUpRouter()
 
+	examplePendingVersion = models.Version{RenderStatus: models.RenderPending}
+	exampleSuccessVersion = models.Version{RenderStatus: models.RenderSuccess}
+	exampleFailureVersion = models.Version{RenderStatus: models.RenderFailure}
 
 	tag1 := tags.ScientificFieldTag{
 		ScientificField: "Mathematics",
@@ -57,11 +61,11 @@ func TestMain(m *testing.M) {
 	exampleSTag2 = &tag2
 
 	exampleMemberDTO = models.MemberDTO{
-		FirstName:           "John",
-		LastName:            "Smith",
-		Email:               "john.smith@gmail.com",
-		Password:            "password",
-		Institution:         "TU Delft",
+		FirstName:             "John",
+		LastName:              "Smith",
+		Email:                 "john.smith@gmail.com",
+		Password:              "password",
+		Institution:           "TU Delft",
 		ScientificFieldTagIDs: []uint{1, 2},
 	}
 
@@ -73,5 +77,35 @@ func TestMain(m *testing.M) {
 		Institution: "TU Delft",
 	}
 
+	cwd, _ = os.Getwd()
 	os.Exit(m.Run())
+}
+
+func SetUpRouter() *gin.Engine {
+	gin.SetMode(gin.TestMode)
+	router = gin.Default()
+
+	router.POST("/api/v2/versions", func(c *gin.Context) {
+		versionController.CreateVersion(c)
+	})
+	router.GET("/api/v2/versions/:versionID/render", func(c *gin.Context) {
+		versionController.GetRender(c)
+	})
+	router.GET("/api/v2/versions/:versionID/repository", func(c *gin.Context) {
+		versionController.GetRepository(c)
+	})
+	router.GET("/api/v2/versions/:versionID/tree", func(c *gin.Context) {
+		versionController.GetFileTree(c)
+	})
+	router.GET("/api/v2/versions/:versionID/file/*filepath", func(c *gin.Context) {
+		versionController.GetFileFromRepository(c)
+	})
+	router.GET("/api/v2/members/:userID", func(c *gin.Context) {
+		memberController.GetMember(c)
+	})
+	router.POST("/api/v2/members", func(c *gin.Context) {
+		memberController.CreateMember(c)
+	})
+
+	return router
 }

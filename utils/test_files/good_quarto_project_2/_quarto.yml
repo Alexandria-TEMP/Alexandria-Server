@@ -1,8 +1,10 @@
-project:
-  type: default
-  render: 
-    - "*.qmd"
-    - "README.qmd"
-
 filters:
-   - include-code-files
+    - include-code-files
+format:
+    html:
+        page-layout: custom
+project:
+    render:
+        - '*.qmd'
+        - README.qmd
+    type: default

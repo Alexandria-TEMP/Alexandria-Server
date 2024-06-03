@@ -1,7 +1,13 @@
 package forms
 
+import "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
+
 type PostCreationForm struct {
-	Collaborators []uint
-	// CurrentVersion models.Version
-	// TODO add fields
+	// TODO send files somehow?
+
+	AuthorMemberIDs     []uint // Members that are authors of the post
+	Title               string
+	Anonymous           bool
+	PostType            tags.PostType
+	ScientificFieldTags []tags.ScientificField
 }

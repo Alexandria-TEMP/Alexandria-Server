@@ -39,7 +39,7 @@ type ControllerEnv struct {
 
 func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 	return RepositoryEnv{
-		memberRepository: &database.ModelRepository[*models.Member]{Database: db},
+		memberRepository:  &database.ModelRepository[*models.Member]{Database: db},
 		versionRepository: &database.ModelRepository[*models.Version]{Database: db},
 		tagRepository:     &database.ModelRepository[*tags.ScientificFieldTag]{Database: db},
 	}
@@ -47,6 +47,7 @@ func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 
 func initServiceEnv(repositoryEnv RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
 	return ServiceEnv{
+
 		postService: &services.PostService{},
 		versionService: &services.VersionService{
 			VersionRepository: repositoryEnv.versionRepository,
@@ -56,7 +57,6 @@ func initServiceEnv(repositoryEnv RepositoryEnv, fs *filesystem.Filesystem) Serv
 		},
 	}
 }
-
 
 func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 	return ControllerEnv{

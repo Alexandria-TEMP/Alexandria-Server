@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -10,7 +9,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 // @BasePath /api/v2
@@ -22,6 +20,7 @@ type PostController struct {
 // GetPost godoc
 // @Summary 	Get post
 // @Description Get a post by post ID
+// @Tags 		posts
 // @Accept  	json
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
@@ -36,8 +35,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr)})
 
 		return
 	}
@@ -46,8 +44,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 	post, err := postController.PostService.GetPost(postID)
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot get post because no post with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": "cannot get post because no post with this ID exists"})
 
 		return
 	}
@@ -60,6 +57,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 // CreatePost godoc
 // @Summary 	Create new post
 // @Description Create a new question or discussion post
+// @Tags 		posts
 // @Accept  	json
 // @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
 // @Produce		json
@@ -73,8 +71,7 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 	err := c.BindJSON(&form)
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind PostCreationForm from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind PostCreationForm from request body"})
 
 		return
 	}
@@ -90,6 +87,7 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 // UpdatePost godoc
 // @Summary 	Update post
 // @Description Update any number of the aspects of a question or discussion post
+// @Tags 		posts
 // @Accept  	json
 // @Param		post	body		models.PostDTO		true	"Updated Post"
 // @Produce		json
@@ -104,8 +102,7 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 	err := c.BindJSON(&updatedPost)
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind updated Post from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated Post from request body"})
 
 		return
 	}
@@ -114,8 +111,7 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 	err = postController.PostService.UpdatePost(&updatedPost)
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update post because no post with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": "cannot update post because no post with this ID exists"})
 
 		return
 	}
@@ -128,6 +124,7 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 // DeletePost godoc
 // @Summary 	Delete a post
 // @Description Delete a post with given ID from database
+// @Tags 		posts
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
@@ -145,6 +142,7 @@ func (postController *PostController) DeletePost(_ *gin.Context) {
 // @Description Create a new question or discussion post
 // @Description Creates a post in the same way as CreatePost
 // @Description However, the post files are imported from the given Github repository
+// @Tags 		posts
 // @Accept  	json
 // @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
 // @Param		url		query	string					true	"Github repository url"
@@ -161,9 +159,10 @@ func (postController *PostController) CreatePostFromGithub(_ *gin.Context) {
 // AddPostReport godoc
 // @Summary 	Add a new report to a post
 // @Description Create a new report for a post
+// @Tags 		posts
 // @Accept  	json
 // @Param		form	body	forms.ReportCreationForm	true	"Report Creation Form"
-// @Param		postID		path		string			true	"Post ID"
+// @Param		postID	path	string						true	"Post ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.ReportDTO
 // @Failure		400 	{object} 	utils.HTTPError
@@ -177,17 +176,46 @@ func (postController *PostController) AddPostReport(_ *gin.Context) {
 // GetPostReports godoc
 // @Summary		Get all reports of this post
 // @Description	Get all reports that have been added to this post
-// @Description Endpoint is offset-paginated
+// @Tags 		posts
 // @Accept 		json
 // @Param		postID		path		string			true	"Post ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.ReportDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/posts/{postID}/reports 		[get]
 func (postController *PostController) GetPostReports(_ *gin.Context) {
-	// TODO: make paginated
+	// TODO implement
+}
+
+// GetCollaborator godoc
+// @Summary 	Get a post collaborator by ID
+// @Description	Get a post collaborator by ID, a member who has collaborated on a post
+// @Tags		posts
+// @Accept  	json
+// @Param		collaboratorID	path	string	true	"Collaborator ID"
+// @Produce		json
+// @Success 	200 		{object}	models.PostCollaboratorDTO
+// @Failure		400 		{object} 	utils.HTTPError
+// @Failure		404 		{object} 	utils.HTTPError
+// @Failure		500 		{object} 	utils.HTTPError
+// @Router 		/posts/collaborators/{collaboratorID}	[get]
+func (postController *PostController) GetPostCollaborator(_ *gin.Context) {
+	// TODO return collaborator by ID
+}
+
+// GetPostReport godoc
+// @Summary		Gets a post report by ID
+// @Description	Gets a post report by its ID
+// @Tags		posts
+// @Param		reportID	path	string	true	"Report ID"
+// @Produce		json
+// @Success		200		{object}	reports.PostReportDTO
+// @Failure		400		{object}	utils.HTTPError
+// @Failure		404		{object}	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router		/posts/reports/{reportID}				[get]
+func (postController *PostController) GetPostReport(_ *gin.Context) {
+	// TODO implement
 }

@@ -2,9 +2,18 @@ package models
 
 import (
 	"encoding/json"
+	"time"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
+)
+
+type MergeRequestReviewStatus string
+
+const (
+	MergeRequestOpenForReview MergeRequestReviewStatus = "open for review"
+	MergeRequestPeerReviewed  MergeRequestReviewStatus = "peer reviewed"
+	MergeRequestRejected      MergeRequestReviewStatus = "rejected"
 )
 
 type MergeRequest struct {
@@ -17,7 +26,7 @@ type MergeRequest struct {
 	NewVersion   Version `gorm:"foreignKey:NewVersionID"`
 	NewVersionID uint
 
-	NewPostTitle string
+	UpdatedPostTitle string
 
 	UpdatedCompletionStatus tags.CompletionStatus
 	UpdatedScientificFields []*tags.ScientificFieldTag
@@ -38,9 +47,9 @@ type MergeRequest struct {
 	PreviousVersion   Version `gorm:"foreignKey:PreviousVersionID"`
 	PreviousVersionID uint
 
-	MergeRequestTitle string
-
-	Anonymous bool
+	MergeRequestTitle    string
+	Anonymous            bool
+	MergeRequestDecision MergeRequestReviewStatus
 }
 
 type MergeRequestDTO struct {
@@ -51,12 +60,15 @@ type MergeRequestDTO struct {
 	UpdatedCompletionStatus      tags.CompletionStatus
 	UpdatedScientificFieldTagIDs []uint
 	// MR metadata
-	CollaboratorIDs   []uint
-	ReviewIDs         []uint
-	ProjectPostID     uint
-	PreviousVersionID uint
-	MergeRequestTitle string
-	Anonymous         bool
+	CollaboratorIDs      []uint
+	ReviewIDs            []uint
+	ProjectPostID        uint
+	PreviousVersionID    uint
+	MergeRequestTitle    string
+	Anonymous            bool
+	MergeRequestDecision MergeRequestReviewStatus
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
 }
 
 func (model *MergeRequest) GetID() uint {
@@ -67,7 +79,7 @@ func (model *MergeRequest) IntoDTO() MergeRequestDTO {
 	return MergeRequestDTO{
 		model.ID,
 		model.NewVersionID,
-		model.NewPostTitle,
+		model.UpdatedPostTitle,
 		model.UpdatedCompletionStatus,
 		tags.ScientificFieldTagIntoIDs(model.UpdatedScientificFields),
 		mergeRequestCollaboratorsToIDs(model.Collaborators),
@@ -76,6 +88,9 @@ func (model *MergeRequest) IntoDTO() MergeRequestDTO {
 		model.PreviousVersionID,
 		model.MergeRequestTitle,
 		model.Anonymous,
+		model.MergeRequestDecision,
+		model.CreatedAt,
+		model.UpdatedAt,
 	}
 }
 

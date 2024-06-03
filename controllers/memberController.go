@@ -23,6 +23,7 @@ type MemberController struct {
 // GetMember godoc
 // @Summary 	Get member from database
 // @Description Get a member by user ID
+// @Tags 		members
 // @Accept  	json
 // @Param		userID		path		string			true	"user ID"
 // @Produce		json
@@ -66,6 +67,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 // CreateMember godoc
 // @Summary 	Create a new member
 // @Description Create a new member from the given fields
+// @Tags 		members
 // @Accept  	json
 // @Param		form	body	forms.MemberCreationForm	true	"Member Creation Form"
 // @Produce		json
@@ -123,8 +125,9 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 // UpdateMember godoc
 // @Summary 	Update a member
 // @Description Update the fields of a member
+// @Tags 		members
 // @Accept  	json
-// @Param		member	body		models.Member		true	"Updated member"
+// @Param		member	body		models.MemberDTO		true	"Updated member"
 // @Produce		json
 // @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
@@ -133,7 +136,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 // @Router 		/members 		[put]
 func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	// get the new member object
-	updatedMember := models.Member{}
+	updatedMember := models.MemberDTO{}
 	err := c.BindJSON(&updatedMember)
 
 	// check for errors
@@ -144,16 +147,15 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 		return
 	}
 
-	// update and add the member to the database
-	err = memberController.MemberService.UpdateMember(&updatedMember)
-
+	// TODO update and add the member to the database
+	// err = memberController.MemberService.UpdateMember(&updatedMember)
 	// check for errors again
-	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update user because no user with this ID exists"))
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update user because no user with this ID exists"))
 
-		return
-	}
+	// 	return
+	// }
 
 	// send back a positive response if member updated successfully
 	c.Header("Content-Type", "application/json")
@@ -163,6 +165,7 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 // DeleteMember godoc
 // @Summary 	Delete a member
 // @Description Delete a member with given ID from database
+// @Tags 		members
 // @Accept  	json
 // @Param		userID		path		string			true	"user ID"
 // @Produce		json
@@ -175,16 +178,29 @@ func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 	// delete method goes here
 }
 
+// GetAllMembers godoc
+// @Summary		Get IDs of all members
+// @Description	Get the ID of every member in the database.
+// TODO this should eventually be paginated?
+// @Tags		members
+// @Produce		json
+// @Success		200		{array}		uint
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		404 	{object} 	utils.HTTPError
+// @Failure		500		{object}	utils.HTTPError
+// @Router		/members	[get]
+func (memberController *MemberController) GetAllMembers(_ *gin.Context) {
+	// TODO implement
+}
+
 // GetMemberPosts godoc
 // @Summary		Get all posts of this member
 // @Description	Get all posts that this member is a collaborator of
-// @Description Endpoint is offset-paginated
+// @Tags 		members
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.PostDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -192,19 +208,17 @@ func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 	// return all the posts
 	// that this member is a collaborator/author of
-	// TODO: make endpoint paginated
+	// TODO implement
 }
 
 // GetMemberProjectPosts godoc
 // @Summary		Get all project posts of this member
 // @Description	Get all project posts that this member is a collaborator of
-// @Description Endpoint is offset-paginated
+// @Tags 		members
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.ProjectPostDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -212,19 +226,17 @@ func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) {
 	// return all the project posts
 	// that this member is a collaborator/author of
-	// TODO: make endpoint paginated
+	// TODO implement
 }
 
 // GetMemberMergeRequests godoc
 // @Summary		Get all merge requests of this member
 // @Description	Get all merge requests that this member is a collaborator of
-// @Description Endpoint is offset-paginated
+// @Tags 		members
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.MergeRequestDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
@@ -232,31 +244,30 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 func (memberController *MemberController) GetMemberMergeRequests(_ *gin.Context) {
 	// return all the merge requests
 	// that this member is a collaborator/author of
-	// TODO: make endpoint paginated
+	// TODO implement
 }
 
 // GetMemberDiscussions godoc
-// @Summary		Get all merge requests of this member
-// @Description	Get all merge requests that this member is a collaborator of
-// @Description Endpoint is offset-paginated
+// @Summary		Get all discussions
+// @Description	Get all discussions that this member has participated in
+// @Tags 		members
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.DiscussionDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/discussions		[get]
 func (memberController *MemberController) GetMemberDiscussions(_ *gin.Context) {
 	// returns all the discussions this member is a part of
-	// TODO: make paginated
+	// TODO implement
 }
 
 // AddMemberSavedPost godoc
 // @Summary 	Adds new saved post
 // @Description Adds a post to the saved posts of a member
+// @Tags 		members
 // @Accept  	json
 // @Param		userID		path		string			true	"user ID"
 // @Param		postID		path		string			true	"post ID"
@@ -272,6 +283,7 @@ func (memberController *MemberController) AddMemberSavedPost(_ *gin.Context) {
 // AddMemberSavedProjectPost godoc
 // @Summary 	Adds new saved project post
 // @Description Adds a project post to the saved project posts of a member
+// @Tags 		members
 // @Accept  	json
 // @Param		userID		path		string			true	"user ID"
 // @Param		postID		path		string			true	"post ID"
@@ -287,37 +299,33 @@ func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Conte
 // GetMemberSavedPosts godoc
 // @Summary		Get all saved posts of this member
 // @Description	Get all posts that this member has saved
-// @Description Endpoint is offset-paginated
+// @Tags 		members
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.PostDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/saved-posts 		[get]
 func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
 	// return all saved posts of this member
-	// TODO: make endpoint paginated
+	// TODO implement
 }
 
 // GetMemberProjectPosts godoc
 // @Summary		Get all saved project posts of this member
 // @Description	Get all project posts that this member has saved
-// @Description Endpoint is offset-paginated
+// @Tags 		members
 // @Accept 		json
 // @Param		userID		path		string			true	"user ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.ProjectPostDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID}/saved-project-posts 		[get]
 func (memberController *MemberController) GetMemberSavedProjectPosts(_ *gin.Context) {
 	// return all the project posts that this member has saved
-	// TODO: make endpoint paginated
+	// TODO implement
 }

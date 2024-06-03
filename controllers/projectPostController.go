@@ -23,6 +23,7 @@ type ProjectPostController struct {
 // GetProjectPost godoc
 // @Summary 	Get project post
 // @Description Get a project post by ID
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
@@ -60,9 +61,9 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 // CreateProjectPost godoc
 // @Summary 	Create new project post
 // @Description Create a new project post
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		form			body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
-// @Param 		parentPostID	query		string							false	"Parent post ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
 // @Failure		400 		{object} 	utils.HTTPError
@@ -91,6 +92,7 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 // UpdateProjectPost godoc
 // @Summary 	Update project post
 // @Description Update any number of the aspects of a project post
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
 // @Produce		json
@@ -130,6 +132,7 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 // DeleteProjectPost godoc
 // @Summary 	Delete a project post
 // @Description Delete a project post with given ID from database
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
@@ -147,6 +150,7 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Con
 // @Description Create a new project post
 // @Description Creates a project post in the same way as CreateProjectPost
 // @Description However, the post files are imported from the given Github repository
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		form	body	forms.ProjectPostCreationForm	true	"Post Creation Form"
 // @Param		url		query	string							true	"Github repository url"
@@ -161,57 +165,33 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 }
 
 // GetProjectPostDiscussions godoc
-// @Summary Returns all discussions associated with the project post
-// @Description Returns all discussions on this project post and all of it's merge requests
-// @Description Endpoint is offset-paginated
+// @Summary Returns all discussion IDs associated with the project post
+// @Description Returns all discussion IDs on this project post over all its previous versions, instead of only the current version
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
-// @Success 	200		{array}		models.DiscussionDTO
+// @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/project-posts/{postID}/all-discussions 	[get]
 func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ *gin.Context) {
-
+	// TODO implement
 }
 
-// GetProjectPostOpenMergeRequests godoc
-// @Summary		Get all open merge requests of a project post
-// @Description	Get all open merge requests associated with the given project post
-// @Description Endpoint is offset-paginated
-// @Accept 		json
-// @Param		postID		path		string			true	"post ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
+// GetProjectPostMRsByStatus godoc
+// @Summary 	Returns MR IDs grouped by each MR status
+// @Description Returns all MR IDs of this project post, grouped by each MR's review status
+// @Tags		project-posts
+// @Accept		json
+// @Param		postID	path	string	true	"post ID"
 // @Produce		json
-// @Success 	200		{array}		models.MergeRequestDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
+// @Success		200		{object}	forms.GroupedMergeRequestForm
+// @Failure		400		{object}	utils.HTTPError
+// @Failure		404		{object}	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/project-posts/{postID}/open-merge-requests 		[get]
-func (projectPostController *ProjectPostController) GetProjectPostOpenMergeRequests(_ *gin.Context) {
-	// return all the merge requests associated with this project post that are open
-	// TODO: make endpoint paginated
-}
-
-// GetProjectPostClosedMergeRequests godoc
-// @Summary		Get all closed merge requests of a project post
-// @Description	Get all closed merge requests associated with the given project post
-// @Description Endpoint is offset-paginated
-// @Accept 		json
-// @Param		postID		path		string			true	"post ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
-// @Produce		json
-// @Success 	200		{array}		models.MergeRequestDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
-// @Router 		/project-posts/{postID}/closed-merge-requests 		[get]
-func (projectPostController *ProjectPostController) GetProjectPostClosedMergeRequests(_ *gin.Context) {
-	// return all the merge requests associated with this project post that are closed
-	// TODO: make endpoint paginated
+// @Router		/project-posts/{postID}/merge-requests-by-status	[get]
+func (projectPostController *ProjectPostController) GetProjectPostMRsByStatus(_ *gin.Context) {
+	// TODO implement
 }

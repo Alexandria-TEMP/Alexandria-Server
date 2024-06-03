@@ -5,5 +5,6 @@ import (
 )
 
 type IncomingFileForm struct {
+	// TODO this doesn't parse right in the swagger thing
 	File *multipart.FileHeader `form:"file"`
 }

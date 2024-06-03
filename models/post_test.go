@@ -30,6 +30,7 @@ func TestPostJSONMarshaling(t *testing.T) {
 			},
 		},
 		Title:               "Nice Post",
+		Anonymous:           false,
 		CurrentVersion:      Version{},
 		CurrentVersionID:    49,
 		PostType:            tags.Question,
@@ -43,6 +44,7 @@ func TestPostJSONMarshaling(t *testing.T) {
 		Title:                 "Nice Post",
 		VersionID:             49,
 		PostType:              tags.Question,
+		Anonymous:             false,
 		ScientificFieldTagIDs: []uint{},
 	}
 

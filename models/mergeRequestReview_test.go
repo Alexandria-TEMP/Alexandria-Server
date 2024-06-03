@@ -3,18 +3,21 @@ package models
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 func TestMergeRequestReviewJSONMarshaling(t *testing.T) {
+	createdAt := time.Now().UTC()
+
 	// This model...
 	model := MergeRequestReview{
-		Model:                gorm.Model{ID: 88},
+		Model:                gorm.Model{ID: 88, CreatedAt: createdAt},
 		MergeRequestID:       40,
 		Member:               Member{},
 		MemberID:             50,
-		MergeRequestDecision: Approved,
+		MergeRequestDecision: ReviewApproved,
 		Feedback:             "Nice!",
 	}
 
@@ -23,8 +26,9 @@ func TestMergeRequestReviewJSONMarshaling(t *testing.T) {
 		ID:                   88,
 		MergeRequestID:       40,
 		MemberID:             50,
-		MergeRequestDecision: Approved,
+		MergeRequestDecision: ReviewApproved,
 		Feedback:             "Nice!",
+		CreatedAt:            createdAt,
 	}
 
 	dto := MergeRequestReviewDTO{}

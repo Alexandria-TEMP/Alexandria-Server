@@ -2,16 +2,20 @@ package services
 
 import (
 	"errors"
+	"fmt"
+	"io/fs"
 	"mime/multipart"
+	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	filesysteminterface "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
+	"gopkg.in/yaml.v3"
 )
 
 type VersionService struct {
@@ -19,97 +23,135 @@ type VersionService struct {
 	VersionRepository database.RepositoryInterface[*models.Version]
 }
 
-// CreateVersion orchestrates the version creation.
-// 1. creates a new version with the pending render status.
-// 2. saves the file to its directory
-// 3. return a status 200 to client
-// 4. unzip file
-// 5. render project and update render status
-// 6. delete unzipped project files
-// TODO: persist data
-func (versionService *VersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader, postID uint) (*models.Version, error) {
-	version := models.Version{
-		RenderStatus: models.Pending,
-	}
-	versionID := version.ID
+func (versionService *VersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader) (*models.Version, error) {
+	// Create version, with pending render status
+	version := models.Version{RenderStatus: models.RenderPending}
+	_ = versionService.VersionRepository.Create(&version)
 
 	// Set paths in filesystem
-	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+	versionService.Filesystem.SetCurrentVersion(version.ID)
 
 	// Save zip file
 	if err := versionService.Filesystem.SaveRepository(c, file); err != nil {
-		_ = versionService.Filesystem.RemoveRepository()
+		versionService.FailAndRemoveVersion(&version)
+
 		return &version, err
 	}
 
-	// Start goroutine to render after responding to client.
-	// If it fails at any point we update the renderstatus to failure and remove the directory to this repository.
-	// If it succeeds we will update the renderstatus to success and remove the quarto project directory.
+	// This goroutine runs parallel to our response being sent, and will likely finish at a later point in time.
+	// If it fails before rendering we will remove the repository entirely.
+	// If it succeeds we will update the renderstatus to success, otherwise failure.
 	go func() {
 		// Unzip saved file
 		if err := versionService.Filesystem.Unzip(); err != nil {
-			version.RenderStatus = models.Failure
-			_ = versionService.Filesystem.RemoveRepository()
+			versionService.FailAndRemoveVersion(&version)
 
 			return
 		}
 
 		// Validate project
 		if valid := versionService.IsValidProject(); !valid {
-			version.RenderStatus = models.Failure
-			_ = versionService.Filesystem.RemoveRepository()
+			versionService.FailAndRemoveVersion(&version)
 
 			return
 		}
 
 		// Install dependencies
 		if err := versionService.InstallRenderDependencies(); err != nil {
-			version.RenderStatus = models.Failure
-			_ = versionService.Filesystem.RemoveRepository()
+			versionService.FailAndRemoveVersion(&version)
+
+			return
+		}
+
+		if err := versionService.SetProjectConfig(); err != nil {
+			versionService.FailAndRemoveVersion(&version)
 
 			return
 		}
 
 		// Render quarto project
 		if err := versionService.RenderProject(); err != nil {
-			version.RenderStatus = models.Failure
-			_ = versionService.Filesystem.RemoveRepository()
+			version.RenderStatus = models.RenderFailure
+			_, _ = versionService.VersionRepository.Update(&version)
 
 			return
 		}
 
 		// Verify that a render was produced in the form of a single file
-		if numFiles := versionService.Filesystem.CountRenderFiles(); numFiles != 1 {
-			version.RenderStatus = models.Failure
-			_ = versionService.Filesystem.RemoveRepository()
-		}
-
-		// Remove unzipped project file
-		if err := versionService.Filesystem.RemoveProjectDirectory(); err != nil {
-			version.RenderStatus = models.Failure
-			_ = versionService.Filesystem.RemoveRepository()
+		if exists, _ := versionService.Filesystem.RenderExists(); !exists {
+			version.RenderStatus = models.RenderFailure
+			_, _ = versionService.VersionRepository.Update(&version)
 
 			return
 		}
 
-		version.RenderStatus = models.Success
+		version.RenderStatus = models.RenderSuccess
+		if _, err := versionService.VersionRepository.Update(&version); err != nil {
+			version.RenderStatus = models.RenderFailure
+			_, _ = versionService.VersionRepository.Update(&version)
+
+			return
+		}
 	}()
 
 	return &version, nil
 }
 
+func (versionService *VersionService) SetProjectConfig() error {
+	// Find config file
+	yamlFilepath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "_quarto.yaml")
+	ymlFilepath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "_quarto.yml")
+	configFilepath := yamlFilepath
+
+	if !utils.FileExists(yamlFilepath) {
+		configFilepath = ymlFilepath
+	}
+
+	// Unmarshal yaml file
+	yamlObj := make(map[string]interface{})
+	yamlFile, err := os.ReadFile(configFilepath)
+
+	if err != nil {
+		return fmt.Errorf("failed to open yaml config file")
+	}
+
+	err = yaml.Unmarshal(yamlFile, yamlObj)
+
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal yaml config file")
+	}
+
+	yamlObj["format"] = map[string]interface{}{"html": map[string]interface{}{"page-layout": "custom"}}
+	yamlFile, err = yaml.Marshal(yamlObj)
+
+	if err != nil {
+		return fmt.Errorf("failed to marshal yaml config file")
+	}
+
+	var permMode fs.FileMode = 0o666
+	err = os.WriteFile(configFilepath, yamlFile, permMode)
+
+	if err != nil {
+		return fmt.Errorf("failed to write yaml config file back")
+	}
+
+	return nil
+}
+
 // RenderProject renders the current project files.
 // It first tries to get all dependencies and then renders to html.
 func (versionService *VersionService) RenderProject() error {
-	// TODO: This is super unsafe right now
+	// Run render command
 	cmd := exec.Command("quarto", "render", versionService.Filesystem.GetCurrentQuartoDirPath(),
 		"--output-dir", versionService.Filesystem.GetCurrentRenderDirPath(),
 		"--to", "html",
 		"--no-cache",
 		"-M", "embed-resources:true",
-		"-M", "toc-location:body",
-		"-M", "margin-left:0",
-		"-M", "margin-right:0",
+		"-M", "title:",
+		"-M", "date:",
+		"-M", "date-modified:",
+		"-M", "author:",
+		"-M", "doi:",
 		"--log-level", "error",
 	)
 	out, err := cmd.CombinedOutput()
@@ -126,7 +168,7 @@ func (versionService *VersionService) RenderProject() error {
 func (versionService *VersionService) InstallRenderDependencies() error {
 	// Check if renv.lock exists and if so get dependencies
 	rLockPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "renv.lock")
-	if filesystem.FileExists(rLockPath) {
+	if utils.FileExists(rLockPath) {
 		cmd := exec.Command("Rscript", "-e", "renv::restore()")
 		cmd.Dir = versionService.Filesystem.GetCurrentQuartoDirPath()
 		out, err := cmd.CombinedOutput()
@@ -138,7 +180,7 @@ func (versionService *VersionService) InstallRenderDependencies() error {
 
 	// Check if any renv exists.
 	renvActivatePath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "renv", "activate.R")
-	if filesystem.FileExists(renvActivatePath) {
+	if utils.FileExists(renvActivatePath) {
 		// Install rmarkdown
 		cmd := exec.Command("Rscript", "-e", "renv::install('rmarkdown')")
 		cmd.Dir = versionService.Filesystem.GetCurrentQuartoDirPath()
@@ -162,44 +204,111 @@ func (versionService *VersionService) InstallRenderDependencies() error {
 }
 
 // IsValidProject validates that the files are a valid default quarto project
+// They mus have a _quarto.yml or _quarto.yaml file.
+// They must be of default quarto project type.
 func (versionService *VersionService) IsValidProject() bool {
 	// If there is no yml file to cofigure the project it is invalid
 	ymlPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "_quarto.yml")
 	yamlPath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), "_quarto.yaml")
 
-	if !(filesystem.FileExists(ymlPath)) {
+	if !(utils.FileExists(ymlPath)) {
 		ymlPath = yamlPath
 
-		if !(filesystem.FileExists(yamlPath)) {
+		if !(utils.FileExists(yamlPath)) {
 			return false
 		}
 	}
 
 	// If they type is not default it is invalid
-	if filesystem.FileContains(ymlPath, "type:") && !filesystem.FileContains(ymlPath, "type: default") {
+	if utils.FileContains(ymlPath, "type:") && !utils.FileContains(ymlPath, "type: default") {
 		return false
 	}
 
 	return true
 }
 
-func (versionService *VersionService) GetRender(versionID, postID uint) (forms.OutgoingFileForm, string, error) {
-	// TODO: Check version render status
-	// If pending return error eccordingly
-	// If failure return error accordingly
-	// If success proceed to steps below
-	//
-	// Set current version
-	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+func (versionService *VersionService) GetRenderFile(versionID uint) (string, error, error) {
+	version, err := versionService.VersionRepository.GetByID(versionID)
 
-	// Get render file
-	return versionService.Filesystem.GetRenderFile()
+	var filePath string
+
+	if err != nil {
+		return filePath, nil, fmt.Errorf("no such version exists")
+	}
+
+	// If pending return error 202
+	if version.RenderStatus == models.RenderPending {
+		return filePath, fmt.Errorf("version still rendering"), nil
+	}
+
+	// If failure return error 404
+	if version.RenderStatus == models.RenderFailure {
+		return filePath, nil, fmt.Errorf("version failed to render")
+	}
+
+	// Set current version
+	versionService.Filesystem.SetCurrentVersion(versionID)
+
+	// Check that render exists, if not update render status to failed and return 404
+	exists, fileName := versionService.Filesystem.RenderExists()
+
+	if !exists {
+		version.RenderStatus = models.RenderFailure
+		_, _ = versionService.VersionRepository.Update(version)
+
+		return filePath, nil, fmt.Errorf("version failed to render")
+	}
+
+	return filepath.Join(versionService.Filesystem.GetCurrentRenderDirPath(), fileName), nil, nil
 }
 
-func (versionService *VersionService) GetRepository(versionID, postID uint) (forms.OutgoingFileForm, string, error) {
+func (versionService *VersionService) GetRepositoryFile(versionID uint) (string, error) {
 	// Set current version
-	versionService.Filesystem.SetCurrentVersion(versionID, postID)
+	versionService.Filesystem.SetCurrentVersion(versionID)
 
-	// Get repository file
-	return versionService.Filesystem.GetRepositoryFile()
+	// Check that render exists, if not update render status to failed and return 404
+	if exists := utils.FileExists(versionService.Filesystem.GetCurrentZipFilePath()); !exists {
+		return "", fmt.Errorf("no such file exists")
+	}
+
+	absFilepath, _ := filepath.Abs(versionService.Filesystem.GetCurrentZipFilePath())
+
+	return absFilepath, nil
+}
+
+func (versionService *VersionService) GetTreeFromRepository(versionID uint) (map[string]int64, error, error) {
+	// Set current version
+	versionService.Filesystem.SetCurrentVersion(versionID)
+
+	// Check that render exists, if not update render status to failed and return 404
+	if exists := utils.FileExists(versionService.Filesystem.GetCurrentQuartoDirPath()); !exists {
+		return nil, fmt.Errorf("no such directory exists"), nil
+	}
+
+	fileTree, err := versionService.Filesystem.GetFileTree()
+
+	return fileTree, nil, err
+}
+
+func (versionService *VersionService) GetFileFromRepository(versionID uint, relFilepath string) (string, error) {
+	if strings.Contains(relFilepath, "..") {
+		return "", fmt.Errorf("file is outside of repository")
+	}
+
+	// Set current version
+	versionService.Filesystem.SetCurrentVersion(versionID)
+	absFilepath := filepath.Join(versionService.Filesystem.GetCurrentQuartoDirPath(), relFilepath)
+
+	// Check that file exists, if not return 404
+	if exists := utils.FileExists(absFilepath); !exists {
+		return "", fmt.Errorf("no such file exists")
+	}
+
+	return absFilepath, nil
+}
+
+func (versionService *VersionService) FailAndRemoveVersion(version *models.Version) {
+	version.RenderStatus = models.RenderFailure
+	_, _ = versionService.VersionRepository.Update(version)
+	_ = versionService.Filesystem.RemoveRepository()
 }

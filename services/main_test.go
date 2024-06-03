@@ -17,21 +17,37 @@ var (
 	versionService VersionService
 	c              *gin.Context
 	mockFilesystem *mocks.MockFilesystem
-	exampleVersion models.Version
 	cwd            string
 
-	memberService        MemberService
-	exampleMember        models.Member
-	exampleSTag1         *tags.ScientificFieldTag
-	exampleSTag2         *tags.ScientificFieldTag
-	mockMemberRepository *mocks.MockRepositoryInterface[*models.Member]
+	memberService         MemberService
+	exampleMember         models.Member
+	exampleSTag1          *tags.ScientificFieldTag
+	exampleSTag2          *tags.ScientificFieldTag
+	mockMemberRepository  *mocks.MockRepositoryInterface[*models.Member]
+	mockVersionRepository *mocks.MockRepositoryInterface[*models.Version]
+
+	pendingVersion models.Version
+	failureVersion models.Version
+	successVersion models.Version
 )
 
 func TestMain(m *testing.M) {
-	exampleVersion = models.Version{
+	pendingVersion = models.Version{
 		Model:        gorm.Model{ID: 0},
 		Discussions:  nil,
-		RenderStatus: models.Pending,
+		RenderStatus: models.RenderPending,
+	}
+
+	failureVersion = models.Version{
+		Model:        gorm.Model{ID: 1},
+		Discussions:  nil,
+		RenderStatus: models.RenderFailure,
+	}
+
+	successVersion = models.Version{
+		Model:        gorm.Model{ID: 2},
+		Discussions:  nil,
+		RenderStatus: models.RenderSuccess,
 	}
 	tag1 := tags.ScientificFieldTag{
 		ScientificField: "Mathematics",

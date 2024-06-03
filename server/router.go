@@ -10,6 +10,8 @@ import (
 func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	// Get router
 	router := gin.Default()
+	router.RedirectTrailingSlash = false
+	router.RedirectFixedPath = false
 	err := router.SetTrustedProxies(nil)
 
 	if err != nil {
@@ -40,6 +42,9 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 
 	tagRouter := v2.Group("/tags")
 	tagRouter.GET("/scientific", controllers.tagController.GetScientificTags)
+	tagRouter.GET("/completion-status", controllers.tagController.GetCompletionStatusTags)
+	tagRouter.GET("/post-type", controllers.tagController.GetPostTypeTags)
+	tagRouter.GET("/feedback-preference", controllers.tagController.GetFeedbackPreferenceTags)
 
 	versionRouter(v2, controllers)
 
@@ -49,11 +54,11 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 func versionRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	versionRouter := v2.Group("/versions")
 	versionRouter.GET("/:versionID", controllers.versionController.GetVersion)
-	versionRouter.POST("/", controllers.versionController.CreateVersion)
+	versionRouter.POST("", controllers.versionController.CreateVersion)
 	versionRouter.GET("/:versionID/render", controllers.versionController.GetRender)
 	versionRouter.GET("/:versionID/repository", controllers.versionController.GetRepository)
 	versionRouter.GET("/:versionID/tree", controllers.versionController.GetFileTree)
-	versionRouter.GET("/:versionID/file", controllers.versionController.GetFileFromrepository)
+	versionRouter.GET("/:versionID/file/*filepath", controllers.versionController.GetFileFromRepository)
 	versionRouter.GET("/:versionID/discussions", controllers.versionController.GetDiscussions)
 }
 
@@ -62,9 +67,9 @@ func discussionRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
 	discussionRouter.POST("/", controllers.discussionController.CreateDiscussion)
 	discussionRouter.DELETE("/:discussionID", controllers.discussionController.DeleteDiscussion)
-	discussionRouter.GET("/:discussionID/replies", controllers.discussionController.GetDiscussionReplies)
 	discussionRouter.POST("/:discussionID/reports", controllers.discussionController.AddDiscussionReport)
 	discussionRouter.GET("/:discussionID/reports", controllers.discussionController.GetDiscussionReports)
+	discussionRouter.GET("/reports/:reportID", controllers.discussionController.GetDiscussionReport)
 }
 
 func mergeRequestRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
@@ -73,10 +78,11 @@ func mergeRequestRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	mergeRequestRouter.POST("/", controllers.mergeRequestController.CreateMergeRequest)
 	mergeRequestRouter.PUT("/", controllers.mergeRequestController.UpdateMergeRequest)
 	mergeRequestRouter.DELETE("/:mergeRequestID", controllers.mergeRequestController.DeleteMergeRequest)
-	mergeRequestRouter.GET("/:mergeRequestID/reviews", controllers.mergeRequestController.GetReviewStatus)
-	mergeRequestRouter.GET("/:mergeRequestID/reviews/:reviewID", controllers.mergeRequestController.GetReview)
+	mergeRequestRouter.GET("/:mergeRequestID/review-statuses", controllers.mergeRequestController.GetReviewStatus)
+	mergeRequestRouter.GET("/reviews/:reviewID", controllers.mergeRequestController.GetReview)
 	mergeRequestRouter.POST("/:mergeRequestID/reviews", controllers.mergeRequestController.CreateReview)
 	mergeRequestRouter.GET("/:mergeRequestID/can-review/:userID", controllers.mergeRequestController.UserCanReview)
+	mergeRequestRouter.GET("/collaborators/:collaboratorID", controllers.mergeRequestController.GetMergeRequestCollaborator)
 }
 
 func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
@@ -85,6 +91,7 @@ func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	memberRouter.POST("/", controllers.memberController.CreateMember)
 	memberRouter.PUT("/", controllers.memberController.UpdateMember)
 	memberRouter.DELETE("/:userID", controllers.memberController.DeleteMember)
+	memberRouter.GET("/", controllers.memberController.GetAllMembers)
 	memberRouter.GET("/:userID/posts", controllers.memberController.GetMemberPosts)
 	memberRouter.GET("/:userID/project-posts", controllers.memberController.GetMemberProjectPosts)
 	memberRouter.GET("/:userID/merge-requests", controllers.memberController.GetMemberMergeRequests)
@@ -103,8 +110,7 @@ func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	projectPostRouter.DELETE("/:postID", controllers.projectPostController.DeleteProjectPost)
 	projectPostRouter.POST("/from-github", controllers.projectPostController.CreateProjectPostFromGithub)
 	projectPostRouter.GET("/:postID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
-	projectPostRouter.GET("/:postID/open-merge-requests", controllers.projectPostController.GetProjectPostOpenMergeRequests)
-	projectPostRouter.GET("/:postID/closed-merge-requests", controllers.projectPostController.GetProjectPostClosedMergeRequests)
+	projectPostRouter.GET("/:postID/merge-requests-by-status", controllers.projectPostController.GetProjectPostMRsByStatus)
 }
 
 func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
@@ -116,4 +122,6 @@ func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	postRouter.POST("/from-github", controllers.postController.CreatePostFromGithub)
 	postRouter.POST("/:postID/reports", controllers.postController.AddPostReport)
 	postRouter.GET("/:postID/reports", controllers.postController.GetPostReports)
+	postRouter.GET("/reports/:reportID", controllers.postController.GetPostReport)
+	postRouter.GET("/collaborators/:collaboratorID", controllers.postController.GetPostCollaborator)
 }

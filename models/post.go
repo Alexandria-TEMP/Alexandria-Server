@@ -19,6 +19,7 @@ type Post struct {
 
 	Title               string
 	PostType            tags.PostType
+	Anonymous           bool
 	ScientificFieldTags []*tags.ScientificFieldTag
 }
 
@@ -27,6 +28,7 @@ type PostDTO struct {
 	CollaboratorIDs       []uint
 	VersionID             uint
 	Title                 string
+	Anonymous             bool
 	PostType              tags.PostType
 	ScientificFieldTagIDs []uint
 }
@@ -41,6 +43,7 @@ func (model *Post) IntoDTO() PostDTO {
 		postCollaboratorsToIDs(model.Collaborators),
 		model.CurrentVersionID,
 		model.Title,
+		model.Anonymous,
 		model.PostType,
 		tags.ScientificFieldTagIntoIDs(model.ScientificFieldTags),
 	}
