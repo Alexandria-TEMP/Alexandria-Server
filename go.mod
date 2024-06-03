@@ -4,6 +4,7 @@ go 1.22.2
 
 require (
 	github.com/gabriel-vasile/mimetype v1.4.4
+	github.com/gin-contrib/cors v1.7.2
 	go.uber.org/mock v0.4.0
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.6
