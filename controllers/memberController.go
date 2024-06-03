@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -10,7 +9,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 // @BasePath /api/v2
@@ -26,9 +24,8 @@ type MemberController struct {
 // @Param		userID		path		string			true	"user ID"
 // @Produce		json
 // @Success 	200 		{object}	models.MemberDTO
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		404 		{object} 	utils.HTTPError
-// @Failure		500			{object}	utils.HTTPError
+// @Failure		404 		{object}
+// @Failure		500			{object}
 // @Router 		/members/{userID}	[get]
 func (memberController *MemberController) GetMember(c *gin.Context) {
 	// extract the id of the member
@@ -36,8 +33,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 	userID, err := strconv.ParseUint(userIDStr, 10, 64)
 	// if this caused an error, print it
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr)})
 
 		return
 	}
@@ -46,8 +42,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 
 	// if there was an error, print it and return
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusNotFound, errors.New("cannot get member because no user with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": "cannot get member because no user with this ID exists"})
 
 		return
 	}
@@ -64,8 +59,8 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 // @Param		form	body	forms.MemberCreationForm	true	"Member Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.MemberDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		500		{object}
 // @Router 		/members 		[post]
 func (memberController *MemberController) CreateMember(c *gin.Context) {
 	// get the member
@@ -75,8 +70,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 
 	// check for errors
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind userCreationForm from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind userCreationForm from request body"})
 
 		return
 	}
@@ -96,9 +90,8 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 // @Param		member	body		models.Member		true	"Updated member"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/members 		[put]
 func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	// get the new member object
@@ -107,8 +100,7 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 
 	// check for errors
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind updated user from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated user from request body"})
 
 		return
 	}
@@ -118,8 +110,7 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 
 	// check for errors again
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update user because no user with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": "cannot update user because no user with this ID exists"})
 
 		return
 	}
@@ -136,9 +127,9 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 // @Param		userID		path		string			true	"user ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/members/{userID} 		[delete]
 func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 	// delete method goes here
@@ -154,9 +145,9 @@ func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.PostDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/members/{userID}/posts 		[get]
 func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 	// return all the posts
@@ -174,9 +165,9 @@ func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.ProjectPostDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/members/{userID}/project-posts 		[get]
 func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) {
 	// return all the project posts
@@ -194,9 +185,9 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.BranchDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/members/{userID}/branches 		[get]
 func (memberController *MemberController) GetMemberBranches(_ *gin.Context) {
 	// return all the branches
@@ -214,9 +205,9 @@ func (memberController *MemberController) GetMemberBranches(_ *gin.Context) {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.DiscussionDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/members/{userID}/discussions		[get]
 func (memberController *MemberController) GetMemberDiscussions(_ *gin.Context) {
 	// returns all the discussions this member is a part of
@@ -231,8 +222,8 @@ func (memberController *MemberController) GetMemberDiscussions(_ *gin.Context) {
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		500		{object}
 // @Router 		/members/{userID}/saved-posts/{postID} 		[post]
 func (memberController *MemberController) AddMemberSavedPost(_ *gin.Context) {
 
@@ -246,8 +237,8 @@ func (memberController *MemberController) AddMemberSavedPost(_ *gin.Context) {
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		500		{object}
 // @Router 		/members/{userID}/saved-project-posts/{postID} 		[post]
 func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Context) {
 
@@ -263,9 +254,9 @@ func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Conte
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.PostDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/members/{userID}/saved-posts 		[get]
 func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
 	// return all saved posts of this member
@@ -282,9 +273,9 @@ func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.ProjectPostDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/members/{userID}/saved-project-posts 		[get]
 func (memberController *MemberController) GetMemberSavedProjectPosts(_ *gin.Context) {
 	// return all the project posts that this member has saved

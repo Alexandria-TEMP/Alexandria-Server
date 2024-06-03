@@ -6,13 +6,12 @@ import (
 )
 
 type BranchService interface {
-	// CreateBranch creates a new branch from a creation form
+	// CreateBranch creates a new branch from a creation form.
+	// It assumes that a repository has already been created for this post.
 	// Error 1 404
 	// Error 2 500
 	CreateBranch(branchCreationForm forms.BranchCreationForm) (models.Branch, error, error)
 
-	// CreateRepository creates a new repository in the vfs, with a clean main branch
-	// Error 1 404
-	// Error 2 500
-	CreateRepository(postID uint) (models.Branch, error, error)
+	// GetBranch gets an existing branch from the DB
+	GetBranch(branchID uint) (models.Branch, error)
 }

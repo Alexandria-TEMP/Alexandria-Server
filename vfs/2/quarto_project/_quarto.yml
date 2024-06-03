@@ -1,0 +1,10 @@
+filters:
+    - include-code-files
+format:
+    html:
+        page-layout: custom
+project:
+    render:
+        - '*.qmd'
+        - README.qmd
+    type: default

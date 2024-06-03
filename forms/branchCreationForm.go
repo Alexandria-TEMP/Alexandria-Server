@@ -9,13 +9,11 @@ type BranchCreationForm struct {
 	NewPostTitle string
 
 	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields []tags.ScientificField `gorm:"serializer:json"`
+	UpdatedScientificFields []tags.ScientificField
 
-	Collaborators []*models.BranchCollaborator `gorm:"foreignKey:BranchID"`
+	Collaborators []*models.BranchCollaborator
 
-	PostID uint
-
-	FromBranchId uint
+	ProjectPostID uint
 
 	BranchTitle string
 

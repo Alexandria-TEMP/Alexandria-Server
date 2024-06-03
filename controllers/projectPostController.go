@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -10,7 +9,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 // @BasePath /api/v2
@@ -27,9 +25,8 @@ type ProjectPostController struct {
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
 // @Success 	200 		{object}	models.ProjectPostDTO
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		404 		{object} 	utils.HTTPError
-// @Failure		500 		{object} 	utils.HTTPError
+// @Failure		404 		{object}
+// @Failure		500 		{object}
 // @Router 		/project-posts/{postID}	[get]
 func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Context) {
 	// extract postID
@@ -37,8 +34,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 	postID, err := strconv.ParseInt(postIDStr, 10, 64)
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr)})
 
 		return
 	}
@@ -46,8 +42,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 	post, err := projectPostController.ProjectPostService.GetProjectPost(uint64(postID))
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot get project post because no post with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": "cannot get project post because no post with this ID exists"})
 
 		return
 	}
@@ -65,8 +60,8 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 // @Param 		parentPostID	query		string							false	"Parent post ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		500 		{object} 	utils.HTTPError
+// @Failure		400 		{object}
+// @Failure		500 		{object}
 // @Router 		/project-posts		[post]
 func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Context) {
 	// extract post
@@ -74,8 +69,7 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 	err := c.BindJSON(&form)
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind ProjectPostCreationForm from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind ProjectPostCreationForm from request body"})
 
 		return
 	}
@@ -95,10 +89,8 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 // @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
 // @Produce		json
 // @Success 	200
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		404 		{object} 	utils.HTTPError
-// @Failure		500 		{object} 	utils.HTTPError
+// @Failure		404 		{object}
+// @Failure		500 		{object}
 // @Router 		/project-posts 		[put]
 func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Context) {
 	// extract post
@@ -106,8 +98,7 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 	err := c.BindJSON(&updatedProjectPost)
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind updated ProjectPost from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind ProjectPostCreationForm from request body"})
 
 		return
 	}
@@ -116,8 +107,7 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 	err = projectPostController.ProjectPostService.UpdateProjectPost(&updatedProjectPost)
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update post because no ProjectPost with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": "cannot update post because no ProjectPost with this ID exists"})
 
 		return
 	}
@@ -134,9 +124,9 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/project-posts/{postID} 		[delete]
 func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Context) {
 	// delete method goes here
@@ -152,9 +142,9 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Con
 // @Param		url		query	string							true	"Github repository url"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500 	{object} 	utils.HTTPError
-// @Failure 	502 	{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		500 	{object}
+// @Failure 	502 	{object}
 // @Router 		/project-posts/from-github 		[post]
 func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(_ *gin.Context) {
 
@@ -170,9 +160,9 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.DiscussionDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router		/project-posts/{postID}/all-discussions 	[get]
 func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ *gin.Context) {
 
@@ -188,9 +178,9 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ 
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.BranchDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/project-posts/{postID}/open-branches 		[get]
 func (projectPostController *ProjectPostController) GetProjectPostOpenBranches(_ *gin.Context) {
 	// return all the branches associated with this project post that are open
@@ -207,9 +197,9 @@ func (projectPostController *ProjectPostController) GetProjectPostOpenBranches(_
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.BranchDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/project-posts/{postID}/closed-branches 		[get]
 func (projectPostController *ProjectPostController) GetProjectPostClosedBranches(_ *gin.Context) {
 	// return all the branches associated with this project post that are closed

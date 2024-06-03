@@ -14,9 +14,9 @@ type DiscussionController struct {
 // @Param		discussionID		path		string			true	"Discussion ID"
 // @Produce		json
 // @Success 	200 		{object}	models.DiscussionDTO
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		404 		{object} 	utils.HTTPError
-// @Failure		500 		{object} 	utils.HTTPError
+// @Failure		400 		{object}
+// @Failure		404 		{object}
+// @Failure		500 		{object}
 // @Router 		/discussions/{discussionID}	[get]
 func (discussionController *DiscussionController) GetDiscussion(_ *gin.Context) {
 
@@ -31,8 +31,8 @@ func (discussionController *DiscussionController) GetDiscussion(_ *gin.Context) 
 // @Param 		parentID			query		string			false	"Parent ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.DiscussionDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500 	{object} 	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		500 	{object}
 // @Router 		/discussions 		[post]
 func (discussionController *DiscussionController) CreateDiscussion(_ *gin.Context) {
 
@@ -45,9 +45,9 @@ func (discussionController *DiscussionController) CreateDiscussion(_ *gin.Contex
 // @Param		discussionID		path		string			true	"discussion ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/discussions/{discussionID} 		[delete]
 func (discussionController *DiscussionController) DeleteDiscussion(_ *gin.Context) {
 	// delete method goes here
@@ -63,9 +63,9 @@ func (discussionController *DiscussionController) DeleteDiscussion(_ *gin.Contex
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.DiscussionDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/discussions/{discussionID}/replies 		[get]
 func (discussionController *DiscussionController) GetDiscussionReplies(_ *gin.Context) {
 	//TODO: make paginated
@@ -79,9 +79,9 @@ func (discussionController *DiscussionController) GetDiscussionReplies(_ *gin.Co
 // @Param		discussionID		path		string			true	"Discussion ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.ReportDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500 	{object} 	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500 	{object}
 // @Router 		/discussions/{discussionID}/reports 		[post]
 func (discussionController *DiscussionController) AddDiscussionReport(_ *gin.Context) {
 
@@ -97,9 +97,9 @@ func (discussionController *DiscussionController) AddDiscussionReport(_ *gin.Con
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.ReportDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/discussions/{discussionID}/reports 		[get]
 func (discussionController *DiscussionController) GetDiscussionReports(_ *gin.Context) {
 	//TODO: make paginated

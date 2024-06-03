@@ -10,15 +10,16 @@ import (
 type ClosedBranch struct {
 	gorm.Model
 
-	// ClosedBranch belongs to Branch
+	// Branch belongs to ClosedBranch
 	Branch   Branch `gorm:"foreignKey:BranchID"`
 	BranchID uint
 
-	// ClosedBranch belongs to Version
-	MainVersionWhenClosed   Version `gorm:"foreignKey:MainVersionWhenClosedID"`
-	MainVersionWhenClosedID uint
+	// SupercededBranch belongs to ClsoedBranch
+	SupercededBranch   Branch `gorm:"foreignKey:SupercededBranchID"`
+	SupercededBranchID uint
 
-	// ProjectPost has many ClosedBranch
+	// ClosedBranch belongs to ProjectPost
+	ProjectPost   ProjectPost `gorm:"foreignKey:ProjectPostID"`
 	ProjectPostID uint
 
 	BranchDecision BranchDecision
@@ -40,7 +41,7 @@ func (model *ClosedBranch) IntoDTO() ClosedBranchDTO {
 	return ClosedBranchDTO{
 		model.ID,
 		model.BranchID,
-		model.MainVersionWhenClosedID,
+		model.SupercededBranchID,
 		model.ProjectPostID,
 		model.BranchDecision,
 	}

@@ -24,9 +24,9 @@ type PostController struct {
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
 // @Success 	200 		{object}	models.PostDTO
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		404 		{object} 	utils.HTTPError
-// @Failure		500 		{object} 	utils.HTTPError
+// @Failure		400 		{object}
+// @Failure		404 		{object}
+// @Failure		500 		{object}
 // @Router 		/posts/{postID}	[get]
 func (postController *PostController) GetPost(c *gin.Context) {
 	// extract postID
@@ -60,8 +60,8 @@ func (postController *PostController) GetPost(c *gin.Context) {
 // @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.PostDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500 	{object} 	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		500 	{object}
 // @Router 		/posts 		[post]
 func (postController *PostController) CreatePost(c *gin.Context) {
 	// extract post
@@ -89,9 +89,9 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 // @Param		post	body		models.PostDTO		true	"Updated Post"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500 		{object} 	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500 		{object}
 // @Router 		/posts 		[put]
 func (postController *PostController) UpdatePost(c *gin.Context) {
 	// extract post
@@ -125,9 +125,9 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/posts/{postID} 		[delete]
 func (postController *PostController) DeletePost(_ *gin.Context) {
 	// delete method goes here
@@ -143,9 +143,9 @@ func (postController *PostController) DeletePost(_ *gin.Context) {
 // @Param		url		query	string					true	"Github repository url"
 // @Produce		json
 // @Success 	200 	{object} 	models.PostDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500 	{object} 	utils.HTTPError
-// @Failure 	502 	{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		500 	{object}
+// @Failure 	502 	{object}
 // @Router 		/posts/from-github 		[post]
 func (postController *PostController) CreatePostFromGithub(_ *gin.Context) {
 
@@ -159,9 +159,9 @@ func (postController *PostController) CreatePostFromGithub(_ *gin.Context) {
 // @Param		postID	path	string						true	"Post ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.ReportDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500 	{object} 	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500 	{object}
 // @Router 		/posts/{postID}/reports 		[post]
 func (postController *PostController) AddPostReport(_ *gin.Context) {
 
@@ -177,9 +177,9 @@ func (postController *PostController) AddPostReport(_ *gin.Context) {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.ReportDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400 	{object}
+// @Failure		404 	{object}
+// @Failure		500		{object}
 // @Router 		/posts/{postID}/reports 		[get]
 func (postController *PostController) GetPostReports(_ *gin.Context) {
 	// TODO: make paginated

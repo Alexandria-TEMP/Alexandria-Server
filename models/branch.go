@@ -7,6 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
+type RenderStatus string
+
+const (
+	Success RenderStatus = "success"
+	Pending RenderStatus = "pending"
+	Failure RenderStatus = "failure"
+)
+
 type Branch struct {
 	gorm.Model
 
@@ -27,14 +35,18 @@ type Branch struct {
 	// Branch has many BranchReview
 	Reviews []*BranchReview `gorm:"foreignKey:BranchID"`
 
-	// Post has many Branch
-	PostID uint
+	// Branch has many Discussion
+	Discussions []*Discussion `gorm:"foreignKey:BranchID"`
 
-	FromBranchID uint
+	// Branch has a ProjectPost
+	ProjectPost   ProjectPost `gorm:"foreignKey:ProjectPostID"`
+	ProjectPostID uint
 
 	BranchTitle string
 
 	Anonymous bool
+
+	RenderStatus RenderStatus
 }
 
 type BranchDTO struct {
@@ -46,10 +58,11 @@ type BranchDTO struct {
 	// MR metadata
 	CollaboratorIDs []uint
 	ReviewIDs       []uint
-	PostID          uint
-	FromBranchId    uint
+	ProjectPostID   uint
 	BranchTitle     string
 	Anonymous       bool
+	RenderStatus    RenderStatus
+	DiscussionIDs   []uint
 }
 
 func (model *Branch) GetID() uint {
@@ -64,10 +77,11 @@ func (model *Branch) IntoDTO() BranchDTO {
 		model.UpdatedScientificFields,
 		branchCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
-		model.PostID,
-		model.FromBranchID,
+		model.ProjectPostID,
 		model.BranchTitle,
 		model.Anonymous,
+		model.RenderStatus,
+		discussionsIntoIDs(model.Discussions),
 	}
 }
 
@@ -92,6 +106,17 @@ func reviewsToIDs(reviews []*BranchReview) []uint {
 
 	for i, review := range reviews {
 		ids[i] = review.ID
+	}
+
+	return ids
+}
+
+// Helper function for JSON marshaling
+func discussionsIntoIDs(discussions []*Discussion) []uint {
+	ids := make([]uint, len(discussions))
+
+	for i, discussion := range discussions {
+		ids[i] = discussion.ID
 	}
 
 	return ids
