@@ -7,7 +7,7 @@ import (
 	docs "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/docs"
 )
 
-func SetUpRouter(controllers *ControllerEnv) *gin.Engine {
+func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	// Get router
 	router := gin.Default()
 	err := router.SetTrustedProxies(nil)
@@ -30,6 +30,44 @@ func SetUpRouter(controllers *ControllerEnv) *gin.Engine {
 
 	memberRouter(v2, controllers)
 
+	mergeRequestRouter(v2, controllers)
+
+	discussionRouter(v2, controllers)
+
+	filterRouter := v2.Group("/filter")
+	filterRouter.GET("/posts", controllers.filterController.FilterPosts)
+	filterRouter.GET("/project-posts", controllers.filterController.FilterProjectPosts)
+
+	tagRouter := v2.Group("/tags")
+	tagRouter.GET("/scientific", controllers.tagController.GetScientificTags)
+
+	versionRouter(v2, controllers)
+
+	return router
+}
+
+func versionRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+	versionRouter := v2.Group("/versions")
+	versionRouter.GET("/:versionID", controllers.versionController.GetVersion)
+	versionRouter.POST("/", controllers.versionController.CreateVersion)
+	versionRouter.GET("/:versionID/render", controllers.versionController.GetRender)
+	versionRouter.GET("/:versionID/repository", controllers.versionController.GetRepository)
+	versionRouter.GET("/:versionID/tree", controllers.versionController.GetFileTree)
+	versionRouter.GET("/:versionID/file", controllers.versionController.GetFileFromrepository)
+	versionRouter.GET("/:versionID/discussions", controllers.versionController.GetDiscussions)
+}
+
+func discussionRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+	discussionRouter := v2.Group("/discussions")
+	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
+	discussionRouter.POST("/", controllers.discussionController.CreateDiscussion)
+	discussionRouter.DELETE("/:discussionID", controllers.discussionController.DeleteDiscussion)
+	discussionRouter.GET("/:discussionID/replies", controllers.discussionController.GetDiscussionReplies)
+	discussionRouter.POST("/:discussionID/reports", controllers.discussionController.AddDiscussionReport)
+	discussionRouter.GET("/:discussionID/reports", controllers.discussionController.GetDiscussionReports)
+}
+
+func mergeRequestRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	mergeRequestRouter := v2.Group("/merge-requests")
 	mergeRequestRouter.GET("/:mergeRequestID", controllers.mergeRequestController.GetMergeRequest)
 	mergeRequestRouter.POST("/", controllers.mergeRequestController.CreateMergeRequest)
@@ -39,35 +77,9 @@ func SetUpRouter(controllers *ControllerEnv) *gin.Engine {
 	mergeRequestRouter.GET("/:mergeRequestID/reviews/:reviewID", controllers.mergeRequestController.GetReview)
 	mergeRequestRouter.POST("/:mergeRequestID/reviews", controllers.mergeRequestController.CreateReview)
 	mergeRequestRouter.GET("/:mergeRequestID/can-review/:userID", controllers.mergeRequestController.UserCanReview)
-
-	discussionRouter := v2.Group("/discussions")
-	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
-	discussionRouter.POST("/", controllers.discussionController.CreateDiscussion)
-	discussionRouter.DELETE("/:discussionID", controllers.discussionController.DeleteDiscussion)
-	discussionRouter.GET("/:discussionID/replies", controllers.discussionController.GetDiscussionReplies)
-	discussionRouter.POST("/:discussionID/reports", controllers.discussionController.AddDiscussionReport)
-	discussionRouter.GET("/:discussionID/reports", controllers.discussionController.GetDiscussionReports)
-
-	filterRouter := v2.Group("/filter")
-	filterRouter.GET("/posts", controllers.filterController.FilterPosts)
-	filterRouter.GET("/project-posts", controllers.filterController.FilterProjectPosts)
-
-	tagRouter := v2.Group("/tags")
-	tagRouter.GET("/scientific", controllers.tagController.GetScientificTags)
-
-	versionRouter := v2.Group("/versions")
-	versionRouter.GET("/:versionID", controllers.versionController.GetVersion)
-	versionRouter.POST("/", controllers.versionController.CreateVersion)
-	versionRouter.GET("/:versionID/render", controllers.versionController.GetRender)
-	versionRouter.GET("/:versionID/repository", controllers.versionController.GetRepository)
-	versionRouter.GET("/:versionID/tree", controllers.versionController.GetFileTree)
-	versionRouter.GET("/:versionID/file", controllers.versionController.GetFileFromrepository)
-	versionRouter.GET("/:versionID/discussions", controllers.versionController.GetDiscussions)
-
-	return router
 }
 
-func memberRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
+func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	memberRouter := v2.Group("/members")
 	memberRouter.GET("/:userID", controllers.memberController.GetMember)
 	memberRouter.POST("/", controllers.memberController.CreateMember)
@@ -83,7 +95,7 @@ func memberRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	memberRouter.GET("/:userID/saved-project-posts", controllers.memberController.GetMemberSavedProjectPosts)
 }
 
-func projectPostRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
+func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	projectPostRouter := v2.Group("/project-posts")
 	projectPostRouter.GET("/:postID", controllers.projectPostController.GetProjectPost)
 	projectPostRouter.POST("/", controllers.projectPostController.CreateProjectPost)
@@ -95,7 +107,7 @@ func projectPostRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	projectPostRouter.GET("/:postID/closed-merge-requests", controllers.projectPostController.GetProjectPostClosedMergeRequests)
 }
 
-func postRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
+func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	postRouter := v2.Group("/posts")
 	postRouter.GET("/:postID", controllers.postController.GetPost)
 	postRouter.POST("/", controllers.postController.CreatePost)
