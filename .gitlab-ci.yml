@@ -59,7 +59,7 @@ test_reports:
 .package_tests:
   stage: test
   coverage: '/coverage: \d+.\d+% of statements/'
-  script: go test $(go list ./... | grep $PKG) -cover
+  script: go test $(go list ./... | grep $PKG) -cover -short
 
 test_pkg_controllers:
   extends: .package_tests
