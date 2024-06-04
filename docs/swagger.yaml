@@ -75,18 +75,30 @@ definitions:
         type: string
       password:
         type: string
+      scientificFieldTags:
+        items:
+          $ref: '#/definitions/tags.ScientificField'
+        type: array
     type: object
   models.BranchDTO:
     properties:
       anonymous:
         type: boolean
       collaboratorIDs:
+        description: MR metadata
         items:
           type: integer
         type: array
       id:
         type: integer
+      mergeRequestTitle:
+        type: string
+      newPostTitle:
+        type: string
       newVersionID:
+        description: MR's proposed changes
+        type: integer
+      previousVersionID:
         type: integer
       projectPostID:
         type: integer
@@ -97,7 +109,9 @@ definitions:
       updatedCompletionStatus:
         $ref: '#/definitions/tags.CompletionStatus'
       updatedScientificFields:
-        $ref: '#/definitions/tags.ScientificField'
+        items:
+          $ref: '#/definitions/tags.ScientificField'
+        type: array
     type: object
   models.PostDTO:
     properties:
@@ -113,6 +127,8 @@ definitions:
         items:
           $ref: '#/definitions/tags.ScientificField'
         type: array
+      title:
+        type: string
       versionID:
         type: integer
     type: object
@@ -137,9 +153,17 @@ definitions:
       postReviewStatusTag:
         $ref: '#/definitions/tags.PostReviewStatus'
     type: object
+  models.RenderStatus:
+    enum:
+    - success
+    - pending
+    - failure
+    type: string
+    x-enum-varnames:
+    - Success
+    - Pending
+    - Failure
   models.ReportDTO:
-    type: object
-  models.Repository:
     type: object
   models.ReviewDTO:
     type: object
@@ -151,6 +175,8 @@ definitions:
         type: array
       id:
         type: integer
+      renderStatus:
+        $ref: '#/definitions/models.RenderStatus'
     type: object
   tags.CompletionStatus:
     enum:
@@ -193,9 +219,11 @@ definitions:
   tags.ScientificField:
     enum:
     - mathematics
+    - computer science
     type: string
     x-enum-varnames:
     - Mathematics
+    - ComputerScience
   tags.ScientificFieldTag:
     type: object
   utils.HTTPError:
@@ -1759,50 +1787,18 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns all scientific tags
-  /version/{versionID}/repository:
-    get:
-      description: Get the entire zipped repository of a version
-      parameters:
-      - description: Version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      produces:
-      - application/zip
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get the repository of a version
   /versions:
     post:
       consumes:
       - multipart/form-data
-      description: Create a new version with discussions and repository
+      description: Create a new version with discussions and repository from zipped
+        file in body
       parameters:
-      - description: Parent Post ID
-        in: query
-        name: postID
-        required: true
-        type: string
       - description: Repository to create
-        in: body
+        in: formData
         name: repository
         required: true
-        schema:
-          $ref: '#/definitions/models.Repository'
+        type: file
       produces:
       - application/json
       responses:
@@ -1821,8 +1817,6 @@ paths:
       summary: Create new version
   /versions/{versionID}:
     get:
-      consumes:
-      - application/json
       description: Get a version by version ID
       parameters:
       - description: Version ID
@@ -1845,15 +1839,9 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get version
   /versions/{versionID}/discussions:
     get:
-      consumes:
-      - application/json
       description: |-
         Returns all discussions on this version that are not a reply to another discussion
         Endpoint is offset-paginated
@@ -1893,21 +1881,79 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Returns all level 1 discussions associated with the version
-  /versions/{versionID}/file:
+  /versions/{versionID}/file/{filepath}:
     get:
       description: Get the contents of a single file from a repository of a version
       parameters:
-      - description: version ID
+      - description: Version ID
         in: path
         name: versionID
         required: true
         type: string
-      - description: file path
-        in: body
-        name: filePath
+      - description: Filepath
+        in: path
+        name: filepath
         required: true
-        schema:
-          type: string
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get a file from a repository
+  /versions/{versionID}/render:
+    get:
+      description: Get the render of the repository underlying a version if it exists
+        and has been rendered successfully
+      parameters:
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "202":
+          description: Accepted
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get the render of a version
+  /versions/{versionID}/repository:
+    get:
+      description: Get the entire zipped repository of a version
+      parameters:
+      - description: Version ID
+        in: path
+        name: versionID
+        required: true
+        type: string
       produces:
       - application/zip
       responses:
@@ -1929,45 +1975,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Get a file from a repository
-  /versions/{versionID}/render:
-    get:
-      description: Get the render of the repository underlying a version
-      parameters:
-      - description: version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      produces:
-      - text/html
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get the render of a version
+      summary: Get the repository of a version
   /versions/{versionID}/tree:
     get:
-      consumes:
-      - application/json
       description: Get the file tree of a repository of a version
       parameters:
-      - description: version ID
+      - description: Version ID
         in: path
         name: versionID
         required: true

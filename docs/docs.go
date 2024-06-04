@@ -2295,50 +2295,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/version/{versionID}/repository": {
-            "get": {
-                "description": "Get the entire zipped repository of a version",
-                "produces": [
-                    "application/zip"
-                ],
-                "summary": "Get the repository of a version",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Version ID",
-                        "name": "versionID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
         "/versions": {
             "post": {
-                "description": "Create a new version with discussions and repository",
+                "description": "Create a new version with discussions and repository from zipped file in body",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -2348,20 +2307,11 @@ const docTemplate = `{
                 "summary": "Create new version",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Parent Post ID",
-                        "name": "postID",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
+                        "type": "file",
                         "description": "Repository to create",
                         "name": "repository",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Repository"
-                        }
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -2389,9 +2339,6 @@ const docTemplate = `{
         "/versions/{versionID}": {
             "get": {
                 "description": "Get a version by version ID",
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2423,12 +2370,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
                     }
                 }
             }
@@ -2436,9 +2377,6 @@ const docTemplate = `{
         "/versions/{versionID}/discussions": {
             "get": {
                 "description": "Returns all discussions on this version that are not a reply to another discussion\nEndpoint is offset-paginated",
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2495,29 +2433,27 @@ const docTemplate = `{
                 }
             }
         },
-        "/versions/{versionID}/file": {
+        "/versions/{versionID}/file/{filepath}": {
             "get": {
                 "description": "Get the contents of a single file from a repository of a version",
                 "produces": [
-                    "application/zip"
+                    "application/octet-stream"
                 ],
                 "summary": "Get a file from a repository",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "version ID",
+                        "description": "Version ID",
                         "name": "versionID",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "file path",
-                        "name": "filePath",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
+                        "type": "string",
+                        "description": "Filepath",
+                        "name": "filepath",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -2528,12 +2464,6 @@ const docTemplate = `{
                             "items": {
                                 "type": "integer"
                             }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
                         }
                     },
                     "404": {
@@ -2553,7 +2483,7 @@ const docTemplate = `{
         },
         "/versions/{versionID}/render": {
             "get": {
-                "description": "Get the render of the repository underlying a version",
+                "description": "Get the render of the repository underlying a version if it exists and has been rendered successfully",
                 "produces": [
                     "text/html"
                 ],
@@ -2561,7 +2491,54 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "version ID",
+                        "description": "Version ID",
+                        "name": "versionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/versions/{versionID}/repository": {
+            "get": {
+                "description": "Get the entire zipped repository of a version",
+                "produces": [
+                    "application/zip"
+                ],
+                "summary": "Get the repository of a version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Version ID",
                         "name": "versionID",
                         "in": "path",
                         "required": true
@@ -2601,9 +2578,6 @@ const docTemplate = `{
         "/versions/{versionID}/tree": {
             "get": {
                 "description": "Get the file tree of a repository of a version",
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -2611,7 +2585,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "version ID",
+                        "description": "Version ID",
                         "name": "versionID",
                         "in": "path",
                         "required": true
@@ -2762,6 +2736,12 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                },
+                "scientificFieldTags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificField"
+                    }
                 }
             }
         },
@@ -2772,6 +2752,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "collaboratorIDs": {
+                    "description": "MR metadata",
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -2780,7 +2761,17 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "mergeRequestTitle": {
+                    "type": "string"
+                },
+                "newPostTitle": {
+                    "type": "string"
+                },
                 "newVersionID": {
+                    "description": "MR's proposed changes",
+                    "type": "integer"
+                },
+                "previousVersionID": {
                     "type": "integer"
                 },
                 "projectPostID": {
@@ -2796,7 +2787,10 @@ const docTemplate = `{
                     "$ref": "#/definitions/tags.CompletionStatus"
                 },
                 "updatedScientificFields": {
-                    "$ref": "#/definitions/tags.ScientificField"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificField"
+                    }
                 }
             }
         },
@@ -2820,6 +2814,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/tags.ScientificField"
                     }
+                },
+                "title": {
+                    "type": "string"
                 },
                 "versionID": {
                     "type": "integer"
@@ -2858,10 +2855,20 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ReportDTO": {
-            "type": "object"
+        "models.RenderStatus": {
+            "type": "string",
+            "enum": [
+                "success",
+                "pending",
+                "failure"
+            ],
+            "x-enum-varnames": [
+                "Success",
+                "Pending",
+                "Failure"
+            ]
         },
-        "models.Repository": {
+        "models.ReportDTO": {
             "type": "object"
         },
         "models.ReviewDTO": {
@@ -2878,6 +2885,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "renderStatus": {
+                    "$ref": "#/definitions/models.RenderStatus"
                 }
             }
         },
@@ -2934,10 +2944,12 @@ const docTemplate = `{
         "tags.ScientificField": {
             "type": "string",
             "enum": [
-                "mathematics"
+                "mathematics",
+                "computer science"
             ],
             "x-enum-varnames": [
-                "Mathematics"
+                "Mathematics",
+                "ComputerScience"
             ]
         },
         "tags.ScientificFieldTag": {

@@ -265,7 +265,7 @@ func (branchController *BranchController) UserCanReview(c *gin.Context) {
 // @Param		branchID	path		string				true	"Branch ID"
 // @Produce		text/html
 // @Success 	200		{object}	[]byte
-// @Success		202
+// @Success		202		{object}	[]byte
 // @Failure		400
 // @Failure		404
 // @Router 		/branches/{branchID}/render	[get]
@@ -285,7 +285,7 @@ func (branchController *BranchController) GetRender(c *gin.Context) {
 
 	// if render is pending return 202 accepted
 	if err202 != nil {
-		c.Status(http.StatusAccepted)
+		c.String(http.StatusAccepted, "text/plain", []byte("pending"))
 
 		return
 	}
@@ -347,7 +347,7 @@ func (branchController *BranchController) GetRepository(c *gin.Context) {
 // @Description Upload a new project version to a specific, preexisting, branch as a zipped quarto project
 // @Accept  	multipart/form-data
 // @Param		branchID		path		string			true	"Branch ID"
-// @Param		file		body		file				true	"Repository to create"
+// @Param		file			body		formData		true	"Repository to create"
 // @Produce		application/json
 // @Success 	200
 // @Failure		400
