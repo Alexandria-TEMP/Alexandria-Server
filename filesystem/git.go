@@ -68,7 +68,7 @@ func (filesystem *Filesystem) CreateBranch(branchName string) error {
 	return nil
 }
 
-// Megre actually resets master to the last commit on the branch we are merging
+// Merge actually resets master to the last commit on the branch we are merging
 func (filesystem *Filesystem) Merge(toMerge string, mergeInto string) error {
 	// get worktree
 	w, err := filesystem.CurrentRepository.Worktree()
@@ -99,6 +99,21 @@ func (filesystem *Filesystem) Merge(toMerge string, mergeInto string) error {
 
 	// git clean --ffxd
 	w.Clean(&git.CleanOptions{Dir: true})
+
+	return nil
+}
+
+func (filesystem *Filesystem) Reset() error {
+	// get worktree
+	w, err := filesystem.CurrentRepository.Worktree()
+
+	if err != nil {
+		return fmt.Errorf("failed to open worktree")
+	}
+
+	if err := w.Reset(&git.ResetOptions{Mode: git.HardReset}); err != nil {
+		return fmt.Errorf("failed to reset current branch")
+	}
 
 	return nil
 }
@@ -162,4 +177,19 @@ func (filesystem *Filesystem) GetLastCommit(branchName string) (*plumbing.Refere
 	}
 
 	return ref, nil
+}
+
+func (filesystem *Filesystem) CleanDir() error {
+	// get worktree
+	w, err := filesystem.CurrentRepository.Worktree()
+
+	if err != nil {
+		return fmt.Errorf("failed to open worktree")
+	}
+
+	// remove all files
+	w.RemoveGlob("render")
+	w.RemoveGlob("quarto_project")
+
+	return nil
 }

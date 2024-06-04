@@ -16,7 +16,7 @@ var (
 	responseRecorder *httptest.ResponseRecorder
 
 	branchController  *BranchController
-	mockBranchService *mock_interfaces.MockBranchService
+	mockBranchService *mock_interfaces.
 
 	examplePendingBranch models.Branch
 	exampleSuccessBranch models.Branch
@@ -41,21 +41,21 @@ func SetUpRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router = gin.Default()
 
-	router.POST("/api/v2/branches", func(c *gin.Context) {
-		branchController.CreateVersion(c)
-	})
-	router.GET("/api/v2/versions/:versionID/render", func(c *gin.Context) {
-		branchController.GetRender(c)
-	})
-	router.GET("/api/v2/versions/:versionID/repository", func(c *gin.Context) {
-		branchController.GetRepository(c)
-	})
-	router.GET("/api/v2/versions/:versionID/tree", func(c *gin.Context) {
-		branchController.GetFileTree(c)
-	})
-	router.GET("/api/v2/versions/:versionID/file/*filepath", func(c *gin.Context) {
-		branchController.GetFileFromRepository(c)
-	})
+	// router.POST("/api/v2/branches", func(c *gin.Context) {
+	// 	branchController.CreateVersion(c)
+	// })
+	// router.GET("/api/v2/versions/:versionID/render", func(c *gin.Context) {
+	// 	branchController.GetRender(c)
+	// })
+	// router.GET("/api/v2/versions/:versionID/repository", func(c *gin.Context) {
+	// 	branchController.GetRepository(c)
+	// })
+	// router.GET("/api/v2/versions/:versionID/tree", func(c *gin.Context) {
+	// 	branchController.GetFileTree(c)
+	// })
+	// router.GET("/api/v2/versions/:versionID/file/*filepath", func(c *gin.Context) {
+	// 	branchController.GetFileFromRepository(c)
+	// })
 
 	return router
 }

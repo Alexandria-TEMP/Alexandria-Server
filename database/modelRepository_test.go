@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -299,43 +298,43 @@ func TestDeleteNonExistingModel(t *testing.T) {
 	}
 }
 
-func TestCreateWithAssociation(t *testing.T) {
-	if testing.Short() {
-		t.SkipNow()
-	}
+// func TestCreateWithAssociation(t *testing.T) {
+// 	if testing.Short() {
+// 		t.SkipNow()
+// 	}
 
-	beforeEach()
-	t.Cleanup(afterEach)
+// 	beforeEach()
+// 	t.Cleanup(afterEach)
 
-	// Create a Post that has a Version
-	version := models.Version{
-		Discussions:  []*models.Discussion{},
-		RenderStatus: models.Pending,
-	}
+// 	// Create a Post that has a Version
+// 	version := models.Version{
+// 		Discussions:  []*models.Discussion{},
+// 		RenderStatus: models.Pending,
+// 	}
 
-	post := models.Post{
-		Collaborators:       []*models.PostCollaborator{},
-		CurrentVersion:      version,
-		PostType:            tags.Question,
-		ScientificFieldTags: []tags.ScientificField{},
-	}
+// 	post := models.Post{
+// 		Collaborators:       []*models.PostCollaborator{},
+// 		CurrentVersion:      version,
+// 		PostType:            tags.Question,
+// 		ScientificFieldTags: []tags.ScientificField{},
+// 	}
 
-	postRepository := ModelRepository[*models.Post]{Database: testDB}
+// 	postRepository := ModelRepository[*models.Post]{Database: testDB}
 
-	versionRepository := ModelRepository[*models.Version]{Database: testDB}
+// 	versionRepository := ModelRepository[*models.Version]{Database: testDB}
 
-	err := postRepository.Create(&post)
-	if err != nil {
-		t.Fatal(err)
-	}
+// 	err := postRepository.Create(&post)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	_, err = postRepository.GetByID(post.ID)
-	if err != nil {
-		t.Fatal(err)
-	}
+// 	_, err = postRepository.GetByID(post.ID)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	_, err = versionRepository.GetByID(post.CurrentVersionID)
-	if err != nil {
-		t.Fatal(err)
-	}
-}
+// 	_, err = versionRepository.GetByID(post.CurrentVersionID)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// }

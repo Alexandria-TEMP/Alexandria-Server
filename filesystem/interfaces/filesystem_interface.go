@@ -11,8 +11,8 @@ import (
 //go:generate mockgen -package=mocks -source=./filesystem_interface.go -destination=../../mocks/filesystem_mock.go
 
 type Filesystem interface {
+	// select which post's repository to interact with
 	CheckoutDirectory(postID uint)
-	GetFileTree() (map[string]int64, error)
 
 	CreateRepository() error
 	CheckoutRepository() (*git.Repository, error)
@@ -23,11 +23,12 @@ type Filesystem interface {
 
 	CreateCommit() error
 	GetLastCommit() (*plumbing.Reference, error)
-
+	GetFileTree() (map[string]int64, error)
+	RenderExists() (bool, string)
 	SaveZipFile(c *gin.Context, file *multipart.FileHeader) error
 	Unzip() error
-
-	RenderExists() (bool, string)
+	CleanDir() error
+	Reset() error
 
 	GetCurrentDirPath() string
 	GetCurrentQuartoDirPath() string

@@ -1,9 +1,0 @@
-<!-- This part is about description of the example -->
-
-::: {.callout-note collapse="true"}
-
-{{< include _about.qmd >}}
-
-:::
-
-<!-- below is the example itself -->

@@ -15,7 +15,6 @@ func autoMigrateAllModels(db *gorm.DB) error {
 	//
 	// If this is not upheld, foreign key constraint errors will be thrown.
 	return db.AutoMigrate(
-		&models.Version{},            //
 		&models.Post{},               // FK to Version
 		&models.ProjectPost{},        // FK to Post
 		&models.Branch{},             // FK to Version, ProjectPost

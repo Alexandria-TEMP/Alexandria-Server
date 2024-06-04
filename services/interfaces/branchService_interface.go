@@ -8,6 +8,8 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 )
 
+//go:generate mockgen -package=mocks -source=./branchService_interface.go -destination=../../mocks/branchService_mock.go
+
 type BranchService interface {
 	// GetBranch gets an existing branch from the DB
 	GetBranch(branchID uint) (models.Branch, error)
@@ -22,21 +24,21 @@ type BranchService interface {
 	GetReviewStatus(branchID uint) ([]models.BranchDecision, error)
 
 	// GetReview gets an existing review from the DB
-	GetReview(reviewID uint) (models.Review, error)
+	GetReview(reviewID uint) (models.BranchReview, error)
 
 	// CreateReview creates a new review and adds it to the branch.
-	CreateReview(branchID uint, reportCreationForm forms.ReviewCreationForm) (models.Review, error)
+	CreateReview(branchReviewCreationForm forms.BranchReviewCreationForm) (models.BranchReview, error)
 
-	// UserCanReview checks whether a user is elligible to review a branch, dpending on whether there is an overlap of the scientific fields.
-	UserCanReview(branchID, userID uint) (bool, error)
-
-	// UploadProject saves a zipper quarto project to its branch and sets the branch to pending.
-	// It the renders the project in a goroutine.
-	UploadProject(c *gin.Context, file *multipart.FileHeader, branchID uint) error
+	// MemberCanReview checks whether a user is elligible to review a branch, dpending on whether there is an overlap of the scientific fields.
+	MemberCanReview(branchID, userID uint) (bool, error)
 
 	// GetProjectFile returns filepath of zipped repository.
 	// Error is for status 404.
 	GetProject(branchID uint) (string, error)
+
+	// UploadProject saves a zipper quarto project to its branch and sets the branch to pending.
+	// It the renders the project in a goroutine.
+	UploadProject(c *gin.Context, file *multipart.FileHeader, branchID uint) error
 
 	// GetFiletree returns a map of all filepaths in a quarto project and their size in bytes
 	// Error 1 is for status 404.

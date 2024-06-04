@@ -130,8 +130,8 @@ func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 }
 
 // GetReview godoc
-// @Summary 	Returns a review of a branch
-// @Description Returns a review with the given ID of the branch with the given ID
+// @Summary 	Returns a review
+// @Description Returns a review with given ID
 // @Accept  	json
 // @Param		reviewID			path		string			true	"review ID"
 // @Produce		json
@@ -168,37 +168,26 @@ func (branchController *BranchController) GetReview(c *gin.Context) {
 // @Summary 	Adds a review to a branch
 // @Description Adds a review to a branch
 // @Accept  	json
-// @Param		branchID		path		string			true	"branch ID"
-// @Param		form	body	forms.ReviewCreationForm	true	"review creation form"
+// @Param		form	body	forms.BranchReviewCreationForm	true	"branch review creation form"
 // @Produce		json
 // @Success 	200
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router 		/branches/{branchID}/reviews		[post]
+// @Router 		/branches/reviews		[post]
 func (branchController *BranchController) CreateReview(c *gin.Context) {
-	// extract branchID
-	branchIDStr := c.Param("branchID")
-	branchID, err := strconv.ParseInt(branchIDStr, 10, 64)
+	// extract BranchReviewCreationForm
+	form := forms.BranchReviewCreationForm{}
+	err := c.BindJSON(&form)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", branchIDStr)})
-
-		return
-	}
-
-	// extract ReviewCreationForm
-	form := forms.ReviewCreationForm{}
-	err = c.BindJSON(&form)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind ReviewCreationForm from request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind BranchReviewCreationForm from request body"})
 
 		return
 	}
 
 	// create review and add to branch
-	review, err := branchController.BranchService.CreateReview(uint(branchID), form)
+	review, err := branchController.BranchService.CreateReview(form)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -217,14 +206,14 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 // @Description Returns false if user is unauthorized to review the branch
 // @Accept  	json
 // @Param		branchID		path		string			true	"branch ID"
-// @Param		userID			path		string			true	"user ID"
+// @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{object}		boolean
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router 		/branches/{branchID}/can-review/{userID}		[get]
-func (branchController *BranchController) UserCanReview(c *gin.Context) {
+// @Router 		/branches/{branchID}/can-review/{memberID}		[get]
+func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 	// extract branchID
 	branchIDStr := c.Param("branchID")
 	branchID, err := strconv.ParseInt(branchIDStr, 10, 64)
@@ -236,17 +225,17 @@ func (branchController *BranchController) UserCanReview(c *gin.Context) {
 	}
 
 	// extract userID
-	userIDStr := c.Param("userID")
-	userID, err := strconv.ParseInt(userIDStr, 10, 64)
+	memberIDStr := c.Param("memberID")
+	memberID, err := strconv.ParseInt(memberIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", userIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", memberIDStr)})
 
 		return
 	}
 
 	// create review and add to branch
-	canReview, err := branchController.BranchService.UserCanReview(uint(branchID), uint(userID))
+	canReview, err := branchController.BranchService.MemberCanReview(uint(branchID), uint(memberID))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -305,7 +294,7 @@ func (branchController *BranchController) GetRender(c *gin.Context) {
 	c.File(filePath)
 }
 
-// GetRepository godoc specs are subject to change
+// GetProject godoc specs are subject to change
 // @Summary 	Get the repository of a branch
 // @Description Get the entire zipped repository of a branch
 // @Param		branchID	path		string				true	"Branch ID"
@@ -314,7 +303,7 @@ func (branchController *BranchController) GetRender(c *gin.Context) {
 // @Failure		400
 // @Failure		404
 // @Router 		/branches/{branchID}/repository	[get]
-func (branchController *BranchController) GetRepository(c *gin.Context) {
+func (branchController *BranchController) GetProject(c *gin.Context) {
 	// extract branch id
 	branchIDStr := c.Param("branchID")
 	branchID, err := strconv.ParseUint(branchIDStr, 10, 64)
