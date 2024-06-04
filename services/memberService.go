@@ -37,7 +37,17 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 	return member, err
 }
 
-func (memberService *MemberService) UpdateMember(_ *models.Member) error {
-	// TODO: database call to update
-	return nil
+func (memberService *MemberService) UpdateMember(member *models.Member) error {
+	_, err := memberService.MemberRepository.Update(member)
+	return err
+}
+
+func (memberService *MemberService) DeleteMember(userID uint) error {
+	err := memberService.MemberRepository.Delete(userID)
+	return err
+}
+
+func (memberService *MemberService) GetAllMembers()	([]uint, error) {
+	result, err := memberService.MemberRepository.GetAllIDs()
+	return result, err
 }

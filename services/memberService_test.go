@@ -49,7 +49,7 @@ func TestGetMemberUnsuccessful(t *testing.T) {
 	id := 5
 	expectedErr := fmt.Errorf("error")
 	// mock member repository here to return member when get by id called
-	mockMemberRepository.EXPECT().GetByID(id).Return(nil, expectedErr)
+	mockMemberRepository.EXPECT().GetByID(uint(id)).Return(nil, expectedErr)
 
 	// call service method
 	member, err := memberService.GetMember(uint(id))

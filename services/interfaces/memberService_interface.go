@@ -13,4 +13,6 @@ type MemberService interface {
 	GetMember(userID uint) (*models.Member, error)
 	CreateMember(memberForm *forms.MemberCreationForm, tags []*tags.ScientificFieldTag) (*models.Member, error)
 	UpdateMember(updatedMember *models.Member) error
+	DeleteMember(userID uint) error
+	GetAllMembers() ([]uint, error)
 }

@@ -77,3 +77,13 @@ func (repo *ModelRepository[T]) Delete(id uint) error {
 
 	return result.Error
 }
+
+func (repo *ModelRepository[T]) GetAllIDs() ([]uint, error) {
+	var models []uint
+	// Return all elements of that type
+	result := repo.Database.Select("ID").Find(&models)
+	if result.Error != nil {
+		return nil, fmt.Errorf("could not return all instances of model to delete: %w", result.Error)
+	}
+	return models, result.Error
+}

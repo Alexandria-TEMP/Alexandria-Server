@@ -174,8 +174,37 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members/{userID} 		[delete]
-func (memberController *MemberController) DeleteMember(_ *gin.Context) {
-	// delete method goes here
+func (memberController *MemberController) DeleteMember(c *gin.Context) {
+	// extract the id of the member
+	userIDStr := c.Param("userID")
+	initUserID, err := strconv.ParseUint(userIDStr, 10, 64)
+
+	// if this caused an error, print it and return status 400: bad input
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr))
+
+		return
+	}
+
+	// cast user ID as uint instead of uint64, because database only accepts those
+	userID := uint(initUserID)
+
+	// get the user through the service
+	err = memberController.MemberService.DeleteMember(userID)
+
+	// if there was an error, print it and return status 404: not found
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("cannot delete member because no user with this ID exists, id=%d", userID))
+
+		return
+	}
+
+	// if correct response send the member back
+	c.Header("Content-Type", "application/json")
+	// TODO: should this return the deleted user? 
+	c.JSON(http.StatusOK, nil)
 }
 
 // GetAllMembers godoc
@@ -189,8 +218,20 @@ func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/members	[get]
-func (memberController *MemberController) GetAllMembers(_ *gin.Context) {
-	// TODO implement
+func (memberController *MemberController) GetAllMembers(c *gin.Context) {
+	// TODO: this should probably not return 400, because how can it be a bad request?
+	members, err := memberController.MemberService.GetAllMembers()
+	// if there was an error, print it and return status 404: not found
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("could not retrieve all members: %w", err))
+
+		return
+	}
+
+	// if correct response send the member back
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, members)
 }
 
 // GetMemberPosts godoc
