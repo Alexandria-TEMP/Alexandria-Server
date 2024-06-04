@@ -20,6 +20,8 @@ type VersionController struct {
 // GetVersion
 // @Summary 	Get version
 // @Description Get a version by version ID
+// @Tags 		versions
+// @Accept  	json
 // @Param		versionID		path		string			true	"Version ID"
 // @Produce		application/json
 // @Success 	200 		{object}	models.VersionDTO
@@ -33,8 +35,9 @@ func (versionController *VersionController) GetVersion(_ *gin.Context) {
 // CreateVersion
 // @Summary 	Create new version
 // @Description Create a new version with discussions and repository from zipped file in body
+// @Tags 		versions
 // @Accept  	multipart/form-data
-// @Param		repository			formData		file				true	"Repository to create"
+// @Param		file			formData		file				true	"Repository to create"
 // @Produce		application/json
 // @Success 	200		{object}	models.VersionDTO
 // @Failure		400 	{object} 	utils.HTTPError
@@ -66,6 +69,7 @@ func (versionController *VersionController) CreateVersion(c *gin.Context) {
 // GetRender
 // @Summary 	Get the render of a version
 // @Description Get the render of the repository underlying a version if it exists and has been rendered successfully
+// @Tags 		versions
 // @Param		versionID	path		string				true	"Version ID"
 // @Produce		text/html
 // @Success 	200		{object}	[]byte
@@ -111,6 +115,7 @@ func (versionController *VersionController) GetRender(c *gin.Context) {
 // GetRepository godoc specs are subject to change
 // @Summary 	Get the repository of a version
 // @Description Get the entire zipped repository of a version
+// @Tags 		versions
 // @Param		versionID	path		string				true	"Version ID"
 // @Produce		application/zip
 // @Success 	200		{object}	[]byte
@@ -149,7 +154,9 @@ func (versionController *VersionController) GetRepository(c *gin.Context) {
 // GetFileTree godoc specs are subject to change
 // @Summary 	Get the file tree of a repository
 // @Description Get the file tree of a repository of a version
-// @Param		versionID	path		string				true	"Version ID"
+// @Tags 		versions
+// @Accept  	json
+// @Param		versionID		path		string			true	"version ID"
 // @Produce		application/json
 // @Success 	200		{object}	map[string]int64
 // @Failure		400 	{object} 	utils.HTTPError
@@ -191,6 +198,7 @@ func (versionController *VersionController) GetFileTree(c *gin.Context) {
 // GetFileFromRepository godoc specs are subject to change
 // @Summary 	Get a file from a repository
 // @Description Get the contents of a single file from a repository of a version
+// @Tags 		versions
 // @Param		versionID	path		string				true	"Version ID"
 // @Param		filepath	path		string				true	"Filepath"
 // @Produce		application/octet-stream
@@ -247,6 +255,7 @@ func (versionController *VersionController) GetFileFromRepository(c *gin.Context
 // @Summary Returns all level 1 discussions associated with the version
 // @Description Returns all discussions on this version that are not a reply to another discussion
 // @Description Endpoint is offset-paginated
+// @Tags versions
 // @Param		versionID	path		string			true	"version ID"
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"

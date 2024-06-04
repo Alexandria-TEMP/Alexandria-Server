@@ -28,9 +28,9 @@ func TestMain(m *testing.M) {
 	// Setup test router, to test controller endpoints through http
 	router = SetUpRouter()
 
-	examplePendingVersion = models.Version{RenderStatus: models.Pending}
-	exampleSuccessVersion = models.Version{RenderStatus: models.Success}
-	exampleFailureVersion = models.Version{RenderStatus: models.Failure}
+	examplePendingVersion = models.Version{RenderStatus: models.RenderPending}
+	exampleSuccessVersion = models.Version{RenderStatus: models.RenderSuccess}
+	exampleFailureVersion = models.Version{RenderStatus: models.RenderFailure}
 
 	cwd, _ = os.Getwd()
 

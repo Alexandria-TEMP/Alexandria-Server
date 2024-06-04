@@ -2,15 +2,16 @@ package models
 
 import (
 	"encoding/json"
+	"time"
 
 	"gorm.io/gorm"
 )
 
-type MergeRequestDecision string
+type MergeRequestReviewDecision string
 
 const (
-	Rejected MergeRequestDecision = "rejected"
-	Approved MergeRequestDecision = "approved"
+	ReviewRejected MergeRequestReviewDecision = "rejected"
+	ReviewApproved MergeRequestReviewDecision = "approved"
 )
 
 type MergeRequestReview struct {
@@ -23,7 +24,7 @@ type MergeRequestReview struct {
 	Member   Member `gorm:"foreignKey:MemberID"`
 	MemberID uint
 
-	MergeRequestDecision MergeRequestDecision
+	MergeRequestDecision MergeRequestReviewDecision
 	Feedback             string
 }
 
@@ -31,8 +32,9 @@ type MergeRequestReviewDTO struct {
 	ID                   uint
 	MergeRequestID       uint
 	MemberID             uint
-	MergeRequestDecision MergeRequestDecision
+	MergeRequestDecision MergeRequestReviewDecision
 	Feedback             string
+	CreatedAt            time.Time
 }
 
 func (model *MergeRequestReview) GetID() uint {
@@ -46,6 +48,7 @@ func (model *MergeRequestReview) IntoDTO() MergeRequestReviewDTO {
 		model.MemberID,
 		model.MergeRequestDecision,
 		model.Feedback,
+		model.CreatedAt,
 	}
 }
 

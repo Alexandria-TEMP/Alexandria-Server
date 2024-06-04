@@ -21,7 +21,7 @@ type ClosedMergeRequest struct {
 	// ProjectPost has many ClosedMergeRequest
 	ProjectPostID uint
 
-	MergeRequestDecision MergeRequestDecision
+	MergeRequestDecision MergeRequestReviewDecision
 }
 
 type ClosedMergeRequestDTO struct {
@@ -29,7 +29,7 @@ type ClosedMergeRequestDTO struct {
 	MergeRequestID          uint
 	MainVersionWhenClosedID uint
 	ProjectPostID           uint
-	MergeRequestDecision    MergeRequestDecision
+	MergeRequestDecision    MergeRequestReviewDecision
 }
 
 func (model *ClosedMergeRequest) GetID() uint {

@@ -92,20 +92,20 @@ func TestCreateVersionDelayedFailure5(t *testing.T) {
 	mockFilesystem.EXPECT().RenderExists().Times(0)
 	mockFilesystem.EXPECT().RemoveRepository().Times(1)
 
-	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending}).Times(1)
-	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Failure}).Times(1)
+	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.RenderPending}).Times(1)
+	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.RenderFailure}).Times(1)
 
 	version, err := versionService.CreateVersion(c, file)
 
 	assert.Nil(t, err)
 
-	assert.Equal(t, models.Pending, version.RenderStatus)
+	assert.Equal(t, models.RenderPending, version.RenderStatus)
 
 	// Wait until model has completed rendering
-	for version.RenderStatus == models.Pending {
+	for version.RenderStatus == models.RenderPending {
 		print()
 	}
-	assert.Equal(t, models.Failure, version.RenderStatus)
+	assert.Equal(t, models.RenderFailure, version.RenderStatus)
 }
 
 func TestCreateVersionDelayedFailure6(t *testing.T) {
@@ -122,20 +122,20 @@ func TestCreateVersionDelayedFailure6(t *testing.T) {
 	mockFilesystem.EXPECT().RenderExists().Return(false, "").Times(1)
 	mockFilesystem.EXPECT().RemoveRepository().Times(0)
 
-	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending})
-	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Failure}).Times(1)
+	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.RenderPending})
+	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.RenderFailure}).Times(1)
 
 	version, err := versionService.CreateVersion(c, file)
 
 	assert.Nil(t, err)
 
-	assert.Equal(t, models.Pending, version.RenderStatus)
+	assert.Equal(t, models.RenderPending, version.RenderStatus)
 
 	// Wait until model has completed rendering
-	for version.RenderStatus == models.Pending {
+	for version.RenderStatus == models.RenderPending {
 		print()
 	}
-	assert.Equal(t, models.Failure, version.RenderStatus)
+	assert.Equal(t, models.RenderFailure, version.RenderStatus)
 
 	renderDirPath := filepath.Join(cwd, "render", "quarto_project.html")
 	assert.Equal(t, false, utils.FileExists(renderDirPath))
@@ -152,8 +152,8 @@ func TestCreateVersionImmediateFailure(t *testing.T) {
 	mockFilesystem.EXPECT().RemoveRepository().Return(nil).Times(1)
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(0)
 
-	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending})
-	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Failure}).Times(1)
+	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.RenderPending})
+	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.RenderFailure}).Times(1)
 
 	_, err := versionService.CreateVersion(c, file)
 
@@ -179,19 +179,19 @@ func testGoodProjectTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(filepath.Join(cwd, "render")).AnyTimes()
 	mockFilesystem.EXPECT().RemoveRepository().Times(0)
 
-	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending}).Times(1)
-	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Success}).Times(1)
+	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.RenderPending}).Times(1)
+	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.RenderSuccess}).Times(1)
 
 	version, err := versionService.CreateVersion(c, file)
 
 	assert.Nil(t, err)
-	assert.Equal(t, models.Pending, version.RenderStatus)
+	assert.Equal(t, models.RenderPending, version.RenderStatus)
 
 	// Wait until model has completed rendering
-	for version.RenderStatus == models.Pending {
+	for version.RenderStatus == models.RenderPending {
 		print()
 	}
-	assert.Equal(t, models.Success, version.RenderStatus)
+	assert.Equal(t, models.RenderSuccess, version.RenderStatus)
 
 	renderDirPath := filepath.Join(cwd, "render")
 	_, err = os.Stat(renderDirPath)
@@ -213,20 +213,20 @@ func testBadProjectTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().RenderExists().Times(0)
 	mockFilesystem.EXPECT().RemoveRepository().Times(1)
 
-	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.Pending})
-	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.Failure}).Times(1)
+	mockVersionRepository.EXPECT().Create(&models.Version{RenderStatus: models.RenderPending})
+	mockVersionRepository.EXPECT().Update(&models.Version{RenderStatus: models.RenderFailure}).Times(1)
 
 	version, err := versionService.CreateVersion(c, file)
 
 	assert.Nil(t, err)
 
-	assert.Equal(t, models.Pending, version.RenderStatus)
+	assert.Equal(t, models.RenderPending, version.RenderStatus)
 
 	// Wait until model has completed rendering
-	for version.RenderStatus == models.Pending {
+	for version.RenderStatus == models.RenderPending {
 		print()
 	}
-	assert.Equal(t, models.Failure, version.RenderStatus)
+	assert.Equal(t, models.RenderFailure, version.RenderStatus)
 
 	renderDirPath := filepath.Join(cwd, "render", "quarto_project.html")
 	assert.Equal(t, false, utils.FileExists(renderDirPath))

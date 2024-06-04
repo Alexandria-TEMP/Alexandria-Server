@@ -2,6 +2,7 @@ package database
 
 import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/reports"
 	"gorm.io/gorm"
 )
 
@@ -25,5 +26,7 @@ func autoMigrateAllModels(db *gorm.DB) error {
 		&models.MergeRequestCollaborator{}, // FK to Member, MergeRequest
 		&models.Discussion{},               // FK to Version, Member
 		&models.MergeRequestReview{},       // FK to MergeRequest, Member
+		&reports.DiscussionReport{},        // FK to Discussion
+		&reports.PostReport{},              // FK to Post
 	)
 }

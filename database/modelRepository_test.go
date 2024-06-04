@@ -310,7 +310,7 @@ func TestCreateWithAssociation(t *testing.T) {
 	// Create a Post that has a Version
 	version := models.Version{
 		Discussions:  []*models.Discussion{},
-		RenderStatus: models.Pending,
+		RenderStatus: models.RenderPending,
 	}
 
 	post := models.Post{

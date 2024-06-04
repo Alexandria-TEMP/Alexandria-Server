@@ -25,7 +25,7 @@ type VersionService struct {
 
 func (versionService *VersionService) CreateVersion(c *gin.Context, file *multipart.FileHeader) (*models.Version, error) {
 	// Create version, with pending render status
-	version := models.Version{RenderStatus: models.Pending}
+	version := models.Version{RenderStatus: models.RenderPending}
 	_ = versionService.VersionRepository.Create(&version)
 
 	// Set paths in filesystem
@@ -71,7 +71,7 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 
 		// Render quarto project
 		if err := versionService.RenderProject(); err != nil {
-			version.RenderStatus = models.Failure
+			version.RenderStatus = models.RenderFailure
 			_, _ = versionService.VersionRepository.Update(&version)
 
 			return
@@ -79,15 +79,15 @@ func (versionService *VersionService) CreateVersion(c *gin.Context, file *multip
 
 		// Verify that a render was produced in the form of a single file
 		if exists, _ := versionService.Filesystem.RenderExists(); !exists {
-			version.RenderStatus = models.Failure
+			version.RenderStatus = models.RenderFailure
 			_, _ = versionService.VersionRepository.Update(&version)
 
 			return
 		}
 
-		version.RenderStatus = models.Success
+		version.RenderStatus = models.RenderSuccess
 		if _, err := versionService.VersionRepository.Update(&version); err != nil {
-			version.RenderStatus = models.Failure
+			version.RenderStatus = models.RenderFailure
 			_, _ = versionService.VersionRepository.Update(&version)
 
 			return
@@ -237,12 +237,12 @@ func (versionService *VersionService) GetRenderFile(versionID uint) (string, err
 	}
 
 	// If pending return error 202
-	if version.RenderStatus == models.Pending {
+	if version.RenderStatus == models.RenderPending {
 		return filePath, fmt.Errorf("version still rendering"), nil
 	}
 
 	// If failure return error 404
-	if version.RenderStatus == models.Failure {
+	if version.RenderStatus == models.RenderFailure {
 		return filePath, nil, fmt.Errorf("version failed to render")
 	}
 
@@ -253,7 +253,7 @@ func (versionService *VersionService) GetRenderFile(versionID uint) (string, err
 	exists, fileName := versionService.Filesystem.RenderExists()
 
 	if !exists {
-		version.RenderStatus = models.Failure
+		version.RenderStatus = models.RenderFailure
 		_, _ = versionService.VersionRepository.Update(version)
 
 		return filePath, nil, fmt.Errorf("version failed to render")
@@ -308,7 +308,7 @@ func (versionService *VersionService) GetFileFromRepository(versionID uint, relF
 }
 
 func (versionService *VersionService) FailAndRemoveVersion(version *models.Version) {
-	version.RenderStatus = models.Failure
+	version.RenderStatus = models.RenderFailure
 	_, _ = versionService.VersionRepository.Update(version)
 	_ = versionService.Filesystem.RemoveRepository()
 }

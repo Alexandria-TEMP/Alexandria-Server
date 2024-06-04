@@ -29,19 +29,19 @@ func TestMain(m *testing.M) {
 	pendingVersion = models.Version{
 		Model:        gorm.Model{ID: 0},
 		Discussions:  nil,
-		RenderStatus: models.Pending,
+		RenderStatus: models.RenderPending,
 	}
 
 	failureVersion = models.Version{
 		Model:        gorm.Model{ID: 1},
 		Discussions:  nil,
-		RenderStatus: models.Failure,
+		RenderStatus: models.RenderFailure,
 	}
 
 	successVersion = models.Version{
 		Model:        gorm.Model{ID: 2},
 		Discussions:  nil,
-		RenderStatus: models.Success,
+		RenderStatus: models.RenderSuccess,
 	}
 
 	cwd, _ = os.Getwd()

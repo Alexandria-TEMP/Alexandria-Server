@@ -16,7 +16,7 @@ func TestClosedMergeRequestJSONMarshaling(t *testing.T) {
 		MainVersionWhenClosed:   Version{},
 		MainVersionWhenClosedID: 87,
 		ProjectPostID:           40,
-		MergeRequestDecision:    Rejected,
+		MergeRequestDecision:    ReviewRejected,
 	}
 
 	// should equal this DTO!
@@ -25,7 +25,7 @@ func TestClosedMergeRequestJSONMarshaling(t *testing.T) {
 		MergeRequestID:          33,
 		MainVersionWhenClosedID: 87,
 		ProjectPostID:           40,
-		MergeRequestDecision:    Rejected,
+		MergeRequestDecision:    ReviewRejected,
 	}
 
 	dto := ClosedMergeRequestDTO{}
