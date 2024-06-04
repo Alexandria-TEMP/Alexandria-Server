@@ -2,9 +2,9 @@ package models
 
 import (
 	"encoding/json"
-	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
@@ -46,6 +46,7 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		UpdatedCompletionStatus: tags.Idea,
 		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
 		Anonymous:               false,
+		DiscussionIDs:           []uint{},
 	}
 
 	dto := BranchDTO{}
@@ -60,7 +61,5 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if !reflect.DeepEqual(dto, targetDTO) {
-		t.Fatal("parsed DTO did not equal target DTO")
-	}
+	assert.Equal(t, targetDTO, dto)
 }

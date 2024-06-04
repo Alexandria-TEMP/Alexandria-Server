@@ -69,7 +69,7 @@ func (mr *MockMemberServiceMockRecorder) CreateMember(memberForm any) *gomock.Ca
 }
 
 // GetCollaborator mocks base method.
-func (m *MockMemberService) GetCollaborator(collaboratorID uint64) (*models.PostCollaborator, error) {
+func (m *MockMemberService) GetCollaborator(collaboratorID uint) (*models.PostCollaborator, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCollaborator", collaboratorID)
 	ret0, _ := ret[0].(*models.PostCollaborator)
@@ -84,7 +84,7 @@ func (mr *MockMemberServiceMockRecorder) GetCollaborator(collaboratorID any) *go
 }
 
 // GetMember mocks base method.
-func (m *MockMemberService) GetMember(userID uint64) (*models.Member, error) {
+func (m *MockMemberService) GetMember(userID uint) (*models.Member, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMember", userID)
 	ret0, _ := ret[0].(*models.Member)

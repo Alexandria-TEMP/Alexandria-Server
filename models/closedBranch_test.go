@@ -10,22 +10,23 @@ import (
 func TestClosedBranchJSONMarshaling(t *testing.T) {
 	// This model...
 	model := ClosedBranch{
-		Model:                   gorm.Model{ID: 55},
-		Branch:                  Branch{},
-		BranchID:                33,
-		MainVersionWhenClosed:   Version{},
-		MainVersionWhenClosedID: 87,
-		ProjectPostID:           40,
-		BranchDecision:          Rejected,
+		Model:              gorm.Model{ID: 55},
+		Branch:             Branch{},
+		BranchID:           33,
+		SupercededBranch:   Branch{},
+		SupercededBranchID: 12,
+		ProjectPost:        ProjectPost{},
+		ProjectPostID:      40,
+		BranchDecision:     Rejected,
 	}
 
 	// should equal this DTO!
 	targetDTO := ClosedBranchDTO{
-		ID:                      55,
-		BranchID:                33,
-		MainVersionWhenClosedID: 87,
-		ProjectPostID:           40,
-		BranchDecision:          Rejected,
+		ID:                 55,
+		BranchID:           33,
+		SupercededBranchID: 12,
+		ProjectPostID:      40,
+		BranchDecision:     Rejected,
 	}
 
 	dto := ClosedBranchDTO{}

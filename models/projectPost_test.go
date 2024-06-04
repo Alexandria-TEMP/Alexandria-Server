@@ -17,8 +17,6 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			{Model: gorm.Model{ID: 1}},
 			{Model: gorm.Model{ID: 60}},
 		},
-		CurrentVersion:      Version{},
-		CurrentVersionID:    49,
 		PostType:            tags.Project,
 		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
 	}
@@ -43,7 +41,6 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 		PostDTO: PostDTO{
 			ID:                  88,
 			CollaboratorIDs:     []uint{1, 60},
-			VersionID:           49,
 			PostType:            tags.Project,
 			ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
 		},

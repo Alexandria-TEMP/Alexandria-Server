@@ -37,12 +37,12 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	branchRouter := v2.Group("/branches")
 	branchRouter.GET("/:branchID", controllers.branchController.GetBranch)
 	branchRouter.POST("/", controllers.branchController.CreateBranch)
-	branchRouter.PUT("/", controllers.branchController.UpdateBranch)
-	branchRouter.DELETE("/:branchID", controllers.branchController.DeleteBranch)
+	// branchRouter.PUT("/", controllers.branchController.UpdateBranch)
+	// branchRouter.DELETE("/:branchID", controllers.branchController.DeleteBranch)
 	branchRouter.GET("/:branchID/reviews", controllers.branchController.GetReviewStatus)
-	branchRouter.GET("/:branchID/reviews/:reviewID", controllers.branchController.GetReview)
+	branchRouter.GET("/reviews/:reviewID", controllers.branchController.GetReview)
 	branchRouter.POST("/:branchID/reviews", controllers.branchController.CreateReview)
-	branchRouter.GET("/:branchID/can-review/:userID", controllers.branchController.UserCanReview)
+	branchRouter.GET("/:branchID/can-review/:memberID", controllers.branchController.MemberCanReview)
 
 	discussionRouter := v2.Group("/discussions")
 	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
@@ -58,15 +58,6 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 
 	tagRouter := v2.Group("/tags")
 	tagRouter.GET("/scientific", controllers.tagController.GetScientificTags)
-
-	versionRouter := v2.Group("/versions")
-	versionRouter.GET("/:versionID", controllers.versionController.GetVersion)
-	versionRouter.POST("", controllers.versionController.CreateVersion)
-	versionRouter.GET("/:versionID/render", controllers.versionController.GetRender)
-	versionRouter.GET("/:versionID/repository", controllers.versionController.GetRepository)
-	versionRouter.GET("/:versionID/tree", controllers.versionController.GetFileTree)
-	versionRouter.GET("/:versionID/file/*filepath", controllers.versionController.GetFileFromRepository)
-	versionRouter.GET("/:versionID/discussions", controllers.versionController.GetDiscussions)
 
 	return router
 }

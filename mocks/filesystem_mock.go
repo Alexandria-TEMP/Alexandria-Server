@@ -83,6 +83,20 @@ func (mr *MockFilesystemMockRecorder) CheckoutRepository() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckoutRepository", reflect.TypeOf((*MockFilesystem)(nil).CheckoutRepository))
 }
 
+// CleanDir mocks base method.
+func (m *MockFilesystem) CleanDir() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CleanDir")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CleanDir indicates an expected call of CleanDir.
+func (mr *MockFilesystemMockRecorder) CleanDir() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CleanDir", reflect.TypeOf((*MockFilesystem)(nil).CleanDir))
+}
+
 // CreateBranch mocks base method.
 func (m *MockFilesystem) CreateBranch(branchName string) error {
 	m.ctrl.T.Helper()
@@ -238,6 +252,20 @@ func (m *MockFilesystem) RenderExists() (bool, string) {
 func (mr *MockFilesystemMockRecorder) RenderExists() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenderExists", reflect.TypeOf((*MockFilesystem)(nil).RenderExists))
+}
+
+// Reset mocks base method.
+func (m *MockFilesystem) Reset() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Reset")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Reset indicates an expected call of Reset.
+func (mr *MockFilesystemMockRecorder) Reset() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reset", reflect.TypeOf((*MockFilesystem)(nil).Reset))
 }
 
 // SaveZipFile mocks base method.

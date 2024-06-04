@@ -13,16 +13,16 @@ import (
 )
 
 type RepositoryEnv struct {
-	versionRepository database.RepositoryInterface[*models.Version]
-	branchRepository  database.RepositoryInterface[*models.Branch]
-	postRepository    database.RepositoryInterface[*models.Post]
+	branchRepository       database.RepositoryInterface[*models.Branch]
+	postRepository         database.RepositoryInterface[*models.Post]
+	projectPostRepository  database.RepositoryInterface[*models.ProjectPost]
+	branchReviewRepository database.RepositoryInterface[*models.BranchReview]
 }
 
 type ServiceEnv struct {
-	postService    interfaces.PostService
-	versionService interfaces.VersionService
-	memberService  interfaces.MemberService
-	branchService  interfaces.BranchService
+	postService   interfaces.PostService
+	memberService interfaces.MemberService
+	branchService interfaces.BranchService
 }
 
 type ControllerEnv struct {
@@ -33,24 +33,18 @@ type ControllerEnv struct {
 	filterController      *controllers.FilterController
 	branchController      *controllers.BranchController
 	tagController         *controllers.TagController
-	versionController     *controllers.VersionController
 }
 
 func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 	return RepositoryEnv{
-		versionRepository: &database.ModelRepository[*models.Version]{Database: db},
-		branchRepository:  &database.ModelRepository[*models.Branch]{Database: db},
-		postRepository:    &database.ModelRepository[*models.Post]{Database: db},
+		branchRepository: &database.ModelRepository[*models.Branch]{Database: db},
+		postRepository:   &database.ModelRepository[*models.Post]{Database: db},
 	}
 }
 
 func initServiceEnv(repositoryEnv RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
 	return ServiceEnv{
-		postService: &services.PostService{},
-		versionService: &services.VersionService{
-			VersionRepository: repositoryEnv.versionRepository,
-			Filesystem:        fs,
-		},
+		postService:   &services.PostService{},
 		memberService: &services.MemberService{},
 		branchService: &services.BranchService{
 			PostRepository:   repositoryEnv.postRepository,

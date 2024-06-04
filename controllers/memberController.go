@@ -38,7 +38,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 		return
 	}
 	// get the user through the service
-	member, err := memberController.MemberService.GetMember(userID)
+	member, err := memberController.MemberService.GetMember(uint(userID))
 
 	// if there was an error, print it and return
 	if err != nil {

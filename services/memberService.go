@@ -10,7 +10,7 @@ type MemberService struct {
 	// but i think they go in here
 }
 
-func (memberService *MemberService) GetMember(_ uint64) (*models.Member, error) {
+func (memberService *MemberService) GetMember(_ uint) (*models.Member, error) {
 	// TODO: database interaction?
 	return new(models.Member), nil
 }
@@ -36,7 +36,7 @@ func (memberService *MemberService) UpdateMember(_ *models.Member) error {
 	return nil
 }
 
-func (memberService *MemberService) GetCollaborator(_ uint64) (*models.PostCollaborator, error) {
+func (memberService *MemberService) GetCollaborator(_ uint) (*models.PostCollaborator, error) {
 	// TODO: actually get from database based on UUID
 	return new(models.PostCollaborator), nil
 }

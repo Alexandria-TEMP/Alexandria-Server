@@ -251,7 +251,7 @@ func (branchService *BranchService) GetFiletree(branchID uint) (map[string]int64
 }
 
 func (branchService *BranchService) GetFileFromProject(branchID uint, relFilepath string) (string, error) {
-	val absFilepath string
+	var absFilepath string
 
 	if strings.Contains(relFilepath, "..") {
 		return absFilepath, fmt.Errorf("file is outside of repository")

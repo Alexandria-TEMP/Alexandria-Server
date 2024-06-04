@@ -16,7 +16,7 @@ var (
 	responseRecorder *httptest.ResponseRecorder
 
 	branchController  *BranchController
-	mockBranchService *mock_interfaces.
+	mockBranchService *mock_interfaces.MockBranchService
 
 	examplePendingBranch models.Branch
 	exampleSuccessBranch models.Branch
