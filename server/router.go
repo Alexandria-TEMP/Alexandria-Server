@@ -34,6 +34,55 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 
 	memberRouter(v2, controllers)
 
+	mergeRequestRouter(v2, controllers)
+
+	filterRouter(v2, controllers)
+
+	tagRouter(v2, controllers)
+
+	discussionRouter(v2, controllers)
+
+	versionRouter(v2, controllers)
+
+	return router
+}
+
+func filterRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+	filterRouter := v2.Group("/filter")
+	filterRouter.GET("/posts", controllers.filterController.FilterPosts)
+	filterRouter.GET("/project-posts", controllers.filterController.FilterProjectPosts)
+}
+
+func tagRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+	tagRouter := v2.Group("/tags")
+	tagRouter.GET("/scientific", controllers.tagController.GetScientificTags)
+	tagRouter.GET("/completion-status", controllers.tagController.GetCompletionStatusTags)
+	tagRouter.GET("/post-type", controllers.tagController.GetPostTypeTags)
+	tagRouter.GET("/feedback-preference", controllers.tagController.GetFeedbackPreferenceTags)
+}
+
+func discussionRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+	discussionRouter := v2.Group("/discussions")
+	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
+	discussionRouter.POST("/", controllers.discussionController.CreateDiscussion)
+	discussionRouter.DELETE("/:discussionID", controllers.discussionController.DeleteDiscussion)
+	discussionRouter.POST("/:discussionID/reports", controllers.discussionController.AddDiscussionReport)
+	discussionRouter.GET("/:discussionID/reports", controllers.discussionController.GetDiscussionReports)
+	discussionRouter.GET("/reports/:reportID", controllers.discussionController.GetDiscussionReport)
+}
+
+func versionRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+	versionRouter := v2.Group("/versions")
+	versionRouter.GET("/:versionID", controllers.versionController.GetVersion)
+	versionRouter.POST("", controllers.versionController.CreateVersion)
+	versionRouter.GET("/:versionID/render", controllers.versionController.GetRender)
+	versionRouter.GET("/:versionID/repository", controllers.versionController.GetRepository)
+	versionRouter.GET("/:versionID/tree", controllers.versionController.GetFileTree)
+	versionRouter.GET("/:versionID/file/*filepath", controllers.versionController.GetFileFromRepository)
+	versionRouter.GET("/:versionID/discussions", controllers.versionController.GetDiscussions)
+}
+
+func mergeRequestRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	mergeRequestRouter := v2.Group("/merge-requests")
 	mergeRequestRouter.GET("/:mergeRequestID", controllers.mergeRequestController.GetMergeRequest)
 	mergeRequestRouter.POST("/", controllers.mergeRequestController.CreateMergeRequest)
@@ -44,35 +93,6 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	mergeRequestRouter.POST("/:mergeRequestID/reviews", controllers.mergeRequestController.CreateReview)
 	mergeRequestRouter.GET("/:mergeRequestID/can-review/:userID", controllers.mergeRequestController.UserCanReview)
 	mergeRequestRouter.GET("/collaborators/:collaboratorID", controllers.mergeRequestController.GetMergeRequestCollaborator)
-
-	discussionRouter := v2.Group("/discussions")
-	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
-	discussionRouter.POST("/", controllers.discussionController.CreateDiscussion)
-	discussionRouter.DELETE("/:discussionID", controllers.discussionController.DeleteDiscussion)
-	discussionRouter.POST("/:discussionID/reports", controllers.discussionController.AddDiscussionReport)
-	discussionRouter.GET("/:discussionID/reports", controllers.discussionController.GetDiscussionReports)
-	discussionRouter.GET("/reports/:reportID", controllers.discussionController.GetDiscussionReport)
-
-	filterRouter := v2.Group("/filter")
-	filterRouter.GET("/posts", controllers.filterController.FilterPosts)
-	filterRouter.GET("/project-posts", controllers.filterController.FilterProjectPosts)
-
-	tagRouter := v2.Group("/tags")
-	tagRouter.GET("/scientific", controllers.tagController.GetScientificTags)
-	tagRouter.GET("/completion-status", controllers.tagController.GetCompletionStatusTags)
-	tagRouter.GET("/post-type", controllers.tagController.GetPostTypeTags)
-	tagRouter.GET("/feedback-preference", controllers.tagController.GetFeedbackPreferenceTags)
-
-	versionRouter := v2.Group("/versions")
-	versionRouter.GET("/:versionID", controllers.versionController.GetVersion)
-	versionRouter.POST("", controllers.versionController.CreateVersion)
-	versionRouter.GET("/:versionID/render", controllers.versionController.GetRender)
-	versionRouter.GET("/:versionID/repository", controllers.versionController.GetRepository)
-	versionRouter.GET("/:versionID/tree", controllers.versionController.GetFileTree)
-	versionRouter.GET("/:versionID/file/*filepath", controllers.versionController.GetFileFromRepository)
-	versionRouter.GET("/:versionID/discussions", controllers.versionController.GetDiscussions)
-
-	return router
 }
 
 func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
