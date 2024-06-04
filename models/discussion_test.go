@@ -13,10 +13,9 @@ func TestDiscussionJSONMarshaling(t *testing.T) {
 
 	// This model...
 	model := Discussion{
-		Model:     gorm.Model{ID: 100},
-		VersionID: 33,
-		Member:    Member{},
-		MemberID:  28,
+		Model:    gorm.Model{ID: 100},
+		Member:   Member{},
+		MemberID: 28,
 		Replies: []*Discussion{
 			{
 				Model: gorm.Model{ID: 50},
@@ -34,7 +33,6 @@ func TestDiscussionJSONMarshaling(t *testing.T) {
 	// should equal this DTO!
 	targetDTO := DiscussionDTO{
 		ID:        100,
-		VersionID: 33,
 		MemberID:  28,
 		ReplyIDs:  []uint{50, 88},
 		Text:      "Test!",

@@ -1,8 +1,8 @@
 package forms
 
-// Holds IDs of MergeRequests
-// Categorized by their MergeRequestReviewStatus
-type GroupedMergeRequestForm struct {
+// Holds IDs of Branches
+// Categorized by their BranchReviewStatus
+type GroupedBranchForm struct {
 	OpenForReviewIDs []uint
 	RejectedIDs      []uint
 	PeerReviewedIDs  []uint

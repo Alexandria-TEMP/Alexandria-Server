@@ -9,8 +9,8 @@ import (
 type Discussion struct {
 	gorm.Model
 
-	// Version has many Discussion
-	VersionID uint
+	// Discussion belongs to Branch
+	BranchID uint
 
 	// Discussion belongs to Member
 	Member   Member `gorm:"foreignKey:MemberID"`
@@ -27,7 +27,6 @@ type Discussion struct {
 
 type DiscussionDTO struct {
 	ID        uint
-	VersionID uint
 	MemberID  uint
 	ReplyIDs  []uint
 	Text      string
@@ -42,7 +41,6 @@ func (model *Discussion) GetID() uint {
 func (model *Discussion) IntoDTO() DiscussionDTO {
 	return DiscussionDTO{
 		model.ID,
-		model.VersionID,
 		model.MemberID,
 		discussionsIntoIDs(model.Replies),
 		model.Text,

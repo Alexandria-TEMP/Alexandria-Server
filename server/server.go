@@ -6,60 +6,49 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gorm.io/gorm"
 )
 
 type RepositoryEnv struct {
-	versionRepository database.RepositoryInterface[*models.Version]
 }
 
 type ServiceEnv struct {
-	postService    interfaces.PostService
-	versionService interfaces.VersionService
-	memberService  interfaces.MemberService
+	postService   interfaces.PostService
+	memberService interfaces.MemberService
 }
 
 type ControllerEnv struct {
-	postController         *controllers.PostController
-	memberController       *controllers.MemberController
-	projectPostController  *controllers.ProjectPostController
-	discussionController   *controllers.DiscussionController
-	filterController       *controllers.FilterController
-	mergeRequestController *controllers.MergeRequestController
-	tagController          *controllers.TagController
-	versionController      *controllers.VersionController
+	postController        *controllers.PostController
+	memberController      *controllers.MemberController
+	projectPostController *controllers.ProjectPostController
+	discussionController  *controllers.DiscussionController
+	filterController      *controllers.FilterController
+	branchController      *controllers.BranchController
+	tagController         *controllers.TagController
 }
 
 func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
-	return RepositoryEnv{
-		versionRepository: &database.ModelRepository[*models.Version]{Database: db},
-	}
+	return RepositoryEnv{}
 }
 
 func initServiceEnv(repositoryEnv RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
 	return ServiceEnv{
-		postService: &services.PostService{},
-		versionService: &services.VersionService{
-			VersionRepository: repositoryEnv.versionRepository,
-			Filesystem:        fs,
-		},
+		postService:   &services.PostService{},
 		memberService: &services.MemberService{},
 	}
 }
 
 func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 	return ControllerEnv{
-		postController:         &controllers.PostController{PostService: serviceEnv.postService},
-		memberController:       &controllers.MemberController{MemberService: serviceEnv.memberService},
-		projectPostController:  &controllers.ProjectPostController{},
-		discussionController:   &controllers.DiscussionController{},
-		filterController:       &controllers.FilterController{},
-		mergeRequestController: &controllers.MergeRequestController{},
-		tagController:          &controllers.TagController{},
-		versionController:      &controllers.VersionController{VersionService: serviceEnv.versionService},
+		postController:        &controllers.PostController{PostService: serviceEnv.postService},
+		memberController:      &controllers.MemberController{MemberService: serviceEnv.memberService},
+		projectPostController: &controllers.ProjectPostController{},
+		discussionController:  &controllers.DiscussionController{},
+		filterController:      &controllers.FilterController{},
+		branchController:      &controllers.BranchController{},
+		tagController:         &controllers.TagController{},
 	}
 }
 
