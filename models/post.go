@@ -18,6 +18,10 @@ type Post struct {
 	Title               string
 	PostType            tags.PostType
 	ScientificFieldTags []tags.ScientificField `gorm:"serializer:json"`
+
+	// Post has a DiscussionContainer
+	DiscussionContainer   DiscussionContainer `gorm:"foreignKey:DiscussionContainerID"`
+	DiscussionContainerID uint
 }
 
 type PostDTO struct {
@@ -26,6 +30,7 @@ type PostDTO struct {
 	Title               string
 	PostType            tags.PostType
 	ScientificFieldTags []tags.ScientificField
+	DiscussionIDs       []uint
 }
 
 func (model *Post) GetID() uint {
@@ -39,6 +44,7 @@ func (model *Post) IntoDTO() PostDTO {
 		model.Title,
 		model.PostType,
 		model.ScientificFieldTags,
+		discussionContainerIntoIDs(&model.DiscussionContainer),
 	}
 }
 

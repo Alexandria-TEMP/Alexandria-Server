@@ -6,11 +6,18 @@ import (
 	"gorm.io/gorm"
 )
 
+type DiscussionContainer struct {
+	gorm.Model
+
+	// DiscussionContainer has many Discussion
+	Discussions []*Discussion `gorm:"foreignKey:ContainerID"`
+}
+
 type Discussion struct {
 	gorm.Model
 
-	// Discussion belongs to Branch
-	BranchID uint
+	// Discussion belongs to DiscussionContainer
+	ContainerID uint
 
 	// Discussion belongs to Member
 	Member   Member `gorm:"foreignKey:MemberID"`
@@ -18,7 +25,7 @@ type Discussion struct {
 
 	// Discussion optionally has many Discussion
 	Replies  []*Discussion `gorm:"foreignKey:ParentID"`
-	ParentID *uint
+	ParentID uint
 
 	Text      string
 	Deleted   bool
@@ -51,4 +58,15 @@ func (model *Discussion) IntoDTO() DiscussionDTO {
 
 func (model *Discussion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(model.IntoDTO())
+}
+
+// Helper function for JSON marshaling
+func discussionsIntoIDs(discussions []*Discussion) []uint {
+	ids := make([]uint, len(discussions))
+
+	for i, discussion := range discussions {
+		ids[i] = discussion.ID
+	}
+
+	return ids
 }

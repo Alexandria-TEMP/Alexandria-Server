@@ -29,11 +29,11 @@ type ControllerEnv struct {
 	tagController         *controllers.TagController
 }
 
-func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
+func initRepositoryEnv(_ *gorm.DB) RepositoryEnv {
 	return RepositoryEnv{}
 }
 
-func initServiceEnv(repositoryEnv RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
+func initServiceEnv(_ RepositoryEnv, _ *filesystem.Filesystem) ServiceEnv {
 	return ServiceEnv{
 		postService:   &services.PostService{},
 		memberService: &services.MemberService{},

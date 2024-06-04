@@ -24,7 +24,7 @@ func TestDiscussionJSONMarshaling(t *testing.T) {
 				Model: gorm.Model{ID: 88},
 			},
 		},
-		ParentID:  &parentID,
+		ParentID:  parentID,
 		Text:      "Test!",
 		Deleted:   false,
 		Anonymous: true,

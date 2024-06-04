@@ -43,8 +43,9 @@ type Branch struct {
 	// Branch has many BranchReview
 	Reviews []*BranchReview `gorm:"foreignKey:BranchID"`
 
-	// Branch has many Discussion
-	Discussions []*Discussion `gorm:"foreignKey:BranchID"`
+	// Branch has a DiscussionContainer
+	DiscussionContainer   DiscussionContainer `gorm:"foreignKey:DiscussionContainerID"`
+	DiscussionContainerID uint
 
 	// Branch has a ProjectPost
 	ProjectPost   ProjectPost `gorm:"foreignKey:ProjectPostID"`
@@ -91,7 +92,7 @@ func (model *Branch) IntoDTO() BranchDTO {
 		model.BranchTitle,
 		model.Anonymous,
 		model.RenderStatus,
-		discussionsIntoIDs(model.Discussions),
+		discussionContainerIntoIDs(&model.DiscussionContainer),
 		model.BranchReviewStatus,
 	}
 }
@@ -123,10 +124,10 @@ func reviewsToIDs(reviews []*BranchReview) []uint {
 }
 
 // Helper function for JSON marshaling
-func discussionsIntoIDs(discussions []*Discussion) []uint {
-	ids := make([]uint, len(discussions))
+func discussionContainerIntoIDs(discussions *DiscussionContainer) []uint {
+	ids := make([]uint, len(discussions.Discussions))
 
-	for i, discussion := range discussions {
+	for i, discussion := range discussions.Discussions {
 		ids[i] = discussion.ID
 	}
 

@@ -16,16 +16,17 @@ func autoMigrateAllModels(db *gorm.DB) error {
 	//
 	// If this is not upheld, foreign key constraint errors will be thrown.
 	return db.AutoMigrate(
-		&models.Post{},               // FK to Version
-		&models.ProjectPost{},        // FK to Post
-		&models.Branch{},             // FK to Version, ProjectPost
-		&models.ClosedBranch{},       // FK to Branch, Version, ProjectPost
-		&models.Member{},             //
-		&models.PostCollaborator{},   // FK to Member, PostMetadata
-		&models.BranchCollaborator{}, // FK to Member, Branch
-		&models.Discussion{},         // FK to Version, Member
-		&models.BranchReview{},       // FK to Branch, Member
-		&reports.DiscussionReport{},  // FK to Discussion
-		&reports.PostReport{},        // FK to Post
+		&models.Post{},                //
+		&models.ProjectPost{},         // FK to Post
+		&models.Branch{},              // FK to ProjectPost
+		&models.ClosedBranch{},        // FK to Branch, ProjectPost
+		&models.Member{},              //
+		&models.PostCollaborator{},    // FK to Member, PostMetadata
+		&models.BranchCollaborator{},  // FK to Member, Branch
+		&models.Discussion{},          // FK to Member
+		&models.DiscussionContainer{}, // FK to Discussion
+		&models.BranchReview{},        // FK to Branch, Member
+		&reports.DiscussionReport{},   // FK to Discussion
+		&reports.PostReport{},         // FK to Post
 	)
 }
