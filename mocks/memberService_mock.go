@@ -51,9 +51,38 @@ func (m *MockMemberService) CreateMember(memberForm *forms.MemberCreationForm, t
 }
 
 // CreateMember indicates an expected call of CreateMember.
-func (mr *MockMemberServiceMockRecorder) CreateMember(memberForm, tags interface{}) *gomock.Call {
+func (mr *MockMemberServiceMockRecorder) CreateMember(memberForm, tags any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMember", reflect.TypeOf((*MockMemberService)(nil).CreateMember), memberForm, tags)
+}
+
+// DeleteMember mocks base method.
+func (m *MockMemberService) DeleteMember(userID uint) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteMember", userID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteMember indicates an expected call of DeleteMember.
+func (mr *MockMemberServiceMockRecorder) DeleteMember(userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMember", reflect.TypeOf((*MockMemberService)(nil).DeleteMember), userID)
+}
+
+// GetAllMembers mocks base method.
+func (m *MockMemberService) GetAllMembers() ([]uint, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllMembers")
+	ret0, _ := ret[0].([]uint)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllMembers indicates an expected call of GetAllMembers.
+func (mr *MockMemberServiceMockRecorder) GetAllMembers() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllMembers", reflect.TypeOf((*MockMemberService)(nil).GetAllMembers))
 }
 
 // GetMember mocks base method.
