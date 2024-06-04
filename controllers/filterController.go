@@ -17,9 +17,9 @@ type FilterController struct {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.PostDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/filter/posts		[get]
 func (filterController *FilterController) FilterPosts(_ *gin.Context) {
 
@@ -35,9 +35,9 @@ func (filterController *FilterController) FilterPosts(_ *gin.Context) {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.ProjectPostDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/filter/project-posts		[get]
 func (filterController *FilterController) FilterProjectPosts(_ *gin.Context) {
 

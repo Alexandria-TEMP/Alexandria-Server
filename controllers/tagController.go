@@ -12,9 +12,9 @@ type TagController struct {
 // @Description Returns all scientific tags in the database
 // @Produce		json
 // @Success 	200		{array}		tags.ScientificFieldTag
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/tags/scientific	[get]
 func (tagController *TagController) GetScientificTags(_ *gin.Context) {
 

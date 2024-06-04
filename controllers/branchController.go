@@ -16,6 +16,7 @@ import (
 
 type BranchController struct {
 	BranchService interfaces.BranchService
+	RenderService interfaces.RenderService
 }
 
 // GetBranch godoc
@@ -25,9 +26,8 @@ type BranchController struct {
 // @Param		branchID		path		string			true	"Branch ID"
 // @Produce		json
 // @Success 	200 		{object}	models.BranchDTO
-// @Failure		400 		{object}
-// @Failure		404 		{object}
-// @Failure		500 		{object}
+// @Failure		400
+// @Failure		404
 // @Router 		/branches/{branchID}	[get]
 func (branchController *BranchController) GetBranch(c *gin.Context) {
 	// extract branchID
@@ -44,7 +44,7 @@ func (branchController *BranchController) GetBranch(c *gin.Context) {
 	branch, err := branchController.BranchService.GetBranch(uint(branchID))
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot find any branch with id=%s ", branchIDStr)})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 
 		return
 	}
@@ -61,8 +61,8 @@ func (branchController *BranchController) GetBranch(c *gin.Context) {
 // @Param		form	body	forms.BranchCreationForm	true	"Branch Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.BranchDTO
-// @Failure		404 	{object}
-// @Failure		500 	{object}
+// @Failure		404
+// @Failure		500
 // @Router 		/branches 		[post]
 func (branchController *BranchController) CreateBranch(c *gin.Context) {
 	// extract branchCreationForm
@@ -101,28 +101,67 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 // @Param		branchID		path		string			true	"branch ID"
 // @Produce		json
 // @Success 	200		{array}		string
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
 // @Router 		/branches/{branchID}/reviews		[get]
-func (branchController *BranchController) GetReviewStatus(_ *gin.Context) {
-	// delete method goes here
+func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
+	// extract branchID
+	branchIDStr := c.Param("branchID")
+	branchID, err := strconv.ParseInt(branchIDStr, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", branchIDStr)})
+
+		return
+	}
+
+	// Get statuses of a branch
+	statuses, err := branchController.BranchService.GetReviewStatus(uint(branchID))
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	// response
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, statuses)
 }
 
 // GetReview godoc
 // @Summary 	Returns a review of a branch
 // @Description Returns a review with the given ID of the branch with the given ID
 // @Accept  	json
-// @Param		branchID		path		string			true	"branch ID"
 // @Param		reviewID			path		string			true	"review ID"
 // @Produce		json
 // @Success 	200		{object}	models.ReviewDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
-// @Router 		/branches/{branchID}/reviews/{reviewID}		[get]
-func (branchController *BranchController) GetReview(_ *gin.Context) {
+// @Failure		400
+// @Failure		404
+// @Router 		/branches/reviews/{reviewID}		[get]
+func (branchController *BranchController) GetReview(c *gin.Context) {
+	// extract reviewID
+	reviewIDStr := c.Param("reviewID")
+	reviewID, err := strconv.ParseInt(reviewIDStr, 10, 64)
 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid review ID, cannot interpret as integer, id=%s ", reviewIDStr)})
+
+		return
+	}
+
+	// get review
+	review, err := branchController.BranchService.GetReview(uint(reviewID))
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	// response
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, review)
 }
 
 // CreateReview godoc
@@ -133,12 +172,43 @@ func (branchController *BranchController) GetReview(_ *gin.Context) {
 // @Param		form	body	forms.ReviewCreationForm	true	"review creation form"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/branches/{branchID}/reviews		[post]
-func (branchController *BranchController) CreateReview(_ *gin.Context) {
+func (branchController *BranchController) CreateReview(c *gin.Context) {
+	// extract branchID
+	branchIDStr := c.Param("branchID")
+	branchID, err := strconv.ParseInt(branchIDStr, 10, 64)
 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", branchIDStr)})
+
+		return
+	}
+
+	// extract ReviewCreationForm
+	form := forms.ReviewCreationForm{}
+	err = c.BindJSON(&form)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind ReviewCreationForm from request body"})
+
+		return
+	}
+
+	// create review and add to branch
+	review, err := branchController.BranchService.CreateReview(uint(branchID), form)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	// response
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, review)
 }
 
 // UserCanReview godoc
@@ -149,48 +219,80 @@ func (branchController *BranchController) CreateReview(_ *gin.Context) {
 // @Param		branchID		path		string			true	"branch ID"
 // @Param		userID			path		string			true	"user ID"
 // @Produce		json
-// @Success 	200		{array}		boolean
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Success 	200		{object}		boolean
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/branches/{branchID}/can-review/{userID}		[get]
-func (branchController *BranchController) UserCanReview(_ *gin.Context) {
+func (branchController *BranchController) UserCanReview(c *gin.Context) {
+	// extract branchID
+	branchIDStr := c.Param("branchID")
+	branchID, err := strconv.ParseInt(branchIDStr, 10, 64)
 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", branchIDStr)})
+
+		return
+	}
+
+	// extract userID
+	userIDStr := c.Param("userID")
+	userID, err := strconv.ParseInt(userIDStr, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", userIDStr)})
+
+		return
+	}
+
+	// create review and add to branch
+	canReview, err := branchController.BranchService.UserCanReview(uint(branchID), uint(userID))
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	// response
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, canReview)
 }
 
 // GetRender
-// @Summary 	Get the render of a version
-// @Description Get the render of the repository underlying a version if it exists and has been rendered successfully
-// @Param		versionID	path		string				true	"Version ID"
+// @Summary 	Get the render of a branch
+// @Description Get the render of the repository underlying a branch if it exists and has been rendered successfully
+// @Param		branchID	path		string				true	"Branch ID"
 // @Produce		text/html
 // @Success 	200		{object}	[]byte
 // @Success		202
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Router 		/{versionID}/render	[get]
+// @Failure		400
+// @Failure		404
+// @Router 		/branches/{branchID}/render	[get]
 func (branchController *BranchController) GetRender(c *gin.Context) {
-	// extract version id
-	versionIDstr := c.Param("versionID")
-	versionID, err := strconv.ParseUint(versionIDstr, 10, 64)
+	// extract branchID id
+	branchIDStr := c.Param("branchID")
+	branchID, err := strconv.ParseUint(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", branchIDStr)})
 
 		return
 	}
 
 	// get render filepath
-	filePath, err202, err404 := branchController.VersionService.GetRenderFile(uint(versionID))
+	filePath, err202, err404 := branchController.RenderService.GetRenderFile(uint(branchID))
 
 	// if render is pending return 202 accepted
 	if err202 != nil {
 		c.Status(http.StatusAccepted)
+
 		return
 	}
 
 	// if render is failed return 404 not found
 	if err404 != nil {
-		c.JSON(http.StatusNotFound, err404)
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 
 		return
 	}
@@ -204,31 +306,30 @@ func (branchController *BranchController) GetRender(c *gin.Context) {
 }
 
 // GetRepository godoc specs are subject to change
-// @Summary 	Get the repository of a version
-// @Description Get the entire zipped repository of a version
-// @Param		versionID	path		string				true	"Version ID"
+// @Summary 	Get the repository of a branch
+// @Description Get the entire zipped repository of a branch
+// @Param		branchID	path		string				true	"Branch ID"
 // @Produce		application/zip
 // @Success 	200		{object}	[]byte
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500 	{object}
-// @Router 		/{versionID}/repository	[get]
+// @Failure		400
+// @Failure		404
+// @Router 		/branches/{branchID}/repository	[get]
 func (branchController *BranchController) GetRepository(c *gin.Context) {
-	// extract version id
-	versionIDstr := c.Param("versionID")
-	versionID, err := strconv.ParseUint(versionIDstr, 10, 64)
+	// extract branch id
+	branchIDStr := c.Param("branchID")
+	branchID, err := strconv.ParseUint(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", branchIDStr)})
 
 		return
 	}
 
 	// get repository filepath
-	filePath, err := branchController.VersionService.GetRepositoryFile(uint(versionID))
+	filePath, err := branchController.BranchService.GetProject(uint(branchID))
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "no such repository found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 
 		return
 	}
@@ -241,18 +342,18 @@ func (branchController *BranchController) GetRepository(c *gin.Context) {
 	c.File(filePath)
 }
 
-// CreateVersion
-// @Summary 	Create new version
-// @Description Create a new version with discussions and repository from zipped file in body
+// UploadProject
+// @Summary 	Upload a new project version to a branch
+// @Description Upload a new project version to a specific, preexisting, branch as a zipped quarto project
 // @Accept  	multipart/form-data
-// @Param		fromVersionID		path		string			true	"Version ID"
-// @Param		repository			body		file				true	"Repository to create"
+// @Param		branchID		path		string			true	"Branch ID"
+// @Param		file		body		file				true	"Repository to create"
 // @Produce		application/json
-// @Success 	200		{object}	models.Version
-// @Failure		400 	{object}
-// @Failure		500 	{object}
-// @Router 		/{fromVersionID}		[post]
-func (branchController *BranchController) CreateVersion(c *gin.Context) {
+// @Success 	200
+// @Failure		400
+// @Failure		500
+// @Router 		/branches/{branchID}		[post]
+func (branchController *BranchController) UploadProject(c *gin.Context) {
 	// extract file
 	file, err := c.FormFile("file")
 
@@ -262,62 +363,60 @@ func (branchController *BranchController) CreateVersion(c *gin.Context) {
 		return
 	}
 
-	// extract version id
-	fromVersionIDstr := c.Param("fromVersionIDs")
-	fromVersionID, err := strconv.ParseUint(fromVersionIDstr, 10, 64)
+	// extract branch id
+	branchIDStr := c.Param("branchID")
+	branchID, err := strconv.ParseUint(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", fromVersionID)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", branchIDStr)})
 
 		return
 	}
 
-	// Create Version
-	version, err := branchController.VersionService.CreateVersion(c, file, uint(fromVersionID))
+	// Create commit on branch with new files
+	err = branchController.BranchService.UploadProject(c, file, uint(branchID))
+
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create version"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 
 		return
 	}
 
 	// response
-	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, version)
+	c.Status(http.StatusOK)
 }
 
-// GetFileTree godoc specs are subject to change
-// @Summary 	Get the file tree of a repository
-// @Description Get the file tree of a repository of a version
-// @Param		versionID	path		string				true	"Version ID"
+// GetFiletree godoc specs are subject to change
+// @Summary 	Get the filetree of a project
+// @Description Get the filetree of a project of a branch
+// @Param		branchID	path		string				true	"Branch ID"
 // @Produce		application/json
 // @Success 	200		{object}	map[string]int64
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500 	{object}
-// @Router 		/{versionID}/tree		[get]
-func (branchController *BranchController) GetFileTree(c *gin.Context) {
-	// extract version id
-	versionIDstr := c.Param("versionID")
-	versionID, err := strconv.ParseUint(versionIDstr, 10, 64)
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router 		/branches/{branchID}/tree		[get]
+func (branchController *BranchController) GetFiletree(c *gin.Context) {
+	// extract branchID id
+	branchIDStr := c.Param("branchID")
+	branchID, err := strconv.ParseUint(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", branchIDStr)})
 
 		return
 	}
 
-	fileTree, err1, err2 := branchController.VersionService.GetTreeFromRepository(uint(versionID))
+	fileTree, err404, err500 := branchController.BranchService.GetFiletree(uint(branchID))
 
-	// if repository doesnt exist throw 404 not found
-	if err1 != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "no such repository found"})
+	if err404 != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err404.Error()})
 
 		return
 	}
 
-	// if failed to parse file tree throw 500 internal server error
-	if err2 != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to parse file tree"})
+	if err500 != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err500.Error()})
 
 		return
 	}
@@ -327,42 +426,40 @@ func (branchController *BranchController) GetFileTree(c *gin.Context) {
 	c.JSON(http.StatusOK, fileTree)
 }
 
-// GetFileFromRepository godoc specs are subject to change
-// @Summary 	Get a file from a repository
-// @Description Get the contents of a single file from a repository of a version
-// @Param		versionID	path		string				true	"Version ID"
+// GetFileFromProject godoc specs are subject to change
+// @Summary 	Get a file from a project
+// @Description Get the contents of a single file from a project of a branch
+// @Param		branchID	path		string				true	"Branch ID"
 // @Param		filepath	path		string				true	"Filepath"
 // @Produce		application/octet-stream
 // @Success 	200		{object}	[]byte
-// @Failure		404 	{object}
-// @Failure		500 	{object}
-// @Router 		/{versionID}/file/{filepath}	[get]
-func (branchController *BranchController) GetFileFromRepository(c *gin.Context) {
-	// extract version id
-	versionIDstr := c.Param("versionID")
-	versionID, err := strconv.ParseUint(versionIDstr, 10, 64)
+// @Failure		404
+// @Failure		500
+// @Router 		/branches/{branchID}/file/{filepath}	[get]
+func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
+	// extract branchID id
+	branchIDStr := c.Param("branchID")
+	branchID, err := strconv.ParseUint(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid version ID, cannot interpret as integer, id=%v ", versionIDstr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", branchIDStr)})
 
 		return
 	}
 
 	relFilepath := c.Param("filepath")
-	absFilepath, err := branchController.VersionService.GetFileFromRepository(uint(versionID), relFilepath)
+	absFilepath, err := branchController.BranchService.GetFileFromProject(uint(branchID), relFilepath)
 
 	// if files doesnt exist return 404 not found
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "no such file exists"})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 
 		return
 	}
 
+	// get the file info
 	fileContentType, err1 := mimetype.DetectFile(absFilepath)
-
 	fileData, err2 := os.Open(absFilepath)
-
-	// Get the file info
 	fileInfo, err3 := fileData.Stat()
 
 	if err1 != nil || err2 != nil || err3 != nil {
@@ -386,15 +483,15 @@ func (branchController *BranchController) GetFileFromRepository(c *gin.Context) 
 // @Summary Returns all level 1 discussions associated with the version
 // @Description Returns all discussions on this version that are not a reply to another discussion
 // @Description Endpoint is offset-paginated
-// @Param		versionID	path		string			true	"version ID"
+// @Param		branchID	path		string			true	"Branch ID"
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		application/json
 // @Success 	200		{array}		models.DiscussionDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
-// @Router		/{versionID}/discussions 	[get]
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router		/brnaches/{branchID}/discussions 	[get]
 func (branchController *BranchController) GetDiscussions(_ *gin.Context) {
 
 }

@@ -25,8 +25,8 @@ type ProjectPostController struct {
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
 // @Success 	200 		{object}	models.ProjectPostDTO
-// @Failure		404 		{object}
-// @Failure		500 		{object}
+// @Failure		404
+// @Failure		500
 // @Router 		/project-posts/{postID}	[get]
 func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Context) {
 	// extract postID
@@ -60,8 +60,8 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 // @Param 		parentPostID	query		string							false	"Parent post ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400 		{object}
-// @Failure		500 		{object}
+// @Failure		400
+// @Failure		500
 // @Router 		/project-posts		[post]
 func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Context) {
 	// extract post
@@ -89,8 +89,8 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 // @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
 // @Produce		json
 // @Success 	200
-// @Failure		404 		{object}
-// @Failure		500 		{object}
+// @Failure		404
+// @Failure		500
 // @Router 		/project-posts 		[put]
 func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Context) {
 	// extract post
@@ -124,9 +124,9 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/project-posts/{postID} 		[delete]
 func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Context) {
 	// delete method goes here
@@ -142,9 +142,9 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Con
 // @Param		url		query	string							true	"Github repository url"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400 	{object}
-// @Failure		500 	{object}
-// @Failure 	502 	{object}
+// @Failure		400
+// @Failure		500
+// @Failure 	502
 // @Router 		/project-posts/from-github 		[post]
 func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(_ *gin.Context) {
 
@@ -160,9 +160,9 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.DiscussionDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router		/project-posts/{postID}/all-discussions 	[get]
 func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ *gin.Context) {
 
@@ -178,9 +178,9 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ 
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.BranchDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/project-posts/{postID}/open-branches 		[get]
 func (projectPostController *ProjectPostController) GetProjectPostOpenBranches(_ *gin.Context) {
 	// return all the branches associated with this project post that are open
@@ -197,9 +197,9 @@ func (projectPostController *ProjectPostController) GetProjectPostOpenBranches(_
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.BranchDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/project-posts/{postID}/closed-branches 		[get]
 func (projectPostController *ProjectPostController) GetProjectPostClosedBranches(_ *gin.Context) {
 	// return all the branches associated with this project post that are closed

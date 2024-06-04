@@ -24,8 +24,8 @@ type MemberController struct {
 // @Param		userID		path		string			true	"user ID"
 // @Produce		json
 // @Success 	200 		{object}	models.MemberDTO
-// @Failure		404 		{object}
-// @Failure		500			{object}
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{userID}	[get]
 func (memberController *MemberController) GetMember(c *gin.Context) {
 	// extract the id of the member
@@ -59,8 +59,8 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 // @Param		form	body	forms.MemberCreationForm	true	"Member Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.MemberDTO
-// @Failure		400 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		500
 // @Router 		/members 		[post]
 func (memberController *MemberController) CreateMember(c *gin.Context) {
 	// get the member
@@ -90,8 +90,8 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 // @Param		member	body		models.Member		true	"Updated member"
 // @Produce		json
 // @Success 	200
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		404
+// @Failure		500
 // @Router 		/members 		[put]
 func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	// get the new member object
@@ -127,9 +127,9 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 // @Param		userID		path		string			true	"user ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{userID} 		[delete]
 func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 	// delete method goes here
@@ -145,9 +145,9 @@ func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.PostDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{userID}/posts 		[get]
 func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 	// return all the posts
@@ -165,9 +165,9 @@ func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.ProjectPostDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{userID}/project-posts 		[get]
 func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) {
 	// return all the project posts
@@ -185,9 +185,9 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.BranchDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{userID}/branches 		[get]
 func (memberController *MemberController) GetMemberBranches(_ *gin.Context) {
 	// return all the branches
@@ -205,9 +205,9 @@ func (memberController *MemberController) GetMemberBranches(_ *gin.Context) {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.DiscussionDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{userID}/discussions		[get]
 func (memberController *MemberController) GetMemberDiscussions(_ *gin.Context) {
 	// returns all the discussions this member is a part of
@@ -222,8 +222,8 @@ func (memberController *MemberController) GetMemberDiscussions(_ *gin.Context) {
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		500
 // @Router 		/members/{userID}/saved-posts/{postID} 		[post]
 func (memberController *MemberController) AddMemberSavedPost(_ *gin.Context) {
 
@@ -237,8 +237,8 @@ func (memberController *MemberController) AddMemberSavedPost(_ *gin.Context) {
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		500
 // @Router 		/members/{userID}/saved-project-posts/{postID} 		[post]
 func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Context) {
 
@@ -254,9 +254,9 @@ func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Conte
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.PostDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{userID}/saved-posts 		[get]
 func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
 	// return all saved posts of this member
@@ -273,9 +273,9 @@ func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.ProjectPostDTO
-// @Failure		400 	{object}
-// @Failure		404 	{object}
-// @Failure		500		{object}
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{userID}/saved-project-posts 		[get]
 func (memberController *MemberController) GetMemberSavedProjectPosts(_ *gin.Context) {
 	// return all the project posts that this member has saved

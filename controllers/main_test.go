@@ -15,12 +15,12 @@ var (
 	router           *gin.Engine
 	responseRecorder *httptest.ResponseRecorder
 
-	versionController  *VersionController
-	mockVersionService *mock_interfaces.MockVersionService
+	branchController  *BranchController
+	mockBranchService *mock_interfaces.MockBranchService
 
-	examplePendingVersion models.Version
-	exampleSuccessVersion models.Version
-	exampleFailureVersion models.Version
+	examplePendingBranch models.Branch
+	exampleSuccessBranch models.Branch
+	exampleFailureBranch models.Branch
 )
 
 // TestMain is a keyword function, this is run by the testing package before other tests
@@ -28,9 +28,9 @@ func TestMain(m *testing.M) {
 	// Setup test router, to test controller endpoints through http
 	router = SetUpRouter()
 
-	examplePendingVersion = models.Version{RenderStatus: models.Pending}
-	exampleSuccessVersion = models.Version{RenderStatus: models.Success}
-	exampleFailureVersion = models.Version{RenderStatus: models.Failure}
+	examplePendingBranch = models.Branch{RenderStatus: models.Pending}
+	exampleSuccessBranch = models.Branch{RenderStatus: models.Success}
+	exampleFailureBranch = models.Branch{RenderStatus: models.Failure}
 
 	cwd, _ = os.Getwd()
 
@@ -41,20 +41,20 @@ func SetUpRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router = gin.Default()
 
-	router.POST("/api/v2/versions", func(c *gin.Context) {
-		versionController.CreateVersion(c)
+	router.POST("/api/v2/branches", func(c *gin.Context) {
+		branchController.CreateVersion(c)
 	})
 	router.GET("/api/v2/versions/:versionID/render", func(c *gin.Context) {
-		versionController.GetRender(c)
+		branchController.GetRender(c)
 	})
 	router.GET("/api/v2/versions/:versionID/repository", func(c *gin.Context) {
-		versionController.GetRepository(c)
+		branchController.GetRepository(c)
 	})
 	router.GET("/api/v2/versions/:versionID/tree", func(c *gin.Context) {
-		versionController.GetFileTree(c)
+		branchController.GetFileTree(c)
 	})
 	router.GET("/api/v2/versions/:versionID/file/*filepath", func(c *gin.Context) {
-		versionController.GetFileFromRepository(c)
+		branchController.GetFileFromRepository(c)
 	})
 
 	return router

@@ -15,16 +15,27 @@ type BranchService struct {
 	Filesystem            filesystemInterfaces.Filesystem
 }
 
+func (branchService *BranchService) GetBranch(branchID uint) (models.Branch, error) {
+	branch, err := branchService.BranchRepository.GetByID(branchID)
+
+	if err != nil {
+		return *branch, fmt.Errorf("failed to find branch with id %v", branchID)
+	}
+
+	return *branch, nil
+}
+
 func (branchService *BranchService) CreateBranch(branchCreationForm forms.BranchCreationForm) (models.Branch, error, error) {
 	var branch models.Branch
 
-	// verify fromBranch exists
+	// verify parent project post exists
 	projectPost, err := branchService.ProjectPostRepository.GetByID(branchCreationForm.ProjectPostID)
 
 	if err != nil {
 		return branch, fmt.Errorf("no such project post exists"), nil
 	}
 
+	// make new branch
 	branch = models.Branch{
 		NewPostTitle:            branchCreationForm.NewPostTitle,
 		UpdatedCompletionStatus: branchCreationForm.UpdatedCompletionStatus,
