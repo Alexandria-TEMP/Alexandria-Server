@@ -12,6 +12,7 @@
 # Testing
 coverage
 coverage.*
+junit.*
 
 # Secrets
 .env
