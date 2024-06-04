@@ -35,7 +35,7 @@ func (m *MockRepositoryInterface) EXPECT() *MockRepositoryInterfaceMockRecorder 
 }
 
 // Create mocks base method.
-func (m *MockRepositoryInterface) Create(object database.T) error {
+func (m *MockRepositoryInterface) Create(object T) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", object)
 	ret0, _ := ret[0].(error)
@@ -62,19 +62,19 @@ func (mr *MockRepositoryInterfaceMockRecorder) Delete(id interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRepositoryInterface)(nil).Delete), id)
 }
 
-// GetAll mocks base method.
-func (m *MockRepositoryInterface) GetAll() ([]database.T, error) {
+// GetAllIDs mocks base method.
+func (m *MockRepositoryInterface) GetAllIDs() ([]uint, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAll")
-	ret0, _ := ret[0].([]database.T)
+	ret := m.ctrl.Call(m, "GetAllIDs")
+	ret0, _ := ret[0].([]uint)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetAll indicates an expected call of GetAll.
-func (mr *MockRepositoryInterfaceMockRecorder) GetAll() *gomock.Call {
+// GetAllIDs indicates an expected call of GetAllIDs.
+func (mr *MockRepositoryInterfaceMockRecorder) GetAllIDs() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAll", reflect.TypeOf((*MockRepositoryInterface)(nil).GetAll))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllIDs", reflect.TypeOf((*MockRepositoryInterface)(nil).GetAllIDs))
 }
 
 // GetByID mocks base method.
