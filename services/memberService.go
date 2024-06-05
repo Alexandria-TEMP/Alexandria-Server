@@ -17,7 +17,7 @@ func (memberService *MemberService) GetMember(userID uint) (*models.Member, erro
 	return member, err
 }
 
-func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm, userFields tags.ScientificFieldTagContainer) (*models.Member, error) {
+func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm, userFields *tags.ScientificFieldTagContainer) (*models.Member, error) {
 	// for now no input sanitization for the strings - so first name, last name, email, institution, etc.
 	// however have to get tags somehow
 	member := &models.Member{
@@ -37,7 +37,7 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 	return member, err
 }
 
-func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, userFields tags.ScientificFieldTagContainer) error {
+func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, userFields *tags.ScientificFieldTagContainer) error {
 	member := &models.Member{
 		FirstName:                   memberDTO.FirstName,
 		LastName:                    memberDTO.LastName,

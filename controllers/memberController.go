@@ -109,7 +109,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	}
 
 	// create and add to database through the memberService
-	member, err := memberController.MemberService.CreateMember(&form, tagContainer)
+	member, err := memberController.MemberService.CreateMember(&form, &tagContainer)
 
 	memberDTO := member.IntoDTO()
 
@@ -168,7 +168,7 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 		return
 	}
 
-	err = memberController.MemberService.UpdateMember(&updatedMember, tagContainer)
+	err = memberController.MemberService.UpdateMember(&updatedMember, &tagContainer)
 	// check for errors again
 	if err != nil {
 		fmt.Println(err)

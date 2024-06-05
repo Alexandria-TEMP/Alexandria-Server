@@ -18,7 +18,7 @@ func TestMemberJSONMarshaling(t *testing.T) {
 		Email:                       "email",
 		Password:                    "password",
 		Institution:                 "institution",
-		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
+		ScientificFieldTagContainer: &tags.ScientificFieldTagContainer{},
 	}
 
 	// should equal this DTO!

@@ -78,7 +78,7 @@ func TestCreateMemberSuccessful(t *testing.T) {
 		ScientificFieldTags: []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2},
 	}
 	// call service method under test
-	member, err := memberService.CreateMember(&memberForm, userTags)
+	member, err := memberService.CreateMember(&memberForm, &userTags)
 
 	// verify that the member object was created correctly
 	assert.Equal(t, &exampleMember, member)
@@ -109,7 +109,7 @@ func TestCreateMemberUnsuccessful(t *testing.T) {
 	}
 
 	// call service method under test
-	member, err := memberService.CreateMember(&memberForm, userTags)
+	member, err := memberService.CreateMember(&memberForm, &userTags)
 
 	// verify that the member object was not created
 	assert.Nil(t, member)

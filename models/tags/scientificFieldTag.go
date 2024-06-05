@@ -10,7 +10,7 @@ type ScientificFieldTagContainer struct {
 	gorm.Model
 
 	// ScientificFieldTagContainer has many ScientificFieldTag
-	ScientificFieldTags []*ScientificFieldTag `gorm:"foreignKey:ContainerID"`
+	ScientificFieldTags []*ScientificFieldTag `gorm:"many2many:tag_containers;"`
 }
 
 // a scientific field tag is a tag representing a specific scientific field
@@ -19,9 +19,9 @@ type ScientificFieldTag struct {
 
 	ScientificField string
 	// ScientificFieldTag belongs to ScientificFieldTagContainer
-	ContainerID uint
+	ContainerIDs []uint
 	// Tag can optionally have many subtags, or many ScientificFieldTag
-	Subtags  []*ScientificFieldTag `gorm:"foreignKey:ParentID"`
+	Subtags  []*ScientificFieldTag `gorm:"many2many:tag_containers;"`
 	ParentID *uint
 }
 
