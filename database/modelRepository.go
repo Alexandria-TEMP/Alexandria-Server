@@ -85,5 +85,6 @@ func (repo *ModelRepository[T]) GetAllIDs() ([]uint, error) {
 	if result.Error != nil {
 		return nil, fmt.Errorf("could not return all instances of model to delete: %w", result.Error)
 	}
+
 	return models, result.Error
 }

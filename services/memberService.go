@@ -47,6 +47,7 @@ func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, us
 		ScientificFieldTagContainer: userFields,
 	}
 	_, err := memberService.MemberRepository.Update(member)
+
 	return err
 }
 

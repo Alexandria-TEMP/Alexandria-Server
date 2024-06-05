@@ -12,9 +12,8 @@ import (
 )
 
 var (
-	c              *gin.Context
-	mockFilesystem *mocks.MockFilesystem
-	cwd            string
+	c   *gin.Context
+	cwd string
 
 	memberService        MemberService
 	exampleMember        models.Member

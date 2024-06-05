@@ -39,9 +39,7 @@ func (tagService *TagService) GetTagsFromUintIDs(ids []uint) ([]*tags.Scientific
 	tagPointers := []*tags.ScientificFieldTag{}
 
 	for _, id := range ids {
-		tagID := uint(id)
-
-		tag, err := tagService.TagRepository.GetByID(tagID)
+		tag, err := tagService.TagRepository.GetByID(id)
 
 		if err != nil {
 			return nil, err
