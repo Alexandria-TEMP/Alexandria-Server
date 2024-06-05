@@ -187,11 +187,11 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ 
 // @Accept		json
 // @Param		postID	path	string	true	"post ID"
 // @Produce		json
-// @Success		200		{object}	forms.GroupedMergeRequestForm
+// @Success		200		{object}	forms.GroupedBranchForm
 // @Failure		400		{object}	utils.HTTPError
 // @Failure		404		{object}	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router		/project-posts/{postID}/merge-requests-by-status	[get]
+// @Router		/project-posts/{postID}/branches-by-status	[get]
 func (projectPostController *ProjectPostController) GetProjectPostMRsByStatus(_ *gin.Context) {
 	// TODO implement
 }
