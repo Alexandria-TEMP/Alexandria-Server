@@ -9,19 +9,19 @@ type PostService struct {
 	// repo interface here
 }
 
-func (postService *PostService) GetPost(_ uint64) (*models.Post, error) {
+func (postService *PostService) GetPost(_ uint) (*models.Post, error) {
 	// TODO: Access repo to get post
 	return new(models.Post), nil
 }
 
-func (postService *PostService) CreatePost(_ *forms.PostCreationForm) *models.Post {
+func (postService *PostService) CreatePost(_ *forms.PostCreationForm) (*models.Post, error) {
 	post := &models.Post{
 		// TODO fill fields
 	}
 
 	// TODO: Add post to repo here
 
-	return post
+	return post, nil
 }
 
 func (postService *PostService) UpdatePost(_ *models.Post) error {
@@ -29,19 +29,19 @@ func (postService *PostService) UpdatePost(_ *models.Post) error {
 	return nil
 }
 
-func (postService *PostService) GetProjectPost(_ uint64) (*models.ProjectPost, error) {
+func (postService *PostService) GetProjectPost(_ uint) (*models.ProjectPost, error) {
 	// TODO: Access repo to get post
 	return new(models.ProjectPost), nil
 }
 
-func (postService *PostService) CreateProjectPost(_ *forms.ProjectPostCreationForm) *models.ProjectPost {
+func (postService *PostService) CreateProjectPost(_ *forms.ProjectPostCreationForm) (*models.ProjectPost, error) {
 	post := &models.ProjectPost{
 		// TODO fill fields
 	}
 
 	// TODO: Add post to repo here
 
-	return post
+	return post, nil
 }
 
 func (postService *PostService) UpdateProjectPost(_ *models.ProjectPost) error {
