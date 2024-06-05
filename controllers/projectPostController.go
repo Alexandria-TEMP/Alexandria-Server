@@ -82,7 +82,7 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 	}
 
 	// Create and add post to database here. For now just do this to test.
-	post, err := projectPostController.ProjectPostService.CreateProjectPost(&form)
+	post, _ := projectPostController.ProjectPostService.CreateProjectPost(&form)
 	// TODO handle error
 
 	// response
