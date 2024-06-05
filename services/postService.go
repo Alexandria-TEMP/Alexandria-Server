@@ -12,6 +12,8 @@ import (
 type PostService struct {
 	PostRepository   database.ModelRepositoryInterface[*models.Post]
 	MemberRepository database.ModelRepositoryInterface[*models.Member]
+
+	// TODO add filesystem interface
 }
 
 func (postService *PostService) GetPost(id uint) (*models.Post, error) {
@@ -65,6 +67,10 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 		return nil, err
 	}
 
+	// TODO filesystem: checkout directory
+
+	// TODO filesystem: create repository
+
 	return &post, nil
 }
 
@@ -92,3 +98,13 @@ func (postService *PostService) UpdateProjectPost(_ *models.ProjectPost) error {
 	// TODO: Access repo to update post here
 	return nil
 }
+
+/*
+	Uploading Post (not ProjectPost) content:
+	- Requires having PostID
+	- CheckoutDirectory
+	- CheckoutBranch("master")
+	- SaveZipFile
+	- Response 200
+	- Start goroutine for rendering
+*/
