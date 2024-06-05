@@ -41,11 +41,12 @@ func (m *MockPostService) EXPECT() *MockPostServiceMockRecorder {
 }
 
 // CreatePost mocks base method.
-func (m *MockPostService) CreatePost(form *forms.PostCreationForm) *models.Post {
+func (m *MockPostService) CreatePost(form *forms.PostCreationForm) (*models.Post, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreatePost", form)
 	ret0, _ := ret[0].(*models.Post)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CreatePost indicates an expected call of CreatePost.
@@ -55,11 +56,12 @@ func (mr *MockPostServiceMockRecorder) CreatePost(form any) *gomock.Call {
 }
 
 // CreateProjectPost mocks base method.
-func (m *MockPostService) CreateProjectPost(form *forms.ProjectPostCreationForm) *models.ProjectPost {
+func (m *MockPostService) CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateProjectPost", form)
 	ret0, _ := ret[0].(*models.ProjectPost)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CreateProjectPost indicates an expected call of CreateProjectPost.
@@ -69,7 +71,7 @@ func (mr *MockPostServiceMockRecorder) CreateProjectPost(form any) *gomock.Call 
 }
 
 // GetPost mocks base method.
-func (m *MockPostService) GetPost(postID uint64) (*models.Post, error) {
+func (m *MockPostService) GetPost(postID uint) (*models.Post, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPost", postID)
 	ret0, _ := ret[0].(*models.Post)
@@ -84,7 +86,7 @@ func (mr *MockPostServiceMockRecorder) GetPost(postID any) *gomock.Call {
 }
 
 // GetProjectPost mocks base method.
-func (m *MockPostService) GetProjectPost(postID uint64) (*models.ProjectPost, error) {
+func (m *MockPostService) GetProjectPost(postID uint) (*models.ProjectPost, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProjectPost", postID)
 	ret0, _ := ret[0].(*models.ProjectPost)

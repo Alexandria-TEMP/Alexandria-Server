@@ -6,12 +6,15 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gorm.io/gorm"
 )
 
 type RepositoryEnv struct {
+	postRepository   database.ModelRepositoryInterface[*models.Post]
+	memberRepository database.ModelRepositoryInterface[*models.Member]
 }
 
 type ServiceEnv struct {
@@ -29,13 +32,23 @@ type ControllerEnv struct {
 	tagController         *controllers.TagController
 }
 
-func initRepositoryEnv(_ *gorm.DB) RepositoryEnv {
-	return RepositoryEnv{}
+func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
+	return RepositoryEnv{
+		postRepository: &database.ModelRepository[*models.Post]{
+			Database: db,
+		},
+		memberRepository: &database.ModelRepository[*models.Member]{
+			Database: db,
+		},
+	}
 }
 
-func initServiceEnv(_ RepositoryEnv, _ *filesystem.Filesystem) ServiceEnv {
+func initServiceEnv(repositories RepositoryEnv, _ *filesystem.Filesystem) ServiceEnv {
 	return ServiceEnv{
-		postService:   &services.PostService{},
+		postService: &services.PostService{
+			PostRepository:   repositories.postRepository,
+			MemberRepository: repositories.memberRepository,
+		},
 		memberService: &services.MemberService{},
 	}
 }
