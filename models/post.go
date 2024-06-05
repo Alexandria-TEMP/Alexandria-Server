@@ -20,7 +20,7 @@ type Post struct {
 	Title               string
 	PostType            tags.PostType
 	Anonymous           bool
-	ScientificFieldTags []*tags.ScientificFieldTag
+	ScientificFieldTags []*tags.ScientificFieldTag `gorm:"foreignKey:PostID"`
 }
 
 type PostDTO struct {

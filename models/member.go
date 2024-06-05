@@ -16,7 +16,7 @@ type Member struct {
 	Email               string
 	Password            string // TODO hmmmmmm maybe not
 	Institution         string
-	ScientificFieldTags []*tags.ScientificFieldTag
+	ScientificFieldTags []*tags.ScientificFieldTag `gorm:"foreignKey:MemberID"`
 }
 
 type MemberDTO struct {
