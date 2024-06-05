@@ -32,7 +32,9 @@ type Branch struct {
 	NewPostTitle string
 
 	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields []*tags.ScientificFieldTag `gorm:"serializer:json"`
+	// Branch has a ScientificFieldTag
+	UpdatedScientificFieldTagContainer   tags.ScientificFieldTagContainer `gorm:"foreignKey:UpdatedScientificFieldTagContainerID"`
+	UpdatedScientificFieldTagContainerID uint
 
 	/////////////////////////////////////////////
 	// The branch's metadata:
@@ -61,9 +63,9 @@ type Branch struct {
 type BranchDTO struct {
 	ID uint
 	// MR's proposed changes
-	NewPostTitle            string
-	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields []*tags.ScientificFieldTag
+	NewPostTitle                 string
+	UpdatedCompletionStatus      tags.CompletionStatus
+	UpdatedScientificFieldTagIDs []uint
 	// MR metadata
 	CollaboratorIDs    []uint
 	ReviewIDs          []uint
@@ -84,7 +86,7 @@ func (model *Branch) IntoDTO() BranchDTO {
 		model.ID,
 		model.NewPostTitle,
 		model.UpdatedCompletionStatus,
-		model.UpdatedScientificFields,
+		tags.ScientificFieldTagContainerIntoIDs(&model.UpdatedScientificFieldTagContainer),
 		branchCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
 		model.ProjectPostID,

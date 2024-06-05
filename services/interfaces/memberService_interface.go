@@ -11,8 +11,8 @@ import (
 
 type MemberService interface {
 	GetMember(userID uint) (*models.Member, error)
-	CreateMember(memberForm *forms.MemberCreationForm, userFields []*tags.ScientificFieldTag) (*models.Member, error)
-	UpdateMember(updatedMember *models.MemberDTO, userFields []*tags.ScientificFieldTag) error
+	CreateMember(memberForm *forms.MemberCreationForm, userFields tags.ScientificFieldTagContainer) (*models.Member, error)
+	UpdateMember(updatedMember *models.MemberDTO, userFields tags.ScientificFieldTagContainer) error
 	DeleteMember(userID uint) error
 	GetAllMembers() ([]uint, error)
 }

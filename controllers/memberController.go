@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
@@ -93,7 +94,10 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	// get array of strings, create array of tags
 	tagIDs := form.ScientificFieldTagIDs
 	// call the method from the tag service
-	tags, err := memberController.TagService.GetTagsFromStringIDs(tagIDs)
+	tagArray, err := memberController.TagService.GetTagsFromStringIDs(tagIDs)
+	tagContainer := tags.ScientificFieldTagContainer{
+		ScientificFieldTags: tagArray,
+	}
 
 	// check for errors in the tags
 	// if there is an error, return a 400 bad request status
@@ -105,7 +109,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	}
 
 	// create and add to database through the memberService
-	member, err := memberController.MemberService.CreateMember(&form, tags)
+	member, err := memberController.MemberService.CreateMember(&form, tagContainer)
 
 	memberDTO := member.IntoDTO()
 
@@ -150,7 +154,10 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	// get array of strings, create array of tags
 	tagIDs := updatedMember.ScientificFieldTagIDs
 	// call the method from the tag service
-	tags, err := memberController.TagService.GetTagsFromUintIDs(tagIDs)
+	tagArray, err := memberController.TagService.GetTagsFromUintIDs(tagIDs)
+	tagContainer := tags.ScientificFieldTagContainer{
+		ScientificFieldTags: tagArray,
+	}
 
 	// check for errors in the tags
 	// if there is an error, return a 400 bad request status
@@ -161,7 +168,7 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 		return
 	}
 
-	err = memberController.MemberService.UpdateMember(&updatedMember, tags)
+	err = memberController.MemberService.UpdateMember(&updatedMember, tagContainer)
 	// check for errors again
 	if err != nil {
 		fmt.Println(err)
@@ -190,11 +197,11 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 func (memberController *MemberController) DeleteMember(c *gin.Context) {
 	// extract the id of the member
 	memberIDStr := c.Param("memberID")
-	initmemberID, err := strconv.ParseUint(memberIDStr, 10, 64)
+	initmemberID, err1 := strconv.ParseUint(memberIDStr, 10, 64)
 
 	// if this caused an error, print it and return status 400: bad input
-	if err != nil {
-		fmt.Println(err)
+	if err1 != nil {
+		fmt.Println(err1)
 		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid member ID, cannot interpret as integer, id=%s ", memberIDStr))
 
 		return
@@ -204,11 +211,11 @@ func (memberController *MemberController) DeleteMember(c *gin.Context) {
 	memberID := uint(initmemberID)
 
 	// get the member through the service
-	err = memberController.MemberService.DeleteMember(memberID)
+	err2 := memberController.MemberService.DeleteMember(memberID)
 
 	// if there was an error, print it and return status 404: not found
-	if err != nil {
-		fmt.Println(err)
+	if err2 != nil {
+		fmt.Println(err2)
 		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("cannot delete member because no member with this ID exists, id=%d", memberID))
 
 		return

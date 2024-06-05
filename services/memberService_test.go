@@ -74,7 +74,9 @@ func TestCreateMemberSuccessful(t *testing.T) {
 	}
 
 	// manually set up the member tags
-	userTags := []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2}
+	userTags := tags.ScientificFieldTagContainer{
+		ScientificFieldTags: []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2},
+	}
 	// call service method under test
 	member, err := memberService.CreateMember(&memberForm, userTags)
 
@@ -89,8 +91,7 @@ func TestCreateMemberUnsuccessful(t *testing.T) {
 
 	expectedErr := fmt.Errorf("error")
 
-	// set up repository mock to create members correctly
-
+	// set up repository mock to return an error
 	mockMemberRepository.EXPECT().Create(&exampleMember).Return(expectedErr)
 
 	// set up a member creation form
@@ -103,7 +104,9 @@ func TestCreateMemberUnsuccessful(t *testing.T) {
 	}
 
 	// manually set up the member tags
-	userTags := []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2}
+	userTags := tags.ScientificFieldTagContainer{
+		ScientificFieldTags: []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2},
+	}
 
 	// call service method under test
 	member, err := memberService.CreateMember(&memberForm, userTags)

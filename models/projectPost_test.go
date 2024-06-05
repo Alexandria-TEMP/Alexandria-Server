@@ -17,9 +17,9 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			{Model: gorm.Model{ID: 1}},
 			{Model: gorm.Model{ID: 60}},
 		},
-		PostType:            tags.Project,
-		ScientificFieldTags: []*tags.ScientificFieldTag{},
-		DiscussionContainer: DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
+		PostType:                    tags.Project,
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
+		DiscussionContainer:         DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
 	}
 
 	model := ProjectPost{

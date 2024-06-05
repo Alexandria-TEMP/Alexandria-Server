@@ -36,14 +36,16 @@ func TestMain(m *testing.M) {
 		ParentID:        nil,
 	}
 	exampleSTag2 = &tag2
-
+	scientificFieldTagArray := []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2}
 	exampleMember = models.Member{
-		FirstName:           "John",
-		LastName:            "Smith",
-		Email:               "john.smith@gmail.com",
-		Password:            "password",
-		Institution:         "TU Delft",
-		ScientificFieldTags: []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2},
+		FirstName:   "John",
+		LastName:    "Smith",
+		Email:       "john.smith@gmail.com",
+		Password:    "password",
+		Institution: "TU Delft",
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: scientificFieldTagArray,
+		},
 	}
 
 	cwd, _ = os.Getwd()

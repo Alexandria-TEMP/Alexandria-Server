@@ -37,7 +37,7 @@ func (m *MockMemberService) EXPECT() *MockMemberServiceMockRecorder {
 }
 
 // CreateMember mocks base method.
-func (m *MockMemberService) CreateMember(memberForm *forms.MemberCreationForm, userFields []*tags.ScientificFieldTag) (*models.Member, error) {
+func (m *MockMemberService) CreateMember(memberForm *forms.MemberCreationForm, userFields tags.ScientificFieldTagContainer) (*models.Member, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateMember", memberForm, userFields)
 	ret0, _ := ret[0].(*models.Member)
@@ -96,7 +96,7 @@ func (mr *MockMemberServiceMockRecorder) GetMember(userID interface{}) *gomock.C
 }
 
 // UpdateMember mocks base method.
-func (m *MockMemberService) UpdateMember(updatedMember *models.MemberDTO, userFields []*tags.ScientificFieldTag) error {
+func (m *MockMemberService) UpdateMember(updatedMember *models.MemberDTO, userFields tags.ScientificFieldTagContainer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateMember", updatedMember, userFields)
 	ret0, _ := ret[0].(error)

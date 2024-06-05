@@ -11,12 +11,14 @@ import (
 type Member struct {
 	gorm.Model
 
-	FirstName           string
-	LastName            string
-	Email               string
-	Password            string // TODO hmmmmmm maybe not
-	Institution         string
-	ScientificFieldTags []*tags.ScientificFieldTag
+	FirstName   string
+	LastName    string
+	Email       string
+	Password    string // TODO hmmmmmm maybe not
+	Institution string
+	// Member has a ScientificFieldTagContainer
+	ScientificFieldTagContainer   tags.ScientificFieldTagContainer `gorm:"foreignKey:ScientificFieldTagContainerID"`
+	ScientificFieldTagContainerID uint
 }
 
 type MemberDTO struct {
@@ -41,7 +43,7 @@ func (model *Member) IntoDTO() MemberDTO {
 		model.Email,
 		model.Password,
 		model.Institution,
-		tags.ScientificFieldTagIntoIDs(model.ScientificFieldTags),
+		tags.ScientificFieldTagContainerIntoIDs(&model.ScientificFieldTagContainer),
 	}
 }
 

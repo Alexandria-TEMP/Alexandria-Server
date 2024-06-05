@@ -17,16 +17,16 @@ func (memberService *MemberService) GetMember(userID uint) (*models.Member, erro
 	return member, err
 }
 
-func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm, userFields []*tags.ScientificFieldTag) (*models.Member, error) {
+func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm, userFields tags.ScientificFieldTagContainer) (*models.Member, error) {
 	// for now no input sanitization for the strings - so first name, last name, email, institution, etc.
 	// however have to get tags somehow
 	member := &models.Member{
-		FirstName:           form.FirstName,
-		LastName:            form.LastName,
-		Email:               form.Email,
-		Password:            form.Password,
-		Institution:         form.Institution,
-		ScientificFieldTags: userFields,
+		FirstName:                   form.FirstName,
+		LastName:                    form.LastName,
+		Email:                       form.Email,
+		Password:                    form.Password,
+		Institution:                 form.Institution,
+		ScientificFieldTagContainer: userFields,
 	}
 
 	err := memberService.MemberRepository.Create(member)
@@ -37,14 +37,14 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 	return member, err
 }
 
-func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, userFields []*tags.ScientificFieldTag) error {
+func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, userFields tags.ScientificFieldTagContainer) error {
 	member := &models.Member{
-		FirstName:           memberDTO.FirstName,
-		LastName:            memberDTO.LastName,
-		Email:               memberDTO.Email,
-		Password:            memberDTO.Password,
-		Institution:         memberDTO.Institution,
-		ScientificFieldTags: userFields,
+		FirstName:                   memberDTO.FirstName,
+		LastName:                    memberDTO.LastName,
+		Email:                       memberDTO.Email,
+		Password:                    memberDTO.Password,
+		Institution:                 memberDTO.Institution,
+		ScientificFieldTagContainer: userFields,
 	}
 	_, err := memberService.MemberRepository.Update(member)
 	return err

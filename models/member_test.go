@@ -12,13 +12,13 @@ import (
 func TestMemberJSONMarshaling(t *testing.T) {
 	// This model...
 	model := Member{
-		Model:               gorm.Model{ID: 100},
-		FirstName:           "first name",
-		LastName:            "last name",
-		Email:               "email",
-		Password:            "password",
-		Institution:         "institution",
-		ScientificFieldTags: []*tags.ScientificFieldTag{},
+		Model:                       gorm.Model{ID: 100},
+		FirstName:                   "first name",
+		LastName:                    "last name",
+		Email:                       "email",
+		Password:                    "password",
+		Institution:                 "institution",
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
 	}
 
 	// should equal this DTO!

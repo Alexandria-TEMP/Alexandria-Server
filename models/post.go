@@ -15,9 +15,11 @@ type Post struct {
 
 	// Post files and render can be implicitly accessed in the vfs with the postID
 
-	Title               string
-	PostType            tags.PostType
-	ScientificFieldTags []*tags.ScientificFieldTag `gorm:"foreignKey:PostID"`
+	Title    string
+	PostType tags.PostType
+	// Post has a ScientificFieldTagContainer
+	ScientificFieldTagContainer   tags.ScientificFieldTagContainer `gorm:"foreignKey:ScientificFieldTagContainerID"`
+	ScientificFieldTagContainerID uint
 	// Post has a DiscussionContainer
 	DiscussionContainer   DiscussionContainer `gorm:"foreignKey:DiscussionContainerID"`
 	DiscussionContainerID uint
@@ -42,7 +44,7 @@ func (model *Post) IntoDTO() PostDTO {
 		postCollaboratorsToIDs(model.Collaborators),
 		model.Title,
 		model.PostType,
-		tags.ScientificFieldTagIntoIDs(model.ScientificFieldTags),
+		tags.ScientificFieldTagContainerIntoIDs(&model.ScientificFieldTagContainer),
 		discussionContainerIntoIDs(&model.DiscussionContainer),
 	}
 }
