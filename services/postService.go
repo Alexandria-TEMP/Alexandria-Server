@@ -10,12 +10,12 @@ import (
 )
 
 type PostService struct {
-	postRepository   database.ModelRepositoryInterface[*models.Post]
-	memberRepository database.ModelRepositoryInterface[*models.Member]
+	PostRepository   database.ModelRepositoryInterface[*models.Post]
+	MemberRepository database.ModelRepositoryInterface[*models.Member]
 }
 
 func (postService *PostService) GetPost(id uint) (*models.Post, error) {
-	return postService.postRepository.GetByID(id)
+	return postService.PostRepository.GetByID(id)
 }
 
 func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*models.Post, error) {
@@ -35,7 +35,7 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 
 		for i, memberID := range authorMemberIDs {
 			// Fetch the member from the database
-			member, err := postService.memberRepository.GetByID(memberID)
+			member, err := postService.MemberRepository.GetByID(memberID)
 			if err != nil {
 				return nil, fmt.Errorf("could not create post collaborators: %w", err)
 			}
@@ -61,7 +61,7 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 		},
 	}
 
-	if err := postService.postRepository.Create(&post); err != nil {
+	if err := postService.PostRepository.Create(&post); err != nil {
 		return nil, err
 	}
 

@@ -31,8 +31,8 @@ func postServiceSetup(t *testing.T) {
 
 	// Create post service
 	postService = PostService{
-		postRepository:   postRepository,
-		memberRepository: memberRepository,
+		PostRepository:   postRepository,
+		MemberRepository: memberRepository,
 	}
 
 	// Setup members in the repository

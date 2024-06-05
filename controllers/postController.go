@@ -78,7 +78,11 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 
 	// Create and add post to database here. For now just do this to test.
 	post, err := postController.PostService.CreatePost(&form)
-	// TODO handle error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post, reason: %s", err)})
+
+		return
+	}
 
 	// response
 	c.Header("Content-Type", "application/json")
