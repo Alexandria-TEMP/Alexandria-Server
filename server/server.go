@@ -14,16 +14,14 @@ import (
 )
 
 type RepositoryEnv struct {
-	memberRepository  database.RepositoryInterface[*models.Member]
-	versionRepository database.RepositoryInterface[*models.Version]
-	tagRepository     database.RepositoryInterface[*tags.ScientificFieldTag]
+	memberRepository database.RepositoryInterface[*models.Member]
+	tagRepository    database.RepositoryInterface[*tags.ScientificFieldTag]
 }
 
 type ServiceEnv struct {
-	postService    interfaces.PostService
-	versionService interfaces.VersionService
-	memberService  interfaces.MemberService
-	tagService     interfaces.TagService
+	postService   interfaces.PostService
+	memberService interfaces.MemberService
+	tagService    interfaces.TagService
 }
 
 type ControllerEnv struct {
@@ -38,19 +36,15 @@ type ControllerEnv struct {
 
 func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 	return RepositoryEnv{
-		memberRepository:  &database.ModelRepository[*models.Member]{Database: db},
-		versionRepository: &database.ModelRepository[*models.Version]{Database: db},
-		tagRepository:     &database.ModelRepository[*tags.ScientificFieldTag]{Database: db},
+		memberRepository: &database.ModelRepository[*models.Member]{Database: db},
+		tagRepository:    &database.ModelRepository[*tags.ScientificFieldTag]{Database: db},
 	}
 }
 
-func initServiceEnv(_ RepositoryEnv, _ *filesystem.Filesystem) ServiceEnv {
+func initServiceEnv(repositoryEnv RepositoryEnv, _ *filesystem.Filesystem) ServiceEnv {
 	return ServiceEnv{
 
 		postService: &services.PostService{},
-		versionService: &services.VersionService{
-			VersionRepository: repositoryEnv.versionRepository,
-			Filesystem:        fs},
 		memberService: &services.MemberService{
 			MemberRepository: repositoryEnv.memberRepository,
 		},
@@ -64,12 +58,10 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 			MemberService: serviceEnv.memberService,
 			TagService:    serviceEnv.tagService,
 		},
-		projectPostController:  &controllers.ProjectPostController{},
-		discussionController:   &controllers.DiscussionController{},
-		filterController:       &controllers.FilterController{},
-		mergeRequestController: &controllers.MergeRequestController{},
-		tagController:          &controllers.TagController{},
-		versionController:      &controllers.VersionController{VersionService: serviceEnv.versionService},
+		projectPostController: &controllers.ProjectPostController{},
+		discussionController:  &controllers.DiscussionController{},
+		filterController:      &controllers.FilterController{},
+		tagController:         &controllers.TagController{},
 	}
 }
 

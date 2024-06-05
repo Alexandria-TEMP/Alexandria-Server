@@ -32,7 +32,7 @@ type Branch struct {
 	NewPostTitle string
 
 	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields []tags.ScientificField `gorm:"serializer:json"`
+	UpdatedScientificFields []*tags.ScientificFieldTag `gorm:"serializer:json"`
 
 	/////////////////////////////////////////////
 	// The branch's metadata:
@@ -63,7 +63,7 @@ type BranchDTO struct {
 	// MR's proposed changes
 	NewPostTitle            string
 	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields []tags.ScientificField
+	UpdatedScientificFields []*tags.ScientificFieldTag
 	// MR metadata
 	CollaboratorIDs    []uint
 	ReviewIDs          []uint

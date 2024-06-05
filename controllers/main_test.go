@@ -16,11 +16,9 @@ var (
 	cwd    string
 	router *gin.Engine
 
-	mockMemberService  *mock_interfaces.MockMemberService
-	mockTagService     *mock_interfaces.MockTagService
-	memberController   *MemberController
-	versionController  *VersionController
-	mockVersionService *mock_interfaces.MockVersionService
+	mockMemberService *mock_interfaces.MockMemberService
+	mockTagService    *mock_interfaces.MockTagService
+	memberController  *MemberController
 
 	responseRecorder *httptest.ResponseRecorder
 
@@ -29,10 +27,6 @@ var (
 	exampleMemberForm forms.MemberCreationForm
 	exampleSTag1      *tags.ScientificFieldTag
 	exampleSTag2      *tags.ScientificFieldTag
-
-	examplePendingVersion models.Version
-	exampleSuccessVersion models.Version
-	exampleFailureVersion models.Version
 )
 
 // TestMain is a keyword function, this is run by the testing package before other tests
@@ -42,10 +36,6 @@ func TestMain(m *testing.M) {
 	gin.SetMode(gin.TestMode)
 
 	router = SetUpRouter()
-
-	examplePendingVersion = models.Version{RenderStatus: models.RenderPending}
-	exampleSuccessVersion = models.Version{RenderStatus: models.RenderSuccess}
-	exampleFailureVersion = models.Version{RenderStatus: models.RenderFailure}
 
 	tag1 := tags.ScientificFieldTag{
 		ScientificField: "Mathematics",
@@ -85,26 +75,20 @@ func SetUpRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router = gin.Default()
 
-	router.POST("/api/v2/versions", func(c *gin.Context) {
-		versionController.CreateVersion(c)
-	})
-	router.GET("/api/v2/versions/:versionID/render", func(c *gin.Context) {
-		versionController.GetRender(c)
-	})
-	router.GET("/api/v2/versions/:versionID/repository", func(c *gin.Context) {
-		versionController.GetRepository(c)
-	})
-	router.GET("/api/v2/versions/:versionID/tree", func(c *gin.Context) {
-		versionController.GetFileTree(c)
-	})
-	router.GET("/api/v2/versions/:versionID/file/*filepath", func(c *gin.Context) {
-		versionController.GetFileFromRepository(c)
-	})
 	router.GET("/api/v2/members/:userID", func(c *gin.Context) {
 		memberController.GetMember(c)
 	})
 	router.POST("/api/v2/members", func(c *gin.Context) {
 		memberController.CreateMember(c)
+	})
+	router.PUT("/api/v2/members", func(c *gin.Context) {
+		memberController.UpdateMember(c)
+	})
+	router.DELETE("/api/v2/members/:userID", func(c *gin.Context) {
+		memberController.DeleteMember(c)
+	})
+	router.GET("/api/v2/members", func(c *gin.Context) {
+		memberController.GetAllMembers(c)
 	})
 
 	return router
