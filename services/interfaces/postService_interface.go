@@ -11,8 +11,4 @@ type PostService interface {
 	GetPost(postID uint) (*models.Post, error)
 	CreatePost(form *forms.PostCreationForm) (*models.Post, error)
 	UpdatePost(updatedPost *models.Post) error
-
-	GetProjectPost(postID uint) (*models.ProjectPost, error)
-	CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error)
-	UpdateProjectPost(updatedPost *models.ProjectPost) error
 }

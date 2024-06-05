@@ -16,8 +16,7 @@ import (
 // @BasePath /api/v2
 
 type ProjectPostController struct {
-	//TODO: change to project post service
-	ProjectPostService interfaces.PostService
+	ProjectPostService interfaces.ProjectPostService
 }
 
 // GetProjectPost godoc
