@@ -37,7 +37,15 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 	return member, err
 }
 
-func (memberService *MemberService) UpdateMember(member *models.Member) error {
+func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, userFields []*tags.ScientificFieldTag) error {
+	member := &models.Member{
+		FirstName:           memberDTO.FirstName,
+		LastName:            memberDTO.LastName,
+		Email:               memberDTO.Email,
+		Password:            memberDTO.Password,
+		Institution:         memberDTO.Institution,
+		ScientificFieldTags: userFields,
+	}
 	_, err := memberService.MemberRepository.Update(member)
 	return err
 }
@@ -47,7 +55,7 @@ func (memberService *MemberService) DeleteMember(userID uint) error {
 	return err
 }
 
-func (memberService *MemberService) GetAllMembers()	([]uint, error) {
+func (memberService *MemberService) GetAllMembers() ([]uint, error) {
 	result, err := memberService.MemberRepository.GetAllIDs()
 	return result, err
 }

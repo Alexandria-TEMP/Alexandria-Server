@@ -11,7 +11,7 @@ type TagService struct {
 	TagRepository database.RepositoryInterface[*tags.ScientificFieldTag]
 }
 
-func (tagService *TagService) GetTagsFromIDs(ids []string) ([]*tags.ScientificFieldTag, error) {
+func (tagService *TagService) GetTagsFromStringIDs(ids []string) ([]*tags.ScientificFieldTag, error) {
 	tagPointers := []*tags.ScientificFieldTag{}
 
 	for _, s := range ids {
@@ -22,6 +22,24 @@ func (tagService *TagService) GetTagsFromIDs(ids []string) ([]*tags.ScientificFi
 		}
 
 		tagID := uint(stringID)
+
+		tag, err := tagService.TagRepository.GetByID(tagID)
+
+		if err != nil {
+			return nil, err
+		}
+
+		tagPointers = append(tagPointers, tag)
+	}
+
+	return tagPointers, nil
+}
+
+func (tagService *TagService) GetTagsFromUintIDs(ids []uint) ([]*tags.ScientificFieldTag, error) {
+	tagPointers := []*tags.ScientificFieldTag{}
+
+	for _, id := range ids {
+		tagID := uint(id)
 
 		tag, err := tagService.TagRepository.GetByID(tagID)
 
