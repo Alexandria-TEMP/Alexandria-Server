@@ -47,8 +47,7 @@ type Branch struct {
 	DiscussionContainer   DiscussionContainer `gorm:"foreignKey:DiscussionContainerID"`
 	DiscussionContainerID uint
 
-	// Branch has a ProjectPost
-	ProjectPost   ProjectPost `gorm:"foreignKey:ProjectPostID"`
+	// ProjectPost has many Branch
 	ProjectPostID uint
 
 	BranchTitle string
