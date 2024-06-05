@@ -16,8 +16,9 @@ import (
 )
 
 type RenderService struct {
-	BranchRepository database.RepositoryInterface[*models.Branch]
-	Filesystem       filesystemInterfaces.Filesystem
+	BranchRepository      database.ModelRepositoryInterface[*models.Branch]
+	ProjectPostRepository database.ModelRepositoryInterface[*models.ProjectPost]
+	Filesystem            filesystemInterfaces.Filesystem
 }
 
 func (renderService *RenderService) GetRenderFile(branchID uint) (string, error, error) {
@@ -28,6 +29,13 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, error,
 
 	if err != nil {
 		return filePath, nil, fmt.Errorf("failed to find branch with id %v", branchID)
+	}
+
+	// get project post
+	projectPost, err := renderService.ProjectPostRepository.GetByID(branch.ProjectPostID)
+
+	if err != nil {
+		return filePath, nil, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
 	}
 
 	// if render is pending return 202
@@ -41,10 +49,10 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, error,
 	}
 
 	// select repository of the parent post
-	renderService.Filesystem.CheckoutDirectory(branch.ProjectPost.PostID)
+	renderService.Filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// checkout specified branch
-	if err := renderService.Filesystem.CheckoutBranch(string(branchID)); err != nil {
+	if err := renderService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
 		return filePath, nil, fmt.Errorf("failed to find this git branch, with name %v", branchID)
 	}
 
@@ -54,6 +62,7 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, error,
 	if !exists {
 		branch.RenderStatus = models.Failure
 		_, _ = renderService.BranchRepository.Update(branch)
+
 		return filePath, nil, fmt.Errorf("render has failed")
 	}
 

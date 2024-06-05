@@ -9,6 +9,7 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -22,9 +23,10 @@ type BranchController struct {
 // GetBranch godoc
 // @Summary 	Get branch
 // @Description Get a branch by branch ID
-// @Accept  	json
+// @Tags 		branches
+// @Accept  	application/json
 // @Param		branchID		path		string			true	"Branch ID"
-// @Produce		json
+// @Produce		application/json
 // @Success 	200 		{object}	models.BranchDTO
 // @Failure		400
 // @Failure		404
@@ -56,10 +58,12 @@ func (branchController *BranchController) GetBranch(c *gin.Context) {
 
 // CreateBranch godoc
 // @Summary 	Create new branch
-// @Description Create a new question or discussion branch
-// @Accept  	json
+// @Description Create a new branch linked to a project post.
+// @Description Note that Member IDs passed here, get converted to Collaborator IDs.
+// @Tags 		branches
+// @Accept  	application/json
 // @Param		form	body	forms.BranchCreationForm	true	"Branch Creation Form"
-// @Produce		json
+// @Produce		application/json
 // @Success 	200 	{object} 	models.BranchDTO
 // @Failure		404
 // @Failure		500
@@ -94,16 +98,85 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 	c.JSON(http.StatusOK, branch.IntoDTO)
 }
 
-// GetReviewStatus godoc
-// @Summary 	Returns status of all branch reviews
-// @Description Returns an array of the statuses of all the reviews of this branch
+// UpdateBranch godoc
+// @Summary 	Update branch
+// @Description Update any number of the aspects of a branch
+// @Tags 		branches
+// @Accept  	json
+// @Param		branch	body		models.BranchDTO		true	"Updated Branch"
+// @Produce		json
+// @Success 	200
+// @Failure		400
+// @Failure		404
+// @Router 		/branches 		[put]
+func (branchController *BranchController) UpdateBranch(c *gin.Context) {
+	// extract branchDTO
+	dto := models.BranchDTO{}
+	err := c.BindJSON(&dto)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind BranchCreationForm from request body"})
+
+		return
+	}
+	// update branch
+	branch, err := branchController.BranchService.UpdateBranch(dto)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	// response
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, branch.IntoDTO)
+}
+
+// DeleteBranch godoc
+// @Summary 	Delete a branch
+// @Description Delete a branch with given ID from database
+// @Tags 		branches
 // @Accept  	json
 // @Param		branchID		path		string			true	"branch ID"
 // @Produce		json
-// @Success 	200		{array}		string
+// @Success 	200
 // @Failure		400
 // @Failure		404
-// @Router 		/branches/{branchID}/reviews		[get]
+// @Failure		500
+// @Router 		/branches/{branchID} 		[delete]
+func (branchController *BranchController) DeleteBranch(c *gin.Context) {
+	// extract branchID
+	branchIDStr := c.Param("branchID")
+	branchID, err := strconv.ParseInt(branchIDStr, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", branchIDStr)})
+
+		return
+	}
+
+	// delete branch
+	if err := branchController.BranchService.DeleteBranch(uint(branchID)); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+// GetReviewStatus godoc
+// @Summary 	Returns status of all branch reviews
+// @Description Returns an array of the statuses of all the reviews of this branch
+// @Tags 		branches
+// @Accept  	json
+// @Param		branchID		path		string			true	"branch ID"
+// @Produce		json
+// @Success 	200		{array}		models.ReviewStatus
+// @Failure		400
+// @Failure		404
+// @Router 		/branches/{branchID}/review-statuses	[get]
 func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 	// extract branchID
 	branchIDStr := c.Param("branchID")
@@ -132,6 +205,7 @@ func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 // GetReview godoc
 // @Summary 	Returns a review
 // @Description Returns a review with given ID
+// @Tags 		branches
 // @Accept  	json
 // @Param		reviewID			path		string			true	"review ID"
 // @Produce		json
@@ -167,21 +241,23 @@ func (branchController *BranchController) GetReview(c *gin.Context) {
 // CreateReview godoc
 // @Summary 	Adds a review to a branch
 // @Description Adds a review to a branch
+// @Tags 		branches
 // @Accept  	json
-// @Param		form	body	forms.BranchReviewCreationForm	true	"branch review creation form"
+// @Param		branchID		path		string			true	"branch ID"
+// @Param		form	body	forms.ReviewCreationForm	true	"review creation form"
 // @Produce		json
 // @Success 	200
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router 		/branches/reviews		[post]
+// @Router 		/branches/{branchID}/reviews		[post]
 func (branchController *BranchController) CreateReview(c *gin.Context) {
-	// extract BranchReviewCreationForm
-	form := forms.BranchReviewCreationForm{}
+	// extract ReviewCreationForm
+	form := forms.ReviewCreationForm{}
 	err := c.BindJSON(&form)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind BranchReviewCreationForm from request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind ReviewCreationForm from request body"})
 
 		return
 	}
@@ -204,6 +280,7 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 // @Summary 	Returns whether the user is allowed to review this branch
 // @Description Returns true if the user fulfills the requirements to review the branch
 // @Description Returns false if user is unauthorized to review the branch
+// @Tags 		branches
 // @Accept  	json
 // @Param		branchID		path		string			true	"branch ID"
 // @Param		memberID		path		string			true	"member ID"
@@ -224,7 +301,7 @@ func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 		return
 	}
 
-	// extract userID
+	// extract memberID
 	memberIDStr := c.Param("memberID")
 	memberID, err := strconv.ParseInt(memberIDStr, 10, 64)
 
@@ -248,9 +325,26 @@ func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 	c.JSON(http.StatusOK, canReview)
 }
 
+// GetCollaborator godoc
+// @Summary 	Get a branch collaborator by ID
+// @Description	Get a branch collaborator by ID, a member who has collaborated on a branch
+// @Tags		branches
+// @Accept  	json
+// @Param		collaboratorID	path	string	true	"Collaborator ID"
+// @Produce		json
+// @Success 	200 		{object}	models.BranchCollaboratorDTO
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router 		/branches/collaborators/{collaboratorID}	[get]
+func (branchController *BranchController) GetBranchCollaborator(_ *gin.Context) {
+	// TODO return collaborator by ID
+}
+
 // GetRender
 // @Summary 	Get the render of a branch
 // @Description Get the render of the repository underlying a branch if it exists and has been rendered successfully
+// @Tags 		branches
 // @Param		branchID	path		string				true	"Branch ID"
 // @Produce		text/html
 // @Success 	200		{object}	[]byte
@@ -297,6 +391,7 @@ func (branchController *BranchController) GetRender(c *gin.Context) {
 // GetProject godoc specs are subject to change
 // @Summary 	Get the repository of a branch
 // @Description Get the entire zipped repository of a branch
+// @Tags 		branches
 // @Param		branchID	path		string				true	"Branch ID"
 // @Produce		application/zip
 // @Success 	200		{object}	[]byte
@@ -334,9 +429,10 @@ func (branchController *BranchController) GetProject(c *gin.Context) {
 // UploadProject
 // @Summary 	Upload a new project version to a branch
 // @Description Upload a new project version to a specific, preexisting, branch as a zipped quarto project
+// @Tags 		branches
 // @Accept  	multipart/form-data
 // @Param		branchID		path		string			true	"Branch ID"
-// @Param		file			body		formData		true	"Repository to create"
+// @Param		file			formData	file			true	"Repository to create"
 // @Produce		application/json
 // @Success 	200
 // @Failure		400
@@ -378,6 +474,7 @@ func (branchController *BranchController) UploadProject(c *gin.Context) {
 // GetFiletree godoc specs are subject to change
 // @Summary 	Get the filetree of a project
 // @Description Get the filetree of a project of a branch
+// @Tags 		branches
 // @Param		branchID	path		string				true	"Branch ID"
 // @Produce		application/json
 // @Success 	200		{object}	map[string]int64
@@ -418,6 +515,7 @@ func (branchController *BranchController) GetFiletree(c *gin.Context) {
 // GetFileFromProject godoc specs are subject to change
 // @Summary 	Get a file from a project
 // @Description Get the contents of a single file from a project of a branch
+// @Tags 		branches
 // @Param		branchID	path		string				true	"Branch ID"
 // @Param		filepath	path		string				true	"Filepath"
 // @Produce		application/octet-stream
@@ -472,6 +570,7 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 // @Summary Returns all level 1 discussions associated with the version
 // @Description Returns all discussions on this version that are not a reply to another discussion
 // @Description Endpoint is offset-paginated
+// @Tags 		branches
 // @Param		branchID	path		string			true	"Branch ID"
 // @Param 		page		query		uint			false	"page query"
 // @Param		pageSize	query		uint			false	"page size"
@@ -480,7 +579,7 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router		/brnaches/{branchID}/discussions 	[get]
+// @Router		/branches/{branchID}/discussions 	[get]
 func (branchController *BranchController) GetDiscussions(_ *gin.Context) {
 
 }

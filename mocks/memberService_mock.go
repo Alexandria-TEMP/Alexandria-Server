@@ -84,18 +84,18 @@ func (mr *MockMemberServiceMockRecorder) GetCollaborator(collaboratorID any) *go
 }
 
 // GetMember mocks base method.
-func (m *MockMemberService) GetMember(userID uint) (*models.Member, error) {
+func (m *MockMemberService) GetMember(memberID uint) (*models.Member, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMember", userID)
+	ret := m.ctrl.Call(m, "GetMember", memberID)
 	ret0, _ := ret[0].(*models.Member)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetMember indicates an expected call of GetMember.
-func (mr *MockMemberServiceMockRecorder) GetMember(userID any) *gomock.Call {
+func (mr *MockMemberServiceMockRecorder) GetMember(memberID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMember", reflect.TypeOf((*MockMemberService)(nil).GetMember), userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMember", reflect.TypeOf((*MockMemberService)(nil).GetMember), memberID)
 }
 
 // UpdateCollaborator mocks base method.

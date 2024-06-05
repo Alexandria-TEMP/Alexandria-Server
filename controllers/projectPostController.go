@@ -21,6 +21,7 @@ type ProjectPostController struct {
 // GetProjectPost godoc
 // @Summary 	Get project post
 // @Description Get a project post by ID
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
@@ -55,9 +56,9 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 // CreateProjectPost godoc
 // @Summary 	Create new project post
 // @Description Create a new project post
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		form			body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
-// @Param 		parentPostID	query		string							false	"Parent post ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
 // @Failure		400
@@ -85,6 +86,7 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 // UpdateProjectPost godoc
 // @Summary 	Update project post
 // @Description Update any number of the aspects of a project post
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
 // @Produce		json
@@ -120,6 +122,7 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 // DeleteProjectPost godoc
 // @Summary 	Delete a project post
 // @Description Delete a project post with given ID from database
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
@@ -137,6 +140,7 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Con
 // @Description Create a new project post
 // @Description Creates a project post in the same way as CreateProjectPost
 // @Description However, the post files are imported from the given Github repository
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		form	body	forms.ProjectPostCreationForm	true	"Post Creation Form"
 // @Param		url		query	string							true	"Github repository url"
@@ -151,13 +155,11 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 }
 
 // GetProjectPostDiscussions godoc
-// @Summary Returns all discussions associated with the project post
-// @Description Returns all discussions on this project post and all of it's branches
-// @Description Endpoint is offset-paginated
+// @Summary Returns all discussion IDs associated with the project post
+// @Description Returns all discussion IDs on this project post over all its previous versions, instead of only the current version
+// @Tags 		project-posts
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
 // @Produce		json
 // @Success 	200		{array}		models.DiscussionDTO
 // @Failure		400
@@ -165,43 +167,21 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Failure		500
 // @Router		/project-posts/{postID}/all-discussions 	[get]
 func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ *gin.Context) {
-
+	// TODO implement
 }
 
-// GetProjectPostOpenBranches godoc
-// @Summary		Get all open branches of a project post
-// @Description	Get all open branches associated with the given project post
-// @Description Endpoint is offset-paginated
-// @Accept 		json
-// @Param		postID		path		string			true	"post ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
+// GetProjectPostBranchesByStatus godoc
+// @Summary 	Returns branch IDs grouped by each branch status
+// @Description Returns all branch IDs of this project post, grouped by each branch's review status
+// @Tags		project-posts
+// @Accept		json
+// @Param		postID	path	string	true	"post ID"
 // @Produce		json
-// @Success 	200		{array}		models.BranchDTO
+// @Success		200		{object}	forms.GroupedBranchForm
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router 		/project-posts/{postID}/open-branches 		[get]
-func (projectPostController *ProjectPostController) GetProjectPostOpenBranches(_ *gin.Context) {
-	// return all the branches associated with this project post that are open
-	// TODO: make endpoint paginated
-}
-
-// GetProjectPostClosedBranches godoc
-// @Summary		Get all closed branches of a project post
-// @Description	Get all closed branches associated with the given project post
-// @Description Endpoint is offset-paginated
-// @Accept 		json
-// @Param		postID		path		string			true	"post ID"
-// @Param 		page		query		uint			false	"page query"
-// @Param		pageSize	query		uint			false	"page size"
-// @Produce		json
-// @Success 	200		{array}		models.BranchDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
-// @Router 		/project-posts/{postID}/closed-branches 		[get]
-func (projectPostController *ProjectPostController) GetProjectPostClosedBranches(_ *gin.Context) {
-	// return all the branches associated with this project post that are closed
-	// TODO: make endpoint paginated
+// @Router		/project-posts/{postID}/branches-by-status	[get]
+func (projectPostController *ProjectPostController) GetProjectPostBranchesByStatus(_ *gin.Context) {
+	// TODO implement
 }

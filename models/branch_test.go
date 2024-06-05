@@ -17,7 +17,7 @@ func TestBranchJSONMarshaling(t *testing.T) {
 			{Model: gorm.Model{ID: 100}},
 			{Model: gorm.Model{ID: 50}},
 		},
-		Reviews: []*BranchReview{
+		Reviews: []*Review{
 			{
 				Model:          gorm.Model{ID: 2},
 				BranchID:       44,
@@ -33,6 +33,8 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		UpdatedCompletionStatus: tags.Idea,
 		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
 		Anonymous:               false,
+		RenderStatus:            Pending,
+		ReviewStatus:            BranchOpenForReview,
 	}
 
 	// should equal this DTO!
@@ -47,6 +49,8 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
 		Anonymous:               false,
 		DiscussionIDs:           []uint{},
+		RenderStatus:            Pending,
+		ReviewStatus:            BranchOpenForReview,
 	}
 
 	dto := BranchDTO{}

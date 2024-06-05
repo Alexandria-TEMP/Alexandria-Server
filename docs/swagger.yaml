@@ -1,13 +1,42 @@
 basePath: /api/v2
 definitions:
+  forms.BranchCreationForm:
+    type: object
   forms.DiscussionCreationForm:
+    properties:
+      anonymous:
+        description: If anonymous, the discussion will ignore member ID
+        type: boolean
+      memberID:
+        type: integer
+      text:
+        type: string
     type: object
   forms.FilterForm:
+    type: object
+  forms.GroupedBranchForm:
+    properties:
+      openForReviewIDs:
+        items:
+          type: integer
+        type: array
+      peerReviewedIDs:
+        items:
+          type: integer
+        type: array
+      rejectedIDs:
+        items:
+          type: integer
+        type: array
     type: object
   forms.MemberCreationForm:
     properties:
       email:
         type: string
+      fields:
+        items:
+          $ref: '#/definitions/tags.ScientificFieldTag'
+        type: array
       firstName:
         type: string
       institution:
@@ -20,26 +49,112 @@ definitions:
           TODO: some hashing or semblance of security
         type: string
     type: object
-  forms.BranchCreationForm:
-    type: object
   forms.PostCreationForm:
     properties:
-      collaborators:
+      anonymous:
+        type: boolean
+      authorMemberIDs:
+        description: Members that are authors of the post
         items:
           type: integer
         type: array
+      postType:
+        $ref: '#/definitions/tags.PostType'
+      scientificFieldTags:
+        items:
+          $ref: '#/definitions/tags.ScientificField'
+        type: array
+      title:
+        type: string
     type: object
   forms.ProjectPostCreationForm:
     properties:
+      completionStatus:
+        $ref: '#/definitions/tags.CompletionStatus'
+      feedbackPreference:
+        $ref: '#/definitions/tags.FeedbackPreference'
       postCreationForm:
-        allOf:
-        - $ref: '#/definitions/forms.PostCreationForm'
-        description: TODO add fields
+        $ref: '#/definitions/forms.PostCreationForm'
     type: object
   forms.ReportCreationForm:
     type: object
   forms.ReviewCreationForm:
+    properties:
+      branchDecision:
+        $ref: '#/definitions/models.BranchDecision'
+      branchID:
+        type: integer
+      feedback:
+        type: string
+      memberID:
+        type: integer
     type: object
+  models.BranchCollaboratorDTO:
+    properties:
+      branchID:
+        type: integer
+      collaborationType:
+        $ref: '#/definitions/models.CollaborationType'
+      id:
+        type: integer
+      memberID:
+        type: integer
+    type: object
+  models.BranchDTO:
+    properties:
+      anonymous:
+        type: boolean
+      branchTitle:
+        type: string
+      collaboratorIDs:
+        description: Branch metadata
+        items:
+          type: integer
+        type: array
+      discussionIDs:
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
+      newPostTitle:
+        description: Branch's proposed changes
+        type: string
+      projectPostID:
+        type: integer
+      renderStatus:
+        $ref: '#/definitions/models.RenderStatus'
+      reviewIDs:
+        items:
+          type: integer
+        type: array
+      reviewStatus:
+        $ref: '#/definitions/models.ReviewStatus'
+      updatedCompletionStatus:
+        $ref: '#/definitions/tags.CompletionStatus'
+      updatedScientificFields:
+        items:
+          $ref: '#/definitions/tags.ScientificField'
+        type: array
+    type: object
+  models.BranchDecision:
+    enum:
+    - rejected
+    - approved
+    type: string
+    x-enum-varnames:
+    - Rejected
+    - Approved
+  models.CollaborationType:
+    enum:
+    - author
+    - contributor
+    - reviewer
+    type: string
+    x-enum-varnames:
+    - Author
+    - Contributor
+    - Reviewer
   models.DiscussionDTO:
     properties:
       anonymous:
@@ -56,10 +171,6 @@ definitions:
         type: array
       text:
         type: string
-      versionID:
-        type: integer
-    type: object
-  models.Member:
     type: object
   models.MemberDTO:
     properties:
@@ -80,42 +191,24 @@ definitions:
           $ref: '#/definitions/tags.ScientificField'
         type: array
     type: object
-  models.BranchDTO:
+  models.PostCollaboratorDTO:
     properties:
-      anonymous:
-        type: boolean
-      collaboratorIDs:
-        description: MR metadata
-        items:
-          type: integer
-        type: array
+      collaborationType:
+        $ref: '#/definitions/models.CollaborationType'
       id:
         type: integer
-      mergeRequestTitle:
-        type: string
-      newPostTitle:
-        type: string
-      newVersionID:
-        description: MR's proposed changes
+      memberID:
         type: integer
-      previousVersionID:
+      postID:
         type: integer
-      projectPostID:
-        type: integer
-      reviewIDs:
-        items:
-          type: integer
-        type: array
-      updatedCompletionStatus:
-        $ref: '#/definitions/tags.CompletionStatus'
-      updatedScientificFields:
-        items:
-          $ref: '#/definitions/tags.ScientificField'
-        type: array
     type: object
   models.PostDTO:
     properties:
       collaboratorIDs:
+        items:
+          type: integer
+        type: array
+      discussionIDs:
         items:
           type: integer
         type: array
@@ -129,8 +222,6 @@ definitions:
         type: array
       title:
         type: string
-      versionID:
-        type: integer
     type: object
   models.ProjectPostDTO:
     properties:
@@ -166,17 +257,39 @@ definitions:
   models.ReportDTO:
     type: object
   models.ReviewDTO:
-    type: object
-  models.VersionDTO:
     properties:
-      discussionIDs:
-        items:
-          type: integer
-        type: array
+      branchDecision:
+        $ref: '#/definitions/models.BranchDecision'
+      branchID:
+        type: integer
+      createdAt:
+        type: string
+      feedback:
+        type: string
       id:
         type: integer
-      renderStatus:
-        $ref: '#/definitions/models.RenderStatus'
+      memberID:
+        type: integer
+    type: object
+  models.ReviewStatus:
+    enum:
+    - open for review
+    - peer reviewed
+    - rejected
+    type: string
+    x-enum-varnames:
+    - BranchOpenForReview
+    - BranchPeerReviewed
+    - BranchRejected
+  reports.DiscussionReportDTO:
+    properties:
+      discussionID:
+        type: integer
+    type: object
+  reports.PostReportDTO:
+    properties:
+      postID:
+        type: integer
     type: object
   tags.CompletionStatus:
     enum:
@@ -226,13 +339,6 @@ definitions:
     - ComputerScience
   tags.ScientificFieldTag:
     type: object
-  utils.HTTPError:
-    properties:
-      code:
-        type: integer
-      message:
-        type: string
-    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -240,49 +346,66 @@ info:
   title: Alexandria API
   version: "2.0"
 paths:
-  /discussions:
+  /branches:
     post:
       consumes:
       - application/json
       description: |-
-        Create a new discussion
-        If parent ID field is used, the discussion will be a reply
+        Create a new branch linked to a project post.
+        Note that Member IDs passed here, get converted to Collaborator IDs.
       parameters:
-      - description: Discussion Creation Form
+      - description: Branch Creation Form
         in: body
         name: form
         required: true
         schema:
-          $ref: '#/definitions/forms.DiscussionCreationForm'
-      - description: Parent ID
-        in: query
-        name: parentID
-        type: string
+          $ref: '#/definitions/forms.BranchCreationForm'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.DiscussionDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/models.BranchDTO'
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Create new discussion
-  /discussions/{discussionID}:
+      summary: Create new branch
+      tags:
+      - branches
+    put:
+      consumes:
+      - application/json
+      description: Update any number of the aspects of a branch
+      parameters:
+      - description: Updated Branch
+        in: body
+        name: branch
+        required: true
+        schema:
+          $ref: '#/definitions/models.BranchDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Update branch
+      tags:
+      - branches
+  /branches/{branchID}:
     delete:
       consumes:
       - application/json
-      description: Delete a discussion with given ID from database
+      description: Delete a branch with given ID from database
       parameters:
-      - description: discussion ID
+      - description: branch ID
         in: path
-        name: discussionID
+        name: branchID
         required: true
         type: string
       produces:
@@ -292,25 +415,21 @@ paths:
           description: OK
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Delete a discussion
+      summary: Delete a branch
+      tags:
+      - branches
     get:
       consumes:
       - application/json
-      description: Get a discussion by discussion ID
+      description: Get a branch by branch ID
       parameters:
-      - description: Discussion ID
+      - description: Branch ID
         in: path
-        name: discussionID
+        name: branchID
         required: true
         type: string
       produces:
@@ -319,31 +438,85 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.DiscussionDTO'
+            $ref: '#/definitions/models.BranchDTO'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
+      summary: Get branch
+      tags:
+      - branches
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a new project version to a specific, preexisting, branch
+        as a zipped quarto project
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branchID
+        required: true
+        type: string
+      - description: Repository to create
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get discussion
-  /discussions/{discussionID}/replies:
+      summary: Upload a new project version to a branch
+      tags:
+      - branches
+  /branches/{branchID}/can-review/{memberID}:
     get:
       consumes:
       - application/json
       description: |-
-        Gets an array of all the first-level replies of a discussion
+        Returns true if the user fulfills the requirements to review the branch
+        Returns false if user is unauthorized to review the branch
+      parameters:
+      - description: branch ID
+        in: path
+        name: branchID
+        required: true
+        type: string
+      - description: member ID
+        in: path
+        name: memberID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Returns whether the user is allowed to review this branch
+      tags:
+      - branches
+  /branches/{branchID}/discussions:
+    get:
+      description: |-
+        Returns all discussions on this version that are not a reply to another discussion
         Endpoint is offset-paginated
       parameters:
-      - description: discussion ID
+      - description: Branch ID
         in: path
-        name: discussionID
+        name: branchID
         required: true
         type: string
       - description: page query
@@ -365,38 +538,111 @@ paths:
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
+      summary: Returns all level 1 discussions associated with the version
+      tags:
+      - branches
+  /branches/{branchID}/file/{filepath}:
+    get:
+      description: Get the contents of a single file from a project of a branch
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branchID
+        required: true
+        type: string
+      - description: Filepath
+        in: path
+        name: filepath
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
           schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get all the replies of a discussion
-  /discussions/{discussionID}/reports:
+            items:
+              type: integer
+            type: array
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get a file from a project
+      tags:
+      - branches
+  /branches/{branchID}/render:
+    get:
+      description: Get the render of the repository underlying a branch if it exists
+        and has been rendered successfully
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branchID
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "202":
+          description: Accepted
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Get the render of a branch
+      tags:
+      - branches
+  /branches/{branchID}/repository:
+    get:
+      description: Get the entire zipped repository of a branch
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branchID
+        required: true
+        type: string
+      produces:
+      - application/zip
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Get the repository of a branch
+      tags:
+      - branches
+  /branches/{branchID}/review-statuses:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all reports that have been added to this discussion
-        Endpoint is offset-paginated
+      description: Returns an array of the statuses of all the reviews of this branch
       parameters:
-      - description: Discussion ID
+      - description: branch ID
         in: path
-        name: discussionID
+        name: branchID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -404,21 +650,242 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ReportDTO'
+              $ref: '#/definitions/models.ReviewStatus'
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
+      summary: Returns status of all branch reviews
+      tags:
+      - branches
+  /branches/{branchID}/reviews:
+    post:
+      consumes:
+      - application/json
+      description: Adds a review to a branch
+      parameters:
+      - description: branch ID
+        in: path
+        name: branchID
+        required: true
+        type: string
+      - description: review creation form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.ReviewCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
+      summary: Adds a review to a branch
+      tags:
+      - branches
+  /branches/{branchID}/tree:
+    get:
+      description: Get the filetree of a project of a branch
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branchID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get the filetree of a project
+      tags:
+      - branches
+  /branches/collaborators/{collaboratorID}:
+    get:
+      consumes:
+      - application/json
+      description: Get a branch collaborator by ID, a member who has collaborated
+        on a branch
+      parameters:
+      - description: Collaborator ID
+        in: path
+        name: collaboratorID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BranchCollaboratorDTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get a branch collaborator by ID
+      tags:
+      - branches
+  /branches/reviews/{reviewID}:
+    get:
+      consumes:
+      - application/json
+      description: Returns a review with given ID
+      parameters:
+      - description: review ID
+        in: path
+        name: reviewID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ReviewDTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Returns a review
+      tags:
+      - branches
+  /discussions:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Create a new discussion
+        Either parent ID or version ID must be specified. This determines whether it's a reply or not, respectively.
+      parameters:
+      - description: Discussion Creation Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.DiscussionCreationForm'
+      - description: Parent ID
+        in: query
+        name: parentID
+        type: string
+      - description: Version ID
+        in: query
+        name: versionID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DiscussionDTO'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Create new discussion
+      tags:
+      - discussions
+  /discussions/{discussionID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a discussion with given ID from database
+      parameters:
+      - description: discussion ID
+        in: path
+        name: discussionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Delete a discussion
+      tags:
+      - discussions
+    get:
+      consumes:
+      - application/json
+      description: Get a discussion by discussion ID
+      parameters:
+      - description: Discussion ID
+        in: path
+        name: discussionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DiscussionDTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get discussion
+      tags:
+      - discussions
+  /discussions/{discussionID}/reports:
+    get:
+      consumes:
+      - application/json
+      description: Get all reports that have been added to this discussion
+      parameters:
+      - description: Discussion ID
+        in: path
+        name: discussionID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
       summary: Get all reports of this discussion
+      tags:
+      - discussions
     post:
       consumes:
       - application/json
@@ -444,23 +911,44 @@ paths:
             $ref: '#/definitions/models.ReportDTO'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Add a new report to a discussion
+      tags:
+      - discussions
+  /discussions/reports/{reportID}:
+    get:
+      description: Gets a discussion report by its ID
+      parameters:
+      - description: Report ID
+        in: path
+        name: reportID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/reports.DiscussionReportDTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Gets a discussion report by ID
+      tags:
+      - discussions
   /filter/posts:
     get:
       consumes:
       - application/json
       description: |-
-        Returns all posts that meet the requirements in the form
+        Returns all post IDs that meet the requirements in the form
         Endpoint is offset-paginated
       parameters:
       - description: Filter form
@@ -484,27 +972,23 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.PostDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Filters all posts
+      tags:
+      - filtering
   /filter/project-posts:
     get:
       consumes:
       - application/json
       description: |-
-        Returns all project posts that meet the requirements in the form
+        Returns all project post IDs that meet the requirements in the form
         Endpoint is offset-paginated
       parameters:
       - description: Filter form
@@ -528,22 +1012,38 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ProjectPostDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Filters all project posts
+      tags:
+      - filtering
   /members:
+    get:
+      description: Get the ID of every member in the database.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get IDs of all members
+      tags:
+      - members
     post:
       consumes:
       - application/json
@@ -564,13 +1064,11 @@ paths:
             $ref: '#/definitions/models.MemberDTO'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Create a new member
+      tags:
+      - members
     put:
       consumes:
       - application/json
@@ -581,26 +1079,20 @@ paths:
         name: member
         required: true
         schema:
-          $ref: '#/definitions/models.Member'
+          $ref: '#/definitions/models.MemberDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Update a member
-  /members/{userID}:
+      tags:
+      - members
+  /members/{memberID}:
     delete:
       consumes:
       - application/json
@@ -608,7 +1100,7 @@ paths:
       parameters:
       - description: user ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       produces:
@@ -618,17 +1110,13 @@ paths:
           description: OK
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Delete a member
+      tags:
+      - members
     get:
       consumes:
       - application/json
@@ -636,7 +1124,7 @@ paths:
       parameters:
       - description: user ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       produces:
@@ -646,40 +1134,24 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.MemberDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get member from database
-  /members/{userID}/discussions:
+      tags:
+      - members
+  /members/{memberID}/branches:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all branches that this member is a collaborator of
-        Endpoint is offset-paginated
+      description: Get all branches that this member is a collaborator of
       parameters:
       - description: user ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -687,42 +1159,28 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.DiscussionDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get all branches of this member
-  /members/{userID}/branches:
+      tags:
+      - members
+  /members/{memberID}/discussions:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all branches that this member is a collaborator of
-        Endpoint is offset-paginated
+      description: Get all discussions that this member has participated in
       parameters:
       - description: user ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -730,42 +1188,28 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.BranchDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get all branches of this member
-  /members/{userID}/posts:
+      summary: Get all discussions
+      tags:
+      - members
+  /members/{memberID}/posts:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all posts that this member is a collaborator of
-        Endpoint is offset-paginated
+      description: Get all posts that this member is a collaborator of
       parameters:
       - description: user ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -773,42 +1217,28 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.PostDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get all posts of this member
-  /members/{userID}/project-posts:
+      tags:
+      - members
+  /members/{memberID}/project-posts:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all project posts that this member is a collaborator of
-        Endpoint is offset-paginated
+      description: Get all project posts that this member is a collaborator of
       parameters:
       - description: user ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -816,42 +1246,28 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ProjectPostDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get all project posts of this member
-  /members/{userID}/saved-posts:
+      tags:
+      - members
+  /members/{memberID}/saved-posts:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all posts that this member has saved
-        Endpoint is offset-paginated
+      description: Get all posts that this member has saved
       parameters:
       - description: user ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -859,22 +1275,18 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.PostDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get all saved posts of this member
-  /members/{userID}/saved-posts/{postID}:
+      tags:
+      - members
+  /members/{memberID}/saved-posts/{postID}:
     post:
       consumes:
       - application/json
@@ -882,7 +1294,7 @@ paths:
       parameters:
       - description: user ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       - description: post ID
@@ -897,34 +1309,22 @@ paths:
           description: OK
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Adds new saved post
-  /members/{userID}/saved-project-posts:
+      tags:
+      - members
+  /members/{memberID}/saved-project-posts:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all project posts that this member has saved
-        Endpoint is offset-paginated
+      description: Get all project posts that this member has saved
       parameters:
       - description: user ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -932,22 +1332,18 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ProjectPostDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get all saved project posts of this member
-  /members/{userID}/saved-project-posts/{postID}:
+      tags:
+      - members
+  /members/{memberID}/saved-project-posts/{postID}:
     post:
       consumes:
       - application/json
@@ -955,7 +1351,7 @@ paths:
       parameters:
       - description: user ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       - description: post ID
@@ -970,274 +1366,11 @@ paths:
           description: OK
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Adds new saved project post
-  /branches:
-    post:
-      consumes:
-      - application/json
-      description: Create a new question or discussion branch
-      parameters:
-      - description: Branch Creation Form
-        in: body
-        name: form
-        required: true
-        schema:
-          $ref: '#/definitions/forms.BranchCreationForm'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.BranchDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Create new branch
-    put:
-      consumes:
-      - application/json
-      description: Update any number of the aspects of a branch
-      parameters:
-      - description: Updated Branch
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/models.BranchDTO'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Update branch
-  /branches/{branchID}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete a branch with given ID from database
-      parameters:
-      - description: branch ID
-        in: path
-        name: branchID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Delete a branch
-    get:
-      consumes:
-      - application/json
-      description: Get a branch by branch ID
-      parameters:
-      - description: Branch ID
-        in: path
-        name: branchID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.BranchDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get branch
-  /branches/{branchID}/can-review/{userID}:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        Returns true if the user fulfills the requirements to review the branch
-        Returns false if user is unauthorized to review the branch
-      parameters:
-      - description: branch ID
-        in: path
-        name: branchID
-        required: true
-        type: string
-      - description: user ID
-        in: path
-        name: userID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: boolean
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Returns whether the user is allowed to review this branch
-  /branches/{branchID}/reviews:
-    get:
-      consumes:
-      - application/json
-      description: Returns an array of the statuses of all the reviews of this merge
-        request
-      parameters:
-      - description: branch ID
-        in: path
-        name: branchID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: string
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Returns status of all branch reviews
-    post:
-      consumes:
-      - application/json
-      description: Adds a review to a branch
-      parameters:
-      - description: branch ID
-        in: path
-        name: branchID
-        required: true
-        type: string
-      - description: review creation form
-        in: body
-        name: form
-        required: true
-        schema:
-          $ref: '#/definitions/forms.ReviewCreationForm'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Adds a review to a branch
-  /branches/{branchID}/reviews/{reviewID}:
-    get:
-      consumes:
-      - application/json
-      description: Returns a review with the given ID of the branch with the
-        given ID
-      parameters:
-      - description: branch ID
-        in: path
-        name: branchID
-        required: true
-        type: string
-      - description: review ID
-        in: path
-        name: reviewID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ReviewDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Returns a review of a branch
+      tags:
+      - members
   /posts:
     post:
       consumes:
@@ -1259,13 +1392,11 @@ paths:
             $ref: '#/definitions/models.PostDTO'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Create new post
+      tags:
+      - posts
     put:
       consumes:
       - application/json
@@ -1284,17 +1415,13 @@ paths:
           description: OK
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Update post
+      tags:
+      - posts
   /posts/{postID}:
     delete:
       consumes:
@@ -1313,17 +1440,13 @@ paths:
           description: OK
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Delete a post
+      tags:
+      - posts
     get:
       consumes:
       - application/json
@@ -1343,38 +1466,24 @@ paths:
             $ref: '#/definitions/models.PostDTO'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get post
+      tags:
+      - posts
   /posts/{postID}/reports:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all reports that have been added to this post
-        Endpoint is offset-paginated
+      description: Get all reports that have been added to this post
       parameters:
       - description: Post ID
         in: path
         name: postID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -1382,21 +1491,17 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ReportDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get all reports of this post
+      tags:
+      - posts
     post:
       consumes:
       - application/json
@@ -1422,17 +1527,41 @@ paths:
             $ref: '#/definitions/models.ReportDTO'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Add a new report to a post
+      tags:
+      - posts
+  /posts/collaborators/{collaboratorID}:
+    get:
+      consumes:
+      - application/json
+      description: Get a post collaborator by ID, a member who has collaborated on
+        a post
+      parameters:
+      - description: Collaborator ID
+        in: path
+        name: collaboratorID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PostCollaboratorDTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get a post collaborator by ID
+      tags:
+      - posts
   /posts/from-github:
     post:
       consumes:
@@ -1462,17 +1591,38 @@ paths:
             $ref: '#/definitions/models.PostDTO'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "502":
           description: Bad Gateway
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Create new post with the version imported from github
+      tags:
+      - posts
+  /posts/reports/{reportID}:
+    get:
+      description: Gets a post report by its ID
+      parameters:
+      - description: Report ID
+        in: path
+        name: reportID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/reports.PostReportDTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Gets a post report by ID
+      tags:
+      - posts
   /project-posts:
     post:
       consumes:
@@ -1485,10 +1635,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/forms.ProjectPostCreationForm'
-      - description: Parent post ID
-        in: query
-        name: parentPostID
-        type: string
       produces:
       - application/json
       responses:
@@ -1498,13 +1644,11 @@ paths:
             $ref: '#/definitions/models.ProjectPostDTO'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Create new project post
+      tags:
+      - project-posts
     put:
       consumes:
       - application/json
@@ -1521,19 +1665,13 @@ paths:
       responses:
         "200":
           description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Update project post
+      tags:
+      - project-posts
   /project-posts/{postID}:
     delete:
       consumes:
@@ -1552,17 +1690,13 @@ paths:
           description: OK
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Delete a project post
+      tags:
+      - project-posts
     get:
       consumes:
       - application/json
@@ -1580,40 +1714,25 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.ProjectPostDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get project post
+      tags:
+      - project-posts
   /project-posts/{postID}/all-discussions:
     get:
       consumes:
       - application/json
-      description: |-
-        Returns all discussions on this project post and all of it's branches
-        Endpoint is offset-paginated
+      description: Returns all discussion IDs on this project post over all its previous
+        versions, instead of only the current version
       parameters:
       - description: post ID
         in: path
         name: postID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
@@ -1625,103 +1744,41 @@ paths:
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Returns all discussions associated with the project post
-  /project-posts/{postID}/closed-branches:
+      summary: Returns all discussion IDs associated with the project post
+      tags:
+      - project-posts
+  /project-posts/{postID}/branches-by-status:
     get:
       consumes:
       - application/json
-      description: |-
-        Get all closed branches associated with the given project post
-        Endpoint is offset-paginated
+      description: Returns all branch IDs of this project post, grouped by each branch's
+        review status
       parameters:
       - description: post ID
         in: path
         name: postID
         required: true
         type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.BranchDTO'
-            type: array
+            $ref: '#/definitions/forms.GroupedBranchForm'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get all closed branches of a project post
-  /project-posts/{postID}/open-branches:
-    get:
-      consumes:
-      - application/json
-      description: |-
-        Get all open branches associated with the given project post
-        Endpoint is offset-paginated
-      parameters:
-      - description: post ID
-        in: path
-        name: postID
-        required: true
-        type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.BranchDTO'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get all open branches of a project post
+      summary: Returns branch IDs grouped by each branch status
+      tags:
+      - project-posts
   /project-posts/from-github:
     post:
       consumes:
@@ -1751,20 +1808,74 @@ paths:
             $ref: '#/definitions/models.ProjectPostDTO'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "502":
           description: Bad Gateway
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Create new project post with the version imported from github
+      tags:
+      - project-posts
+  /tags/completion-status:
+    get:
+      description: Returns every possible completion status that a Post can have
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/tags.CompletionStatus'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Returns all completion statuses
+      tags:
+      - tags
+  /tags/feedback-preference:
+    get:
+      description: Returns every possible feedback preference that a Project Post
+        can have
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/tags.FeedbackPreference'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Returns all feedback preferences
+      tags:
+      - tags
+  /tags/post-type:
+    get:
+      description: Returns every possible post type that a Post can have
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/tags.PostType'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Returns all post types
+      tags:
+      - tags
   /tags/scientific:
     get:
-      description: Returns all scientific tags in the database
+      description: Returns all scientific tags (an array of strings) in the database
       produces:
       - application/json
       responses:
@@ -1776,235 +1887,9 @@ paths:
             type: array
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Returns all scientific tags
-  /versions:
-    post:
-      consumes:
-      - multipart/form-data
-      description: Create a new version with discussions and repository from zipped
-        file in body
-      parameters:
-      - description: Repository to create
-        in: formData
-        name: repository
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.VersionDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Create new version
-  /versions/{versionID}:
-    get:
-      description: Get a version by version ID
-      parameters:
-      - description: Version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.VersionDTO'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get version
-  /versions/{versionID}/discussions:
-    get:
-      description: |-
-        Returns all discussions on this version that are not a reply to another discussion
-        Endpoint is offset-paginated
-      parameters:
-      - description: version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      - description: page query
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: pageSize
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.DiscussionDTO'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Returns all level 1 discussions associated with the version
-  /versions/{versionID}/file/{filepath}:
-    get:
-      description: Get the contents of a single file from a repository of a version
-      parameters:
-      - description: Version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      - description: Filepath
-        in: path
-        name: filepath
-        required: true
-        type: string
-      produces:
-      - application/octet-stream
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get a file from a repository
-  /versions/{versionID}/render:
-    get:
-      description: Get the render of the repository underlying a version if it exists
-        and has been rendered successfully
-      parameters:
-      - description: Version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      produces:
-      - text/html
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "202":
-          description: Accepted
-          schema:
-            type: string
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get the render of a version
-  /versions/{versionID}/repository:
-    get:
-      description: Get the entire zipped repository of a version
-      parameters:
-      - description: Version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      produces:
-      - application/zip
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get the repository of a version
-  /versions/{versionID}/tree:
-    get:
-      description: Get the file tree of a repository of a version
-      parameters:
-      - description: Version ID
-        in: path
-        name: versionID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: integer
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get the file tree of a repository
+      tags:
+      - tags
 swagger: "2.0"

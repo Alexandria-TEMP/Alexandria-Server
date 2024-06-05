@@ -225,18 +225,18 @@ func (mr *MockFilesystemMockRecorder) GetFileTree() *gomock.Call {
 }
 
 // GetLastCommit mocks base method.
-func (m *MockFilesystem) GetLastCommit() (*plumbing.Reference, error) {
+func (m *MockFilesystem) GetLastCommit(branchName string) (*plumbing.Reference, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLastCommit")
+	ret := m.ctrl.Call(m, "GetLastCommit", branchName)
 	ret0, _ := ret[0].(*plumbing.Reference)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetLastCommit indicates an expected call of GetLastCommit.
-func (mr *MockFilesystemMockRecorder) GetLastCommit() *gomock.Call {
+func (mr *MockFilesystemMockRecorder) GetLastCommit(branchName any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastCommit", reflect.TypeOf((*MockFilesystem)(nil).GetLastCommit))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastCommit", reflect.TypeOf((*MockFilesystem)(nil).GetLastCommit), branchName)
 }
 
 // RenderExists mocks base method.

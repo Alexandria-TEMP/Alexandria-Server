@@ -7,9 +7,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestBranchReviewJSONMarshaling(t *testing.T) {
+func TestReviewJSONMarshaling(t *testing.T) {
 	// This model...
-	model := BranchReview{
+	model := Review{
 		Model:          gorm.Model{ID: 88},
 		BranchID:       40,
 		Member:         Member{},
@@ -19,7 +19,7 @@ func TestBranchReviewJSONMarshaling(t *testing.T) {
 	}
 
 	// should equal this DTO!
-	targetDTO := BranchReviewDTO{
+	targetDTO := ReviewDTO{
 		ID:             88,
 		BranchID:       40,
 		MemberID:       50,
@@ -27,7 +27,7 @@ func TestBranchReviewJSONMarshaling(t *testing.T) {
 		Feedback:       "Nice!",
 	}
 
-	dto := BranchReviewDTO{}
+	dto := ReviewDTO{}
 
 	bytes, err := model.MarshalJSON()
 	if err != nil {

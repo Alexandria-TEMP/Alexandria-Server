@@ -15,7 +15,6 @@ func TestClosedBranchJSONMarshaling(t *testing.T) {
 		BranchID:           33,
 		SupercededBranch:   Branch{},
 		SupercededBranchID: 12,
-		ProjectPost:        ProjectPost{},
 		ProjectPostID:      40,
 		BranchDecision:     Rejected,
 	}

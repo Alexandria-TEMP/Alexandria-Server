@@ -11,23 +11,49 @@ import (
 //go:generate mockgen -package=mocks -source=./filesystem_interface.go -destination=../../mocks/filesystem_mock.go
 
 type Filesystem interface {
-	// select which post's repository to interact with
+	// CheckoutDirectory set filepaths according to postID. If repo is present check it out.
 	CheckoutDirectory(postID uint)
 
+	// CreateRepository create git repository at CurrentDirPath
 	CreateRepository() error
+
+	// CheckoutRepository checkout git repository if there is one at CurrentDirPath
 	CheckoutRepository() (*git.Repository, error)
+
+	// DeleteRepository delete entire repository and directory at CurrentDirPath
 	DeleteRepository() error
 
+	// CreateBranch create a new branch off of master's last commit
 	CreateBranch(branchName string) error
+
+	// DeleteBranch delete a branch
+	DeleteBranch(branchName string) error
+
+	// CheckoutBranch checkout branch
 	CheckoutBranch(branchName string) error
 
+	// CreateCommit commit current changes
 	CreateCommit() error
-	GetLastCommit() (*plumbing.Reference, error)
+
+	// GetLastCommit get last commit reference for specific branch
+	GetLastCommit(branchName string) (*plumbing.Reference, error)
+
+	// GetFileTree get all files at GetCurrentQuartoDirPath
 	GetFileTree() (map[string]int64, error)
+
+	// RenderExists checks whether render exists as expected at GetCurrentRenderDirPath and returns filename
 	RenderExists() (bool, string)
+
+	// SaveZipFile saves a zip file from the gin context to GetCurrentZipFilePath
 	SaveZipFile(c *gin.Context, file *multipart.FileHeader) error
+
+	// Unzip unzips a project to GetCurrentQuartoDirPath
 	Unzip() error
+
+	// CleanDir deletes all files from the currnet branch
 	CleanDir() error
+
+	// Reset resets a branch to the last commit
 	Reset() error
 
 	GetCurrentDirPath() string

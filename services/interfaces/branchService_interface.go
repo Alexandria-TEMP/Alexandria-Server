@@ -20,17 +20,24 @@ type BranchService interface {
 	// Error 2 500
 	CreateBranch(branchCreationForm forms.BranchCreationForm) (models.Branch, error, error)
 
+	// UpdateBranch updates an existing branch using a DTO.
+	// This only effects the entity, not the filesystem.
+	UpdateBranch(branchDTO models.BranchDTO) (models.Branch, error)
+
+	// DeleteBranch deletes an existing branch entity, as well as the branch in the vfs.
+	DeleteBranch(branchID uint) error
+
 	// GetReviewStatus gets the decisions for all reviews of a branch, given its ID,
 	GetReviewStatus(branchID uint) ([]models.BranchDecision, error)
 
 	// GetReview gets an existing review from the DB
-	GetReview(reviewID uint) (models.BranchReview, error)
+	GetReview(reviewID uint) (models.Review, error)
 
 	// CreateReview creates a new review and adds it to the branch.
-	CreateReview(branchReviewCreationForm forms.BranchReviewCreationForm) (models.BranchReview, error)
+	CreateReview(reviewCreationForm forms.ReviewCreationForm) (models.Review, error)
 
 	// MemberCanReview checks whether a user is elligible to review a branch, dpending on whether there is an overlap of the scientific fields.
-	MemberCanReview(branchID, userID uint) (bool, error)
+	MemberCanReview(branchID, memberID uint) (bool, error)
 
 	// GetProjectFile returns filepath of zipped repository.
 	// Error is for status 404.

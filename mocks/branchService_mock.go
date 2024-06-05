@@ -59,18 +59,18 @@ func (mr *MockBranchServiceMockRecorder) CreateBranch(branchCreationForm any) *g
 }
 
 // CreateReview mocks base method.
-func (m *MockBranchService) CreateReview(branchReviewCreationForm forms.BranchReviewCreationForm) (models.BranchReview, error) {
+func (m *MockBranchService) CreateReview(reviewCreationForm forms.ReviewCreationForm) (models.Review, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateReview", branchReviewCreationForm)
-	ret0, _ := ret[0].(models.BranchReview)
+	ret := m.ctrl.Call(m, "CreateReview", reviewCreationForm)
+	ret0, _ := ret[0].(models.Review)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateReview indicates an expected call of CreateReview.
-func (mr *MockBranchServiceMockRecorder) CreateReview(branchReviewCreationForm any) *gomock.Call {
+func (mr *MockBranchServiceMockRecorder) CreateReview(reviewCreationForm any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateReview", reflect.TypeOf((*MockBranchService)(nil).CreateReview), branchReviewCreationForm)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateReview", reflect.TypeOf((*MockBranchService)(nil).CreateReview), reviewCreationForm)
 }
 
 // GetBranch mocks base method.
@@ -135,10 +135,10 @@ func (mr *MockBranchServiceMockRecorder) GetProject(branchID any) *gomock.Call {
 }
 
 // GetReview mocks base method.
-func (m *MockBranchService) GetReview(reviewID uint) (models.BranchReview, error) {
+func (m *MockBranchService) GetReview(reviewID uint) (models.Review, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetReview", reviewID)
-	ret0, _ := ret[0].(models.BranchReview)
+	ret0, _ := ret[0].(models.Review)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -165,18 +165,18 @@ func (mr *MockBranchServiceMockRecorder) GetReviewStatus(branchID any) *gomock.C
 }
 
 // MemberCanReview mocks base method.
-func (m *MockBranchService) MemberCanReview(branchID, userID uint) (bool, error) {
+func (m *MockBranchService) MemberCanReview(branchID, memberID uint) (bool, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MemberCanReview", branchID, userID)
+	ret := m.ctrl.Call(m, "MemberCanReview", branchID, memberID)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // MemberCanReview indicates an expected call of MemberCanReview.
-func (mr *MockBranchServiceMockRecorder) MemberCanReview(branchID, userID any) *gomock.Call {
+func (mr *MockBranchServiceMockRecorder) MemberCanReview(branchID, memberID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MemberCanReview", reflect.TypeOf((*MockBranchService)(nil).MemberCanReview), branchID, userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MemberCanReview", reflect.TypeOf((*MockBranchService)(nil).MemberCanReview), branchID, memberID)
 }
 
 // UploadProject mocks base method.

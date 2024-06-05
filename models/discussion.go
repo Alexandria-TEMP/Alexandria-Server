@@ -6,11 +6,22 @@ import (
 	"gorm.io/gorm"
 )
 
+type DiscussionContainer struct {
+	gorm.Model
+
+	// DiscussionContainer has many Discussion
+	Discussions []*Discussion `gorm:"foreignKey:ContainerID"`
+}
+
+func (model *DiscussionContainer) GetID() uint {
+	return model.Model.ID
+}
+
 type Discussion struct {
 	gorm.Model
 
-	// Version has many Discussion
-	VersionID uint
+	// Discussion belongs to DiscussionContainer
+	ContainerID uint
 
 	// Discussion belongs to Member
 	Member   Member `gorm:"foreignKey:MemberID"`
@@ -27,7 +38,6 @@ type Discussion struct {
 
 type DiscussionDTO struct {
 	ID        uint
-	VersionID uint
 	MemberID  uint
 	ReplyIDs  []uint
 	Text      string
@@ -42,7 +52,6 @@ func (model *Discussion) GetID() uint {
 func (model *Discussion) IntoDTO() DiscussionDTO {
 	return DiscussionDTO{
 		model.ID,
-		model.VersionID,
 		model.MemberID,
 		discussionsIntoIDs(model.Replies),
 		model.Text,
@@ -53,4 +62,15 @@ func (model *Discussion) IntoDTO() DiscussionDTO {
 
 func (model *Discussion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(model.IntoDTO())
+}
+
+// Helper function for JSON marshaling
+func discussionsIntoIDs(discussions []*Discussion) []uint {
+	ids := make([]uint, len(discussions))
+
+	for i, discussion := range discussions {
+		ids[i] = discussion.ID
+	}
+
+	return ids
 }

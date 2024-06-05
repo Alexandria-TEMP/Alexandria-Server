@@ -31,7 +31,9 @@ func (filesystem *Filesystem) CreateRepository() error {
 	}
 
 	// make initial commit
-	filesystem.CreateCommit()
+	if err := filesystem.CreateCommit(); err != nil {
+		return fmt.Errorf("failed to make initial commit")
+	}
 
 	return nil
 }
@@ -40,11 +42,13 @@ func (filesystem *Filesystem) CreateRepository() error {
 // Do this prior to any operations on a repo.
 // If no repo has been initiated here this will error.
 func (filesystem *Filesystem) CheckoutRepository() (*git.Repository, error) {
-	if r, err := git.PlainOpen(filesystem.CurrentDirPath); err != nil {
+	r, err := git.PlainOpen(filesystem.CurrentDirPath)
+
+	if err != nil {
 		return nil, fmt.Errorf("failed to open repository")
-	} else {
-		return r, nil
 	}
+
+	return r, nil
 }
 
 // CreateBranch creates a new branch from the last commit on master with branchName as the name.
@@ -68,8 +72,22 @@ func (filesystem *Filesystem) CreateBranch(branchName string) error {
 	return nil
 }
 
+func (filesystem *Filesystem) DeleteBranch(branchName string) error {
+	// checkout master
+	if err := filesystem.CheckoutBranch("master"); err != nil {
+		return fmt.Errorf("failed to checkout branch master")
+	}
+
+	// delete branch
+	if err := filesystem.CurrentRepository.DeleteBranch(branchName); err != nil {
+		return fmt.Errorf("failed to delete branch %v", branchName)
+	}
+
+	return nil
+}
+
 // Merge actually resets master to the last commit on the branch we are merging
-func (filesystem *Filesystem) Merge(toMerge string, mergeInto string) error {
+func (filesystem *Filesystem) Merge(toMerge, mergeInto string) error {
 	// get worktree
 	w, err := filesystem.CurrentRepository.Worktree()
 
@@ -78,7 +96,9 @@ func (filesystem *Filesystem) Merge(toMerge string, mergeInto string) error {
 	}
 
 	// checkout master to merge into it
-	filesystem.CheckoutBranch(mergeInto)
+	if err := filesystem.CheckoutBranch(mergeInto); err != nil {
+		return fmt.Errorf("failed to checkout branch %v", mergeInto)
+	}
 
 	// get last commit on <branchName>
 	lastCommit, err := filesystem.GetLastCommit(toMerge)
@@ -98,7 +118,9 @@ func (filesystem *Filesystem) Merge(toMerge string, mergeInto string) error {
 	}
 
 	// git clean --ffxd
-	w.Clean(&git.CleanOptions{Dir: true})
+	if err := w.Clean(&git.CleanOptions{Dir: true}); err != nil {
+		return fmt.Errorf("failed to clean master")
+	}
 
 	return nil
 }
@@ -160,10 +182,14 @@ func (filesystem *Filesystem) CheckoutBranch(branchName string) error {
 	}
 
 	// git reset --hard
-	w.Reset(&git.ResetOptions{Mode: git.HardReset})
+	if err := w.Reset(&git.ResetOptions{Mode: git.HardReset}); err != nil {
+		return fmt.Errorf("failed to reset branch %s", branchName)
+	}
 
 	// git clean --ffxd
-	w.Clean(&git.CleanOptions{Dir: true})
+	if err := w.Clean(&git.CleanOptions{Dir: true}); err != nil {
+		return fmt.Errorf("failed to clean branch %s", branchName)
+	}
 
 	return nil
 }
@@ -188,8 +214,12 @@ func (filesystem *Filesystem) CleanDir() error {
 	}
 
 	// remove all files
-	w.RemoveGlob("render")
-	w.RemoveGlob("quarto_project")
+	err1 := w.RemoveGlob("render")
+	err2 := w.RemoveGlob("quarto_project")
+
+	if err1 != nil || err2 != nil {
+		return fmt.Errorf("failed to remove all files")
+	}
 
 	return nil
 }

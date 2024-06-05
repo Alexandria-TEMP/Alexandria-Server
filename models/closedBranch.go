@@ -14,12 +14,11 @@ type ClosedBranch struct {
 	Branch   Branch `gorm:"foreignKey:BranchID"`
 	BranchID uint
 
-	// SupercededBranch belongs to ClsoedBranch
+	// SupercededBranch belongs to ClosedBranch
 	SupercededBranch   Branch `gorm:"foreignKey:SupercededBranchID"`
 	SupercededBranchID uint
 
-	// ClosedBranch belongs to ProjectPost
-	ProjectPost   ProjectPost `gorm:"foreignKey:ProjectPostID"`
+	// ProjectPost has many ClosedBranch
 	ProjectPostID uint
 
 	BranchDecision BranchDecision
