@@ -75,7 +75,7 @@ func SetUpRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router = gin.Default()
 
-	router.GET("/api/v2/members/:userID", func(c *gin.Context) {
+	router.GET("/api/v2/members/:memberID", func(c *gin.Context) {
 		memberController.GetMember(c)
 	})
 	router.POST("/api/v2/members", func(c *gin.Context) {
@@ -84,7 +84,7 @@ func SetUpRouter() *gin.Engine {
 	router.PUT("/api/v2/members", func(c *gin.Context) {
 		memberController.UpdateMember(c)
 	})
-	router.DELETE("/api/v2/members/:userID", func(c *gin.Context) {
+	router.DELETE("/api/v2/members/:memberID", func(c *gin.Context) {
 		memberController.DeleteMember(c)
 	})
 	router.GET("/api/v2/members", func(c *gin.Context) {
