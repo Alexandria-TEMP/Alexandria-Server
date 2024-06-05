@@ -102,3 +102,42 @@ func TestCreateMember400(t *testing.T) {
 
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
+
+func TestDeleteMember200(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberService.EXPECT().DeleteMember(uint(1)).Return(nil).Times(1)
+
+	req, _ := http.NewRequest("DELETE", "/api/v2/members/1", http.NoBody)
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+}
+
+func TestDeleteMember400(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberService.EXPECT().DeleteMember(gomock.Any()).Return(nil).Times(0)
+
+	req, _ := http.NewRequest("DELETE", "/api/v2/members/bad", http.NoBody)
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestDeleteMember404(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberService.EXPECT().DeleteMember(uint(1)).Return(errors.New("some error")).Times(1)
+
+	req, _ := http.NewRequest("DELETE", "/api/v2/members/1", http.NoBody)
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}
