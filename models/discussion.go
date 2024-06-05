@@ -25,7 +25,7 @@ type Discussion struct {
 
 	// Discussion optionally has many Discussion
 	Replies  []*Discussion `gorm:"foreignKey:ParentID"`
-	ParentID uint
+	ParentID *uint
 
 	Text      string
 	Deleted   bool
