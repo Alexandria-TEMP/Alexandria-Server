@@ -17,18 +17,17 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			{Model: gorm.Model{ID: 1}},
 			{Model: gorm.Model{ID: 60}},
 		},
-		CurrentVersion:      Version{},
-		CurrentVersionID:    49,
 		PostType:            tags.Project,
 		ScientificFieldTags: []*tags.ScientificFieldTag{},
+		DiscussionContainer: DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
 	}
 
 	model := ProjectPost{
-		Model:             gorm.Model{ID: 42},
-		Post:              post,
-		PostID:            88,
-		OpenMergeRequests: []*MergeRequest{{Model: gorm.Model{ID: 44}}},
-		ClosedMergeRequests: []*ClosedMergeRequest{
+		Model:        gorm.Model{ID: 42},
+		Post:         post,
+		PostID:       88,
+		OpenBranches: []*Branch{{Model: gorm.Model{ID: 44}}},
+		ClosedBranches: []*ClosedBranch{
 			{Model: gorm.Model{ID: 59}},
 			{Model: gorm.Model{ID: 20}},
 		},
@@ -41,17 +40,18 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 	targetDTO := ProjectPostDTO{
 		ID: 42,
 		PostDTO: PostDTO{
-			ID:                    88,
-			CollaboratorIDs:       []uint{1, 60},
-			VersionID:             49,
+			ID:              88,
+			CollaboratorIDs: []uint{1, 60},
+
 			PostType:              tags.Project,
 			ScientificFieldTagIDs: []uint{},
+			DiscussionIDs:         []uint{95},
 		},
-		OpenMergeRequestIDs:   []uint{44},
-		ClosedMergeRequestIDs: []uint{59, 20},
-		CompletionStatus:      tags.Completed,
-		FeedbackPreference:    tags.FormalFeedback,
-		PostReviewStatusTag:   tags.RevisionNeeded,
+		OpenBranchIDs:       []uint{44},
+		ClosedBranchIDs:     []uint{59, 20},
+		CompletionStatus:    tags.Completed,
+		FeedbackPreference:  tags.FormalFeedback,
+		PostReviewStatusTag: tags.RevisionNeeded,
 	}
 
 	dto := ProjectPostDTO{}

@@ -3,35 +3,31 @@ package models
 import (
 	"encoding/json"
 	"testing"
-	"time"
 
 	"gorm.io/gorm"
 )
 
-func TestMergeRequestReviewJSONMarshaling(t *testing.T) {
-	createdAt := time.Now().UTC()
-
+func TestBranchReviewJSONMarshaling(t *testing.T) {
 	// This model...
-	model := MergeRequestReview{
-		Model:                gorm.Model{ID: 88, CreatedAt: createdAt},
-		MergeRequestID:       40,
+	model := BranchReview{
+		Model:                gorm.Model{ID: 88},
+		BranchID:             40,
 		Member:               Member{},
 		MemberID:             50,
-		MergeRequestDecision: ReviewApproved,
+		BranchReviewDecision: Approved,
 		Feedback:             "Nice!",
 	}
 
 	// should equal this DTO!
-	targetDTO := MergeRequestReviewDTO{
+	targetDTO := BranchReviewDTO{
 		ID:                   88,
-		MergeRequestID:       40,
+		BranchID:             40,
 		MemberID:             50,
-		MergeRequestDecision: ReviewApproved,
+		BranchReviewDecision: Approved,
 		Feedback:             "Nice!",
-		CreatedAt:            createdAt,
 	}
 
-	dto := MergeRequestReviewDTO{}
+	dto := BranchReviewDTO{}
 
 	bytes, err := model.MarshalJSON()
 	if err != nil {

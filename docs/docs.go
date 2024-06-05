@@ -739,9 +739,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}/merge-requests": {
+        "/members/{userID}/branches": {
             "get": {
-                "description": "Get all merge requests that this member is a collaborator of",
+                "description": "Get all branches that this member is a collaborator of",
                 "consumes": [
                     "application/json"
                 ],
@@ -751,7 +751,7 @@ const docTemplate = `{
                 "tags": [
                     "members"
                 ],
-                "summary": "Get all merge requests of this member",
+                "summary": "Get all branches of this member",
                 "parameters": [
                     {
                         "type": "string",
@@ -1100,9 +1100,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests": {
+        "/branches": {
             "put": {
-                "description": "Update any number of the aspects of a merge request",
+                "description": "Update any number of the aspects of a branch",
                 "consumes": [
                     "application/json"
                 ],
@@ -1110,17 +1110,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "merge-requests"
+                    "branches"
                 ],
-                "summary": "Update merge request",
+                "summary": "Update branch",
                 "parameters": [
                     {
-                        "description": "Updated MergeRequest",
+                        "description": "Updated Branch",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.MergeRequestDTO"
+                            "$ref": "#/definitions/models.BranchDTO"
                         }
                     }
                 ],
@@ -1149,7 +1149,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create a new merge request linked to a project post.\nNote that Member IDs passed here, get converted to Collaborator IDs.",
+                "description": "Create a new branch linked to a project post.\nNote that Member IDs passed here, get converted to Collaborator IDs.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1157,17 +1157,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "merge-requests"
+                    "branches"
                 ],
-                "summary": "Create new merge request",
+                "summary": "Create new branch",
                 "parameters": [
                     {
-                        "description": "MergeRequest Creation Form",
+                        "description": "Branch Creation Form",
                         "name": "form",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.MergeRequestCreationForm"
+                            "$ref": "#/definitions/forms.BranchCreationForm"
                         }
                     }
                 ],
@@ -1175,7 +1175,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.MergeRequestDTO"
+                            "$ref": "#/definitions/models.BranchDTO"
                         }
                     },
                     "400": {
@@ -1193,9 +1193,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests/collaborators/{collaboratorID}": {
+        "/branches/collaborators/{collaboratorID}": {
             "get": {
-                "description": "Get a merge request collaborator by ID, a member who has collaborated on a merge request",
+                "description": "Get a branch collaborator by ID, a member who has collaborated on a branch",
                 "consumes": [
                     "application/json"
                 ],
@@ -1203,9 +1203,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "merge-requests"
+                    "branches"
                 ],
-                "summary": "Get a merge request collaborator by ID",
+                "summary": "Get a branch collaborator by ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -1219,7 +1219,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.MergeRequestCollaboratorDTO"
+                            "$ref": "#/definitions/models.BranchCollaboratorDTO"
                         }
                     },
                     "400": {
@@ -1243,9 +1243,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests/reviews/{reviewID}": {
+        "/branches/reviews/{reviewID}": {
             "get": {
-                "description": "Returns a review of a merge request with the given ID",
+                "description": "Returns a review of a branch with the given ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1253,9 +1253,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "merge-requests"
+                    "branches"
                 ],
-                "summary": "Returns a merge request review by ID",
+                "summary": "Returns a branch review by ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -1269,7 +1269,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.MergeRequestReviewDTO"
+                            "$ref": "#/definitions/models.BranchReviewDTO"
                         }
                     },
                     "400": {
@@ -1293,9 +1293,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests/{mergeRequestID}": {
+        "/branches/{branchID}": {
             "get": {
-                "description": "Get a merge request by merge request ID",
+                "description": "Get a branch by branch ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1303,14 +1303,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "merge-requests"
+                    "branches"
                 ],
-                "summary": "Get merge request",
+                "summary": "Get branch",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "MergeRequest ID",
-                        "name": "mergeRequestID",
+                        "description": "Branch ID",
+                        "name": "branchID",
                         "in": "path",
                         "required": true
                     }
@@ -1319,7 +1319,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.MergeRequestDTO"
+                            "$ref": "#/definitions/models.BranchDTO"
                         }
                     },
                     "400": {
@@ -1343,7 +1343,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete a merge request with given ID from database",
+                "description": "Delete a branch with given ID from database",
                 "consumes": [
                     "application/json"
                 ],
@@ -1351,14 +1351,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "merge-requests"
+                    "branches"
                 ],
-                "summary": "Delete a merge request",
+                "summary": "Delete a branch",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "merge request ID",
-                        "name": "mergeRequestID",
+                        "description": "branch ID",
+                        "name": "branchID",
                         "in": "path",
                         "required": true
                     }
@@ -1388,9 +1388,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests/{mergeRequestID}/can-review/{userID}": {
+        "/branches/{branchID}/can-review/{userID}": {
             "get": {
-                "description": "Returns true if the user fulfills the requirements to review the merge request\nReturns false if user is unauthorized to review the merge request",
+                "description": "Returns true if the user fulfills the requirements to review the branch\nReturns false if user is unauthorized to review the branch",
                 "consumes": [
                     "application/json"
                 ],
@@ -1398,14 +1398,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "merge-requests"
+                    "branches"
                 ],
-                "summary": "Returns whether the user is allowed to review this merge request",
+                "summary": "Returns whether the user is allowed to review this branch",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "merge request ID",
-                        "name": "mergeRequestID",
+                        "description": "branch ID",
+                        "name": "branchID",
                         "in": "path",
                         "required": true
                     },
@@ -1445,9 +1445,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests/{mergeRequestID}/review-statuses": {
+        "/branches/{branchID}/review-statuses": {
             "get": {
-                "description": "Returns an array of the statuses of all the reviews of this merge request",
+                "description": "Returns an array of the statuses of all the reviews of this branch",
                 "consumes": [
                     "application/json"
                 ],
@@ -1455,14 +1455,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "merge-requests"
+                    "branches"
                 ],
-                "summary": "Returns status of all merge request reviews",
+                "summary": "Returns status of all branch reviews",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "merge request ID",
-                        "name": "mergeRequestID",
+                        "description": "branch ID",
+                        "name": "branchID",
                         "in": "path",
                         "required": true
                     }
@@ -1473,7 +1473,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.MergeRequestReviewStatus"
+                                "$ref": "#/definitions/models.BranchReviewStatus"
                             }
                         }
                     },
@@ -1498,9 +1498,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/merge-requests/{mergeRequestID}/reviews": {
+        "/branches/{branchID}/reviews": {
             "post": {
-                "description": "Adds a review to a merge request",
+                "description": "Adds a review to a branch",
                 "consumes": [
                     "application/json"
                 ],
@@ -1508,14 +1508,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "merge-requests"
+                    "branches"
                 ],
-                "summary": "Adds a review to a merge request",
+                "summary": "Adds a review to a branch",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "merge request ID",
-                        "name": "mergeRequestID",
+                        "description": "branch ID",
+                        "name": "branchID",
                         "in": "path",
                         "required": true
                     },
@@ -2308,7 +2308,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/project-posts/{postID}/merge-requests-by-status": {
+        "/project-posts/{postID}/branches-by-status": {
             "get": {
                 "description": "Returns all MR IDs of this project post, grouped by each MR's review status",
                 "consumes": [
@@ -2334,7 +2334,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/forms.GroupedMergeRequestForm"
+                            "$ref": "#/definitions/forms.GroupedBranchForm"
                         }
                     },
                     "400": {
@@ -2872,7 +2872,7 @@ const docTemplate = `{
         "forms.FilterForm": {
             "type": "object"
         },
-        "forms.GroupedMergeRequestForm": {
+        "forms.GroupedBranchForm": {
             "type": "object",
             "properties": {
                 "openForReviewIDs": {
@@ -2922,7 +2922,7 @@ const docTemplate = `{
                 }
             }
         },
-        "forms.MergeRequestCreationForm": {
+        "forms.BranchCreationForm": {
             "type": "object",
             "properties": {
                 "anonymous": {
@@ -2935,7 +2935,7 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "mergeRequestTitle": {
+                "branchTitle": {
                     "type": "string"
                 },
                 "projectPostID": {
@@ -3009,8 +3009,8 @@ const docTemplate = `{
                 "feedback": {
                     "type": "string"
                 },
-                "mergeRequestDecision": {
-                    "$ref": "#/definitions/models.MergeRequestReviewDecision"
+                "branchReviewDecision": {
+                    "$ref": "#/definitions/models.BranchReviewDecision"
                 },
                 "reviewingMemberID": {
                     "type": "integer"
@@ -3088,7 +3088,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.MergeRequestCollaboratorDTO": {
+        "models.BranchCollaboratorDTO": {
             "type": "object",
             "properties": {
                 "id": {
@@ -3097,12 +3097,12 @@ const docTemplate = `{
                 "memberID": {
                     "type": "integer"
                 },
-                "mergeRequestID": {
+                "branchID": {
                     "type": "integer"
                 }
             }
         },
-        "models.MergeRequestDTO": {
+        "models.BranchDTO": {
             "type": "object",
             "properties": {
                 "anonymous": {
@@ -3121,10 +3121,10 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "mergeRequestDecision": {
-                    "$ref": "#/definitions/models.MergeRequestReviewStatus"
+                "branchReviewDecision": {
+                    "$ref": "#/definitions/models.BranchReviewStatus"
                 },
-                "mergeRequestTitle": {
+                "branchTitle": {
                     "type": "string"
                 },
                 "newPostTitle": {
@@ -3160,7 +3160,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.MergeRequestReviewDTO": {
+        "models.BranchReviewDTO": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -3175,15 +3175,15 @@ const docTemplate = `{
                 "memberID": {
                     "type": "integer"
                 },
-                "mergeRequestDecision": {
-                    "$ref": "#/definitions/models.MergeRequestReviewDecision"
+                "branchReviewDecision": {
+                    "$ref": "#/definitions/models.BranchReviewDecision"
                 },
-                "mergeRequestID": {
+                "branchID": {
                     "type": "integer"
                 }
             }
         },
-        "models.MergeRequestReviewDecision": {
+        "models.BranchReviewDecision": {
             "type": "string",
             "enum": [
                 "rejected",
@@ -3194,7 +3194,7 @@ const docTemplate = `{
                 "ReviewApproved"
             ]
         },
-        "models.MergeRequestReviewStatus": {
+        "models.BranchReviewStatus": {
             "type": "string",
             "enum": [
                 "open for review",
@@ -3202,9 +3202,9 @@ const docTemplate = `{
                 "rejected"
             ],
             "x-enum-varnames": [
-                "MergeRequestOpenForReview",
-                "MergeRequestPeerReviewed",
-                "MergeRequestRejected"
+                "BranchOpenForReview",
+                "BranchPeerReviewed",
+                "BranchRejected"
             ]
         },
         "models.PostCollaboratorDTO": {
@@ -3259,7 +3259,7 @@ const docTemplate = `{
         "models.ProjectPostDTO": {
             "type": "object",
             "properties": {
-                "closedMergeRequestIDs": {
+                "closedBranchIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -3274,7 +3274,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "openMergeRequestIDs": {
+                "openBranchIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"

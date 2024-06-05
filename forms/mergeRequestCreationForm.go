@@ -2,7 +2,7 @@ package forms
 
 import "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 
-type MergeRequestCreationForm struct {
+type BranchCreationForm struct {
 	// TODO New files to add to the version
 
 	// Changes made by the MR
@@ -12,8 +12,8 @@ type MergeRequestCreationForm struct {
 	UpdatedFeedbackPreferences tags.FeedbackPreference
 
 	// The MR's metadata
-	CollaboratingMemberIDs []uint // Get converted to MergeRequestCollaborators
+	CollaboratingMemberIDs []uint // Get converted to BranchCollaborators
 	ProjectPostID          uint
-	MergeRequestTitle      string
+	BranchTitle            string
 	Anonymous              bool
 }

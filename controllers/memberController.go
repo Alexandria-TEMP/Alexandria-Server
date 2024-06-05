@@ -283,9 +283,9 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 	// TODO implement
 }
 
-// GetMemberMergeRequests godoc
-// @Summary		Get all merge requests of this member
-// @Description	Get all merge requests that this member is a collaborator of
+// GetMemberBranches godoc
+// @Summary		Get all branches of this member
+// @Description	Get all branches that this member is a collaborator of
 // @Tags 		members
 // @Accept 		json
 // @Param		memberID		path		string			true	"member ID"
@@ -294,9 +294,9 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{memberID}/merge-requests 		[get]
-func (memberController *MemberController) GetMemberMergeRequests(_ *gin.Context) {
-	// return all the merge requests
+// @Router 		/members/{userID}/branches 		[get]
+func (memberController *MemberController) GetMemberBranches(_ *gin.Context) {
+	// return all the branches
 	// that this member is a collaborator/author of
 	// TODO implement
 }

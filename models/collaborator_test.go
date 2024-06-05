@@ -42,23 +42,25 @@ func TestPostCollaboratorJSONMarshaling(t *testing.T) {
 	}
 }
 
-func TestMergeRequestCollaboratorJSONMarshaling(t *testing.T) {
+func TestBranchCollaboratorJSONMarshaling(t *testing.T) {
 	// This model...
-	model := MergeRequestCollaborator{
-		Model:          gorm.Model{ID: 55},
-		Member:         Member{},
-		MemberID:       32,
-		MergeRequestID: 87,
+	model := BranchCollaborator{
+		Model:             gorm.Model{ID: 55},
+		Member:            Member{},
+		MemberID:          32,
+		BranchID:          87,
+		CollaborationType: Author,
 	}
 
 	// should equal this DTO!
-	targetDTO := MergeRequestCollaboratorDTO{
-		ID:             55,
-		MemberID:       32,
-		MergeRequestID: 87,
+	targetDTO := BranchCollaboratorDTO{
+		ID:                55,
+		MemberID:          32,
+		BranchID:          87,
+		CollaborationType: Author,
 	}
 
-	dto := MergeRequestCollaboratorDTO{}
+	dto := BranchCollaboratorDTO{}
 
 	bytes, err := model.MarshalJSON()
 	if err != nil {

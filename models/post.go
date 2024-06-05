@@ -13,24 +13,23 @@ type Post struct {
 	// Post has many PostCollaborator
 	Collaborators []*PostCollaborator `gorm:"foreignKey:PostID"`
 
-	// Post belongs to Version
-	CurrentVersion   Version `gorm:"foreignKey:CurrentVersionID"`
-	CurrentVersionID uint
+	// Post files and render can be implicitly accessed in the vfs with the postID
 
 	Title               string
 	PostType            tags.PostType
-	Anonymous           bool
 	ScientificFieldTags []*tags.ScientificFieldTag `gorm:"foreignKey:PostID"`
+	// Post has a DiscussionContainer
+	DiscussionContainer   DiscussionContainer `gorm:"foreignKey:DiscussionContainerID"`
+	DiscussionContainerID uint
 }
 
 type PostDTO struct {
 	ID                    uint
 	CollaboratorIDs       []uint
-	VersionID             uint
 	Title                 string
-	Anonymous             bool
 	PostType              tags.PostType
 	ScientificFieldTagIDs []uint
+	DiscussionIDs         []uint
 }
 
 func (model *Post) GetID() uint {
@@ -41,11 +40,10 @@ func (model *Post) IntoDTO() PostDTO {
 	return PostDTO{
 		model.ID,
 		postCollaboratorsToIDs(model.Collaborators),
-		model.CurrentVersionID,
 		model.Title,
-		model.Anonymous,
 		model.PostType,
 		tags.ScientificFieldTagIntoIDs(model.ScientificFieldTags),
+		discussionContainerIntoIDs(&model.DiscussionContainer),
 	}
 }
 

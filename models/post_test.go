@@ -30,22 +30,20 @@ func TestPostJSONMarshaling(t *testing.T) {
 			},
 		},
 		Title:               "Nice Post",
-		Anonymous:           false,
-		CurrentVersion:      Version{},
-		CurrentVersionID:    49,
 		PostType:            tags.Question,
 		ScientificFieldTags: []*tags.ScientificFieldTag{},
+		DiscussionContainer: DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
 	}
 
 	// should equal this DTO!
 	targetDTO := PostDTO{
-		ID:                    88,
-		CollaboratorIDs:       []uint{1, 60},
-		Title:                 "Nice Post",
-		VersionID:             49,
+		ID:              88,
+		CollaboratorIDs: []uint{1, 60},
+		Title:           "Nice Post",
+
 		PostType:              tags.Question,
-		Anonymous:             false,
 		ScientificFieldTagIDs: []uint{},
+		DiscussionIDs:         []uint{95},
 	}
 
 	dto := PostDTO{}
