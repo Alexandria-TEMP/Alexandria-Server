@@ -66,7 +66,6 @@ func (postController *PostController) GetPost(c *gin.Context) {
 // @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/posts 		[post]
 func (postController *PostController) CreatePost(c *gin.Context) {
-	// extract post
 	form := forms.PostCreationForm{}
 	err := c.BindJSON(&form)
 
@@ -76,7 +75,6 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 		return
 	}
 
-	// Create and add post to database here. For now just do this to test.
 	post, err := postController.PostService.CreatePost(&form)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post, reason: %s", err)})
