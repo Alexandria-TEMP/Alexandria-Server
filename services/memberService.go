@@ -11,9 +11,9 @@ type MemberService struct {
 	MemberRepository database.RepositoryInterface[*models.Member]
 }
 
-func (memberService *MemberService) GetMember(userID uint) (*models.Member, error) {
+func (memberService *MemberService) GetMember(memberID uint) (*models.Member, error) {
 	// get member by this id
-	member, err := memberService.MemberRepository.GetByID(userID)
+	member, err := memberService.MemberRepository.GetByID(memberID)
 	return member, err
 }
 
@@ -51,8 +51,8 @@ func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, us
 	return err
 }
 
-func (memberService *MemberService) DeleteMember(userID uint) error {
-	err := memberService.MemberRepository.Delete(userID)
+func (memberService *MemberService) DeleteMember(memberID uint) error {
+	err := memberService.MemberRepository.Delete(memberID)
 	return err
 }
 

@@ -36,8 +36,9 @@ type MemberController struct {
 func (memberController *MemberController) GetMember(c *gin.Context) {
 	// extract the id of the member
 	memberIDStr := c.Param("memberID")
+	fmt.Println("test point 1")
 	initmemberID, err := strconv.ParseUint(memberIDStr, 10, 64)
-
+	fmt.Println("test point 2")
 	// if this caused an error, print it and return status 400: bad input
 	if err != nil {
 		fmt.Println(err)
@@ -81,6 +82,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	form := forms.MemberCreationForm{}
 	// bind the fields of the param to the JSON of the model
 	err := c.BindJSON(&form)
+	fmt.Println(form.ScientificFieldTagIDs)
 
 	// check for errors
 	// if there is an error, return a 400 bad request status
@@ -301,7 +303,7 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID}/branches 		[get]
+// @Router 		/members/{memberID}/branches 		[get]
 func (memberController *MemberController) GetMemberBranches(_ *gin.Context) {
 	// return all the branches
 	// that this member is a collaborator/author of

@@ -127,13 +127,13 @@ func (branchController *BranchController) CreateReview(_ *gin.Context) {
 // @Tags 		branches
 // @Accept  	json
 // @Param		branchID		path		string			true	"branch ID"
-// @Param		userID			path		string			true	"user ID"
+// @Param		memberID			path		string			true	"user ID"
 // @Produce		json
 // @Success 	200		{object}		boolean
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/branches/{branchID}/can-review/{userID}		[get]
+// @Router 		/branches/{branchID}/can-review/{memberID}		[get]
 func (branchController *BranchController) UserCanReview(_ *gin.Context) {
 
 }

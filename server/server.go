@@ -48,6 +48,9 @@ func initServiceEnv(repositoryEnv RepositoryEnv, _ *filesystem.Filesystem) Servi
 		memberService: &services.MemberService{
 			MemberRepository: repositoryEnv.memberRepository,
 		},
+		tagService: &services.TagService{
+			TagRepository: repositoryEnv.tagRepository,
+		},
 	}
 }
 

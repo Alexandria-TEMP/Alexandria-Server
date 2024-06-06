@@ -57,17 +57,17 @@ func (mr *MockMemberServiceMockRecorder) CreateMember(memberForm, userFields any
 }
 
 // DeleteMember mocks base method.
-func (m *MockMemberService) DeleteMember(userID uint) error {
+func (m *MockMemberService) DeleteMember(memberID uint) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteMember", userID)
+	ret := m.ctrl.Call(m, "DeleteMember", memberID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteMember indicates an expected call of DeleteMember.
-func (mr *MockMemberServiceMockRecorder) DeleteMember(userID any) *gomock.Call {
+func (mr *MockMemberServiceMockRecorder) DeleteMember(memberID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMember", reflect.TypeOf((*MockMemberService)(nil).DeleteMember), userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMember", reflect.TypeOf((*MockMemberService)(nil).DeleteMember), memberID)
 }
 
 // GetAllMembers mocks base method.
@@ -86,18 +86,18 @@ func (mr *MockMemberServiceMockRecorder) GetAllMembers() *gomock.Call {
 }
 
 // GetMember mocks base method.
-func (m *MockMemberService) GetMember(userID uint) (*models.Member, error) {
+func (m *MockMemberService) GetMember(memberID uint) (*models.Member, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMember", userID)
+	ret := m.ctrl.Call(m, "GetMember", memberID)
 	ret0, _ := ret[0].(*models.Member)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetMember indicates an expected call of GetMember.
-func (mr *MockMemberServiceMockRecorder) GetMember(userID any) *gomock.Call {
+func (mr *MockMemberServiceMockRecorder) GetMember(memberID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMember", reflect.TypeOf((*MockMemberService)(nil).GetMember), userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMember", reflect.TypeOf((*MockMemberService)(nil).GetMember), memberID)
 }
 
 // UpdateMember mocks base method.
