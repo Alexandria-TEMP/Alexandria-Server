@@ -11,7 +11,12 @@ import (
 //go:generate mockgen -package=mocks -source=./filesystem_interface.go -destination=../../mocks/filesystem_mock.go
 
 type Filesystem interface {
-	// CheckoutDirectory set filepaths according to postID. If repo is present check it out.
+	// CheckoutDirectory set filepaths according to postID.
+	// If a git repo exists there it will be opened.
+	// CurrentDirPath = <cwd>/vfs/<postID>
+	// CurrentQuartoDirPath = <cwd>/vfs/<postID>/quarto_project
+	// CurrentZipFilePath = <cwd>/vfs/<postID>/quarto_project.zip
+	// CurrentRenderDirPath = <cwd>/vfs/<postID>/render/<some_html_file>
 	CheckoutDirectory(postID uint)
 
 	// CreateRepository create git repository at CurrentDirPath

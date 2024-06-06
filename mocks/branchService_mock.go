@@ -73,6 +73,20 @@ func (mr *MockBranchServiceMockRecorder) CreateReview(reviewCreationForm any) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateReview", reflect.TypeOf((*MockBranchService)(nil).CreateReview), reviewCreationForm)
 }
 
+// DeleteBranch mocks base method.
+func (m *MockBranchService) DeleteBranch(branchID uint) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteBranch", branchID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteBranch indicates an expected call of DeleteBranch.
+func (mr *MockBranchServiceMockRecorder) DeleteBranch(branchID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBranch", reflect.TypeOf((*MockBranchService)(nil).DeleteBranch), branchID)
+}
+
 // GetBranch mocks base method.
 func (m *MockBranchService) GetBranch(branchID uint) (models.Branch, error) {
 	m.ctrl.T.Helper()
@@ -177,6 +191,21 @@ func (m *MockBranchService) MemberCanReview(branchID, memberID uint) (bool, erro
 func (mr *MockBranchServiceMockRecorder) MemberCanReview(branchID, memberID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MemberCanReview", reflect.TypeOf((*MockBranchService)(nil).MemberCanReview), branchID, memberID)
+}
+
+// UpdateBranch mocks base method.
+func (m *MockBranchService) UpdateBranch(branchDTO models.BranchDTO) (models.Branch, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateBranch", branchDTO)
+	ret0, _ := ret[0].(models.Branch)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateBranch indicates an expected call of UpdateBranch.
+func (mr *MockBranchServiceMockRecorder) UpdateBranch(branchDTO any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBranch", reflect.TypeOf((*MockBranchService)(nil).UpdateBranch), branchDTO)
 }
 
 // UploadProject mocks base method.

@@ -3,6 +3,7 @@ package filesystem
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -20,7 +21,7 @@ func (filesystem *Filesystem) CreateRepository() error {
 	_, err := git.PlainInit(directory, false)
 
 	if err != nil {
-		return fmt.Errorf("failed it git init")
+		return fmt.Errorf("failed git init")
 	}
 
 	// set CurrentRepository to new repo
@@ -53,6 +54,11 @@ func (filesystem *Filesystem) CheckoutRepository() (*git.Repository, error) {
 
 // CreateBranch creates a new branch from the last commit on master with branchName as the name.
 func (filesystem *Filesystem) CreateBranch(branchName string) error {
+	// check if we have a repo open
+	if filesystem.CurrentRepository == nil {
+		return fmt.Errorf("no repository is currently checked out")
+	}
+
 	// get reference to commit we branch off of
 	fromCommit, err := filesystem.GetLastCommit("master")
 
@@ -78,9 +84,12 @@ func (filesystem *Filesystem) DeleteBranch(branchName string) error {
 		return fmt.Errorf("failed to checkout branch master")
 	}
 
-	// delete branch
-	if err := filesystem.CurrentRepository.DeleteBranch(branchName); err != nil {
-		return fmt.Errorf("failed to delete branch %v", branchName)
+	// git branch -d <branchName>
+	cmd := exec.Command("git", "branch", "-D", branchName)
+	cmd.Dir = filesystem.CurrentDirPath
+
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to delete branch %v with message:\n %v", branchName, out)
 	}
 
 	return nil
@@ -88,6 +97,11 @@ func (filesystem *Filesystem) DeleteBranch(branchName string) error {
 
 // Merge actually resets master to the last commit on the branch we are merging
 func (filesystem *Filesystem) Merge(toMerge, mergeInto string) error {
+	// check if we have a repo open
+	if filesystem.CurrentRepository == nil {
+		return fmt.Errorf("no repository is currently checked out")
+	}
+
 	// get worktree
 	w, err := filesystem.CurrentRepository.Worktree()
 
@@ -126,6 +140,11 @@ func (filesystem *Filesystem) Merge(toMerge, mergeInto string) error {
 }
 
 func (filesystem *Filesystem) Reset() error {
+	// check if we have a repo open
+	if filesystem.CurrentRepository == nil {
+		return fmt.Errorf("no repository is currently checked out")
+	}
+
 	// get worktree
 	w, err := filesystem.CurrentRepository.Worktree()
 
@@ -142,6 +161,11 @@ func (filesystem *Filesystem) Reset() error {
 
 // CreateCommit will stage and commit all changes to the current branch
 func (filesystem *Filesystem) CreateCommit() error {
+	// check if we have a repo open
+	if filesystem.CurrentRepository == nil {
+		return fmt.Errorf("no repository is currently checked out")
+	}
+
 	// get worktree
 	w, err := filesystem.CurrentRepository.Worktree()
 
@@ -164,6 +188,11 @@ func (filesystem *Filesystem) CreateCommit() error {
 
 // CheckoutBranch switches to the latest commit of a branch and removes any untracked files.
 func (filesystem *Filesystem) CheckoutBranch(branchName string) error {
+	// check if we have a repo open
+	if filesystem.CurrentRepository == nil {
+		return fmt.Errorf("no repository is currently checked out")
+	}
+
 	// get worktree
 	w, err := filesystem.CurrentRepository.Worktree()
 
@@ -196,6 +225,11 @@ func (filesystem *Filesystem) CheckoutBranch(branchName string) error {
 
 // GetMasterRef gets the hash for the last commit on master.
 func (filesystem *Filesystem) GetLastCommit(branchName string) (*plumbing.Reference, error) {
+	// check if we have a repo open
+	if filesystem.CurrentRepository == nil {
+		return nil, fmt.Errorf("no repository is currently checked out")
+	}
+
 	ref, err := filesystem.CurrentRepository.Reference(plumbing.NewBranchReferenceName(branchName), true)
 
 	if err != nil || ref.Type() == plumbing.InvalidReference {
@@ -206,19 +240,11 @@ func (filesystem *Filesystem) GetLastCommit(branchName string) (*plumbing.Refere
 }
 
 func (filesystem *Filesystem) CleanDir() error {
-	// get worktree
-	w, err := filesystem.CurrentRepository.Worktree()
-
-	if err != nil {
-		return fmt.Errorf("failed to open worktree")
-	}
-
-	// remove all files
-	err1 := w.RemoveGlob("render")
-	err2 := w.RemoveGlob("quarto_project")
-
-	if err1 != nil || err2 != nil {
-		return fmt.Errorf("failed to remove all files")
+	// git rm -rf .
+	cmd := exec.Command("git", "rm", "-rf", ".")
+	cmd.Dir = filesystem.CurrentDirPath
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to remove all files from index")
 	}
 
 	return nil

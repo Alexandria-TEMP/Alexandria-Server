@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-git/go-git/v5"
 	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
@@ -69,8 +70,9 @@ func TestGit(t *testing.T) {
 	contents, _ := os.ReadFile(helloFilePath)
 	assert.Equal(t, "world", string(contents))
 
-	// Merge 1 into master
+	// Merge 1 into master and verify
 	assert.Nil(t, CurrentFilesystem.Merge("1", "master"))
+
 	contents, _ = os.ReadFile(helloFilePath)
 	assert.Equal(t, "world", string(contents))
 
@@ -78,23 +80,26 @@ func TestGit(t *testing.T) {
 	assert.Nil(t, CurrentFilesystem.CreateBranch("2"))
 	assert.Nil(t, CurrentFilesystem.CreateBranch("3"))
 
-	// Checkout branch 2, edit hello.txt, commit, and merge
+	// Checkout branch 2, edit hello.txt, commit, merge, and verify changes
 	assert.Nil(t, CurrentFilesystem.CheckoutBranch("2"))
 	assert.Nil(t, os.WriteFile(helloFilePath, []byte("alexandria"), fs.ModePerm))
 	assert.Nil(t, CurrentFilesystem.CreateCommit())
 	assert.Nil(t, CurrentFilesystem.Merge("2", "master"))
 
-	// hello.txt has been changed
 	contents, _ = os.ReadFile(helloFilePath)
 	assert.Equal(t, "alexandria", string(contents))
 
-	// Checkout branch 3, delete hello.txt, add "README.md", commit, and merge
+	// Checkout branch 3, delete hello.txt, add "README.md", commit, merge, and verify changes
 	readmeFilePath := filepath.Join(CurrentFilesystem.GetCurrentDirPath(), "README.md")
 	assert.Nil(t, CurrentFilesystem.CheckoutBranch("3"))
+	assert.Nil(t, CurrentFilesystem.CleanDir())
 	assert.Nil(t, os.WriteFile(readmeFilePath, []byte("welcome"), fs.ModePerm))
-	assert.Nil(t, os.Remove(helloFilePath))
 	assert.Nil(t, CurrentFilesystem.CreateCommit())
 	assert.Nil(t, CurrentFilesystem.Merge("3", "master"))
+	assert.False(t, utils.FileExists(helloFilePath))
+
+	contents, _ = os.ReadFile(readmeFilePath)
+	assert.Equal(t, "welcome", string(contents))
 
 	// Delete branch 3
 	assert.Nil(t, CurrentFilesystem.DeleteBranch("2"))
@@ -105,12 +110,90 @@ func TestGit(t *testing.T) {
 	assert.NotNil(t, ref)
 	assert.Nil(t, err)
 
-	// hello.txt has been deleted and README.md has been added
-	assert.False(t, utils.FileExists(helloFilePath))
+	// Add files, reset before committing, and verify reset worked
+	mistakeFilePath := filepath.Join(CurrentFilesystem.GetCurrentDirPath(), "oops")
+	assert.Nil(t, os.WriteFile(mistakeFilePath, []byte("whoopsies"), fs.ModePerm))
+	assert.Nil(t, CurrentFilesystem.Reset())
 
-	contents, _ = os.ReadFile(readmeFilePath)
-	assert.Equal(t, "welcome", string(contents))
+	ref2, err := CurrentFilesystem.GetLastCommit("master")
+	assert.Nil(t, err)
+	assert.Equal(t, ref, ref2)
+	assert.False(t, utils.FileExists(mistakeFilePath))
 
+	// Delete repo and verify it worked
+	assert.Nil(t, CurrentFilesystem.DeleteRepository())
+
+	_, err = CurrentFilesystem.CheckoutRepository()
+	assert.NotNil(t, err)
+}
+
+func TestGitOperationsWithoutRepo(t *testing.T) {
+	defer cleanup(t)
+
+	// Create branch without repo
+	assert.NotNil(t, CurrentFilesystem.CreateBranch("master"))
+
+	// Checkout branch without repo
+	assert.NotNil(t, CurrentFilesystem.CheckoutBranch("master"))
+
+	// Merge without repo
+	assert.NotNil(t, CurrentFilesystem.Merge("2", "master"))
+
+	// Reset without repo
+	assert.NotNil(t, CurrentFilesystem.Reset())
+
+	// Create commit without repo
+	assert.NotNil(t, CurrentFilesystem.CreateCommit())
+
+	// Get last commit without repo
+	_, err := CurrentFilesystem.GetLastCommit("master")
+	assert.NotNil(t, err)
+}
+
+func TestCheckoutNonexistantBranch(t *testing.T) {
+	defer cleanup(t)
+
+	// Set current dir
+	CurrentFilesystem.CheckoutDirectory(99)
+
+	// Create repo
+	assert.Nil(t, CurrentFilesystem.CreateRepository())
+
+	// Checkout branch that doesnt exist
+	assert.NotNil(t, CurrentFilesystem.CheckoutBranch("badbranch"))
+}
+
+func TestGitOperationsOnBareRepo(t *testing.T) {
+	defer cleanup(t)
+
+	// get repository path
+	directory := filepath.Join(cwdTest, "vfs", "1")
+
+	// git init at
+	_, err := git.PlainInit(directory, true)
+	assert.Nil(t, err)
+
+	// checkout bare repo
+	CurrentFilesystem.CheckoutDirectory(1)
+
+	// Create branch with bare repo
+	assert.NotNil(t, CurrentFilesystem.CreateBranch("master"))
+
+	// Checkout branch with bare repo
+	assert.NotNil(t, CurrentFilesystem.CheckoutBranch("master"))
+
+	// Merge with bare repo
+	assert.NotNil(t, CurrentFilesystem.Merge("2", "master"))
+
+	// Reset with bare repo
+	assert.NotNil(t, CurrentFilesystem.Reset())
+
+	// Create commit with bare repo
+	assert.NotNil(t, CurrentFilesystem.CreateCommit())
+
+	// Get last commit with bare repo
+	_, err = CurrentFilesystem.GetLastCommit("master")
+	assert.NotNil(t, err)
 }
 
 func TestFileHandling(t *testing.T) {
@@ -147,7 +230,56 @@ func TestFileHandling(t *testing.T) {
 	assert.False(t, utils.FileExists(CurrentFilesystem.CurrentDirPath))
 }
 
+func TestUnzipDoesntExist(t *testing.T) {
+	defer cleanup(t)
+
+	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	file, _ := CreateMultipartFileHeader("../utils/test_files/bad_zip")
+
+	CurrentFilesystem.CheckoutDirectory(1)
+
+	// Test saving fileheader
+	err := CurrentFilesystem.SaveZipFile(c, file)
+	assert.Nil(t, err)
+	assert.True(t, utils.FileExists(CurrentFilesystem.CurrentZipFilePath))
+
+	// Test unzipping succeeds and that contents are correct
+	err = CurrentFilesystem.Unzip()
+	assert.NotNil(t, err)
+}
+
+func TestRenderExistsSuccess(t *testing.T) {
+	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup", "render")
+
+	exists, name := CurrentFilesystem.RenderExists()
+	assert.True(t, exists)
+	assert.Equal(t, "1234.html", name)
+}
+
+func TestRenderExistsNoFile(t *testing.T) {
+	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup", "badpath")
+
+	exists, _ := CurrentFilesystem.RenderExists()
+	assert.False(t, exists)
+}
+
+func TestRenderExistsMultipleFiles(t *testing.T) {
+	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_1")
+
+	exists, _ := CurrentFilesystem.RenderExists()
+	assert.False(t, exists)
+}
+
+func TestRenderExistsMultipleNotHtml(t *testing.T) {
+	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_2")
+
+	exists, _ := CurrentFilesystem.RenderExists()
+	assert.False(t, exists)
+}
+
 func TestGetFileTreeSuccess(t *testing.T) {
+	defer cleanup(t)
+
 	CurrentFilesystem.CurrentQuartoDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "file_tree")
 
 	files, err := CurrentFilesystem.GetFileTree()

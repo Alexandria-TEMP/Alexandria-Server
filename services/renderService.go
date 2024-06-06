@@ -45,7 +45,7 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, error,
 
 	// if render is failed return 404
 	if branch.RenderStatus == models.Failure {
-		return filePath, fmt.Errorf("render has failed"), nil
+		return filePath, nil, fmt.Errorf("render has failed")
 	}
 
 	// select repository of the parent post

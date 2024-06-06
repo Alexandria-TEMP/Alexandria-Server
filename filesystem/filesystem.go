@@ -63,12 +63,6 @@ func (filesystem *Filesystem) GetCurrentRenderDirPath() string {
 	return filesystem.CurrentRenderDirPath
 }
 
-// SetCurrentRepository will set the paths the filesystem uses in accordance with the IDs passed.
-// If a git repo exists there it will be opened.
-// CurrentDirPath = <cwd>/vfs/<postID>
-// CurrentQuartoDirPath = <cwd>/vfs/<postID>/quarto_project
-// CurrentZipFilePath = <cwd>/vfs/<postID>/quarto_project.zip
-// CurrentRenderDirPath = <cwd>/vfs/<postID>/render/<some_html_file>
 func (filesystem *Filesystem) CheckoutDirectory(postID uint) {
 	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10))
 	filesystem.CurrentQuartoDirPath = filepath.Join(filesystem.CurrentDirPath, filesystem.quartoDirectoryName)
@@ -79,7 +73,6 @@ func (filesystem *Filesystem) CheckoutDirectory(postID uint) {
 	filesystem.CurrentRepository, _ = filesystem.CheckoutRepository()
 }
 
-// SaveZippedRepository saves a zip file to a CurrentZipFilePath in the filesystem.
 func (filesystem *Filesystem) SaveZipFile(c *gin.Context, file *multipart.FileHeader) error {
 	// Save zip file
 	err := c.SaveUploadedFile(file, filesystem.CurrentZipFilePath)

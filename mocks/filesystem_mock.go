@@ -139,6 +139,20 @@ func (mr *MockFilesystemMockRecorder) CreateRepository() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRepository", reflect.TypeOf((*MockFilesystem)(nil).CreateRepository))
 }
 
+// DeleteBranch mocks base method.
+func (m *MockFilesystem) DeleteBranch(branchName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteBranch", branchName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteBranch indicates an expected call of DeleteBranch.
+func (mr *MockFilesystemMockRecorder) DeleteBranch(branchName any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBranch", reflect.TypeOf((*MockFilesystem)(nil).DeleteBranch), branchName)
+}
+
 // DeleteRepository mocks base method.
 func (m *MockFilesystem) DeleteRepository() error {
 	m.ctrl.T.Helper()
