@@ -46,7 +46,7 @@ definitions:
         type: string
       scientificFieldTagIDs:
         items:
-          type: string
+          type: integer
         type: array
     type: object
   forms.PostCreationForm:
@@ -1097,6 +1097,41 @@ paths:
       summary: Get member from database
       tags:
       - members
+  /members/{memberID}/branches:
+    get:
+      consumes:
+      - application/json
+      description: Get all branches that this member is a collaborator of
+      parameters:
+      - description: member ID
+        in: path
+        name: memberID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get all branches of this member
+      tags:
+      - members
   /members/{memberID}/discussions:
     get:
       consumes:
@@ -1334,41 +1369,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Adds new saved project post
-      tags:
-      - members
-  /members/{memberID}/branches:
-    get:
-      consumes:
-      - application/json
-      description: Get all branches that this member is a collaborator of
-      parameters:
-      - description: member ID
-        in: path
-        name: memberID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Get all branches of this member
       tags:
       - members
   /posts:

@@ -2,6 +2,7 @@ package tags
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -19,9 +20,9 @@ type ScientificFieldTag struct {
 
 	ScientificField string
 	// ScientificFieldTag belongs to ScientificFieldTagContainer
-	ContainerIDs []uint
+	Containers []*ScientificFieldTagContainer `gorm:"many2many:tag_containers;"`
 	// Tag can optionally have many subtags, or many ScientificFieldTag
-	Subtags  []*ScientificFieldTag `gorm:"many2many:tag_containers;"`
+	Subtags  []*ScientificFieldTag `gorm:"foreignKey:ParentID"`
 	ParentID *uint
 }
 
@@ -32,6 +33,10 @@ type ScientificFieldTagDTO struct {
 }
 
 func (model *ScientificFieldTag) GetID() uint {
+	return model.Model.ID
+}
+
+func (model *ScientificFieldTagContainer) GetID() uint {
 	return model.Model.ID
 }
 
@@ -60,11 +65,16 @@ func ScientificFieldTagIntoIDs(subtags []*ScientificFieldTag) []uint {
 
 // Helper function for JSON marshaling
 func ScientificFieldTagContainerIntoIDs(scientificFieldTags *ScientificFieldTagContainer) []uint {
+	fmt.Printf("This is the container we get in the scientific field tag container into id's method: %v", scientificFieldTags)
+	if len(scientificFieldTags.ScientificFieldTags) == 0 {
+		ints := []uint{}
+		return ints
+	}
 	ids := make([]uint, len(scientificFieldTags.ScientificFieldTags))
 
 	for i, tag := range scientificFieldTags.ScientificFieldTags {
 		ids[i] = tag.ID
 	}
-
+	fmt.Printf("These are the ids in the container: %v", ids)
 	return ids
 }

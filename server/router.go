@@ -12,8 +12,6 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	// Get router
 	router := gin.Default()
 	router.Use(cors.Default())
-	router.RedirectTrailingSlash = false
-	router.RedirectFixedPath = false
 	err := router.SetTrustedProxies(nil)
 
 	if err != nil {
@@ -85,18 +83,18 @@ func branchRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	memberRouter := v2.Group("/members")
 	memberRouter.GET("/:memberID", controllers.memberController.GetMember)
-	// memberRouter.POST("/", controllers.memberController.CreateMember)
-	// memberRouter.PUT("/", controllers.memberController.UpdateMember)
-	// memberRouter.DELETE("/:memberID", controllers.memberController.DeleteMember)
-	// memberRouter.GET("/", controllers.memberController.GetAllMembers)
-	// memberRouter.GET("/:memberID/posts", controllers.memberController.GetMemberPosts)
-	// memberRouter.GET("/:memberID/project-posts", controllers.memberController.GetMemberProjectPosts)
-	// memberRouter.GET("/:memberID/branches", controllers.memberController.GetMemberBranches)
-	// memberRouter.GET("/:memberID/discussions", controllers.memberController.GetMemberDiscussions)
-	// memberRouter.POST("/:memberID/saved-posts", controllers.memberController.AddMemberSavedPost)
-	// memberRouter.POST("/:memberID/saved-project-posts", controllers.memberController.AddMemberSavedProjectPost)
-	// memberRouter.GET("/:memberID/saved-posts", controllers.memberController.GetMemberSavedPosts)
-	// memberRouter.GET("/:memberID/saved-project-posts", controllers.memberController.GetMemberSavedProjectPosts)
+	memberRouter.POST("/", controllers.memberController.CreateMember)
+	memberRouter.PUT("/", controllers.memberController.UpdateMember)
+	memberRouter.DELETE("/:memberID", controllers.memberController.DeleteMember)
+	memberRouter.GET("/", controllers.memberController.GetAllMembers)
+	memberRouter.GET("/:memberID/posts", controllers.memberController.GetMemberPosts)
+	memberRouter.GET("/:memberID/project-posts", controllers.memberController.GetMemberProjectPosts)
+	memberRouter.GET("/:memberID/branches", controllers.memberController.GetMemberBranches)
+	memberRouter.GET("/:memberID/discussions", controllers.memberController.GetMemberDiscussions)
+	memberRouter.POST("/:memberID/saved-posts", controllers.memberController.AddMemberSavedPost)
+	memberRouter.POST("/:memberID/saved-project-posts", controllers.memberController.AddMemberSavedProjectPost)
+	memberRouter.GET("/:memberID/saved-posts", controllers.memberController.GetMemberSavedPosts)
+	memberRouter.GET("/:memberID/saved-project-posts", controllers.memberController.GetMemberSavedProjectPosts)
 }
 
 func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {

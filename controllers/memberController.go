@@ -36,9 +36,7 @@ type MemberController struct {
 func (memberController *MemberController) GetMember(c *gin.Context) {
 	// extract the id of the member
 	memberIDStr := c.Param("memberID")
-	fmt.Println("test point 1")
 	initmemberID, err := strconv.ParseUint(memberIDStr, 10, 64)
-	fmt.Println("test point 2")
 	// if this caused an error, print it and return status 400: bad input
 	if err != nil {
 		fmt.Println(err)
@@ -52,6 +50,14 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 
 	// get the member through the service
 	member, err := memberController.MemberService.GetMember(memberID)
+	fmt.Printf("This is the member we get through the member service: %v", member)
+	//fmt.Printf("%d", member.ScientificFieldTagContainerID)
+	//if member.ScientificFieldTagContainer == nil {
+	//	fmt.Printf("the container is nil")
+	//}
+	fmt.Printf("This is the container of the member we get through the member service: %v", member.ScientificFieldTagContainer)
+	memberDTO := member.IntoDTO()
+	fmt.Printf("This is the member DTO we get through the member service: %v", memberDTO)
 
 	// if there was an error, print it and return status 404: not found
 	if err != nil {
@@ -63,7 +69,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 
 	// if correct response send the member back
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, member)
+	c.JSON(http.StatusOK, memberDTO)
 }
 
 // CreateMember godoc
@@ -97,10 +103,11 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	tagIDs := form.ScientificFieldTagIDs
 	// call the method from the tag service
 	tagArray, err := memberController.TagService.GetTagsFromUintIDs(tagIDs)
+
 	tagContainer := tags.ScientificFieldTagContainer{
 		ScientificFieldTags: tagArray,
 	}
-
+	fmt.Printf("%v", tagContainer)
 	// check for errors in the tags
 	// if there is an error, return a 400 bad request status
 	if err != nil {
@@ -112,9 +119,9 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 
 	// create and add to database through the memberService
 	member, err := memberController.MemberService.CreateMember(&form, &tagContainer)
-
+	fmt.Printf("The created member is: %v", member)
 	memberDTO := member.IntoDTO()
-
+	fmt.Printf("The created member DTO is: %v", memberDTO)
 	// if the member service throws an error, return a 400 Bad request status
 	if err != nil {
 		fmt.Println(err)
