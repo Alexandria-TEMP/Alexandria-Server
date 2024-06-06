@@ -16,6 +16,7 @@ var projectPostRepositoryMock *mocks.MockModelRepositoryInterface[*models.Projec
 var memberRepositoryMock *mocks.MockModelRepositoryInterface[*models.Member]
 
 var postCollaboratorServiceMock *mocks.MockPostCollaboratorService
+var branchCollaboratorServiceMock *mocks.MockBranchCollaboratorService
 
 var memberA, memberB, memberC models.Member
 

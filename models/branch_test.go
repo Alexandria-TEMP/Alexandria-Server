@@ -32,7 +32,6 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		NewPostTitle:            "Updated Post Title",
 		UpdatedCompletionStatus: tags.Idea,
 		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
-		Anonymous:               false,
 		RenderStatus:            Pending,
 		BranchReviewStatus:      BranchOpenForReview,
 	}
@@ -47,7 +46,6 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		NewPostTitle:            "Updated Post Title",
 		UpdatedCompletionStatus: tags.Idea,
 		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
-		Anonymous:               false,
 		DiscussionIDs:           []uint{},
 		RenderStatus:            Pending,
 		BranchReviewStatus:      BranchOpenForReview,

@@ -14,7 +14,8 @@ type ProjectPostService struct {
 	ProjectPostRepository database.ModelRepositoryInterface[*models.ProjectPost]
 	MemberRepository      database.ModelRepositoryInterface[*models.Member]
 
-	PostCollaboratorService interfaces.PostCollaboratorService
+	PostCollaboratorService   interfaces.PostCollaboratorService
+	BranchCollaboratorService interfaces.BranchCollaboratorService
 }
 
 func (projectPostService *ProjectPostService) GetProjectPost(id uint) (*models.ProjectPost, error) {
@@ -28,6 +29,7 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 			form.PostCreationForm.PostType)
 	}
 
+	// Information about the creators of this Project Post
 	memberIDs := form.PostCreationForm.AuthorMemberIDs
 	anonymous := form.PostCreationForm.Anonymous
 
@@ -36,6 +38,7 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 		return nil, fmt.Errorf("could not create project post: %w", err)
 	}
 
+	// This Post instance will be embedded into the Project Post
 	post := models.Post{
 		Collaborators: postCollaborators,
 
@@ -48,14 +51,35 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 		},
 	}
 
+	// A new project post starts with a single "initial proposed changes" branch. This is how project posts,
+	// themselves, are initially peer reviewed. While this initial proposed changes branch is open, no other
+	// branches may be opened on the Project Post.
+	branchCollaborators, err := projectPostService.BranchCollaboratorService.MembersToBranchCollaborators(memberIDs, anonymous)
+	if err != nil {
+		return nil, fmt.Errorf("could not create project post: %w", err)
+	}
+
 	projectPost := models.ProjectPost{
 		Post:               post,
 		CompletionStatus:   form.CompletionStatus,
 		FeedbackPreference: form.FeedbackPreference,
 
-		// New project posts have no open or closed branches
-		// TODO change this to have the initial peer review branch
-		OpenBranches:   []*models.Branch{},
+		OpenBranches: []*models.Branch{
+			{
+				// TODO make these fields optional maybe? so they dont have to be filled in
+				NewPostTitle:            form.PostCreationForm.Title,
+				UpdatedCompletionStatus: form.CompletionStatus,
+				UpdatedScientificFields: form.PostCreationForm.ScientificFieldTags,
+				Collaborators:           branchCollaborators,
+				Reviews:                 []*models.BranchReview{},
+				DiscussionContainer: models.DiscussionContainer{
+					Discussions: []*models.Discussion{},
+				},
+				BranchTitle:        models.InitialPeerReviewBranchName,
+				RenderStatus:       models.Pending,
+				BranchReviewStatus: models.BranchOpenForReview,
+			},
+		},
 		ClosedBranches: []*models.ClosedBranch{},
 
 		// New project posts are always open for review

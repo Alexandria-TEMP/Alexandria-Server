@@ -52,8 +52,6 @@ type Branch struct {
 
 	BranchTitle string
 
-	Anonymous bool
-
 	RenderStatus       RenderStatus
 	BranchReviewStatus BranchReviewStatus
 }
@@ -69,7 +67,6 @@ type BranchDTO struct {
 	ReviewIDs          []uint
 	ProjectPostID      uint
 	BranchTitle        string
-	Anonymous          bool
 	RenderStatus       RenderStatus
 	DiscussionIDs      []uint
 	BranchReviewStatus BranchReviewStatus
@@ -89,7 +86,6 @@ func (model *Branch) IntoDTO() BranchDTO {
 		reviewsToIDs(model.Reviews),
 		model.ProjectPostID,
 		model.BranchTitle,
-		model.Anonymous,
 		model.RenderStatus,
 		discussionContainerIntoIDs(&model.DiscussionContainer),
 		model.BranchReviewStatus,

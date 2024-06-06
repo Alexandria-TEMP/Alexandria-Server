@@ -62,15 +62,12 @@ type BranchCollaborator struct {
 
 	// Branch has many BranchCollaborator
 	BranchID uint
-
-	CollaborationType CollaborationType
 }
 
 type BranchCollaboratorDTO struct {
-	ID                uint
-	MemberID          uint
-	BranchID          uint
-	CollaborationType CollaborationType
+	ID       uint
+	MemberID uint
+	BranchID uint
 }
 
 func (model *BranchCollaborator) GetID() uint {
@@ -82,7 +79,6 @@ func (model *BranchCollaborator) IntoDTO() BranchCollaboratorDTO {
 		model.ID,
 		model.MemberID,
 		model.BranchID,
-		model.CollaborationType,
 	}
 }
 
