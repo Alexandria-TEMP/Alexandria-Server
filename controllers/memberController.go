@@ -96,7 +96,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	// get array of strings, create array of tags
 	tagIDs := form.ScientificFieldTagIDs
 	// call the method from the tag service
-	tagArray, err := memberController.TagService.GetTagsFromStringIDs(tagIDs)
+	tagArray, err := memberController.TagService.GetTagsFromUintIDs(tagIDs)
 	tagContainer := tags.ScientificFieldTagContainer{
 		ScientificFieldTags: tagArray,
 	}

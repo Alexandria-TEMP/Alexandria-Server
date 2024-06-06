@@ -39,21 +39,6 @@ func (m *MockTagService) EXPECT() *MockTagServiceMockRecorder {
 	return m.recorder
 }
 
-// GetTagsFromStringIDs mocks base method.
-func (m *MockTagService) GetTagsFromStringIDs(arg0 []string) ([]*tags.ScientificFieldTag, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetTagsFromStringIDs", arg0)
-	ret0, _ := ret[0].([]*tags.ScientificFieldTag)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetTagsFromStringIDs indicates an expected call of GetTagsFromStringIDs.
-func (mr *MockTagServiceMockRecorder) GetTagsFromStringIDs(arg0 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTagsFromStringIDs", reflect.TypeOf((*MockTagService)(nil).GetTagsFromStringIDs), arg0)
-}
-
 // GetTagsFromUintIDs mocks base method.
 func (m *MockTagService) GetTagsFromUintIDs(arg0 []uint) ([]*tags.ScientificFieldTag, error) {
 	m.ctrl.T.Helper()
