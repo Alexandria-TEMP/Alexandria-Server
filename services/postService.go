@@ -37,7 +37,7 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 
 	post := models.Post{
 		Collaborators:       postCollaborators,
-		Title:               form.Title, // TODO sanitize title?
+		Title:               form.Title,
 		PostType:            form.PostType,
 		ScientificFieldTags: form.ScientificFieldTags,
 		DiscussionContainer: models.DiscussionContainer{
@@ -58,26 +58,6 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 }
 
 func (postService *PostService) UpdatePost(_ *models.Post) error {
-	// TODO: Access repo to update post here
-	return nil
-}
-
-func (postService *PostService) GetProjectPost(_ uint) (*models.ProjectPost, error) {
-	// TODO: Access repo to get post
-	return new(models.ProjectPost), nil
-}
-
-func (postService *PostService) CreateProjectPost(_ *forms.ProjectPostCreationForm) (*models.ProjectPost, error) {
-	post := &models.ProjectPost{
-		// TODO fill fields
-	}
-
-	// TODO: Add post to repo here
-
-	return post, nil
-}
-
-func (postService *PostService) UpdateProjectPost(_ *models.ProjectPost) error {
 	// TODO: Access repo to update post here
 	return nil
 }

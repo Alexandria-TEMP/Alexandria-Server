@@ -61,9 +61,6 @@ func (repo *ModelRepository[T]) Update(object T) (T, error) {
 		return zero, fmt.Errorf("could not update model with ID %d: %w", id, result.Error)
 	}
 
-	// Return the newly saved object, because some of its fields
-	// (e.g. last-updated) may have been changed automatically.
-	// TODO the "object" field may already have been modified by GORM's Save method above
 	return repo.GetByID(id)
 }
 
