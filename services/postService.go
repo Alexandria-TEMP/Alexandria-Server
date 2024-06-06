@@ -7,11 +7,14 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
 type PostService struct {
 	PostRepository   database.ModelRepositoryInterface[*models.Post]
 	MemberRepository database.ModelRepositoryInterface[*models.Member]
+
+	PostCollaboratorService interfaces.PostCollaboratorService
 
 	// TODO add filesystem interface
 }
@@ -27,29 +30,9 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 		return nil, fmt.Errorf("creating post of type ProjectPost using CreatePost is forbidden")
 	}
 
-	// If the Post is not anonymous, convert the author member IDs into a list of Post Collaborators
-	postCollaborators := make([]*models.PostCollaborator, 0)
-
-	// TODO extract into separate function
-	if !form.Anonymous {
-		authorMemberIDs := form.AuthorMemberIDs
-		postCollaborators = make([]*models.PostCollaborator, len(authorMemberIDs))
-
-		for i, memberID := range authorMemberIDs {
-			// Fetch the member from the database
-			member, err := postService.MemberRepository.GetByID(memberID)
-			if err != nil {
-				return nil, fmt.Errorf("could not create post collaborators: %w", err)
-			}
-
-			newPostCollaborator := models.PostCollaborator{
-				Member: *member,
-				// Post Collaborators on a brand new Post are always automatically set to Authors
-				CollaborationType: models.Author,
-			}
-
-			postCollaborators[i] = &newPostCollaborator
-		}
+	postCollaborators, err := postService.PostCollaboratorService.MembersToPostCollaborators(form.AuthorMemberIDs, form.Anonymous, models.Author)
+	if err != nil {
+		return nil, fmt.Errorf("could not create post: %w", err)
 	}
 
 	post := models.Post{
@@ -64,7 +47,7 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 	}
 
 	if err := postService.PostRepository.Create(&post); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not create post: %w", err)
 	}
 
 	// TODO filesystem: checkout directory
