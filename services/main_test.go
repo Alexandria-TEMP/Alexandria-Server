@@ -42,7 +42,7 @@ func TestMain(m *testing.M) {
 		Email:       "john.smith@gmail.com",
 		Password:    "password",
 		Institution: "TU Delft",
-		ScientificFieldTagContainer: &tags.ScientificFieldTagContainer{
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
 			ScientificFieldTags: scientificFieldTagArray,
 		},
 	}

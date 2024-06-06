@@ -26,7 +26,7 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 		Email:                       form.Email,
 		Password:                    form.Password,
 		Institution:                 form.Institution,
-		ScientificFieldTagContainer: userFields,
+		ScientificFieldTagContainer: *userFields,
 	}
 
 	err := memberService.MemberRepository.Create(member)
@@ -44,7 +44,7 @@ func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, us
 		Email:                       memberDTO.Email,
 		Password:                    memberDTO.Password,
 		Institution:                 memberDTO.Institution,
-		ScientificFieldTagContainer: userFields,
+		ScientificFieldTagContainer: *userFields,
 	}
 	_, err := memberService.MemberRepository.Update(member)
 

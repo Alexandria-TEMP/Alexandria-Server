@@ -17,7 +17,7 @@ type Member struct {
 	Password    string // TODO hmmmmmm maybe not
 	Institution string
 	// Member has a ScientificFieldTagContainer
-	ScientificFieldTagContainer   *tags.ScientificFieldTagContainer `gorm:"foreignKey:ScientificFieldTagContainerID"`
+	ScientificFieldTagContainer   tags.ScientificFieldTagContainer `gorm:"foreignKey:ScientificFieldTagContainerID"`
 	ScientificFieldTagContainerID uint
 }
 
@@ -43,7 +43,7 @@ func (model *Member) IntoDTO() MemberDTO {
 		model.Email,
 		model.Password,
 		model.Institution,
-		tags.ScientificFieldTagContainerIntoIDs(model.ScientificFieldTagContainer),
+		tags.ScientificFieldTagContainerIntoIDs(&model.ScientificFieldTagContainer),
 	}
 }
 
