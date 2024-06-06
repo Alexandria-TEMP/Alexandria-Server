@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 // Performs CRUD operations on a given type of database model to the database.
@@ -33,7 +34,7 @@ func (repo *ModelRepository[T]) Create(object T) error {
 
 func (repo *ModelRepository[T]) GetByID(id uint) (T, error) {
 	var found T
-	result := repo.Database.First(&found, id)
+	result := repo.Database.Preload(clause.Associations).First(&found, id)
 
 	if result.Error != nil {
 		var zero T
