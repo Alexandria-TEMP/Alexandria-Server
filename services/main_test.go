@@ -11,10 +11,16 @@ import (
 )
 
 var (
-	renderService             RenderService
-	mockBranchRepository      *mocks.MockModelRepositoryInterface[*models.Branch]
-	mockProjectPostRepository *mocks.MockModelRepositoryInterface[*models.ProjectPost]
-	mockFilesystem            *mocks.MockFilesystem
+	renderService RenderService
+	branchService BranchService
+
+	mockBranchRepository              *mocks.MockModelRepositoryInterface[*models.Branch]
+	mockProjectPostRepository         *mocks.MockModelRepositoryInterface[*models.ProjectPost]
+	mockReviewRepository              *mocks.MockModelRepositoryInterface[*models.Review]
+	mockBranchCollaboratorRepository  *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
+	mockDiscussionContainerRepository *mocks.MockModelRepositoryInterface[*models.DiscussionContainer]
+	mockDiscussionRepository          *mocks.MockModelRepositoryInterface[*models.Discussion]
+	mockFilesystem                    *mocks.MockFilesystem
 
 	pendingBranch *models.Branch
 	successBranch *models.Branch

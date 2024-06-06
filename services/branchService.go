@@ -40,7 +40,7 @@ func (branchService *BranchService) GetBranch(branchID uint) (models.Branch, err
 	return *branch, nil
 }
 
-func (branchService *BranchService) CreateBranch(branchCreationForm forms.BranchCreationForm) (models.Branch, error, error) {
+func (branchService *BranchService) CreateBranch(branchCreationForm *forms.BranchCreationForm) (models.Branch, error, error) {
 	var branch models.Branch
 
 	// verify parent project post exists
