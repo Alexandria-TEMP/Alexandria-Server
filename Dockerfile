@@ -1,4 +1,3 @@
-# FROM golang:1.22.2 as build
 FROM janneskelso/go-with-quarto:alpha as build
  
 ARG GOPKG
@@ -23,7 +22,7 @@ RUN go install go.uber.org/mock/mockgen@v0.4.0
 RUN swag init -g alexandria.go 
 
 # Build binary
-# RUN go build -o /usr/bin/alexandria-backend -v ./
+RUN go build -o /usr/bin/alexandria-backend -v ./
 
 # Expose port
 EXPOSE 8080
@@ -31,7 +30,4 @@ EXPOSE 8080
 FROM build AS run
 
 # Start server on run
-# ENTRYPOINT /usr/bin/alexandria-backend
-
-# TODO: Remove
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+ENTRYPOINT /usr/bin/alexandria-backend

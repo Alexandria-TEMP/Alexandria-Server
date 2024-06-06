@@ -96,8 +96,18 @@ func TestGit(t *testing.T) {
 	assert.Nil(t, CurrentFilesystem.CreateCommit())
 	assert.Nil(t, CurrentFilesystem.Merge("3", "master"))
 
+	// Delete branch 3
+	assert.Nil(t, CurrentFilesystem.DeleteBranch("2"))
+	assert.NotNil(t, CurrentFilesystem.CheckoutBranch("2"))
+
+	// Get last commit on master
+	ref, err := CurrentFilesystem.GetLastCommit("master")
+	assert.NotNil(t, ref)
+	assert.Nil(t, err)
+
 	// hello.txt has been deleted and README.md has been added
 	assert.False(t, utils.FileExists(helloFilePath))
+
 	contents, _ = os.ReadFile(readmeFilePath)
 	assert.Equal(t, "welcome", string(contents))
 
