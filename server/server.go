@@ -19,10 +19,11 @@ type RepositoryEnv struct {
 }
 
 type ServiceEnv struct {
-	postService             interfaces.PostService
-	projectPostService      interfaces.ProjectPostService
-	memberService           interfaces.MemberService
-	postCollaboratorService interfaces.PostCollaboratorService
+	postService               interfaces.PostService
+	projectPostService        interfaces.ProjectPostService
+	memberService             interfaces.MemberService
+	postCollaboratorService   interfaces.PostCollaboratorService
+	branchCollaboratorService interfaces.BranchCollaboratorService
 }
 
 type ControllerEnv struct {
@@ -54,6 +55,10 @@ func initServiceEnv(repositories RepositoryEnv, _ *filesystem.Filesystem) Servic
 		MemberRepository: repositories.memberRepository,
 	}
 
+	branchCollaboratorService := &services.BranchCollaboratorService{
+		MemberRepository: repositories.memberRepository,
+	}
+
 	postService := &services.PostService{
 		PostRepository:          repositories.postRepository,
 		MemberRepository:        repositories.memberRepository,
@@ -61,16 +66,18 @@ func initServiceEnv(repositories RepositoryEnv, _ *filesystem.Filesystem) Servic
 	}
 
 	projectPostService := &services.ProjectPostService{
-		ProjectPostRepository:   repositories.projectPostRepository,
-		MemberRepository:        repositories.memberRepository,
-		PostCollaboratorService: postCollaboratorService,
+		ProjectPostRepository:     repositories.projectPostRepository,
+		MemberRepository:          repositories.memberRepository,
+		PostCollaboratorService:   postCollaboratorService,
+		BranchCollaboratorService: branchCollaboratorService,
 	}
 
 	return ServiceEnv{
-		postService:             postService,
-		projectPostService:      projectPostService,
-		memberService:           &services.MemberService{},
-		postCollaboratorService: postCollaboratorService,
+		postService:               postService,
+		projectPostService:        projectPostService,
+		memberService:             &services.MemberService{},
+		postCollaboratorService:   postCollaboratorService,
+		branchCollaboratorService: branchCollaboratorService,
 	}
 }
 
