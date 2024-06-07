@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"mime/multipart"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-collections/collections/set"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
@@ -122,7 +122,7 @@ func (branchService *BranchService) UpdateBranch(branchDTO models.BranchDTO) (mo
 	discussionContainer := models.DiscussionContainer{Discussions: discussions}
 
 	// check project post exists
-	_, err := branchService.ProjectPostRepository.GetByID(branch.ProjectPostID)
+	_, err := branchService.ProjectPostRepository.GetByID(branchDTO.ProjectPostID)
 
 	if err != nil {
 		return branch, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
@@ -153,11 +153,6 @@ func (branchService *BranchService) UpdateBranch(branchDTO models.BranchDTO) (mo
 }
 
 func (branchService *BranchService) DeleteBranch(branchID uint) error {
-	// delete entity
-	if err := branchService.BranchRepository.Delete(branchID); err != nil {
-		return fmt.Errorf("failed to find branch with id %v", branchID)
-	}
-
 	// get branch
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 
@@ -178,6 +173,11 @@ func (branchService *BranchService) DeleteBranch(branchID uint) error {
 	// delete branch
 	if err := branchService.Filesystem.DeleteBranch(fmt.Sprintf("%v", branchID)); err != nil {
 		return fmt.Errorf("failed to delete branch from vfs with id %v", branchID)
+	}
+
+	// delete entity
+	if err := branchService.BranchRepository.Delete(branchID); err != nil {
+		return fmt.Errorf("failed to find branch with id %v", branchID)
 	}
 
 	return nil
@@ -275,17 +275,14 @@ func (branchService *BranchService) MemberCanReview(branchID, memberID uint) (bo
 		return false, fmt.Errorf("failed to find member with id %v", memberID)
 	}
 
-	// get all tags
-	branchTags := set.New(branch.UpdatedScientificFields)
-	postTags := set.New(projectPost.Post.ScientificFieldTags)
-	combinedTags := branchTags.Union(postTags)
+	// create sets of all tags
+	for _, tag := range member.ScientificFieldTags {
+		if slices.Contains(branch.UpdatedScientificFields, tag) || slices.Contains(projectPost.Post.ScientificFieldTags, tag) {
+			return true, nil
+		}
+	}
 
-	memberTags := set.New(member.ScientificFieldTags)
-
-	// find intersection of tags
-	intersection := combinedTags.Intersection(memberTags)
-
-	return intersection.Len() >= 1, nil
+	return false, nil
 }
 
 func (branchService *BranchService) GetProject(branchID uint) (string, error) {

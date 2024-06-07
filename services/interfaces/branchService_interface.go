@@ -18,7 +18,7 @@ type BranchService interface {
 	// It assumes that a repository has already been created for this post.
 	// Error 1 404
 	// Error 2 500
-	CreateBranch(branchCreationForm forms.BranchCreationForm) (models.Branch, error, error)
+	CreateBranch(branchCreationForm *forms.BranchCreationForm) (models.Branch, error, error)
 
 	// UpdateBranch updates an existing branch using a DTO.
 	// This only effects the entity, not the filesystem.

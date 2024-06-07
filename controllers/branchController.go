@@ -79,7 +79,7 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 		return
 	}
 
-	branch, err404, err500 := branchController.BranchService.CreateBranch(form)
+	branch, err404, err500 := branchController.BranchService.CreateBranch(&form)
 
 	if err404 != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})

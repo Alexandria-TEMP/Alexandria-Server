@@ -14,6 +14,9 @@ var (
 	renderService RenderService
 	branchService BranchService
 
+	mockMemberService *mocks.MockMemberService
+	mockRenderService *mocks.MockRenderService
+
 	mockBranchRepository              *mocks.MockModelRepositoryInterface[*models.Branch]
 	mockProjectPostRepository         *mocks.MockModelRepositoryInterface[*models.ProjectPost]
 	mockReviewRepository              *mocks.MockModelRepositoryInterface[*models.Review]
