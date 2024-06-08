@@ -13,10 +13,13 @@ import (
 )
 
 type RepositoryEnv struct {
-	branchRepository      database.ModelRepositoryInterface[*models.Branch]
-	postRepository        database.ModelRepositoryInterface[*models.Post]
-	projectPostRepository database.ModelRepositoryInterface[*models.ProjectPost]
-	reviewRepository      database.ModelRepositoryInterface[*models.Review]
+	branchRepository              database.ModelRepositoryInterface[*models.Branch]
+	branchCollaboratorRepository  database.ModelRepositoryInterface[*models.BranchCollaborator]
+	postRepository                database.ModelRepositoryInterface[*models.Post]
+	projectPostRepository         database.ModelRepositoryInterface[*models.ProjectPost]
+	reviewRepository              database.ModelRepositoryInterface[*models.Review]
+	discussionRepository          database.ModelRepositoryInterface[*models.Discussion]
+	discussionContainerRepository database.ModelRepositoryInterface[*models.DiscussionContainer]
 }
 
 type ServiceEnv struct {
@@ -36,14 +39,19 @@ type ControllerEnv struct {
 	tagController         *controllers.TagController
 }
 
-func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
-	return RepositoryEnv{
-		branchRepository: &database.ModelRepository[*models.Branch]{Database: db},
-		postRepository:   &database.ModelRepository[*models.Post]{Database: db},
+func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
+	return &RepositoryEnv{
+		branchRepository:              &database.ModelRepository[*models.Branch]{Database: db},
+		branchCollaboratorRepository:  &database.ModelRepository[*models.BranchCollaborator]{Database: db},
+		postRepository:                &database.ModelRepository[*models.Post]{Database: db},
+		projectPostRepository:         &database.ModelRepository[*models.ProjectPost]{Database: db},
+		reviewRepository:              &database.ModelRepository[*models.Review]{Database: db},
+		discussionRepository:          &database.ModelRepository[*models.Discussion]{Database: db},
+		discussionContainerRepository: &database.ModelRepository[*models.DiscussionContainer]{Database: db},
 	}
 }
 
-func initServiceEnv(repositoryEnv RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
+func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
 	postService := &services.PostService{}
 	memberService := &services.MemberService{}
 	renderService := &services.RenderService{
@@ -52,12 +60,15 @@ func initServiceEnv(repositoryEnv RepositoryEnv, fs *filesystem.Filesystem) Serv
 		Filesystem:            fs,
 	}
 	branchService := &services.BranchService{
-		BranchRepository:      repositoryEnv.branchRepository,
-		ProjectPostRepository: repositoryEnv.projectPostRepository,
-		ReviewRepository:      repositoryEnv.reviewRepository,
-		Filesystem:            fs,
-		RenderService:         renderService,
-		MemberService:         memberService,
+		BranchRepository:              repositoryEnv.branchRepository,
+		ProjectPostRepository:         repositoryEnv.projectPostRepository,
+		ReviewRepository:              repositoryEnv.reviewRepository,
+		BranchCollaboratorRepository:  repositoryEnv.branchCollaboratorRepository,
+		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
+		DiscussionRepository:          repositoryEnv.discussionRepository,
+		Filesystem:                    fs,
+		RenderService:                 renderService,
+		MemberService:                 memberService,
 	}
 
 	return ServiceEnv{

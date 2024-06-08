@@ -50,12 +50,20 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 		return branch, fmt.Errorf("no such project post exists"), nil
 	}
 
+	// create and save discussion new container
+	// we shouldn't have to do this extra, it should be implicit but it isnt...
+	discussionContainer := models.DiscussionContainer{}
+	if err := branchService.DiscussionContainerRepository.Create(&discussionContainer); err != nil {
+		return branch, fmt.Errorf("failed to add discussion container to db"), nil
+	}
+
 	// make new branch
 	branch = models.Branch{
 		NewPostTitle:            branchCreationForm.NewPostTitle,
 		UpdatedCompletionStatus: branchCreationForm.UpdatedCompletionStatus,
 		UpdatedScientificFields: branchCreationForm.UpdatedScientificFields,
 		Collaborators:           branchCreationForm.Collaborators,
+		DiscussionContainer:     discussionContainer,
 		ProjectPostID:           branchCreationForm.ProjectPostID,
 		BranchTitle:             branchCreationForm.BranchTitle,
 		Anonymous:               branchCreationForm.Anonymous,
@@ -333,12 +341,12 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 
 	// checkout specified branch
 	if err := branchService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
-		return fmt.Errorf("failed to find this git branch, with name %v", branchID)
+		return err
 	}
 
 	// clean directory to remove all files
 	if err := branchService.Filesystem.CleanDir(); err != nil {
-		return fmt.Errorf("failed to remove all old files")
+		return err
 	}
 
 	// save zipped project
@@ -349,6 +357,11 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 		_ = branchService.Filesystem.Reset()
 
 		return fmt.Errorf("failed to remove all old files")
+	}
+
+	// commit
+	if err := branchService.Filesystem.CreateCommit(); err != nil {
+		return err
 	}
 
 	go branchService.RenderService.Render(branch)

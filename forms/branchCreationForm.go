@@ -6,16 +6,16 @@ import (
 )
 
 type BranchCreationForm struct {
-	NewPostTitle string
+	NewPostTitle string `json:"new_post_title"`
 
-	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields []tags.ScientificField
+	UpdatedCompletionStatus tags.CompletionStatus  `json:"updated_completion_status"`
+	UpdatedScientificFields []tags.ScientificField `json:"updated_scientific_fields"`
 
-	Collaborators []*models.BranchCollaborator
+	Collaborators []*models.BranchCollaborator `json:"collaborators"`
 
-	ProjectPostID uint
+	ProjectPostID uint `json:"project_post_id"`
 
-	BranchTitle string
+	BranchTitle string `json:"branch_title"`
 
-	Anonymous bool
+	Anonymous bool `json:"anonymous"`
 }

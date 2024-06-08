@@ -53,7 +53,7 @@ func (branchController *BranchController) GetBranch(c *gin.Context) {
 
 	// response
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, branch.IntoDTO)
+	c.JSON(http.StatusOK, branch.IntoDTO())
 }
 
 // CreateBranch godoc
@@ -82,20 +82,20 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 	branch, err404, err500 := branchController.BranchService.CreateBranch(&form)
 
 	if err404 != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": err404.Error()})
 
 		return
 	}
 
 	if err500 != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err500.Error()})
 
 		return
 	}
 
 	// response
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, branch.IntoDTO)
+	c.JSON(http.StatusOK, branch.IntoDTO())
 }
 
 // UpdateBranch godoc
@@ -130,7 +130,7 @@ func (branchController *BranchController) UpdateBranch(c *gin.Context) {
 
 	// response
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, branch.IntoDTO)
+	c.JSON(http.StatusOK, branch.IntoDTO())
 }
 
 // DeleteBranch godoc
@@ -375,7 +375,7 @@ func (branchController *BranchController) GetRender(c *gin.Context) {
 
 	// if render is failed return 404 not found
 	if err404 != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": err404.Error()})
 
 		return
 	}

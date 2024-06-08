@@ -73,6 +73,13 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, error,
 }
 
 func (renderService *RenderService) Render(branch *models.Branch) {
+	// Checkout the branch
+	if err := renderService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branch.ID)); err != nil {
+		renderService.FailBranch(branch)
+
+		return
+	}
+
 	// Unzip saved file
 	if err := renderService.Filesystem.Unzip(); err != nil {
 		renderService.FailBranch(branch)
@@ -114,6 +121,14 @@ func (renderService *RenderService) Render(branch *models.Branch) {
 		return
 	}
 
+	// Commit
+	if err := renderService.Filesystem.CreateCommit(); err != nil {
+		renderService.FailBranch(branch)
+
+		return
+	}
+
+	// Update branch render status
 	branch.RenderStatus = models.Success
 	if _, err := renderService.BranchRepository.Update(branch); err != nil {
 		renderService.FailBranch(branch)

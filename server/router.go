@@ -80,6 +80,12 @@ func branchRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	branchRouter.POST("/:branchID/reviews", controllers.branchController.CreateReview)
 	branchRouter.GET("/:branchID/can-review/:memberID", controllers.branchController.MemberCanReview)
 	branchRouter.GET("/collaborators/:collaboratorID", controllers.branchController.GetBranchCollaborator)
+	branchRouter.GET("/:branchID/render", controllers.branchController.GetRender)
+	branchRouter.GET("/:branchID/repository", controllers.branchController.GetProject)
+	branchRouter.POST("/:branchID", controllers.branchController.UploadProject)
+	branchRouter.GET("/:branchID/tree", controllers.branchController.GetFiletree)
+	branchRouter.GET("/:branchID/file/*filepath", controllers.branchController.GetFileFromProject)
+	branchRouter.GET("/:branchID/discussions", controllers.branchController.GetDiscussions)
 }
 
 func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {

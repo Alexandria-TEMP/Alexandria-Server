@@ -243,8 +243,9 @@ func (filesystem *Filesystem) CleanDir() error {
 	// git rm -rf .
 	cmd := exec.Command("git", "rm", "-rf", ".")
 	cmd.Dir = filesystem.CurrentDirPath
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to remove all files from index")
+
+	if out, err := cmd.CombinedOutput(); err != nil && string(out) != "fatal: pathspec '.' did not match any files\n" {
+		return fmt.Errorf("failed to remove all files from index:\n%s", out)
 	}
 
 	return nil
