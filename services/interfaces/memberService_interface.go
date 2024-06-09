@@ -13,6 +13,4 @@ type MemberService interface {
 	UpdateMember(updatedMember *models.Member) error
 
 	GetCollaborator(collaboratorID uint64) (*models.PostCollaborator, error)
-	CreateCollaborator(collaboratorForm *forms.CollaboratorCreationForm) *models.PostCollaborator
-	UpdateCollaborator(updatedCollaborator *models.PostCollaborator) error
 }

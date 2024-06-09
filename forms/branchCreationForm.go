@@ -25,6 +25,6 @@ type BranchCreationForm struct {
 func (form *BranchCreationForm) IsValid() bool {
 	return form.UpdatedCompletionStatus.IsValid() &&
 		form.UpdatedFeedbackPreferences.IsValid() &&
-		len(form.UpdatedPostTitle) >= 0 &&
-		len(form.BranchTitle) >= 0
+		form.UpdatedPostTitle != "" &&
+		form.BranchTitle != ""
 }

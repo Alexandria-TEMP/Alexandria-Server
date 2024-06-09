@@ -2403,7 +2403,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.FeedbackPreference"
+                                "$ref": "#/definitions/models.ProjectFeedbackPreference"
                             }
                         }
                     },
@@ -2517,7 +2517,7 @@
                     "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "updatedFeedbackPreferences": {
-                    "$ref": "#/definitions/models.FeedbackPreference"
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 },
                 "updatedPostTitle": {
                     "description": "Changes made by the MR",
@@ -2633,7 +2633,7 @@
                     "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "feedbackPreference": {
-                    "$ref": "#/definitions/models.FeedbackPreference"
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 },
                 "postCreationForm": {
                     "$ref": "#/definitions/forms.PostCreationForm"
@@ -2906,7 +2906,7 @@
                     "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "feedbackPreference": {
-                    "$ref": "#/definitions/models.FeedbackPreference"
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 },
                 "id": {
                     "type": "integer"
@@ -2970,7 +2970,7 @@
                 "Completed"
             ]
         },
-        "models.FeedbackPreference": {
+        "models.ProjectFeedbackPreference": {
             "type": "string",
             "enum": [
                 "discussion",

@@ -2409,7 +2409,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.FeedbackPreference"
+                                "$ref": "#/definitions/models.ProjectFeedbackPreference"
                             }
                         }
                     },
@@ -2523,7 +2523,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "updatedFeedbackPreferences": {
-                    "$ref": "#/definitions/models.FeedbackPreference"
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 },
                 "updatedPostTitle": {
                     "description": "Changes made by the MR",
@@ -2639,7 +2639,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "feedbackPreference": {
-                    "$ref": "#/definitions/models.FeedbackPreference"
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 },
                 "postCreationForm": {
                     "$ref": "#/definitions/forms.PostCreationForm"
@@ -2912,7 +2912,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "feedbackPreference": {
-                    "$ref": "#/definitions/models.FeedbackPreference"
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 },
                 "id": {
                     "type": "integer"
@@ -2976,7 +2976,7 @@ const docTemplate = `{
                 "Completed"
             ]
         },
-        "models.FeedbackPreference": {
+        "models.ProjectFeedbackPreference": {
             "type": "string",
             "enum": [
                 "discussion",

@@ -40,20 +40,6 @@ func (m *MockMemberService) EXPECT() *MockMemberServiceMockRecorder {
 	return m.recorder
 }
 
-// CreateCollaborator mocks base method.
-func (m *MockMemberService) CreateCollaborator(collaboratorForm *forms.CollaboratorCreationForm) *models.PostCollaborator {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateCollaborator", collaboratorForm)
-	ret0, _ := ret[0].(*models.PostCollaborator)
-	return ret0
-}
-
-// CreateCollaborator indicates an expected call of CreateCollaborator.
-func (mr *MockMemberServiceMockRecorder) CreateCollaborator(collaboratorForm any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollaborator", reflect.TypeOf((*MockMemberService)(nil).CreateCollaborator), collaboratorForm)
-}
-
 // CreateMember mocks base method.
 func (m *MockMemberService) CreateMember(memberForm *forms.MemberCreationForm) *models.Member {
 	m.ctrl.T.Helper()

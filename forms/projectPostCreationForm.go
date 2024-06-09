@@ -7,3 +7,10 @@ type ProjectPostCreationForm struct {
 	CompletionStatus   models.ProjectCompletionStatus
 	FeedbackPreference models.ProjectFeedbackPreference
 }
+
+// Whether the form itself contains valid data. Should NOT contain business logic (such as "if Foo > 0, Bar may not be 1")
+func (form *ProjectPostCreationForm) IsValid() bool {
+	return form.PostCreationForm.IsValid() &&
+		form.CompletionStatus.IsValid() &&
+		form.FeedbackPreference.IsValid()
+}

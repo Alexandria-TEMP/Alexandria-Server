@@ -25,7 +25,7 @@ func (tagController *TagController) GetScientificTags(_ *gin.Context) {
 // @Description Returns every possible completion status that a Post can have
 // @Tags		tags
 // @Produce		json
-// @Success		200		{array}		models.CompletionStatus
+// @Success		200		{array}		models.ProjectCompletionStatus
 // @Failure		400 	{object}	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/tags/completion-status	[get]
@@ -51,7 +51,7 @@ func (tagController *TagController) GetPostTypeTags(_ *gin.Context) {
 // @Description Returns every possible feedback preference that a Project Post can have
 // @Tags		tags
 // @Produce		json
-// @Success		200		{array}		models.FeedbackPreference
+// @Success		200		{array}		models.ProjectFeedbackPreference
 // @Failure		400 	{object}	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/tags/feedback-preference	[get]
