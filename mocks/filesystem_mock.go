@@ -253,6 +253,20 @@ func (mr *MockFilesystemMockRecorder) GetLastCommit(branchName any) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastCommit", reflect.TypeOf((*MockFilesystem)(nil).GetLastCommit), branchName)
 }
 
+// Merge mocks base method.
+func (m *MockFilesystem) Merge(toMerge, mergeInto string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Merge", toMerge, mergeInto)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Merge indicates an expected call of Merge.
+func (mr *MockFilesystemMockRecorder) Merge(toMerge, mergeInto any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Merge", reflect.TypeOf((*MockFilesystem)(nil).Merge), toMerge, mergeInto)
+}
+
 // RenderExists mocks base method.
 func (m *MockFilesystem) RenderExists() (bool, string) {
 	m.ctrl.T.Helper()

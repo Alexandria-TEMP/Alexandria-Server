@@ -55,4 +55,7 @@ type BranchService interface {
 	// GetFileFromRepository returns absolute filepath of file.
 	// Error is for status 404.
 	GetFileFromProject(branchID uint, relFilepath string) (string, error)
+
+	// GetBranchCollaborator returns the corresponding BranchCollaborator
+	GetBranchCollaborator(branchCollaboratorID uint) (*models.BranchCollaborator, error)
 }

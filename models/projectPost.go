@@ -23,6 +23,9 @@ type ProjectPost struct {
 	CompletionStatus    tags.CompletionStatus
 	FeedbackPreference  tags.FeedbackPreference
 	PostReviewStatusTag tags.PostReviewStatus
+
+	// ProjectPost may have a Branch (it won't if its master)
+	LastMergedBranch *Branch `gorm:"foreignKey:ProjectPostID"`
 }
 
 type ProjectPostDTO struct {

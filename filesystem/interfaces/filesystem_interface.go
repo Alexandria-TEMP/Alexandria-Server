@@ -37,6 +37,9 @@ type Filesystem interface {
 	// CheckoutBranch checkout branch
 	CheckoutBranch(branchName string) error
 
+	// Merge actually resets master to the last commit on the branch we are merging
+	Merge(toMerge, mergeInto string) error
+
 	// CreateCommit commit current changes
 	CreateCommit() error
 

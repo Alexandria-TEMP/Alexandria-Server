@@ -52,7 +52,7 @@ func TestGit(t *testing.T) {
 	defer cleanup(t)
 
 	// Set current dir
-	CurrentFilesystem.CheckoutDirectory(1)
+	CurrentFilesystem.CheckoutDirectory(9)
 
 	// Create repo
 	assert.Nil(t, CurrentFilesystem.CreateRepository())

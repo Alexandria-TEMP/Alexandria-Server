@@ -26,13 +26,13 @@ type ProjectPostController struct {
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
 // @Success 	200 		{object}	models.ProjectPostDTO
+// @Failure		400
 // @Failure		404
-// @Failure		500
 // @Router 		/project-posts/{postID}	[get]
 func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Context) {
 	// extract postID
 	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseInt(postIDStr, 10, 64)
+	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr)})
@@ -40,7 +40,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 		return
 	}
 
-	post, err := projectPostController.ProjectPostService.GetProjectPost(uint64(postID))
+	post, err := projectPostController.ProjectPostService.GetProjectPost(uint(postID))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "cannot get project post because no post with this ID exists"})
@@ -49,7 +49,6 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 	}
 
 	// response
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, post)
 }
 
@@ -76,10 +75,10 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 	}
 
 	// Create and add post to database here. For now just do this to test.
-	post := projectPostController.ProjectPostService.CreateProjectPost(&form)
+	post, _ := projectPostController.ProjectPostService.CreateProjectPost(&form)
+	// TODO handle error
 
 	// response
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, &post)
 }
 
@@ -91,8 +90,8 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 // @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
 // @Produce		json
 // @Success 	200
+// @Failure		400
 // @Failure		404
-// @Failure		500
 // @Router 		/project-posts 		[put]
 func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Context) {
 	// extract post
@@ -100,7 +99,7 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 	err := c.BindJSON(&updatedProjectPost)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind ProjectPostCreationForm from request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated ProjectPost from request body"})
 
 		return
 	}
@@ -161,7 +160,7 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
-// @Success 	200		{array}		models.DiscussionDTO
+// @Success 	200		{array}		uint
 // @Failure		400
 // @Failure		404
 // @Failure		500

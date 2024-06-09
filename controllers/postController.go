@@ -41,7 +41,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 	}
 
 	// retrieve post
-	post, err := postController.PostService.GetPost(postID)
+	post, err := postController.PostService.GetPost(uint(postID))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "cannot get post because no post with this ID exists"})
@@ -50,7 +50,6 @@ func (postController *PostController) GetPost(c *gin.Context) {
 	}
 
 	// response
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, post)
 }
 
@@ -66,7 +65,6 @@ func (postController *PostController) GetPost(c *gin.Context) {
 // @Failure		500
 // @Router 		/posts 		[post]
 func (postController *PostController) CreatePost(c *gin.Context) {
-	// extract post
 	form := forms.PostCreationForm{}
 	err := c.BindJSON(&form)
 
@@ -76,11 +74,14 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 		return
 	}
 
-	// Create and add post to database here. For now just do this to test.
-	post := postController.PostService.CreatePost(&form)
+	post, err := postController.PostService.CreatePost(&form)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post, reason: %s", err)})
+
+		return
+	}
 
 	// response
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, &post)
 }
 

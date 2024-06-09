@@ -43,7 +43,7 @@ func (m *MockBranchService) EXPECT() *MockBranchServiceMockRecorder {
 }
 
 // CreateBranch mocks base method.
-func (m *MockBranchService) CreateBranch(branchCreationForm forms.BranchCreationForm) (models.Branch, error, error) {
+func (m *MockBranchService) CreateBranch(branchCreationForm *forms.BranchCreationForm) (models.Branch, error, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateBranch", branchCreationForm)
 	ret0, _ := ret[0].(models.Branch)

@@ -104,35 +104,35 @@ definitions:
     properties:
       anonymous:
         type: boolean
-      branchTitle:
+      branch_title:
         type: string
-      collaboratorIDs:
+      collaborator_ids:
         description: Branch metadata
         items:
           type: integer
         type: array
-      discussionIDs:
+      discussion_ids:
         items:
           type: integer
         type: array
       id:
         type: integer
-      newPostTitle:
+      new_post_title:
         description: Branch's proposed changes
         type: string
-      projectPostID:
+      project_post_id:
         type: integer
-      renderStatus:
+      render_status:
         $ref: '#/definitions/models.RenderStatus'
-      reviewIDs:
+      review_ids:
         items:
           type: integer
         type: array
-      reviewStatus:
+      review_status:
         $ref: '#/definitions/models.ReviewStatus'
-      updatedCompletionStatus:
+      updated_completion_status:
         $ref: '#/definitions/tags.CompletionStatus'
-      updatedScientificFields:
+      updated_scientific_fields:
         items:
           $ref: '#/definitions/tags.ScientificField'
         type: array
@@ -1665,10 +1665,10 @@ paths:
       responses:
         "200":
           description: OK
+        "400":
+          description: Bad Request
         "404":
           description: Not Found
-        "500":
-          description: Internal Server Error
       summary: Update project post
       tags:
       - project-posts
@@ -1714,10 +1714,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.ProjectPostDTO'
+        "400":
+          description: Bad Request
         "404":
           description: Not Found
-        "500":
-          description: Internal Server Error
       summary: Get project post
       tags:
       - project-posts
@@ -1740,7 +1740,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.DiscussionDTO'
+              type: integer
             type: array
         "400":
           description: Bad Request

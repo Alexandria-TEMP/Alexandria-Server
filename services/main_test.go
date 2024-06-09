@@ -14,7 +14,6 @@ var (
 	renderService RenderService
 	branchService BranchService
 
-	mockMemberService *mocks.MockMemberService
 	mockRenderService *mocks.MockRenderService
 
 	mockBranchRepository              *mocks.MockModelRepositoryInterface[*models.Branch]
@@ -23,6 +22,7 @@ var (
 	mockBranchCollaboratorRepository  *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
 	mockDiscussionContainerRepository *mocks.MockModelRepositoryInterface[*models.DiscussionContainer]
 	mockDiscussionRepository          *mocks.MockModelRepositoryInterface[*models.Discussion]
+	mockMemberRepository              *mocks.MockModelRepositoryInterface[*models.Member]
 	mockFilesystem                    *mocks.MockFilesystem
 
 	pendingBranch *models.Branch

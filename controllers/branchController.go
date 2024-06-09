@@ -52,7 +52,6 @@ func (branchController *BranchController) GetBranch(c *gin.Context) {
 	}
 
 	// response
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, branch.IntoDTO())
 }
 
@@ -94,7 +93,6 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 	}
 
 	// response
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, branch.IntoDTO())
 }
 
@@ -129,7 +127,6 @@ func (branchController *BranchController) UpdateBranch(c *gin.Context) {
 	}
 
 	// response
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, branch.IntoDTO())
 }
 
@@ -198,7 +195,6 @@ func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 	}
 
 	// response
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, statuses)
 }
 
@@ -234,7 +230,6 @@ func (branchController *BranchController) GetReview(c *gin.Context) {
 	}
 
 	// response
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, review)
 }
 
@@ -250,7 +245,7 @@ func (branchController *BranchController) GetReview(c *gin.Context) {
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router 		/branches/{branchID}/reviews		[post]
+// @Router 		/branches/reviews		[post]
 func (branchController *BranchController) CreateReview(c *gin.Context) {
 	// extract ReviewCreationForm
 	form := forms.ReviewCreationForm{}
@@ -272,7 +267,6 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 	}
 
 	// response
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, review)
 }
 
@@ -321,7 +315,6 @@ func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 	}
 
 	// response
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, canReview)
 }
 
@@ -335,10 +328,28 @@ func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 // @Success 	200 		{object}	models.BranchCollaboratorDTO
 // @Failure		400
 // @Failure		404
-// @Failure		500
 // @Router 		/branches/collaborators/{collaboratorID}	[get]
-func (branchController *BranchController) GetBranchCollaborator(_ *gin.Context) {
-	// TODO return collaborator by ID
+func (branchController *BranchController) GetBranchCollaborator(c *gin.Context) {
+	// extract collaboratorID id
+	collaboratorIDStr := c.Param("collaboratorID")
+	collaboratorID, err := strconv.ParseUint(collaboratorIDStr, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", collaboratorIDStr)})
+
+		return
+	}
+
+	collaborator, err := branchController.BranchService.GetBranchCollaborator(uint(collaboratorID))
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	// response
+	c.JSON(http.StatusOK, collaborator.IntoDTO())
 }
 
 // GetRender
@@ -508,7 +519,6 @@ func (branchController *BranchController) GetFiletree(c *gin.Context) {
 	}
 
 	// response
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, fileTree)
 }
 
@@ -580,6 +590,6 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 // @Failure		404
 // @Failure		500
 // @Router		/branches/{branchID}/discussions 	[get]
-func (branchController *BranchController) GetDiscussions(_ *gin.Context) {
-
+func (branchController *BranchController) GetDiscussions(c *gin.Context) {
+	// TODO ahh its paginated
 }

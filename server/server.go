@@ -20,6 +20,7 @@ type RepositoryEnv struct {
 	reviewRepository              database.ModelRepositoryInterface[*models.Review]
 	discussionRepository          database.ModelRepositoryInterface[*models.Discussion]
 	discussionContainerRepository database.ModelRepositoryInterface[*models.DiscussionContainer]
+	memberRepository              database.ModelRepositoryInterface[*models.Member]
 }
 
 type ServiceEnv struct {
@@ -48,11 +49,15 @@ func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
 		reviewRepository:              &database.ModelRepository[*models.Review]{Database: db},
 		discussionRepository:          &database.ModelRepository[*models.Discussion]{Database: db},
 		discussionContainerRepository: &database.ModelRepository[*models.DiscussionContainer]{Database: db},
+		memberRepository:              &database.ModelRepository[*models.Member]{Database: db},
 	}
 }
 
 func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
-	postService := &services.PostService{}
+	postService := &services.PostService{
+		PostRepository:   repositoryEnv.postRepository,
+		MemberRepository: repositoryEnv.memberRepository,
+	}
 	memberService := &services.MemberService{}
 	renderService := &services.RenderService{
 		BranchRepository:      repositoryEnv.branchRepository,
@@ -66,9 +71,9 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		BranchCollaboratorRepository:  repositoryEnv.branchCollaboratorRepository,
 		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
 		DiscussionRepository:          repositoryEnv.discussionRepository,
+		MemberRepository:              repositoryEnv.memberRepository,
 		Filesystem:                    fs,
 		RenderService:                 renderService,
-		MemberService:                 memberService,
 	}
 
 	return ServiceEnv{

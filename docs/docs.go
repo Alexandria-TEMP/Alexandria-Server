@@ -1949,11 +1949,11 @@ const docTemplate = `{
                     "200": {
                         "description": "OK"
                     },
+                    "400": {
+                        "description": "Bad Request"
+                    },
                     "404": {
                         "description": "Not Found"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -2075,11 +2075,11 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.ProjectPostDTO"
                         }
                     },
+                    "400": {
+                        "description": "Bad Request"
+                    },
                     "404": {
                         "description": "Not Found"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -2148,7 +2148,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.DiscussionDTO"
+                                "type": "integer"
                             }
                         }
                     },
@@ -2478,17 +2478,17 @@ const docTemplate = `{
                 "anonymous": {
                     "type": "boolean"
                 },
-                "branchTitle": {
+                "branch_title": {
                     "type": "string"
                 },
-                "collaboratorIDs": {
+                "collaborator_ids": {
                     "description": "Branch metadata",
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
                 },
-                "discussionIDs": {
+                "discussion_ids": {
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -2497,29 +2497,29 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "newPostTitle": {
+                "new_post_title": {
                     "description": "Branch's proposed changes",
                     "type": "string"
                 },
-                "projectPostID": {
+                "project_post_id": {
                     "type": "integer"
                 },
-                "renderStatus": {
+                "render_status": {
                     "$ref": "#/definitions/models.RenderStatus"
                 },
-                "reviewIDs": {
+                "review_ids": {
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
                 },
-                "reviewStatus": {
+                "review_status": {
                     "$ref": "#/definitions/models.ReviewStatus"
                 },
-                "updatedCompletionStatus": {
+                "updated_completion_status": {
                     "$ref": "#/definitions/tags.CompletionStatus"
                 },
-                "updatedScientificFields": {
+                "updated_scientific_fields": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/tags.ScientificField"

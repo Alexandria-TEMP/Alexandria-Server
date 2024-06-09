@@ -43,6 +43,18 @@ func (repo *ModelRepository[T]) GetByID(id uint) (T, error) {
 	return found, nil
 }
 
+func (repo *ModelRepository[T]) GetBy(match T) ([]T, error) {
+	var found []T
+	result := repo.Database.Where(match).Find(&found)
+
+	if result.Error != nil {
+		var zero []T
+		return zero, result.Error
+	}
+
+	return found, nil
+}
+
 func (repo *ModelRepository[T]) Update(object T) (T, error) {
 	// Ensure a model with this ID already exists
 	id := object.GetID()

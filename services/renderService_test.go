@@ -71,13 +71,18 @@ func testRenderSuccessTemplate(t *testing.T, dirName string) {
 	beforeEachRender(t)
 	defer cleanup(t)
 
+	pendingBranch.ID = 10
+	successBranch.ID = 10
 	dirPath := filepath.Join(cwd, "..", "utils", "test_files", dirName)
 	renderDirPath := filepath.Join(cwd, "render")
 
+	mockBranchRepository.EXPECT().Update(pendingBranch).Return(pendingBranch, nil)
+	mockFilesystem.EXPECT().CheckoutBranch("10").Return(nil)
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(dirPath).AnyTimes()
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(renderDirPath).AnyTimes()
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
 	mockFilesystem.EXPECT().RenderExists().Return(true, "").Times(1)
+	mockFilesystem.EXPECT().CreateCommit().Return(nil).Times(1)
 	mockBranchRepository.EXPECT().Update(successBranch).Return(successBranch, nil).Times(1)
 
 	renderService.Render(pendingBranch)
@@ -90,8 +95,12 @@ func TestRenderUnzipFailed(t *testing.T) {
 	beforeEachRender(t)
 	defer cleanup(t)
 
+	pendingBranch.ID = 10
+	failedBranch.ID = 10
 	renderDirPath := filepath.Join(cwd, "render")
 
+	mockBranchRepository.EXPECT().Update(pendingBranch).Return(pendingBranch, nil)
+	mockFilesystem.EXPECT().CheckoutBranch("10").Return(nil)
 	mockFilesystem.EXPECT().Unzip().Return(errors.New("failed")).Times(1)
 	mockBranchRepository.EXPECT().Update(failedBranch).Return(failedBranch, nil).Times(1)
 
@@ -109,9 +118,13 @@ func TestRenderExistsFailed(t *testing.T) {
 	beforeEachRender(t)
 	defer cleanup(t)
 
+	pendingBranch.ID = 10
+	failedBranch.ID = 10
 	dirPath := filepath.Join(cwd, "..", "utils", "test_files", "good_quarto_project_1")
 	renderDirPath := filepath.Join(cwd, "render")
 
+	mockBranchRepository.EXPECT().Update(pendingBranch).Return(pendingBranch, nil)
+	mockFilesystem.EXPECT().CheckoutBranch("10").Return(nil)
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(dirPath).AnyTimes()
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(renderDirPath).AnyTimes()
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)

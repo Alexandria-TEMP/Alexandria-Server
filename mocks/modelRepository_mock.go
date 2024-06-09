@@ -67,6 +67,21 @@ func (mr *MockModelRepositoryInterfaceMockRecorder[T]) Delete(id any) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockModelRepositoryInterface[T])(nil).Delete), id)
 }
 
+// GetBy mocks base method.
+func (m *MockModelRepositoryInterface[T]) GetBy(match T) ([]T, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBy", match)
+	ret0, _ := ret[0].([]T)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBy indicates an expected call of GetBy.
+func (mr *MockModelRepositoryInterfaceMockRecorder[T]) GetBy(match any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBy", reflect.TypeOf((*MockModelRepositoryInterface[T])(nil).GetBy), match)
+}
+
 // GetByID mocks base method.
 func (m *MockModelRepositoryInterface[T]) GetByID(id uint) (T, error) {
 	m.ctrl.T.Helper()

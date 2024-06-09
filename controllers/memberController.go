@@ -49,7 +49,6 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 	}
 
 	// if correct response send the member back
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, member)
 }
 
@@ -81,7 +80,6 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	member := memberController.MemberService.CreateMember(&form)
 
 	// send back a positive response with the created member
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, &member)
 }
 

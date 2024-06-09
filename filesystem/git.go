@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 
+	cp "github.com/otiai10/copy"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 )
@@ -29,6 +31,13 @@ func (filesystem *Filesystem) CreateRepository() error {
 
 	if err != nil {
 		return fmt.Errorf("failed to open new repo")
+	}
+
+	// create initial files
+	err = cp.Copy("/app/utils/template_repo", filesystem.CurrentDirPath)
+
+	if err != nil {
+		return fmt.Errorf("failed to copy over default repository")
 	}
 
 	// make initial commit
@@ -95,7 +104,6 @@ func (filesystem *Filesystem) DeleteBranch(branchName string) error {
 	return nil
 }
 
-// Merge actually resets master to the last commit on the branch we are merging
 func (filesystem *Filesystem) Merge(toMerge, mergeInto string) error {
 	// check if we have a repo open
 	if filesystem.CurrentRepository == nil {
@@ -111,7 +119,7 @@ func (filesystem *Filesystem) Merge(toMerge, mergeInto string) error {
 
 	// checkout master to merge into it
 	if err := filesystem.CheckoutBranch(mergeInto); err != nil {
-		return fmt.Errorf("failed to checkout branch %v", mergeInto)
+		return err
 	}
 
 	// get last commit on <branchName>
@@ -200,6 +208,11 @@ func (filesystem *Filesystem) CheckoutBranch(branchName string) error {
 		return fmt.Errorf("failed to open worktree")
 	}
 
+	// git reset --hard
+	if err := w.Reset(&git.ResetOptions{Mode: git.HardReset}); err != nil {
+		return fmt.Errorf("failed to reset branch %s", branchName)
+	}
+
 	// git checkout <branchName>
 	branchCoOpts := git.CheckoutOptions{
 		Branch: plumbing.NewBranchReferenceName(branchName),
@@ -240,7 +253,24 @@ func (filesystem *Filesystem) GetLastCommit(branchName string) (*plumbing.Refere
 }
 
 func (filesystem *Filesystem) CleanDir() error {
-	// git rm -rf .
+	// check if we have a repo open
+	if filesystem.CurrentRepository == nil {
+		return fmt.Errorf("no repository is currently checked out")
+	}
+
+	// get worktree
+	w, err := filesystem.CurrentRepository.Worktree()
+
+	if err != nil {
+		return fmt.Errorf("failed to open worktree")
+	}
+
+	// git add . (add all files, in order to track them)
+	if err = w.AddWithOptions(&git.AddOptions{All: true}); err != nil {
+		return fmt.Errorf("failed to stage all changes")
+	}
+
+	// git rm -rf . (then remove all tracked files)
 	cmd := exec.Command("git", "rm", "-rf", ".")
 	cmd.Dir = filesystem.CurrentDirPath
 
