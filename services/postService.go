@@ -71,7 +71,20 @@ func (postService *PostService) UpdatePost(_ *models.Post) error {
 	- Start goroutine for rendering
 */
 
-func (postService *PostService) Filter(forms.FilterForm) []uint {
-	// TODO
-	return nil
+func (postService *PostService) Filter(forms.FilterForm) ([]uint, error) {
+	// TODO construct query based off filter form
+	// Future changes: make sure to exclude any posts of type 'Project' from the result!
+	// Posts are composed into Project Posts, and those composed Posts shouldn't be returned.
+	posts, err := postService.PostRepository.Query("post_type != 'project'")
+	if err != nil {
+		return nil, err
+	}
+
+	// Extract IDs from the list of posts
+	ids := make([]uint, len(posts))
+	for i, post := range posts {
+		ids[i] = post.ID
+	}
+
+	return ids, nil
 }

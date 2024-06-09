@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,7 +33,13 @@ type FilterController struct {
 // @Router 		/filter/posts		[get]
 func (filterController *FilterController) FilterPosts(c *gin.Context) {
 	var filterForm forms.FilterForm
-	c.BindJSON(&filterForm)
+
+	err := c.BindJSON(&filterForm)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to bind form JSON: %s", err)})
+
+		return
+	}
 
 	if !filterForm.IsValid() {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
@@ -40,10 +47,16 @@ func (filterController *FilterController) FilterPosts(c *gin.Context) {
 		return
 	}
 
-	// TODO
-	// postIDs := filterController.PostService.filter(filterForm)
+	postIDs, err := filterController.PostService.Filter(filterForm)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering posts failed: %s", err)})
 
-	// c.JSON(http.StatusOK, postIDs)
+		return
+	}
+
+	// TODO pagination
+
+	c.JSON(http.StatusOK, postIDs)
 }
 
 // FilterProjectPosts godoc
@@ -61,6 +74,28 @@ func (filterController *FilterController) FilterPosts(c *gin.Context) {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/filter/project-posts		[get]
-func (filterController *FilterController) FilterProjectPosts(_ *gin.Context) {
+func (filterController *FilterController) FilterProjectPosts(c *gin.Context) {
+	var filterForm forms.FilterForm
 
+	err := c.BindJSON(&filterForm)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to bind form JSON: %s", err)})
+
+		return
+	}
+
+	if !filterForm.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
+
+		return
+	}
+
+	projectPostIDs, err := filterController.ProjectPostService.Filter(filterForm)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering project posts failed: %s", err)})
+	}
+
+	// TODO pagination
+
+	c.JSON(http.StatusOK, projectPostIDs)
 }

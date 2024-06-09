@@ -13,5 +13,5 @@ type PostService interface {
 	UpdatePost(updatedPost *models.Post) error
 
 	// Return a filtered list of post IDs
-	Filter(forms.FilterForm) []uint
+	Filter(forms.FilterForm) ([]uint, error)
 }
