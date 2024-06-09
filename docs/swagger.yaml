@@ -901,7 +901,7 @@ paths:
         type: integer
       - description: page size
         in: query
-        name: pageSize
+        name: size
         type: integer
       produces:
       - application/json
@@ -947,7 +947,7 @@ paths:
         type: integer
       - description: page size
         in: query
-        name: pageSize
+        name: size
         type: integer
       produces:
       - application/json
