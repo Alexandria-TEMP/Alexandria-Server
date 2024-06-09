@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"slices"
 
 	"gorm.io/gorm"
 )
@@ -13,6 +14,11 @@ const (
 	Contributor CollaborationType = "contributor"
 	Reviewer    CollaborationType = "reviewer"
 )
+
+func (enum *CollaborationType) IsValid() bool {
+	valid := []CollaborationType{Author, Contributor, Reviewer}
+	return slices.Contains(valid, *enum)
+}
 
 // A member that has collaborated on a post.
 type PostCollaborator struct {

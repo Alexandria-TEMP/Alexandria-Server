@@ -66,7 +66,7 @@ func TestCreatePostGoodWeather(t *testing.T) {
 		AuthorMemberIDs: []uint{memberA.ID, memberB.ID},
 		Title:           "My Awesome Question",
 		Anonymous:       false,
-		PostType:        tags.Question,
+		PostType:        models.Question,
 		ScientificFieldTags: []tags.ScientificField{
 			tags.Mathematics, tags.ComputerScience,
 		},
@@ -105,7 +105,7 @@ func TestCreatePostGoodWeather(t *testing.T) {
 			},
 		},
 		Title:    "My Awesome Question",
-		PostType: tags.Question,
+		PostType: models.Question,
 		ScientificFieldTags: []tags.ScientificField{
 			tags.Mathematics, tags.ComputerScience,
 		},
@@ -129,7 +129,7 @@ func TestCreatePostNonExistingMembers(t *testing.T) {
 		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
 		Title:               "My Broken Post",
 		Anonymous:           false,
-		PostType:            tags.Reflection,
+		PostType:            models.Reflection,
 		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
 	}
 
@@ -159,7 +159,7 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 		AuthorMemberIDs: []uint{memberA.ID, memberB.ID},
 		Title:           "My Awesome Question",
 		Anonymous:       true,
-		PostType:        tags.Question,
+		PostType:        models.Question,
 		ScientificFieldTags: []tags.ScientificField{
 			tags.Mathematics, tags.ComputerScience,
 		},
@@ -179,7 +179,7 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 	expectedPost := models.Post{
 		Collaborators: []*models.PostCollaborator{},
 		Title:         "My Awesome Question",
-		PostType:      tags.Question,
+		PostType:      models.Question,
 		ScientificFieldTags: []tags.ScientificField{
 			tags.Mathematics, tags.ComputerScience,
 		},
@@ -203,7 +203,7 @@ func TestCreatePostDatabaseFailure(t *testing.T) {
 		AuthorMemberIDs:     []uint{memberA.ID, memberC.ID},
 		Title:               "My Post That Shall Fail",
 		Anonymous:           false,
-		PostType:            tags.Reflection,
+		PostType:            models.Reflection,
 		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
 	}
 
@@ -242,7 +242,7 @@ func TestCreatePostWithBadPostType(t *testing.T) {
 		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID, memberC.ID},
 		Title:               "My Faulty Project Post",
 		Anonymous:           false,
-		PostType:            tags.Project,
+		PostType:            models.Project,
 		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
 	}
 

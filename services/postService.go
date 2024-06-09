@@ -6,7 +6,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -26,7 +25,7 @@ func (postService *PostService) GetPost(id uint) (*models.Post, error) {
 func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*models.Post, error) {
 	// Posts created via this function may not be project posts
 	// (those must use ProjectPostCreationForms)
-	if form.PostType == tags.Project {
+	if form.PostType == models.Project {
 		return nil, fmt.Errorf("creating post of type ProjectPost using CreatePost is forbidden")
 	}
 

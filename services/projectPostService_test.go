@@ -59,11 +59,11 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 			AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
 			Title:               "My Awesome Project Post",
 			Anonymous:           false,
-			PostType:            tags.Project,
+			PostType:            models.Project,
 			ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
 		},
-		CompletionStatus:   tags.Ongoing,
-		FeedbackPreference: tags.FormalFeedback,
+		CompletionStatus:   models.Ongoing,
+		FeedbackPreference: models.FormalFeedback,
 	}
 
 	// Setup mock function return values
@@ -92,7 +92,7 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 				{Member: memberB, CollaborationType: models.Author},
 			},
 			Title:               "My Awesome Project Post",
-			PostType:            tags.Project,
+			PostType:            models.Project,
 			ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
 			DiscussionContainer: models.DiscussionContainer{
 				Discussions: []*models.Discussion{},
@@ -101,7 +101,7 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 		OpenBranches: []*models.Branch{
 			{
 				NewPostTitle:            "My Awesome Project Post",
-				UpdatedCompletionStatus: tags.Ongoing,
+				UpdatedCompletionStatus: models.Ongoing,
 				UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
 				Collaborators: []*models.BranchCollaborator{
 					{Member: memberA}, {Member: memberB},
@@ -116,9 +116,9 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 			},
 		},
 		ClosedBranches:      []*models.ClosedBranch{},
-		CompletionStatus:    tags.Ongoing,
-		FeedbackPreference:  tags.FormalFeedback,
-		PostReviewStatusTag: tags.Open,
+		CompletionStatus:    models.Ongoing,
+		FeedbackPreference:  models.FormalFeedback,
+		PostReviewStatusTag: models.Open,
 	}
 
 	if !reflect.DeepEqual(createdProjectPost, expectedProjectPost) {
@@ -137,11 +137,11 @@ func TestCreateProjectPostDatabaseFailure(t *testing.T) {
 			AuthorMemberIDs:     []uint{},
 			Title:               "My Broken Project Post",
 			Anonymous:           true,
-			PostType:            tags.Project,
+			PostType:            models.Project,
 			ScientificFieldTags: []tags.ScientificField{},
 		},
-		CompletionStatus:   tags.Completed,
-		FeedbackPreference: tags.FormalFeedback,
+		CompletionStatus:   models.Completed,
+		FeedbackPreference: models.FormalFeedback,
 	}
 
 	// Setup mock function return values
@@ -171,11 +171,11 @@ func TestCreateProjectPostWrongPostType(t *testing.T) {
 			AuthorMemberIDs:     []uint{},
 			Title:               "",
 			Anonymous:           true,
-			PostType:            tags.Question,
+			PostType:            models.Question,
 			ScientificFieldTags: []tags.ScientificField{},
 		},
-		CompletionStatus:   tags.Idea,
-		FeedbackPreference: tags.Discussion,
+		CompletionStatus:   models.Idea,
+		FeedbackPreference: models.DiscussionFeedback,
 	}
 
 	// Function under test
@@ -200,11 +200,11 @@ func TestCreateProjectPostCollaboratorsFail(t *testing.T) {
 			AuthorMemberIDs:     []uint{10, 15},
 			Title:               "",
 			Anonymous:           false,
-			PostType:            tags.Project,
+			PostType:            models.Project,
 			ScientificFieldTags: []tags.ScientificField{},
 		},
-		CompletionStatus:   tags.Idea,
-		FeedbackPreference: tags.Discussion,
+		CompletionStatus:   models.Idea,
+		FeedbackPreference: models.DiscussionFeedback,
 	}
 
 	// Setup mock function return values
@@ -232,11 +232,11 @@ func TestCreateProjectBranchCollaboratorsFail(t *testing.T) {
 			AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
 			Title:               "",
 			Anonymous:           false,
-			PostType:            tags.Project,
+			PostType:            models.Project,
 			ScientificFieldTags: []tags.ScientificField{},
 		},
-		CompletionStatus:   tags.Idea,
-		FeedbackPreference: tags.Discussion,
+		CompletionStatus:   models.Idea,
+		FeedbackPreference: models.DiscussionFeedback,
 	}
 
 	// Setup mock function return values

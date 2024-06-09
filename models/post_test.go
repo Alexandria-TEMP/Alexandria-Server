@@ -30,7 +30,7 @@ func TestPostJSONMarshaling(t *testing.T) {
 			},
 		},
 		Title:               "Nice Post",
-		PostType:            tags.Question,
+		PostType:            Question,
 		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
 		DiscussionContainer: DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
 	}
@@ -40,7 +40,7 @@ func TestPostJSONMarshaling(t *testing.T) {
 		ID:                  88,
 		CollaboratorIDs:     []uint{1, 60},
 		Title:               "Nice Post",
-		PostType:            tags.Question,
+		PostType:            Question,
 		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
 		DiscussionIDs:       []uint{95},
 	}

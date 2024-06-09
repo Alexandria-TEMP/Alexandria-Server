@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"slices"
 	"time"
 
 	"gorm.io/gorm"
@@ -13,6 +14,11 @@ const (
 	Rejected BranchReviewDecision = "rejected"
 	Approved BranchReviewDecision = "approved"
 )
+
+func (enum *BranchReviewDecision) IsValid() bool {
+	valid := []BranchReviewDecision{Rejected, Approved}
+	return slices.Contains(valid, *enum)
+}
 
 type BranchReview struct {
 	gorm.Model

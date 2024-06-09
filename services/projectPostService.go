@@ -6,7 +6,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -24,7 +23,7 @@ func (projectPostService *ProjectPostService) GetProjectPost(id uint) (*models.P
 
 func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error) {
 	// This function may only be used to create Posts of type Project.
-	if form.PostCreationForm.PostType != tags.Project {
+	if form.PostCreationForm.PostType != models.Project {
 		return nil, fmt.Errorf("function CreateProjectPost may only create Post of type Project. received: %s",
 			form.PostCreationForm.PostType)
 	}
@@ -83,7 +82,7 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 		ClosedBranches: []*models.ClosedBranch{},
 
 		// New project posts are always open for review
-		PostReviewStatusTag: tags.Open,
+		PostReviewStatusTag: models.Open,
 	}
 
 	if err := projectPostService.ProjectPostRepository.Create(&projectPost); err != nil {

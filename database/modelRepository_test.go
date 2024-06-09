@@ -317,7 +317,7 @@ func TestGetPreloadedAssociations(t *testing.T) {
 		Post: models.Post{
 			Collaborators:       []*models.PostCollaborator{},
 			Title:               "TEST POST",
-			PostType:            tags.Project,
+			PostType:            models.Project,
 			ScientificFieldTags: []tags.ScientificField{},
 			DiscussionContainer: models.DiscussionContainer{
 				Discussions: []*models.Discussion{},
@@ -325,9 +325,9 @@ func TestGetPreloadedAssociations(t *testing.T) {
 		},
 		OpenBranches:        []*models.Branch{},
 		ClosedBranches:      []*models.ClosedBranch{},
-		CompletionStatus:    tags.Ongoing,
-		FeedbackPreference:  tags.FormalFeedback,
-		PostReviewStatusTag: tags.Open,
+		CompletionStatus:    models.Ongoing,
+		FeedbackPreference:  models.FormalFeedback,
+		PostReviewStatusTag: models.Open,
 	}
 
 	if err := projectPostRepository.Create(&createdProjectPost); err != nil {

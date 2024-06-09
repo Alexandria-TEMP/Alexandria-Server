@@ -18,8 +18,8 @@ type PostController struct {
 }
 
 // GetPost godoc
-// @Summary 	Get post
-// @Description Get a post by post ID
+// @Summary 	Get post by ID
+// @Description Get a post by ID
 // @Tags 		posts
 // @Accept  	json
 // @Param		postID		path		string			true	"Post ID"
@@ -56,7 +56,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 
 // CreatePost godoc
 // @Summary 	Create new post
-// @Description Create a new question or discussion post
+// @Description Create a new question or discussion post. Cannot be a project post.
 // @Tags 		posts
 // @Accept  	json
 // @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
@@ -89,7 +89,7 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 
 // UpdatePost godoc
 // @Summary 	Update post
-// @Description Update any number of the aspects of a question or discussion post
+// @Description Update any number of aspects of a question or discussion post
 // @Tags 		posts
 // @Accept  	json
 // @Param		post	body		models.PostDTO		true	"Updated Post"

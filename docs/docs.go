@@ -2374,7 +2374,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.CompletionStatus"
+                                "$ref": "#/definitions/models.CompletionStatus"
                             }
                         }
                     },
@@ -2409,7 +2409,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.FeedbackPreference"
+                                "$ref": "#/definitions/models.FeedbackPreference"
                             }
                         }
                     },
@@ -2444,7 +2444,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.PostType"
+                                "$ref": "#/definitions/models.PostType"
                             }
                         }
                     },
@@ -2520,10 +2520,10 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "updatedCompletionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
+                    "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "updatedFeedbackPreferences": {
-                    "$ref": "#/definitions/tags.FeedbackPreference"
+                    "$ref": "#/definitions/models.FeedbackPreference"
                 },
                 "updatedPostTitle": {
                     "description": "Changes made by the MR",
@@ -2619,7 +2619,7 @@ const docTemplate = `{
                     }
                 },
                 "postType": {
-                    "$ref": "#/definitions/tags.PostType"
+                    "$ref": "#/definitions/models.PostType"
                 },
                 "scientificFieldTags": {
                     "type": "array",
@@ -2636,10 +2636,10 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "completionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
+                    "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "feedbackPreference": {
-                    "$ref": "#/definitions/tags.FeedbackPreference"
+                    "$ref": "#/definitions/models.FeedbackPreference"
                 },
                 "postCreationForm": {
                     "$ref": "#/definitions/forms.PostCreationForm"
@@ -2725,7 +2725,7 @@ const docTemplate = `{
                     }
                 },
                 "updatedCompletionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
+                    "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "updatedScientificFields": {
                     "type": "array",
@@ -2886,7 +2886,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "postType": {
-                    "$ref": "#/definitions/tags.PostType"
+                    "$ref": "#/definitions/models.PostType"
                 },
                 "scientificFieldTags": {
                     "type": "array",
@@ -2909,10 +2909,10 @@ const docTemplate = `{
                     }
                 },
                 "completionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
+                    "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "feedbackPreference": {
-                    "$ref": "#/definitions/tags.FeedbackPreference"
+                    "$ref": "#/definitions/models.FeedbackPreference"
                 },
                 "id": {
                     "type": "integer"
@@ -2963,7 +2963,7 @@ const docTemplate = `{
                 }
             }
         },
-        "tags.CompletionStatus": {
+        "models.CompletionStatus": {
             "type": "string",
             "enum": [
                 "idea",
@@ -2976,7 +2976,7 @@ const docTemplate = `{
                 "Completed"
             ]
         },
-        "tags.FeedbackPreference": {
+        "models.FeedbackPreference": {
             "type": "string",
             "enum": [
                 "discussion",
@@ -3000,7 +3000,7 @@ const docTemplate = `{
                 "Reviewed"
             ]
         },
-        "tags.PostType": {
+        "models.PostType": {
             "type": "string",
             "enum": [
                 "project",

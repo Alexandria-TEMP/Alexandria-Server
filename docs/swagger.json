@@ -2368,7 +2368,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.CompletionStatus"
+                                "$ref": "#/definitions/models.CompletionStatus"
                             }
                         }
                     },
@@ -2403,7 +2403,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.FeedbackPreference"
+                                "$ref": "#/definitions/models.FeedbackPreference"
                             }
                         }
                     },
@@ -2438,7 +2438,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.PostType"
+                                "$ref": "#/definitions/models.PostType"
                             }
                         }
                     },
@@ -2514,10 +2514,10 @@
                     "type": "integer"
                 },
                 "updatedCompletionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
+                    "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "updatedFeedbackPreferences": {
-                    "$ref": "#/definitions/tags.FeedbackPreference"
+                    "$ref": "#/definitions/models.FeedbackPreference"
                 },
                 "updatedPostTitle": {
                     "description": "Changes made by the MR",
@@ -2613,7 +2613,7 @@
                     }
                 },
                 "postType": {
-                    "$ref": "#/definitions/tags.PostType"
+                    "$ref": "#/definitions/models.PostType"
                 },
                 "scientificFieldTags": {
                     "type": "array",
@@ -2630,10 +2630,10 @@
             "type": "object",
             "properties": {
                 "completionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
+                    "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "feedbackPreference": {
-                    "$ref": "#/definitions/tags.FeedbackPreference"
+                    "$ref": "#/definitions/models.FeedbackPreference"
                 },
                 "postCreationForm": {
                     "$ref": "#/definitions/forms.PostCreationForm"
@@ -2719,7 +2719,7 @@
                     }
                 },
                 "updatedCompletionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
+                    "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "updatedScientificFields": {
                     "type": "array",
@@ -2880,7 +2880,7 @@
                     "type": "integer"
                 },
                 "postType": {
-                    "$ref": "#/definitions/tags.PostType"
+                    "$ref": "#/definitions/models.PostType"
                 },
                 "scientificFieldTags": {
                     "type": "array",
@@ -2903,10 +2903,10 @@
                     }
                 },
                 "completionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
+                    "$ref": "#/definitions/models.CompletionStatus"
                 },
                 "feedbackPreference": {
-                    "$ref": "#/definitions/tags.FeedbackPreference"
+                    "$ref": "#/definitions/models.FeedbackPreference"
                 },
                 "id": {
                     "type": "integer"
@@ -2957,7 +2957,7 @@
                 }
             }
         },
-        "tags.CompletionStatus": {
+        "models.CompletionStatus": {
             "type": "string",
             "enum": [
                 "idea",
@@ -2970,7 +2970,7 @@
                 "Completed"
             ]
         },
-        "tags.FeedbackPreference": {
+        "models.FeedbackPreference": {
             "type": "string",
             "enum": [
                 "discussion",
@@ -2994,7 +2994,7 @@
                 "Reviewed"
             ]
         },
-        "tags.PostType": {
+        "models.PostType": {
             "type": "string",
             "enum": [
                 "project",

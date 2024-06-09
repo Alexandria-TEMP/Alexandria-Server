@@ -14,9 +14,9 @@ definitions:
       projectPostID:
         type: integer
       updatedCompletionStatus:
-        $ref: '#/definitions/tags.CompletionStatus'
+        $ref: '#/definitions/models.CompletionStatus'
       updatedFeedbackPreferences:
-        $ref: '#/definitions/tags.FeedbackPreference'
+        $ref: '#/definitions/models.FeedbackPreference'
       updatedPostTitle:
         description: Changes made by the MR
         type: string
@@ -82,7 +82,7 @@ definitions:
           type: integer
         type: array
       postType:
-        $ref: '#/definitions/tags.PostType'
+        $ref: '#/definitions/models.PostType'
       scientificFieldTags:
         items:
           $ref: '#/definitions/tags.ScientificField'
@@ -93,9 +93,9 @@ definitions:
   forms.ProjectPostCreationForm:
     properties:
       completionStatus:
-        $ref: '#/definitions/tags.CompletionStatus'
+        $ref: '#/definitions/models.CompletionStatus'
       feedbackPreference:
-        $ref: '#/definitions/tags.FeedbackPreference'
+        $ref: '#/definitions/models.FeedbackPreference'
       postCreationForm:
         $ref: '#/definitions/forms.PostCreationForm'
     type: object
@@ -152,7 +152,7 @@ definitions:
           type: integer
         type: array
       updatedCompletionStatus:
-        $ref: '#/definitions/tags.CompletionStatus'
+        $ref: '#/definitions/models.CompletionStatus'
       updatedScientificFields:
         items:
           $ref: '#/definitions/tags.ScientificField'
@@ -261,7 +261,7 @@ definitions:
       id:
         type: integer
       postType:
-        $ref: '#/definitions/tags.PostType'
+        $ref: '#/definitions/models.PostType'
       scientificFieldTags:
         items:
           $ref: '#/definitions/tags.ScientificField'
@@ -276,9 +276,9 @@ definitions:
           type: integer
         type: array
       completionStatus:
-        $ref: '#/definitions/tags.CompletionStatus'
+        $ref: '#/definitions/models.CompletionStatus'
       feedbackPreference:
-        $ref: '#/definitions/tags.FeedbackPreference'
+        $ref: '#/definitions/models.FeedbackPreference'
       id:
         type: integer
       openBranchIDs:
@@ -312,7 +312,7 @@ definitions:
       postID:
         type: integer
     type: object
-  tags.CompletionStatus:
+  models.CompletionStatus:
     enum:
     - idea
     - ongoing
@@ -322,7 +322,7 @@ definitions:
     - Idea
     - Ongoing
     - Completed
-  tags.FeedbackPreference:
+  models.FeedbackPreference:
     enum:
     - discussion
     - formal feedback
@@ -340,7 +340,7 @@ definitions:
     - Open
     - RevisionNeeded
     - Reviewed
-  tags.PostType:
+  models.PostType:
     enum:
     - project
     - question
@@ -1952,7 +1952,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/tags.CompletionStatus'
+              $ref: '#/definitions/models.CompletionStatus'
             type: array
         "400":
           description: Bad Request
@@ -1976,7 +1976,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/tags.FeedbackPreference'
+              $ref: '#/definitions/models.FeedbackPreference'
             type: array
         "400":
           description: Bad Request
@@ -1999,7 +1999,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/tags.PostType'
+              $ref: '#/definitions/models.PostType'
             type: array
         "400":
           description: Bad Request
