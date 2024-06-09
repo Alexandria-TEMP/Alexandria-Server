@@ -189,6 +189,7 @@ func TestUpdateMember404(t *testing.T) {
 func TestGetAllMembers200(t *testing.T) {
 	beforeEachMember(t)
 	mockMemberService.EXPECT().GetAllMembers().Return([]uint{2, 3}, nil)
+
 	req, _ := http.NewRequest("GET", "/api/v2/members", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 

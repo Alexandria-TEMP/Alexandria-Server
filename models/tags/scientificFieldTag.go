@@ -68,6 +68,7 @@ func ScientificFieldTagContainerIntoIDs(scientificFieldTags *ScientificFieldTagC
 		ints := []uint{}
 		return ints
 	}
+
 	ids := make([]uint, len(scientificFieldTags.ScientificFieldTags))
 
 	for i, tag := range scientificFieldTags.ScientificFieldTags {
