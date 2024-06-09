@@ -68,7 +68,7 @@ func (mr *MockModelRepositoryInterfaceMockRecorder[T]) Delete(id any) *gomock.Ca
 }
 
 // GetAllIDs mocks base method.
-func (m *MockRepositoryInterface[T]) GetAllIDs() ([]uint, error) {
+func (m *MockModelRepositoryInterface[T]) GetAllIDs() ([]uint, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllIDs")
 	ret0, _ := ret[0].([]uint)
@@ -77,9 +77,9 @@ func (m *MockRepositoryInterface[T]) GetAllIDs() ([]uint, error) {
 }
 
 // GetAllIDs indicates an expected call of GetAllIDs.
-func (mr *MockRepositoryInterfaceMockRecorder[T]) GetAllIDs() *gomock.Call {
+func (mr *MockModelRepositoryInterfaceMockRecorder[T]) GetAllIDs() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllIDs", reflect.TypeOf((*MockRepositoryInterface[T])(nil).GetAllIDs))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllIDs", reflect.TypeOf((*MockModelRepositoryInterface[T])(nil).GetAllIDs))
 }
 
 // GetByID mocks base method.

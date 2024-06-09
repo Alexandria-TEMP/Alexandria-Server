@@ -8,7 +8,7 @@ import (
 )
 
 type MemberService struct {
-	MemberRepository database.RepositoryInterface[*models.Member]
+	MemberRepository database.ModelRepositoryInterface[*models.Member]
 }
 
 func (memberService *MemberService) GetMember(memberID uint) (*models.Member, error) {

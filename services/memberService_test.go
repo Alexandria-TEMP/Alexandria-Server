@@ -19,7 +19,7 @@ func beforeEachMember(t *testing.T) {
 
 	defer mockCtrl.Finish()
 
-	mockMemberRepository = mocks.NewMockRepositoryInterface[*models.Member](mockCtrl)
+	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 
 	// need to mock repository here, how?
 	memberService = MemberService{

@@ -64,13 +64,11 @@ func TestCreatePostGoodWeather(t *testing.T) {
 
 	// The input we will be sending to the function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs: []uint{memberA.ID, memberB.ID},
-		Title:           "My Awesome Question",
-		Anonymous:       false,
-		PostType:        tags.Question,
-		ScientificFieldTags: []tags.ScientificField{
-			tags.Mathematics, tags.ComputerScience,
-		},
+		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
+		Title:               "My Awesome Question",
+		Anonymous:           false,
+		PostType:            tags.Question,
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	// What we expect the database to receive, called by function under test
@@ -94,11 +92,9 @@ func TestCreatePostGoodWeather(t *testing.T) {
 				CollaborationType: models.Author,
 			},
 		},
-		Title:    "My Awesome Question",
-		PostType: tags.Question,
-		ScientificFieldTags: []tags.ScientificField{
-			tags.Mathematics, tags.ComputerScience,
-		},
+		Title:                       "My Awesome Question",
+		PostType:                    tags.Question,
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
 		},
@@ -121,7 +117,7 @@ func TestCreatePostNonExistingMembers(t *testing.T) {
 		Title:               "My Broken Post",
 		Anonymous:           false,
 		PostType:            tags.Reflection,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	// Function under test
@@ -144,13 +140,11 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 
 	// The input we will be sending to the function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs: []uint{memberA.ID, memberB.ID},
-		Title:           "My Awesome Question",
-		Anonymous:       true,
-		PostType:        tags.Question,
-		ScientificFieldTags: []tags.ScientificField{
-			tags.Mathematics, tags.ComputerScience,
-		},
+		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
+		Title:               "My Awesome Question",
+		Anonymous:           true,
+		PostType:            tags.Question,
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	// What we expect the database to receive, called by function under test
@@ -164,12 +158,10 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 	}
 
 	expectedPost := models.Post{
-		Collaborators: []*models.PostCollaborator{},
-		Title:         "My Awesome Question",
-		PostType:      tags.Question,
-		ScientificFieldTags: []tags.ScientificField{
-			tags.Mathematics, tags.ComputerScience,
-		},
+		Collaborators:               []*models.PostCollaborator{},
+		Title:                       "My Awesome Question",
+		PostType:                    tags.Question,
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
 		},
@@ -191,7 +183,7 @@ func TestCreatePostDatabaseFailure(t *testing.T) {
 		Title:               "My Post That Shall Fail",
 		Anonymous:           false,
 		PostType:            tags.Reflection,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	postRepository.EXPECT().Create(gomock.Any()).Return(fmt.Errorf("oh no")).Times(1)
@@ -220,7 +212,7 @@ func TestCreatePostWithBadPostType(t *testing.T) {
 		Title:               "My Faulty Project Post",
 		Anonymous:           false,
 		PostType:            tags.Project,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	postRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)

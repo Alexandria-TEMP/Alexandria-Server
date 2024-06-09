@@ -52,11 +52,16 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 		}
 	}
 
+	postFields := form.ScientificFieldTags
+	postTagContainer := tags.ScientificFieldTagContainer{
+		ScientificFieldTags: postFields,
+	}
+
 	post := models.Post{
-		Collaborators:       postCollaborators,
-		Title:               form.Title, // TODO sanitize title?
-		PostType:            form.PostType,
-		ScientificFieldTags: form.ScientificFieldTags,
+		Collaborators:               postCollaborators,
+		Title:                       form.Title, // TODO sanitize title?
+		PostType:                    form.PostType,
+		ScientificFieldTagContainer: postTagContainer,
 		DiscussionContainer: models.DiscussionContainer{
 			// The discussion list is initially empty
 			Discussions: []*models.Discussion{},
