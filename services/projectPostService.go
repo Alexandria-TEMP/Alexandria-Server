@@ -95,3 +95,8 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 func (projectPostService *ProjectPostService) UpdateProjectPost(_ *models.ProjectPost) error {
 	return fmt.Errorf("TODO")
 }
+
+func (projectPostService *ProjectPostService) Filter(forms.FilterForm) []uint {
+	// TODO
+	return nil
+}

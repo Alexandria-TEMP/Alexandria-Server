@@ -344,3 +344,44 @@ func TestGetPreloadedAssociations(t *testing.T) {
 		t.Fatal("nested Post object did not pre load")
 	}
 }
+
+func TestQuerySimple(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	// Create dummy members in the database, with specific IDs
+	membersToCreate := []models.Member{
+		{Model: gorm.Model{ID: 5}},
+		{Model: gorm.Model{ID: 10}},
+		{Model: gorm.Model{ID: 12}},
+	}
+
+	for _, member := range membersToCreate {
+		if err := memberRepository.Create(&member); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Try to fetch some via a query
+	fetchedMembers, err := memberRepository.Query("id > 6")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedIDs := []uint{10, 12}
+
+	if len(fetchedMembers) != len(expectedIDs) {
+		t.Fatalf("expected %d records, got %d", len(expectedIDs), len(fetchedMembers))
+	}
+
+	// Check each fetched member's ID
+	for i, fetchedMember := range fetchedMembers {
+		if fetchedMember.ID != expectedIDs[i] {
+			t.Fatalf("encountered ID %d expecting %d", fetchedMember.ID, expectedIDs[i])
+		}
+	}
+}

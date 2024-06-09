@@ -1,10 +1,18 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
+)
 
 // @BasePath /api/v2
 
 type FilterController struct {
+	PostService        interfaces.PostService
+	ProjectPostService interfaces.ProjectPostService
 }
 
 // FilterPosts godoc
@@ -22,8 +30,20 @@ type FilterController struct {
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/filter/posts		[get]
-func (filterController *FilterController) FilterPosts(_ *gin.Context) {
+func (filterController *FilterController) FilterPosts(c *gin.Context) {
+	var filterForm forms.FilterForm
+	c.BindJSON(&filterForm)
 
+	if !filterForm.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
+
+		return
+	}
+
+	// TODO
+	// postIDs := filterController.PostService.filter(filterForm)
+
+	// c.JSON(http.StatusOK, postIDs)
 }
 
 // FilterProjectPosts godoc

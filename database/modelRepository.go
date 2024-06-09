@@ -75,3 +75,15 @@ func (repo *ModelRepository[T]) Delete(id uint) error {
 
 	return result.Error
 }
+
+func (repo *ModelRepository[T]) Query(conds ...interface{}) ([]T, error) {
+	var models []T
+
+	result := repo.Database.Find(&models, conds[0:]...)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("could not query: result.Error")
+	}
+
+	return models, nil
+}

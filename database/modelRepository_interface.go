@@ -5,6 +5,7 @@ type ModelRepositoryInterface[T Model] interface {
 	GetByID(id uint) (T, error)
 	Update(object T) (T, error)
 	Delete(id uint) error
+	Query(conds ...interface{}) ([]T, error)
 }
 
 //go:generate mockgen -package=mocks -source=./modelRepository_interface.go -destination=../mocks/modelRepository_mock.go

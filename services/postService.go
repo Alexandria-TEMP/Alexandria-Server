@@ -70,3 +70,8 @@ func (postService *PostService) UpdatePost(_ *models.Post) error {
 	- Response 200
 	- Start goroutine for rendering
 */
+
+func (postService *PostService) Filter(forms.FilterForm) []uint {
+	// TODO
+	return nil
+}
