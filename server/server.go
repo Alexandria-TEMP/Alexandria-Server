@@ -13,10 +13,11 @@ import (
 )
 
 type RepositoryEnv struct {
-	postRepository        database.ModelRepositoryInterface[*models.Post]
-	projectPostRepository database.ModelRepositoryInterface[*models.ProjectPost]
-	memberRepository      database.ModelRepositoryInterface[*models.Member]
-	discussionRepository  database.ModelRepositoryInterface[*models.Discussion]
+	postRepository                database.ModelRepositoryInterface[*models.Post]
+	projectPostRepository         database.ModelRepositoryInterface[*models.ProjectPost]
+	memberRepository              database.ModelRepositoryInterface[*models.Member]
+	discussionRepository          database.ModelRepositoryInterface[*models.Discussion]
+	discussionContainerRepository database.ModelRepositoryInterface[*models.DiscussionContainer]
 }
 
 type ServiceEnv struct {
@@ -52,6 +53,9 @@ func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 		discussionRepository: &database.ModelRepository[*models.Discussion]{
 			Database: db,
 		},
+		discussionContainerRepository: &database.ModelRepository[*models.DiscussionContainer]{
+			Database: db,
+		},
 	}
 }
 
@@ -78,7 +82,9 @@ func initServiceEnv(repositories RepositoryEnv, _ *filesystem.Filesystem) Servic
 	}
 
 	discussionService := &services.DiscussionService{
-		DiscussionRepository: repositories.discussionRepository,
+		DiscussionRepository:          repositories.discussionRepository,
+		DiscussionContainerRepository: repositories.discussionContainerRepository,
+		MemberRepository:              repositories.memberRepository,
 	}
 
 	return ServiceEnv{

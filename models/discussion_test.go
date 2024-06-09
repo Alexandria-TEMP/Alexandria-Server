@@ -11,11 +11,13 @@ import (
 func TestDiscussionJSONMarshaling(t *testing.T) {
 	var parentID uint = 5
 
+	var memberID uint = 28
+
 	// This model...
 	model := Discussion{
 		Model:    gorm.Model{ID: 100},
-		Member:   Member{},
-		MemberID: 28,
+		Member:   &Member{},
+		MemberID: &memberID,
 		Replies: []*Discussion{
 			{
 				Model: gorm.Model{ID: 50},
@@ -24,20 +26,16 @@ func TestDiscussionJSONMarshaling(t *testing.T) {
 				Model: gorm.Model{ID: 88},
 			},
 		},
-		ParentID:  &parentID,
-		Text:      "Test!",
-		Deleted:   false,
-		Anonymous: true,
+		ParentID: &parentID,
+		Text:     "Test!",
 	}
 
 	// should equal this DTO!
 	targetDTO := DiscussionDTO{
-		ID:        100,
-		MemberID:  28,
-		ReplyIDs:  []uint{50, 88},
-		Text:      "Test!",
-		Deleted:   false,
-		Anonymous: true,
+		ID:       100,
+		MemberID: &memberID,
+		ReplyIDs: []uint{50, 88},
+		Text:     "Test!",
 	}
 
 	dto := DiscussionDTO{}

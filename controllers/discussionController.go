@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
@@ -27,8 +28,26 @@ type DiscussionController struct {
 // @Failure		404 		{object} 	utils.HTTPError
 // @Failure		500 		{object} 	utils.HTTPError
 // @Router 		/discussions/{discussionID}	[get]
-func (discussionController *DiscussionController) GetDiscussion(_ *gin.Context) {
-	// TODO implement
+func (discussionController *DiscussionController) GetDiscussion(c *gin.Context) {
+	// Parse discussion ID path parameter
+	discussionIDString := c.Param("discussionID")
+
+	discussionID, err := strconv.ParseUint(discussionIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not parse discussion ID '%s' as unsigned integer: %s", discussionIDString, err)})
+
+		return
+	}
+
+	// Get from database
+	discussion, err := discussionController.DiscussionService.GetDiscussion(uint(discussionID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get discussion with ID %d: %s", discussionID, err)})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, discussion)
 }
 
 // CreateRootDiscussion godoc
