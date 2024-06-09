@@ -82,6 +82,25 @@ func (mr *MockModelRepositoryInterfaceMockRecorder[T]) GetByID(id any) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockModelRepositoryInterface[T])(nil).GetByID), id)
 }
 
+// Query mocks base method.
+func (m *MockModelRepositoryInterface[T]) Query(conds ...any) ([]T, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{}
+	for _, a := range conds {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Query", varargs...)
+	ret0, _ := ret[0].([]T)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Query indicates an expected call of Query.
+func (mr *MockModelRepositoryInterfaceMockRecorder[T]) Query(conds ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockModelRepositoryInterface[T])(nil).Query), conds...)
+}
+
 // Update mocks base method.
 func (m *MockModelRepositoryInterface[T]) Update(object T) (T, error) {
 	m.ctrl.T.Helper()
