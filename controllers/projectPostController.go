@@ -76,6 +76,12 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 		return
 	}
 
+	if !form.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
+
+		return
+	}
+
 	projectPost, err := projectPostController.ProjectPostService.CreateProjectPost(&form)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("internal server error: %s", err)})
@@ -105,6 +111,8 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 	// extract post
 	updatedProjectPost := models.ProjectPost{}
 	err := c.BindJSON(&updatedProjectPost)
+
+	// TODO convert from project post DTO to updated project post
 
 	if err != nil {
 		fmt.Println(err)

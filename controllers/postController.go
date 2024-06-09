@@ -75,6 +75,12 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 		return
 	}
 
+	if !form.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
+
+		return
+	}
+
 	post, err := postController.PostService.CreatePost(&form)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post, reason: %s", err)})
@@ -103,6 +109,8 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 	// extract post
 	updatedPost := models.Post{}
 	err := c.BindJSON(&updatedPost)
+
+	// TODO convert from Post DTO to updated Post data
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated Post from request body"})

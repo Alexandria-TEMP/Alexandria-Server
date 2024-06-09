@@ -84,20 +84,6 @@ func (mr *MockMemberServiceMockRecorder) GetMember(userID any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMember", reflect.TypeOf((*MockMemberService)(nil).GetMember), userID)
 }
 
-// UpdateCollaborator mocks base method.
-func (m *MockMemberService) UpdateCollaborator(updatedCollaborator *models.PostCollaborator) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateCollaborator", updatedCollaborator)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdateCollaborator indicates an expected call of UpdateCollaborator.
-func (mr *MockMemberServiceMockRecorder) UpdateCollaborator(updatedCollaborator any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCollaborator", reflect.TypeOf((*MockMemberService)(nil).UpdateCollaborator), updatedCollaborator)
-}
-
 // UpdateMember mocks base method.
 func (m *MockMemberService) UpdateMember(updatedMember *models.Member) error {
 	m.ctrl.T.Helper()
