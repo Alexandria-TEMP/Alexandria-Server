@@ -2,7 +2,6 @@ package tags
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -65,7 +64,6 @@ func ScientificFieldTagIntoIDs(subtags []*ScientificFieldTag) []uint {
 
 // Helper function for JSON marshaling
 func ScientificFieldTagContainerIntoIDs(scientificFieldTags *ScientificFieldTagContainer) []uint {
-	fmt.Printf("This is the container we get in the scientific field tag container into id's method: %v", scientificFieldTags)
 	if len(scientificFieldTags.ScientificFieldTags) == 0 {
 		ints := []uint{}
 		return ints
@@ -75,6 +73,6 @@ func ScientificFieldTagContainerIntoIDs(scientificFieldTags *ScientificFieldTagC
 	for i, tag := range scientificFieldTags.ScientificFieldTags {
 		ids[i] = tag.ID
 	}
-	fmt.Printf("These are the ids in the container: %v", ids)
+
 	return ids
 }
