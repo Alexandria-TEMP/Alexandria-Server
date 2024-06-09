@@ -38,8 +38,8 @@ type ControllerEnv struct {
 	tagController         *controllers.TagController
 }
 
-func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
-	return RepositoryEnv{
+func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
+	return &RepositoryEnv{
 		postRepository: &database.ModelRepository[*models.Post]{
 			Database: db,
 		},
@@ -58,7 +58,7 @@ func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 	}
 }
 
-func initServiceEnv(repositories RepositoryEnv, _ *filesystem.Filesystem) ServiceEnv {
+func initServiceEnv(repositories *RepositoryEnv, _ *filesystem.Filesystem) *ServiceEnv {
 	postCollaboratorService := &services.PostCollaboratorService{
 		PostCollaboratorRepository: repositories.postCollaboratorRepository,
 		MemberRepository:           repositories.memberRepository,
@@ -82,7 +82,7 @@ func initServiceEnv(repositories RepositoryEnv, _ *filesystem.Filesystem) Servic
 		BranchCollaboratorService: branchCollaboratorService,
 	}
 
-	return ServiceEnv{
+	return &ServiceEnv{
 		postService:               postService,
 		projectPostService:        projectPostService,
 		memberService:             &services.MemberService{},
@@ -91,8 +91,8 @@ func initServiceEnv(repositories RepositoryEnv, _ *filesystem.Filesystem) Servic
 	}
 }
 
-func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
-	return ControllerEnv{
+func initControllerEnv(serviceEnv *ServiceEnv) *ControllerEnv {
+	return &ControllerEnv{
 		postController: &controllers.PostController{
 			PostService:             serviceEnv.postService,
 			PostCollaboratorService: serviceEnv.postCollaboratorService,
@@ -124,7 +124,7 @@ func Init() {
 
 	repositoryEnv := initRepositoryEnv(db)
 	serviceEnv := initServiceEnv(repositoryEnv, fs)
-	controllerEnv := initControllerEnv(&serviceEnv)
+	controllerEnv := initControllerEnv(serviceEnv)
 
 	router := SetUpRouter(controllerEnv)
 	err = router.Run(":8080")
