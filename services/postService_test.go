@@ -2,9 +2,9 @@ package services
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
@@ -92,17 +92,16 @@ func TestCreatePostGoodWeather(t *testing.T) {
 				CollaborationType: models.Author,
 			},
 		},
-		Title:                       "My Awesome Question",
-		PostType:                    tags.Question,
-		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
+		Title:    "My Awesome Question",
+		PostType: tags.Question,
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		},
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
 		},
 	}
-
-	if !reflect.DeepEqual(createdPost, expectedPost) {
-		t.Fatalf("created post:\n%+v\n did not equal expected post:\n%+v\n", createdPost, expectedPost)
-	}
+	assert.Equal(t, createdPost, expectedPost)
 }
 
 // Try to create a Post with a member that exists, and one that doesn't
@@ -158,18 +157,17 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 	}
 
 	expectedPost := models.Post{
-		Collaborators:               []*models.PostCollaborator{},
-		Title:                       "My Awesome Question",
-		PostType:                    tags.Question,
-		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
+		Collaborators: []*models.PostCollaborator{},
+		Title:         "My Awesome Question",
+		PostType:      tags.Question,
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		},
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
 		},
 	}
-
-	if !reflect.DeepEqual(*createdPost, expectedPost) {
-		t.Fatalf("created post:\n%+v\n did not equal expected post:\n%+v\n", *createdPost, expectedPost)
-	}
+	assert.Equal(t, *createdPost, expectedPost)
 }
 
 // If the database creation fails, creating a post should fail
