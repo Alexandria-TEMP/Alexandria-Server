@@ -57,8 +57,6 @@ func (filterController *FilterController) FilterPosts(c *gin.Context) {
 		return
 	}
 
-	// TODO pagination
-
 	c.JSON(http.StatusOK, postIDs)
 }
 
@@ -100,8 +98,6 @@ func (filterController *FilterController) FilterProjectPosts(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering project posts failed: %s", err)})
 	}
-
-	// TODO pagination
 
 	c.JSON(http.StatusOK, projectPostIDs)
 }
