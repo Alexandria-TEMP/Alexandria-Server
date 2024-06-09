@@ -3,9 +3,9 @@ package forms
 // Holds IDs of Branches
 // Categorized by their BranchReviewStatus
 type GroupedBranchForm struct {
-	OpenForReviewIDs []uint
-	RejectedIDs      []uint
-	PeerReviewedIDs  []uint
+	OpenForReviewIDs []uint `json:"openForReviewIDs"`
+	RejectedIDs      []uint `json:"rejectedIDs"`
+	PeerReviewedIDs  []uint `json:"peerReviewedIDs"`
 }
 
 // TODO this should not be a form!

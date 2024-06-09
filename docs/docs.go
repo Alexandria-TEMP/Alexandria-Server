@@ -388,7 +388,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.BranchReviewStatus"
+                                "$ref": "#/definitions/models.BranchOverallReviewStatus"
                             }
                         }
                     },
@@ -1556,7 +1556,7 @@ const docTemplate = `{
         },
         "/posts": {
             "put": {
-                "description": "Update any number of the aspects of a question or discussion post",
+                "description": "Update any number of aspects of a question or discussion post",
                 "consumes": [
                     "application/json"
                 ],
@@ -1603,7 +1603,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create a new question or discussion post",
+                "description": "Create a new question or discussion post. Cannot be a project post.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1805,7 +1805,7 @@ const docTemplate = `{
         },
         "/posts/{postID}": {
             "get": {
-                "description": "Get a post by post ID",
+                "description": "Get a post by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1815,7 +1815,7 @@ const docTemplate = `{
                 "tags": [
                     "posts"
                 ],
-                "summary": "Get post",
+                "summary": "Get post by ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -2374,7 +2374,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.CompletionStatus"
+                                "$ref": "#/definitions/models.ProjectCompletionStatus"
                             }
                         }
                     },
@@ -2510,7 +2510,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "collaboratingMemberIDs": {
-                    "description": "The MR's metadata",
+                    "description": "The branch's metadata",
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -2520,13 +2520,13 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "updatedCompletionStatus": {
-                    "$ref": "#/definitions/models.CompletionStatus"
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
                 },
                 "updatedFeedbackPreferences": {
                     "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 },
                 "updatedPostTitle": {
-                    "description": "Changes made by the MR",
+                    "description": "Changes made by the branch",
                     "type": "string"
                 },
                 "updatedScientificFields": {
@@ -2612,7 +2612,6 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "authorMemberIDs": {
-                    "description": "Members that are authors of the post",
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -2636,7 +2635,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "completionStatus": {
-                    "$ref": "#/definitions/models.CompletionStatus"
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
                 },
                 "feedbackPreference": {
                     "$ref": "#/definitions/models.ProjectFeedbackPreference"
@@ -2669,9 +2668,6 @@ const docTemplate = `{
                 "branchID": {
                     "type": "integer"
                 },
-                "collaborationType": {
-                    "$ref": "#/definitions/models.CollaborationType"
-                },
                 "id": {
                     "type": "integer"
                 },
@@ -2683,11 +2679,8 @@ const docTemplate = `{
         "models.BranchDTO": {
             "type": "object",
             "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "branchReviewStatus": {
-                    "$ref": "#/definitions/models.BranchReviewStatus"
+                "branchOverallReviewStatus": {
+                    "$ref": "#/definitions/models.BranchOverallReviewStatus"
                 },
                 "branchTitle": {
                     "type": "string"
@@ -2712,7 +2705,7 @@ const docTemplate = `{
                     "description": "MR's proposed changes",
                     "type": "string"
                 },
-                "projectPostID": {
+                "projectPostIDs": {
                     "type": "integer"
                 },
                 "renderStatus": {
@@ -2725,7 +2718,7 @@ const docTemplate = `{
                     }
                 },
                 "updatedCompletionStatus": {
-                    "$ref": "#/definitions/models.CompletionStatus"
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
                 },
                 "updatedScientificFields": {
                     "type": "array",
@@ -2734,6 +2727,19 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "models.BranchOverallReviewStatus": {
+            "type": "string",
+            "enum": [
+                "open for review",
+                "peer reviewed",
+                "rejected"
+            ],
+            "x-enum-varnames": [
+                "BranchOpenForReview",
+                "BranchPeerReviewed",
+                "BranchRejected"
+            ]
         },
         "models.BranchReviewDTO": {
             "type": "object",
@@ -2767,19 +2773,6 @@ const docTemplate = `{
             "x-enum-varnames": [
                 "Rejected",
                 "Approved"
-            ]
-        },
-        "models.BranchReviewStatus": {
-            "type": "string",
-            "enum": [
-                "open for review",
-                "peer reviewed",
-                "rejected"
-            ],
-            "x-enum-varnames": [
-                "BranchOpenForReview",
-                "BranchPeerReviewed",
-                "BranchRejected"
             ]
         },
         "models.CollaborationType": {
@@ -2899,6 +2892,43 @@ const docTemplate = `{
                 }
             }
         },
+        "models.PostType": {
+            "type": "string",
+            "enum": [
+                "project",
+                "question",
+                "reflection"
+            ],
+            "x-enum-varnames": [
+                "Project",
+                "Question",
+                "Reflection"
+            ]
+        },
+        "models.ProjectCompletionStatus": {
+            "type": "string",
+            "enum": [
+                "idea",
+                "ongoing",
+                "completed"
+            ],
+            "x-enum-varnames": [
+                "Idea",
+                "Ongoing",
+                "Completed"
+            ]
+        },
+        "models.ProjectFeedbackPreference": {
+            "type": "string",
+            "enum": [
+                "discussion feedback",
+                "formal feedback"
+            ],
+            "x-enum-varnames": [
+                "DiscussionFeedback",
+                "FormalFeedback"
+            ]
+        },
         "models.ProjectPostDTO": {
             "type": "object",
             "properties": {
@@ -2909,7 +2939,7 @@ const docTemplate = `{
                     }
                 },
                 "completionStatus": {
-                    "$ref": "#/definitions/models.CompletionStatus"
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
                 },
                 "feedbackPreference": {
                     "$ref": "#/definitions/models.ProjectFeedbackPreference"
@@ -2923,13 +2953,26 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "postDTO": {
+                "post": {
                     "$ref": "#/definitions/models.PostDTO"
                 },
-                "postReviewStatusTag": {
-                    "$ref": "#/definitions/tags.PostReviewStatus"
+                "postReviewStatus": {
+                    "$ref": "#/definitions/models.ProjectReviewStatus"
                 }
             }
+        },
+        "models.ProjectReviewStatus": {
+            "type": "string",
+            "enum": [
+                "open",
+                "revision needed",
+                "reviewed"
+            ],
+            "x-enum-varnames": [
+                "Open",
+                "RevisionNeeded",
+                "Reviewed"
+            ]
         },
         "models.RenderStatus": {
             "type": "string",
@@ -2962,56 +3005,6 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
-        },
-        "models.CompletionStatus": {
-            "type": "string",
-            "enum": [
-                "idea",
-                "ongoing",
-                "completed"
-            ],
-            "x-enum-varnames": [
-                "Idea",
-                "Ongoing",
-                "Completed"
-            ]
-        },
-        "models.ProjectFeedbackPreference": {
-            "type": "string",
-            "enum": [
-                "discussion",
-                "formal feedback"
-            ],
-            "x-enum-varnames": [
-                "Discussion",
-                "FormalFeedback"
-            ]
-        },
-        "tags.PostReviewStatus": {
-            "type": "string",
-            "enum": [
-                "open",
-                "revision needed",
-                "reviewed"
-            ],
-            "x-enum-varnames": [
-                "Open",
-                "RevisionNeeded",
-                "Reviewed"
-            ]
-        },
-        "models.PostType": {
-            "type": "string",
-            "enum": [
-                "project",
-                "question",
-                "reflection"
-            ],
-            "x-enum-varnames": [
-                "Project",
-                "Question",
-                "Reflection"
-            ]
         },
         "tags.ScientificField": {
             "type": "string",
