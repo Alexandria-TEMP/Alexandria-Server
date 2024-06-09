@@ -17,6 +17,7 @@ var (
 
 	memberService        MemberService
 	exampleMember        models.Member
+	exampleMemberDTO     models.MemberDTO
 	exampleSTag1         *tags.ScientificFieldTag
 	exampleSTag2         *tags.ScientificFieldTag
 	mockMemberRepository *mocks.MockModelRepositoryInterface[*models.Member]
@@ -45,6 +46,14 @@ func TestMain(m *testing.M) {
 		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
 			ScientificFieldTags: scientificFieldTagArray,
 		},
+	}
+	exampleMemberDTO = models.MemberDTO{
+		FirstName:             "John",
+		LastName:              "Smith",
+		Email:                 "john.smith@gmail.com",
+		Password:              "password",
+		Institution:           "TU Delft",
+		ScientificFieldTagIDs: []uint{},
 	}
 
 	cwd, _ = os.Getwd()

@@ -80,12 +80,12 @@ func (repo *ModelRepository[T]) Delete(id uint) error {
 }
 
 func (repo *ModelRepository[T]) GetAllIDs() ([]uint, error) {
-	var models []uint
-	// Return all elements of that type
-	result := repo.Database.Select("ID").Find(&models)
+	var ids []uint
+	// using "pluck" to get a single column to extract only the IDs
+	result := repo.Database.Model(new(T)).Pluck("ID", &ids)
 	if result.Error != nil {
-		return nil, fmt.Errorf("could not return all instances of model to delete: %w", result.Error)
+		return nil, fmt.Errorf("could not retrieve IDs of model: %w", result.Error)
 	}
 
-	return models, result.Error
+	return ids, nil
 }

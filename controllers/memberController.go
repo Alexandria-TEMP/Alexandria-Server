@@ -88,7 +88,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	form := forms.MemberCreationForm{}
 	// bind the fields of the param to the JSON of the model
 	err := c.BindJSON(&form)
-	fmt.Println(form.ScientificFieldTagIDs)
+	fmt.Printf("form ids: %v", form.ScientificFieldTagIDs)
 
 	// check for errors
 	// if there is an error, return a 400 bad request status
@@ -101,6 +101,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 
 	// get array of strings, create array of tags
 	tagIDs := form.ScientificFieldTagIDs
+	fmt.Printf("tag ids: %v", form.ScientificFieldTagIDs)
 	// call the method from the tag service
 	tagArray, err := memberController.TagService.GetTagsFromUintIDs(tagIDs)
 
@@ -132,7 +133,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 
 	// send back a positive response 200 status with the created member
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, &memberDTO)
+	c.JSON(http.StatusOK, memberDTO)
 }
 
 // UpdateMember godoc
@@ -151,7 +152,7 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	// get the new member object
 	updatedMember := models.MemberDTO{}
 	err := c.BindJSON(&updatedMember)
-
+	fmt.Printf("This is the updated Member from the form: %v", updatedMember)
 	// check for errors
 	if err != nil {
 		fmt.Println(err)
@@ -180,8 +181,8 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	err = memberController.MemberService.UpdateMember(&updatedMember, &tagContainer)
 	// check for errors again
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update member because no member with this ID exists"))
+		fmt.Printf("%v", err)
+		utils.ThrowHTTPError(c, http.StatusNotFound, errors.New("cannot update member because no member with this ID exists"))
 
 		return
 	}
@@ -258,7 +259,7 @@ func (memberController *MemberController) GetAllMembers(c *gin.Context) {
 		return
 	}
 
-	// if correct response send the member back
+	// if correct response send the member ids back
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, members)
 }

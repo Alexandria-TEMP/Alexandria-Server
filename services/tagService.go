@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 )
@@ -18,16 +20,16 @@ type TagService struct {
 
 func (tagService *TagService) GetTagsFromUintIDs(ids []uint) ([]*tags.ScientificFieldTag, error) {
 	tagPointers := []*tags.ScientificFieldTag{}
-
+	fmt.Printf("ids in tag service method: %v", ids)
 	for _, id := range ids {
 		tag, err := tagService.TagRepository.GetByID(id)
-
+		fmt.Printf("tag id: %v", tag)
 		if err != nil {
 			return nil, err
 		}
 
 		tagPointers = append(tagPointers, tag)
 	}
-
+	fmt.Printf(" tag pointers: %v", tagPointers)
 	return tagPointers, nil
 }

@@ -50,21 +50,32 @@ func TestMain(m *testing.M) {
 	}
 	exampleSTag2 = &tag2
 
+	exampleMember = models.Member{
+		FirstName:   "John",
+		LastName:    "Smith",
+		Email:       "john.smith@gmail.com",
+		Password:    "password",
+		Institution: "TU Delft",
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		},
+	}
 	exampleMemberDTO = models.MemberDTO{
 		FirstName:             "John",
 		LastName:              "Smith",
 		Email:                 "john.smith@gmail.com",
 		Password:              "password",
 		Institution:           "TU Delft",
-		ScientificFieldTagIDs: []uint{1, 2},
+		ScientificFieldTagIDs: []uint{},
 	}
 
 	exampleMemberForm = forms.MemberCreationForm{
-		FirstName:   "John",
-		LastName:    "Smith",
-		Email:       "john.smith@gmail.com",
-		Password:    "password",
-		Institution: "TU Delft",
+		FirstName:             "John",
+		LastName:              "Smith",
+		Email:                 "john.smith@gmail.com",
+		Password:              "password",
+		Institution:           "TU Delft",
+		ScientificFieldTagIDs: []uint{},
 	}
 
 	cwd, _ = os.Getwd()

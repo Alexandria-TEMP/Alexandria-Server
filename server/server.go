@@ -35,8 +35,18 @@ type ControllerEnv struct {
 	tagController         *controllers.TagController
 }
 
-func initRepositoryEnv(_ *gorm.DB) RepositoryEnv {
-	return RepositoryEnv{}
+func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
+	return RepositoryEnv{
+		postRepository: &database.ModelRepository[*models.Post]{
+			Database: db,
+		},
+		memberRepository: &database.ModelRepository[*models.Member]{
+			Database: db,
+		},
+		tagRepository: &database.ModelRepository[*tags.ScientificFieldTag]{
+			Database: db,
+		},
+	}
 }
 
 func initServiceEnv(repositoryEnv RepositoryEnv, _ *filesystem.Filesystem) ServiceEnv {

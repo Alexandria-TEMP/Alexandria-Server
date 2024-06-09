@@ -21,7 +21,6 @@ func beforeEachMember(t *testing.T) {
 
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 
-	// need to mock repository here, how?
 	memberService = MemberService{
 		MemberRepository: mockMemberRepository,
 	}
@@ -114,5 +113,62 @@ func TestCreateMemberUnsuccessful(t *testing.T) {
 	// verify that the member object was not created
 	assert.Nil(t, member)
 	// verify the error was returned correctly
+	assert.Equal(t, expectedErr, err)
+}
+
+func TestUpdateMemberSuccessful(t *testing.T) {
+	beforeEachMember(t)
+
+	// mock member repository here to return no error
+	mockMemberRepository.EXPECT().Update(&exampleMember).Return(&exampleMember, nil)
+
+	// call service method
+	err := memberService.UpdateMember(&exampleMemberDTO, &exampleMember.ScientificFieldTagContainer)
+	// assert there was no error
+	assert.Nil(t, err)
+}
+
+func TestUpdateMemberUnsuccessful(t *testing.T) {
+	beforeEachMember(t)
+
+	expectedErr := fmt.Errorf("error")
+
+	// mock member repository to return an error
+	mockMemberRepository.EXPECT().Update(&exampleMember).Return(&exampleMember, expectedErr)
+
+	// call service method
+	err := memberService.UpdateMember(&exampleMemberDTO, &exampleMember.ScientificFieldTagContainer)
+
+	// verify the error was returned correctly
+	assert.Equal(t, expectedErr, err)
+}
+
+func TestDeleteMemberSuccessful(t *testing.T) {
+	beforeEachMember(t)
+
+	id := 5
+
+	// mock member repository here to return member when get by id called
+	mockMemberRepository.EXPECT().Delete(uint(id)).Return(nil)
+
+	// call service method
+	err := memberService.DeleteMember(uint(id))
+
+	// assert there was no error
+	assert.Nil(t, err)
+}
+
+func TestDeleteMemberUnsuccessful(t *testing.T) {
+	beforeEachMember(t)
+	// var id uint
+	id := 5
+	expectedErr := fmt.Errorf("error")
+	// mock member repository here to return member when get by id called
+	mockMemberRepository.EXPECT().Delete(uint(id)).Return(expectedErr)
+
+	// call service method
+	err := memberService.DeleteMember(uint(id))
+
+	// assert there expected error was returned
 	assert.Equal(t, expectedErr, err)
 }

@@ -26,7 +26,7 @@ func beforeEachMember(t *testing.T) {
 
 	mockMemberService = mock_interfaces.NewMockMemberService(mockCtrl)
 	mockTagService = mock_interfaces.NewMockTagService(mockCtrl)
-	memberController = &MemberController{MemberService: mockMemberService}
+	memberController = &MemberController{MemberService: mockMemberService, TagService: mockTagService}
 }
 
 func TestGetMember200(t *testing.T) {
@@ -37,12 +37,12 @@ func TestGetMember200(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/v2/members/1", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
-	var responsemember models.Member
+	var responsemember models.MemberDTO
 
 	responseJSON, _ := io.ReadAll(responseRecorder.Body)
 	_ = json.Unmarshal(responseJSON, &responsemember)
 
-	assert.Equal(t, exampleMember, responsemember)
+	assert.Equal(t, exampleMemberDTO, responsemember)
 }
 
 func TestGetMember400(t *testing.T) {
@@ -75,18 +75,19 @@ func TestGetMember404(t *testing.T) {
 func TestCreateMember200(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().CreateMember(&exampleMemberForm, []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2}).Return(&exampleMember, nil).Times(1)
+	mockMemberService.EXPECT().CreateMember(&exampleMemberForm, gomock.Any()).Return(&exampleMember, nil).Times(1)
+	mockTagService.EXPECT().GetTagsFromUintIDs([]uint{}).Return([]*tags.ScientificFieldTag{}, nil).Times(1)
 
 	exampleMemberFormJSON, _ := json.Marshal(exampleMemberForm)
 	req, _ := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(exampleMemberFormJSON))
 	router.ServeHTTP(responseRecorder, req)
 
-	var responsemember models.Member
+	var responsemember models.MemberDTO
 
 	responseJSON, _ := io.ReadAll(responseRecorder.Body)
 	_ = json.Unmarshal(responseJSON, &responsemember)
 
-	assert.Equal(t, exampleMember, responsemember)
+	assert.Equal(t, exampleMemberDTO, responsemember)
 }
 
 func TestCreateMember400(t *testing.T) {
@@ -135,6 +136,73 @@ func TestDeleteMember404(t *testing.T) {
 	mockMemberService.EXPECT().DeleteMember(uint(1)).Return(errors.New("some error")).Times(1)
 
 	req, _ := http.NewRequest("DELETE", "/api/v2/members/1", http.NoBody)
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}
+
+func TestUpdateMember200(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberService.EXPECT().UpdateMember(&exampleMemberDTO, gomock.Any()).Return(nil).Times(1)
+	mockTagService.EXPECT().GetTagsFromUintIDs([]uint{}).Return([]*tags.ScientificFieldTag{}, nil).Times(1)
+
+	exampleMemberDTOJSON, _ := json.Marshal(exampleMemberDTO)
+	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(exampleMemberDTOJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+}
+
+func TestUpdateMember400(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberService.EXPECT().UpdateMember(gomock.Any(), gomock.Any()).Return(nil).Times(0)
+
+	badMemberFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
+	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(badMemberFormJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+func TestUpdateMember404(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberService.EXPECT().UpdateMember(gomock.Any(), gomock.Any()).Return(errors.New("some error")).Times(1)
+	mockTagService.EXPECT().GetTagsFromUintIDs([]uint{}).Return([]*tags.ScientificFieldTag{}, nil).Times(1)
+
+	exampleMemberDTOJSON, _ := json.Marshal(exampleMemberDTO)
+	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(exampleMemberDTOJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}
+
+func TestGetAllMembers200(t *testing.T) {
+	beforeEachMember(t)
+	mockMemberService.EXPECT().GetAllMembers().Return([]uint{2, 3}, nil)
+	req, _ := http.NewRequest("GET", "/api/v2/members", http.NoBody)
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+}
+
+func TestGetAllMembers404(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberService.EXPECT().GetAllMembers().Return(nil, errors.New("some error")).Times(1)
+
+	req, _ := http.NewRequest("GET", "/api/v2/members", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()

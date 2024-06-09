@@ -38,7 +38,7 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 }
 
 func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, userFields *tags.ScientificFieldTagContainer) error {
-	member := &models.Member{
+	newMember := &models.Member{
 		FirstName:                   memberDTO.FirstName,
 		LastName:                    memberDTO.LastName,
 		Email:                       memberDTO.Email,
@@ -46,7 +46,8 @@ func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, us
 		Institution:                 memberDTO.Institution,
 		ScientificFieldTagContainer: *userFields,
 	}
-	_, err := memberService.MemberRepository.Update(member)
+	newMember.ID = memberDTO.ID
+	_, err := memberService.MemberRepository.Update(newMember)
 
 	return err
 }
