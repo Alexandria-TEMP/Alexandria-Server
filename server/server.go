@@ -16,6 +16,7 @@ type RepositoryEnv struct {
 	postRepository        database.ModelRepositoryInterface[*models.Post]
 	projectPostRepository database.ModelRepositoryInterface[*models.ProjectPost]
 	memberRepository      database.ModelRepositoryInterface[*models.Member]
+	discussionRepository  database.ModelRepositoryInterface[*models.Discussion]
 }
 
 type ServiceEnv struct {
@@ -24,6 +25,7 @@ type ServiceEnv struct {
 	memberService             interfaces.MemberService
 	postCollaboratorService   interfaces.PostCollaboratorService
 	branchCollaboratorService interfaces.BranchCollaboratorService
+	discussionService         interfaces.DiscussionService
 }
 
 type ControllerEnv struct {
@@ -45,6 +47,9 @@ func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
 			Database: db,
 		},
 		memberRepository: &database.ModelRepository[*models.Member]{
+			Database: db,
+		},
+		discussionRepository: &database.ModelRepository[*models.Discussion]{
 			Database: db,
 		},
 	}
@@ -72,12 +77,17 @@ func initServiceEnv(repositories RepositoryEnv, _ *filesystem.Filesystem) Servic
 		BranchCollaboratorService: branchCollaboratorService,
 	}
 
+	discussionService := &services.DiscussionService{
+		DiscussionRepository: repositories.discussionRepository,
+	}
+
 	return ServiceEnv{
 		postService:               postService,
 		projectPostService:        projectPostService,
 		memberService:             &services.MemberService{},
 		postCollaboratorService:   postCollaboratorService,
 		branchCollaboratorService: branchCollaboratorService,
+		discussionService:         discussionService,
 	}
 }
 
@@ -92,10 +102,12 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 		projectPostController: &controllers.ProjectPostController{
 			ProjectPostService: serviceEnv.projectPostService,
 		},
-		discussionController: &controllers.DiscussionController{},
-		filterController:     &controllers.FilterController{},
-		branchController:     &controllers.BranchController{},
-		tagController:        &controllers.TagController{},
+		discussionController: &controllers.DiscussionController{
+			DiscussionService: serviceEnv.discussionService,
+		},
+		filterController: &controllers.FilterController{},
+		branchController: &controllers.BranchController{},
+		tagController:    &controllers.TagController{},
 	}
 }
 

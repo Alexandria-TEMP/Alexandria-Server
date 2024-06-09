@@ -62,7 +62,8 @@ func tagRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 func discussionRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	discussionRouter := v2.Group("/discussions")
 	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
-	discussionRouter.POST("", controllers.discussionController.CreateDiscussion)
+	discussionRouter.POST("/roots", controllers.discussionController.CreateRootDiscussion)
+	discussionRouter.POST("/replies", controllers.discussionController.CreateReplyDiscussion)
 	discussionRouter.DELETE("/:discussionID", controllers.discussionController.DeleteDiscussion)
 	discussionRouter.POST("/:discussionID/reports", controllers.discussionController.AddDiscussionReport)
 	discussionRouter.GET("/:discussionID/reports", controllers.discussionController.GetDiscussionReports)
