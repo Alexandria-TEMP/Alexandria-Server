@@ -71,7 +71,7 @@ func (postService *PostService) UpdatePost(_ *models.Post) error {
 	- Start goroutine for rendering
 */
 
-func (postService *PostService) Filter(page, size int, form forms.FilterForm) ([]uint, error) {
+func (postService *PostService) Filter(page, size int, _ forms.FilterForm) ([]uint, error) {
 	// TODO construct query based off filter form
 	// Future changes: make sure to exclude any posts of type 'Project' from the result!
 	// Posts are composed into Project Posts, and those composed Posts shouldn't be returned.
