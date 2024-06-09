@@ -15,6 +15,460 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/branches": {
+            "put": {
+                "description": "Update any number of the aspects of a branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Update branch",
+                "parameters": [
+                    {
+                        "description": "Updated Branch",
+                        "name": "branch",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.BranchDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new branch linked to a project post.\nNote that Member IDs passed here, get converted to Collaborator IDs.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Create new branch",
+                "parameters": [
+                    {
+                        "description": "Branch Creation Form",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.BranchCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.BranchDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/branches/collaborators/{collaboratorID}": {
+            "get": {
+                "description": "Get a branch collaborator by ID, a member who has collaborated on a branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Get a branch collaborator by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Collaborator ID",
+                        "name": "collaboratorID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.BranchCollaboratorDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/branches/reviews/{reviewID}": {
+            "get": {
+                "description": "Returns a review of a branch with the given ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Returns a branch review by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "review ID",
+                        "name": "reviewID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.BranchReviewDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/branches/{branchID}": {
+            "get": {
+                "description": "Get a branch by branch ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Get branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.BranchDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a branch with given ID from database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Delete a branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/branches/{branchID}/can-review/{userID}": {
+            "get": {
+                "description": "Returns true if the user fulfills the requirements to review the branch\nReturns false if user is unauthorized to review the branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Returns whether the user is allowed to review this branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "user ID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/branches/{branchID}/review-statuses": {
+            "get": {
+                "description": "Returns an array of the statuses of all the reviews of this branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Returns status of all branch reviews",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.BranchOverallReviewStatus"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/branches/{branchID}/reviews": {
+            "post": {
+                "description": "Adds a review to a branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Adds a review to a branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "review creation form",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.ReviewCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/discussions": {
             "post": {
                 "description": "Create a new discussion\nEither parent ID or version ID must be specified. This determines whether it's a reply or not, respectively.",
@@ -686,9 +1140,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}/discussions": {
+        "/members/{userID}/branches": {
             "get": {
-                "description": "Get all discussions that this member has participated in",
+                "description": "Get all branches that this member is a collaborator of",
                 "consumes": [
                     "application/json"
                 ],
@@ -698,7 +1152,7 @@ const docTemplate = `{
                 "tags": [
                     "members"
                 ],
-                "summary": "Get all discussions",
+                "summary": "Get all branches of this member",
                 "parameters": [
                     {
                         "type": "string",
@@ -739,9 +1193,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}/branches": {
+        "/members/{userID}/discussions": {
             "get": {
-                "description": "Get all branches that this member is a collaborator of",
+                "description": "Get all discussions that this member has participated in",
                 "consumes": [
                     "application/json"
                 ],
@@ -751,7 +1205,7 @@ const docTemplate = `{
                 "tags": [
                     "members"
                 ],
-                "summary": "Get all branches of this member",
+                "summary": "Get all discussions",
                 "parameters": [
                     {
                         "type": "string",
@@ -1100,463 +1554,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/branches": {
-            "put": {
-                "description": "Update any number of the aspects of a branch",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Update branch",
-                "parameters": [
-                    {
-                        "description": "Updated Branch",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.BranchDTO"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a new branch linked to a project post.\nNote that Member IDs passed here, get converted to Collaborator IDs.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Create new branch",
-                "parameters": [
-                    {
-                        "description": "Branch Creation Form",
-                        "name": "form",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/forms.BranchCreationForm"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.BranchDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/branches/collaborators/{collaboratorID}": {
-            "get": {
-                "description": "Get a branch collaborator by ID, a member who has collaborated on a branch",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Get a branch collaborator by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Collaborator ID",
-                        "name": "collaboratorID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.BranchCollaboratorDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/branches/reviews/{reviewID}": {
-            "get": {
-                "description": "Returns a review of a branch with the given ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Returns a branch review by ID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "review ID",
-                        "name": "reviewID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.BranchReviewDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/branches/{branchID}": {
-            "get": {
-                "description": "Get a branch by branch ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Get branch",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Branch ID",
-                        "name": "branchID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.BranchDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete a branch with given ID from database",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Delete a branch",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "branch ID",
-                        "name": "branchID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/branches/{branchID}/can-review/{userID}": {
-            "get": {
-                "description": "Returns true if the user fulfills the requirements to review the branch\nReturns false if user is unauthorized to review the branch",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Returns whether the user is allowed to review this branch",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "branch ID",
-                        "name": "branchID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "boolean"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/branches/{branchID}/review-statuses": {
-            "get": {
-                "description": "Returns an array of the statuses of all the reviews of this branch",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Returns status of all branch reviews",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "branch ID",
-                        "name": "branchID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.BranchReviewStatus"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/branches/{branchID}/reviews": {
-            "post": {
-                "description": "Adds a review to a branch",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Adds a review to a branch",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "branch ID",
-                        "name": "branchID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "review creation form",
-                        "name": "form",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/forms.ReviewCreationForm"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
         "/posts": {
             "put": {
-                "description": "Update any number of the aspects of a question or discussion post",
+                "description": "Update any number of aspects of a question or discussion post",
                 "consumes": [
                     "application/json"
                 ],
@@ -1603,7 +1603,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create a new question or discussion post",
+                "description": "Create a new question or discussion post. Cannot be a project post.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1805,7 +1805,7 @@ const docTemplate = `{
         },
         "/posts/{postID}": {
             "get": {
-                "description": "Get a post by post ID",
+                "description": "Get a post by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1815,7 +1815,7 @@ const docTemplate = `{
                 "tags": [
                     "posts"
                 ],
-                "summary": "Get post",
+                "summary": "Get post by ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -2374,7 +2374,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.CompletionStatus"
+                                "$ref": "#/definitions/models.ProjectCompletionStatus"
                             }
                         }
                     },
@@ -2409,7 +2409,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.FeedbackPreference"
+                                "$ref": "#/definitions/models.ProjectFeedbackPreference"
                             }
                         }
                     },
@@ -2444,7 +2444,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.PostType"
+                                "$ref": "#/definitions/models.PostType"
                             }
                         }
                     },
@@ -2497,363 +2497,46 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/versions": {
-            "post": {
-                "description": "Create a new version with discussions and repository from zipped file in body",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "versions"
-                ],
-                "summary": "Create new version",
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "Repository to create",
-                        "name": "repository",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.VersionDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/versions/{versionID}": {
-            "get": {
-                "description": "Get a version by version ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "versions"
-                ],
-                "summary": "Get version",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Version ID",
-                        "name": "versionID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.VersionDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/versions/{versionID}/discussions": {
-            "get": {
-                "description": "Returns all discussions on this version that are not a reply to another discussion\nEndpoint is offset-paginated",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "versions"
-                ],
-                "summary": "Returns all level 1 discussions associated with the version",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "version ID",
-                        "name": "versionID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "pageSize",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.DiscussionDTO"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/versions/{versionID}/file/{filepath}": {
-            "get": {
-                "description": "Get the contents of a single file from a repository of a version",
-                "produces": [
-                    "application/octet-stream"
-                ],
-                "tags": [
-                    "versions"
-                ],
-                "summary": "Get a file from a repository",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Version ID",
-                        "name": "versionID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filepath",
-                        "name": "filepath",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/versions/{versionID}/render": {
-            "get": {
-                "description": "Get the render of the repository underlying a version if it exists and has been rendered successfully",
-                "produces": [
-                    "text/html"
-                ],
-                "tags": [
-                    "versions"
-                ],
-                "summary": "Get the render of a version",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Version ID",
-                        "name": "versionID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    },
-                    "202": {
-                        "description": "Accepted",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/versions/{versionID}/repository": {
-            "get": {
-                "description": "Get the entire zipped repository of a version",
-                "produces": [
-                    "application/zip"
-                ],
-                "tags": [
-                    "versions"
-                ],
-                "summary": "Get the repository of a version",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Version ID",
-                        "name": "versionID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
-        "/versions/{versionID}/tree": {
-            "get": {
-                "description": "Get the file tree of a repository of a version",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "versions"
-                ],
-                "summary": "Get the file tree of a repository",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "version ID",
-                        "name": "versionID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "integer"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
+        "forms.BranchCreationForm": {
+            "type": "object",
+            "properties": {
+                "anonymous": {
+                    "type": "boolean"
+                },
+                "branchTitle": {
+                    "type": "string"
+                },
+                "collaboratingMemberIDs": {
+                    "description": "The branch's metadata",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "projectPostID": {
+                    "type": "integer"
+                },
+                "updatedCompletionStatus": {
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                },
+                "updatedFeedbackPreferences": {
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                },
+                "updatedPostTitle": {
+                    "description": "Changes made by the branch",
+                    "type": "string"
+                },
+                "updatedScientificFields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificField"
+                    }
+                }
+            }
+        },
         "forms.DiscussionCreationForm": {
             "type": "object",
             "properties": {
@@ -2922,43 +2605,6 @@ const docTemplate = `{
                 }
             }
         },
-        "forms.BranchCreationForm": {
-            "type": "object",
-            "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "collaboratingMemberIDs": {
-                    "description": "The MR's metadata",
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "branchTitle": {
-                    "type": "string"
-                },
-                "projectPostID": {
-                    "type": "integer"
-                },
-                "updatedCompletionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
-                },
-                "updatedFeedbackPreferences": {
-                    "$ref": "#/definitions/tags.FeedbackPreference"
-                },
-                "updatedPostTitle": {
-                    "description": "Changes made by the MR",
-                    "type": "string"
-                },
-                "updatedScientificFields": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/tags.ScientificField"
-                    }
-                }
-            }
-        },
         "forms.PostCreationForm": {
             "type": "object",
             "properties": {
@@ -2966,14 +2612,13 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "authorMemberIDs": {
-                    "description": "Members that are authors of the post",
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
                 },
                 "postType": {
-                    "$ref": "#/definitions/tags.PostType"
+                    "$ref": "#/definitions/models.PostType"
                 },
                 "scientificFieldTags": {
                     "type": "array",
@@ -2990,10 +2635,10 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "completionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
                 },
                 "feedbackPreference": {
-                    "$ref": "#/definitions/tags.FeedbackPreference"
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 },
                 "postCreationForm": {
                     "$ref": "#/definitions/forms.PostCreationForm"
@@ -3006,16 +2651,129 @@ const docTemplate = `{
         "forms.ReviewCreationForm": {
             "type": "object",
             "properties": {
-                "feedback": {
-                    "type": "string"
-                },
                 "branchReviewDecision": {
                     "$ref": "#/definitions/models.BranchReviewDecision"
+                },
+                "feedback": {
+                    "type": "string"
                 },
                 "reviewingMemberID": {
                     "type": "integer"
                 }
             }
+        },
+        "models.BranchCollaboratorDTO": {
+            "type": "object",
+            "properties": {
+                "branchID": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memberID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.BranchDTO": {
+            "type": "object",
+            "properties": {
+                "branchOverallReviewStatus": {
+                    "$ref": "#/definitions/models.BranchOverallReviewStatus"
+                },
+                "branchTitle": {
+                    "type": "string"
+                },
+                "collaboratorIDs": {
+                    "description": "MR metadata",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "discussionIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "newPostTitle": {
+                    "description": "MR's proposed changes",
+                    "type": "string"
+                },
+                "projectPostIDs": {
+                    "type": "integer"
+                },
+                "renderStatus": {
+                    "$ref": "#/definitions/models.RenderStatus"
+                },
+                "reviewIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "updatedCompletionStatus": {
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                },
+                "updatedScientificFields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/tags.ScientificField"
+                    }
+                }
+            }
+        },
+        "models.BranchOverallReviewStatus": {
+            "type": "string",
+            "enum": [
+                "open for review",
+                "peer reviewed",
+                "rejected"
+            ],
+            "x-enum-varnames": [
+                "BranchOpenForReview",
+                "BranchPeerReviewed",
+                "BranchRejected"
+            ]
+        },
+        "models.BranchReviewDTO": {
+            "type": "object",
+            "properties": {
+                "branchID": {
+                    "type": "integer"
+                },
+                "branchReviewDecision": {
+                    "$ref": "#/definitions/models.BranchReviewDecision"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "feedback": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memberID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.BranchReviewDecision": {
+            "type": "string",
+            "enum": [
+                "rejected",
+                "approved"
+            ],
+            "x-enum-varnames": [
+                "Rejected",
+                "Approved"
+            ]
         },
         "models.CollaborationType": {
             "type": "string",
@@ -3053,9 +2811,6 @@ const docTemplate = `{
                 },
                 "text": {
                     "type": "string"
-                },
-                "versionID": {
-                    "type": "integer"
                 }
             }
         },
@@ -3088,125 +2843,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.BranchCollaboratorDTO": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "memberID": {
-                    "type": "integer"
-                },
-                "branchID": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.BranchDTO": {
-            "type": "object",
-            "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "collaboratorIDs": {
-                    "description": "MR metadata",
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "branchReviewDecision": {
-                    "$ref": "#/definitions/models.BranchReviewStatus"
-                },
-                "branchTitle": {
-                    "type": "string"
-                },
-                "newPostTitle": {
-                    "type": "string"
-                },
-                "newVersionID": {
-                    "description": "MR's proposed changes",
-                    "type": "integer"
-                },
-                "previousVersionID": {
-                    "type": "integer"
-                },
-                "projectPostID": {
-                    "type": "integer"
-                },
-                "reviewIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "updatedCompletionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
-                },
-                "updatedScientificFields": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/tags.ScientificField"
-                    }
-                }
-            }
-        },
-        "models.BranchReviewDTO": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "feedback": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "memberID": {
-                    "type": "integer"
-                },
-                "branchReviewDecision": {
-                    "$ref": "#/definitions/models.BranchReviewDecision"
-                },
-                "branchID": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.BranchReviewDecision": {
-            "type": "string",
-            "enum": [
-                "rejected",
-                "approved"
-            ],
-            "x-enum-varnames": [
-                "ReviewRejected",
-                "ReviewApproved"
-            ]
-        },
-        "models.BranchReviewStatus": {
-            "type": "string",
-            "enum": [
-                "open for review",
-                "peer reviewed",
-                "rejected"
-            ],
-            "x-enum-varnames": [
-                "BranchOpenForReview",
-                "BranchPeerReviewed",
-                "BranchRejected"
-            ]
-        },
         "models.PostCollaboratorDTO": {
             "type": "object",
             "properties": {
@@ -3227,10 +2863,13 @@ const docTemplate = `{
         "models.PostDTO": {
             "type": "object",
             "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
                 "collaboratorIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "discussionIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -3240,7 +2879,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "postType": {
-                    "$ref": "#/definitions/tags.PostType"
+                    "$ref": "#/definitions/models.PostType"
                 },
                 "scientificFieldTags": {
                     "type": "array",
@@ -3250,11 +2889,45 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
-                },
-                "versionID": {
-                    "type": "integer"
                 }
             }
+        },
+        "models.PostType": {
+            "type": "string",
+            "enum": [
+                "project",
+                "question",
+                "reflection"
+            ],
+            "x-enum-varnames": [
+                "Project",
+                "Question",
+                "Reflection"
+            ]
+        },
+        "models.ProjectCompletionStatus": {
+            "type": "string",
+            "enum": [
+                "idea",
+                "ongoing",
+                "completed"
+            ],
+            "x-enum-varnames": [
+                "Idea",
+                "Ongoing",
+                "Completed"
+            ]
+        },
+        "models.ProjectFeedbackPreference": {
+            "type": "string",
+            "enum": [
+                "discussion feedback",
+                "formal feedback"
+            ],
+            "x-enum-varnames": [
+                "DiscussionFeedback",
+                "FormalFeedback"
+            ]
         },
         "models.ProjectPostDTO": {
             "type": "object",
@@ -3266,10 +2939,10 @@ const docTemplate = `{
                     }
                 },
                 "completionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
                 },
                 "feedbackPreference": {
-                    "$ref": "#/definitions/tags.FeedbackPreference"
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 },
                 "id": {
                     "type": "integer"
@@ -3280,13 +2953,26 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "postDTO": {
+                "post": {
                     "$ref": "#/definitions/models.PostDTO"
                 },
-                "postReviewStatusTag": {
-                    "$ref": "#/definitions/tags.PostReviewStatus"
+                "postReviewStatus": {
+                    "$ref": "#/definitions/models.ProjectReviewStatus"
                 }
             }
+        },
+        "models.ProjectReviewStatus": {
+            "type": "string",
+            "enum": [
+                "open",
+                "revision needed",
+                "reviewed"
+            ],
+            "x-enum-varnames": [
+                "Open",
+                "RevisionNeeded",
+                "Reviewed"
+            ]
         },
         "models.RenderStatus": {
             "type": "string",
@@ -3296,30 +2982,13 @@ const docTemplate = `{
                 "failure"
             ],
             "x-enum-varnames": [
-                "RenderSuccess",
-                "RenderPending",
-                "RenderFailure"
+                "Success",
+                "Pending",
+                "Failure"
             ]
         },
         "models.ReportDTO": {
             "type": "object"
-        },
-        "models.VersionDTO": {
-            "type": "object",
-            "properties": {
-                "discussionIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "renderStatus": {
-                    "$ref": "#/definitions/models.RenderStatus"
-                }
-            }
         },
         "reports.DiscussionReportDTO": {
             "type": "object",
@@ -3336,56 +3005,6 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
-        },
-        "tags.CompletionStatus": {
-            "type": "string",
-            "enum": [
-                "idea",
-                "ongoing",
-                "completed"
-            ],
-            "x-enum-varnames": [
-                "Idea",
-                "Ongoing",
-                "Completed"
-            ]
-        },
-        "tags.FeedbackPreference": {
-            "type": "string",
-            "enum": [
-                "discussion",
-                "formal feedback"
-            ],
-            "x-enum-varnames": [
-                "Discussion",
-                "FormalFeedback"
-            ]
-        },
-        "tags.PostReviewStatus": {
-            "type": "string",
-            "enum": [
-                "open",
-                "revision needed",
-                "reviewed"
-            ],
-            "x-enum-varnames": [
-                "Open",
-                "RevisionNeeded",
-                "Reviewed"
-            ]
-        },
-        "tags.PostType": {
-            "type": "string",
-            "enum": [
-                "project",
-                "question",
-                "reflection"
-            ],
-            "x-enum-varnames": [
-                "Project",
-                "Question",
-                "Reflection"
-            ]
         },
         "tags.ScientificField": {
             "type": "string",

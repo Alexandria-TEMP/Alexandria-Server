@@ -10,19 +10,17 @@ import (
 func TestBranchCollaboratorJSONMarshaling(t *testing.T) {
 	// This model...
 	model := BranchCollaborator{
-		Model:             gorm.Model{ID: 55},
-		Member:            Member{},
-		MemberID:          32,
-		BranchID:          87,
-		CollaborationType: Author,
+		Model:    gorm.Model{ID: 55},
+		Member:   Member{},
+		MemberID: 32,
+		BranchID: 87,
 	}
 
 	// should equal this DTO!
 	targetDTO := BranchCollaboratorDTO{
-		ID:                55,
-		MemberID:          32,
-		BranchID:          87,
-		CollaborationType: Author,
+		ID:       55,
+		MemberID: 32,
+		BranchID: 87,
 	}
 
 	dto := BranchCollaboratorDTO{}

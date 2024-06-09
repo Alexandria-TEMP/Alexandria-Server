@@ -78,7 +78,7 @@ func (branchController *BranchController) DeleteBranch(_ *gin.Context) {
 // @Accept  	json
 // @Param		branchID		path		string			true	"branch ID"
 // @Produce		json
-// @Success 	200		{array}		models.BranchReviewStatus
+// @Success 	200		{array}		models.BranchOverallReviewStatus
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
