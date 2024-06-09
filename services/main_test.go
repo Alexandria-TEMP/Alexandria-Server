@@ -11,12 +11,18 @@ import (
 // Variables that are used by all service tests
 // Tests are responsible for initializing their values
 
-var postRepositoryMock *mocks.MockModelRepositoryInterface[*models.Post]
-var projectPostRepositoryMock *mocks.MockModelRepositoryInterface[*models.ProjectPost]
-var memberRepositoryMock *mocks.MockModelRepositoryInterface[*models.Member]
+var (
+	postRepositoryMock               *mocks.MockModelRepositoryInterface[*models.Post]
+	projectPostRepositoryMock        *mocks.MockModelRepositoryInterface[*models.ProjectPost]
+	memberRepositoryMock             *mocks.MockModelRepositoryInterface[*models.Member]
+	postCollaboratorRepositoryMock   *mocks.MockModelRepositoryInterface[*models.PostCollaborator]
+	branchCollaboratorRepositoryMock *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
+)
 
-var postCollaboratorServiceMock *mocks.MockPostCollaboratorService
-var branchCollaboratorServiceMock *mocks.MockBranchCollaboratorService
+var (
+	postCollaboratorServiceMock   *mocks.MockPostCollaboratorService
+	branchCollaboratorServiceMock *mocks.MockBranchCollaboratorService
+)
 
 var memberA, memberB, memberC models.Member
 
