@@ -12,6 +12,8 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	// Get router
 	router := gin.Default()
 	router.Use(cors.Default())
+	router.RedirectTrailingSlash = true
+	router.RedirectFixedPath = true
 	err := router.SetTrustedProxies(nil)
 
 	if err != nil {
@@ -60,7 +62,7 @@ func tagRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 func discussionRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	discussionRouter := v2.Group("/discussions")
 	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
-	discussionRouter.POST("/", controllers.discussionController.CreateDiscussion)
+	discussionRouter.POST("", controllers.discussionController.CreateDiscussion)
 	discussionRouter.DELETE("/:discussionID", controllers.discussionController.DeleteDiscussion)
 	discussionRouter.POST("/:discussionID/reports", controllers.discussionController.AddDiscussionReport)
 	discussionRouter.GET("/:discussionID/reports", controllers.discussionController.GetDiscussionReports)
@@ -70,8 +72,8 @@ func discussionRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 func branchRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	branchRouter := v2.Group("/branches")
 	branchRouter.GET("/:branchID", controllers.branchController.GetBranch)
-	branchRouter.POST("/", controllers.branchController.CreateBranch)
-	branchRouter.PUT("/", controllers.branchController.UpdateBranch)
+	branchRouter.POST("", controllers.branchController.CreateBranch)
+	branchRouter.PUT("", controllers.branchController.UpdateBranch)
 	branchRouter.DELETE("/:branchID", controllers.branchController.DeleteBranch)
 	branchRouter.GET("/:branchID/review-statuses", controllers.branchController.GetReviewStatus)
 	branchRouter.GET("/reviews/:reviewID", controllers.branchController.GetReview)
@@ -83,10 +85,10 @@ func branchRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	memberRouter := v2.Group("/members")
 	memberRouter.GET("/:memberID", controllers.memberController.GetMember)
-	memberRouter.POST("/", controllers.memberController.CreateMember)
-	memberRouter.PUT("/", controllers.memberController.UpdateMember)
+	memberRouter.POST("", controllers.memberController.CreateMember)
+	memberRouter.PUT("", controllers.memberController.UpdateMember)
 	memberRouter.DELETE("/:memberID", controllers.memberController.DeleteMember)
-	memberRouter.GET("/", controllers.memberController.GetAllMembers)
+	memberRouter.GET("", controllers.memberController.GetAllMembers)
 	memberRouter.GET("/:memberID/posts", controllers.memberController.GetMemberPosts)
 	memberRouter.GET("/:memberID/project-posts", controllers.memberController.GetMemberProjectPosts)
 	memberRouter.GET("/:memberID/branches", controllers.memberController.GetMemberBranches)
@@ -100,8 +102,8 @@ func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	projectPostRouter := v2.Group("/project-posts")
 	projectPostRouter.GET("/:postID", controllers.projectPostController.GetProjectPost)
-	projectPostRouter.POST("/", controllers.projectPostController.CreateProjectPost)
-	projectPostRouter.PUT("/", controllers.projectPostController.UpdateProjectPost)
+	projectPostRouter.POST("", controllers.projectPostController.CreateProjectPost)
+	projectPostRouter.PUT("", controllers.projectPostController.UpdateProjectPost)
 	projectPostRouter.DELETE("/:postID", controllers.projectPostController.DeleteProjectPost)
 	projectPostRouter.POST("/from-github", controllers.projectPostController.CreateProjectPostFromGithub)
 	projectPostRouter.GET("/:postID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
@@ -111,8 +113,8 @@ func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	postRouter := v2.Group("/posts")
 	postRouter.GET("/:postID", controllers.postController.GetPost)
-	postRouter.POST("/", controllers.postController.CreatePost)
-	postRouter.PUT("/", controllers.postController.UpdatePost)
+	postRouter.POST("", controllers.postController.CreatePost)
+	postRouter.PUT("", controllers.postController.UpdatePost)
 	postRouter.DELETE("/:postID", controllers.postController.DeletePost)
 	postRouter.POST("/from-github", controllers.postController.CreatePostFromGithub)
 	postRouter.POST("/:postID/reports", controllers.postController.AddPostReport)

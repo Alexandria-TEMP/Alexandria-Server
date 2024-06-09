@@ -35,7 +35,7 @@ type ProjectPostController struct {
 func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Context) {
 	// extract postID
 	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseInt(postIDStr, 10, 64)
+	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
 		fmt.Println(err)
@@ -44,7 +44,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 		return
 	}
 
-	post, err := projectPostController.ProjectPostService.GetProjectPost(uint64(postID))
+	post, err := projectPostController.ProjectPostService.GetProjectPost(uint(postID))
 
 	if err != nil {
 		fmt.Println(err)
@@ -82,7 +82,8 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 	}
 
 	// Create and add post to database here. For now just do this to test.
-	post := projectPostController.ProjectPostService.CreateProjectPost(&form)
+	post, _ := projectPostController.ProjectPostService.CreateProjectPost(&form)
+	// TODO handle error
 
 	// response
 	c.Header("Content-Type", "application/json")

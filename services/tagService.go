@@ -6,7 +6,7 @@ import (
 )
 
 type TagService struct {
-	TagRepository database.RepositoryInterface[*tags.ScientificFieldTag]
+	TagRepository database.ModelRepositoryInterface[*tags.ScientificFieldTag]
 	//TagContainerRepository database.RepositoryInterface[*tags.ScientificFieldTagContainer]
 }
 

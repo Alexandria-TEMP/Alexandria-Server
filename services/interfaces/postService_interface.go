@@ -8,11 +8,11 @@ import (
 //go:generate mockgen -package=mocks -source=./postService_interface.go -destination=../../mocks/postService_mock.go
 
 type PostService interface {
-	GetPost(postID uint64) (*models.Post, error)
-	CreatePost(form *forms.PostCreationForm) *models.Post
+	GetPost(postID uint) (*models.Post, error)
+	CreatePost(form *forms.PostCreationForm) (*models.Post, error)
 	UpdatePost(updatedPost *models.Post) error
 
-	GetProjectPost(postID uint64) (*models.ProjectPost, error)
-	CreateProjectPost(form *forms.ProjectPostCreationForm) *models.ProjectPost
+	GetProjectPost(postID uint) (*models.ProjectPost, error)
+	CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error)
 	UpdateProjectPost(updatedPost *models.ProjectPost) error
 }

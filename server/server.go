@@ -14,8 +14,9 @@ import (
 )
 
 type RepositoryEnv struct {
-	memberRepository database.RepositoryInterface[*models.Member]
-	tagRepository    database.RepositoryInterface[*tags.ScientificFieldTag]
+	postRepository   database.ModelRepositoryInterface[*models.Post]
+	memberRepository database.ModelRepositoryInterface[*models.Member]
+	tagRepository    database.ModelRepositoryInterface[*tags.ScientificFieldTag]
 }
 
 type ServiceEnv struct {
@@ -34,17 +35,16 @@ type ControllerEnv struct {
 	tagController         *controllers.TagController
 }
 
-func initRepositoryEnv(db *gorm.DB) RepositoryEnv {
-	return RepositoryEnv{
-		memberRepository: &database.ModelRepository[*models.Member]{Database: db},
-		tagRepository:    &database.ModelRepository[*tags.ScientificFieldTag]{Database: db},
-	}
+func initRepositoryEnv(_ *gorm.DB) RepositoryEnv {
+	return RepositoryEnv{}
 }
 
 func initServiceEnv(repositoryEnv RepositoryEnv, _ *filesystem.Filesystem) ServiceEnv {
 	return ServiceEnv{
-
-		postService: &services.PostService{},
+		postService: &services.PostService{
+			PostRepository:   repositoryEnv.postRepository,
+			MemberRepository: repositoryEnv.memberRepository,
+		},
 		memberService: &services.MemberService{
 			MemberRepository: repositoryEnv.memberRepository,
 		},

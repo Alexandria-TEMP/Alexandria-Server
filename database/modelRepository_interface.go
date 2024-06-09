@@ -1,6 +1,6 @@
 package database
 
-type RepositoryInterface[T Model] interface {
+type ModelRepositoryInterface[T Model] interface {
 	Create(object T) error
 	GetByID(id uint) (T, error)
 	Update(object T) (T, error)
