@@ -17,6 +17,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const approvalsToMerge = 2 // 0 indexed
+
 type BranchService struct {
 	BranchRepository              database.ModelRepositoryInterface[*models.Branch]
 	ClosedBranchRepository        database.ModelRepositoryInterface[*models.ClosedBranch]
@@ -90,52 +92,32 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 	return branch, nil, nil
 }
 
-func (branchService *BranchService) UpdateBranch(branchDTO models.BranchDTO) (models.Branch, error) {
+func (branchService *BranchService) UpdateBranch(branchDTO *models.BranchDTO) (models.Branch, error) {
 	var branch models.Branch
 
 	// map collaborator IDs to collaborators
-	var collaborators []*models.BranchCollaborator
+	collaborators, err := branchService.getBranchCollaboratorsFromIDs(branchDTO.CollaboratorIDs)
 
-	for _, ID := range branchDTO.CollaboratorIDs {
-		collaborator, err := branchService.BranchCollaboratorRepository.GetByID(ID)
-
-		if err != nil {
-			return branch, fmt.Errorf("failed to find branch collaborator with id=%v", ID)
-		}
-
-		collaborators = append(collaborators, collaborator)
+	if err != nil {
+		return branch, err
 	}
 
 	// map review IDs to reviews
-	var reviews []*models.Review
+	reviews, err := branchService.getBranchReviewsFromIDs(branchDTO.ReviewIDs)
 
-	for _, ID := range branchDTO.ReviewIDs {
-		review, err := branchService.ReviewRepository.GetByID(ID)
-
-		if err != nil {
-			return branch, fmt.Errorf("failed to find review with id=%v", ID)
-		}
-
-		reviews = append(reviews, review)
+	if err != nil {
+		return branch, err
 	}
 
 	// map discussion IDs to discussion container
-	var discussions []*models.Discussion
+	discussionContainer, err := branchService.getDiscussionContainerFromIDs(branchDTO.DiscussionIDs)
 
-	for _, ID := range branchDTO.DiscussionIDs {
-		discussion, err := branchService.DiscussionRepository.GetByID(ID)
-
-		if err != nil {
-			return branch, fmt.Errorf("failed to find discussion with id=%v", ID)
-		}
-
-		discussions = append(discussions, discussion)
+	if err != nil {
+		return branch, err
 	}
 
-	discussionContainer := models.DiscussionContainer{Discussions: discussions}
-
 	// check project post exists
-	_, err := branchService.ProjectPostRepository.GetByID(branchDTO.ProjectPostID)
+	_, err = branchService.ProjectPostRepository.GetByID(branchDTO.ProjectPostID)
 
 	if err != nil {
 		return branch, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
@@ -163,6 +145,54 @@ func (branchService *BranchService) UpdateBranch(branchDTO models.BranchDTO) (mo
 	}
 
 	return branch, nil
+}
+
+func (branchService *BranchService) getBranchCollaboratorsFromIDs(ids []uint) ([]*models.BranchCollaborator, error) {
+	collaborators := []*models.BranchCollaborator{}
+
+	for _, ID := range ids {
+		collaborator, err := branchService.BranchCollaboratorRepository.GetByID(ID)
+
+		if err != nil {
+			return collaborators, fmt.Errorf("failed to find branch collaborator with id=%v", ID)
+		}
+
+		collaborators = append(collaborators, collaborator)
+	}
+
+	return collaborators, nil
+}
+
+func (branchService *BranchService) getBranchReviewsFromIDs(ids []uint) ([]*models.Review, error) {
+	reviews := []*models.Review{}
+
+	for _, ID := range ids {
+		review, err := branchService.ReviewRepository.GetByID(ID)
+
+		if err != nil {
+			return reviews, fmt.Errorf("failed to find review with id=%v", ID)
+		}
+
+		reviews = append(reviews, review)
+	}
+
+	return reviews, nil
+}
+
+func (branchService *BranchService) getDiscussionContainerFromIDs(ids []uint) (models.DiscussionContainer, error) {
+	discussions := []*models.Discussion{}
+
+	for _, ID := range ids {
+		discussion, err := branchService.DiscussionRepository.GetByID(ID)
+
+		if err != nil {
+			return models.DiscussionContainer{}, fmt.Errorf("failed to find discussion with id=%v", ID)
+		}
+
+		discussions = append(discussions, discussion)
+	}
+
+	return models.DiscussionContainer{Discussions: discussions}, nil
 }
 
 func (branchService *BranchService) DeleteBranch(branchID uint) error {
@@ -212,7 +242,7 @@ func (branchService *BranchService) GetReviewStatus(branchID uint) ([]models.Bra
 	}
 
 	// get all decisions
-	var decisions []models.BranchDecision
+	decisions := []models.BranchDecision{}
 	for _, review := range branch.Reviews {
 		decisions = append(decisions, review.BranchDecision)
 	}
@@ -269,46 +299,8 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 
 	// if approved or rejected we close the branch
 	if branch.ReviewStatus == models.BranchPeerReviewed || branch.ReviewStatus == models.BranchRejected {
-		// get project post
-		projectPost, err := branchService.ProjectPostRepository.GetByID(branch.ProjectPostID)
-
-		// close branch
-		if err != nil {
-			return review, fmt.Errorf("failed to merge branch into main")
-		}
-
-		closedBranch := &models.ClosedBranch{
-			Branch:         *branch,
-			ProjectPostID:  branch.ProjectPostID,
-			BranchDecision: models.Approved,
-		}
-
-		// merge into master if approved
-		if branch.ReviewStatus == models.BranchPeerReviewed {
-			if err := branchService.Filesystem.Merge(fmt.Sprintf("%v", branch.ID), "master"); err != nil {
-				return review, fmt.Errorf("failed to merge branch into main")
-			}
-
-			closedBranch.SupercededBranch = projectPost.LastMergedBranch
-			projectPost.LastMergedBranch = branch
-		}
-
-		projectPost.ClosedBranches = append(projectPost.ClosedBranches, closedBranch)
-
-		// remove branch from open branches
-		newOpenBranches := []*models.Branch{}
-
-		for _, b := range projectPost.OpenBranches {
-			if b.ID != branch.ID {
-				newOpenBranches = append(newOpenBranches, b)
-			}
-		}
-
-		projectPost.OpenBranches = newOpenBranches
-
-		// save changes to project post and branch
-		if _, err := branchService.ProjectPostRepository.Update(projectPost); err != nil {
-			return review, fmt.Errorf("failed to save project post and branch")
+		if err := branchService.closeBranch(branch); err != nil {
+			return review, err
 		}
 
 		return review, nil
@@ -322,6 +314,52 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 	return review, nil
 }
 
+func (branchService *BranchService) closeBranch(branch *models.Branch) error {
+	// get project post
+	projectPost, err := branchService.ProjectPostRepository.GetByID(branch.ProjectPostID)
+
+	// close branch
+	if err != nil {
+		return fmt.Errorf("failed to merge branch into main")
+	}
+
+	closedBranch := &models.ClosedBranch{
+		Branch:         *branch,
+		ProjectPostID:  branch.ProjectPostID,
+		BranchDecision: models.Approved,
+	}
+
+	// merge into master if approved
+	if branch.ReviewStatus == models.BranchPeerReviewed {
+		if err := branchService.Filesystem.Merge(fmt.Sprintf("%v", branch.ID), "master"); err != nil {
+			return fmt.Errorf("failed to merge branch into main")
+		}
+
+		closedBranch.SupercededBranch = projectPost.LastMergedBranch
+		projectPost.LastMergedBranch = branch
+	}
+
+	projectPost.ClosedBranches = append(projectPost.ClosedBranches, closedBranch)
+
+	// remove branch from open branches
+	newOpenBranches := []*models.Branch{}
+
+	for _, b := range projectPost.OpenBranches {
+		if b.ID != branch.ID {
+			newOpenBranches = append(newOpenBranches, b)
+		}
+	}
+
+	projectPost.OpenBranches = newOpenBranches
+
+	// save changes to project post and branch
+	if _, err := branchService.ProjectPostRepository.Update(projectPost); err != nil {
+		return fmt.Errorf("failed to save project post and branch")
+	}
+
+	return nil
+}
+
 // UpdateReviewStatus finds the current review status
 // If there are 3 approvals, approve the branch
 // If there are any rejections, reject the branch
@@ -332,7 +370,7 @@ func (branchService *BranchService) UpdateReviewStatus(reviews []*models.Review)
 			return models.BranchRejected
 		}
 
-		if i == 2 {
+		if i == approvalsToMerge {
 			return models.BranchPeerReviewed
 		}
 	}
@@ -441,6 +479,12 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 	// commit
 	if err := branchService.Filesystem.CreateCommit(); err != nil {
 		return err
+	}
+
+	// Set render status pending
+	branch.RenderStatus = models.Pending
+	if _, err := branchService.BranchRepository.Update(branch); err != nil {
+		return fmt.Errorf("failed to update branch entity")
 	}
 
 	go branchService.RenderService.Render(branch)

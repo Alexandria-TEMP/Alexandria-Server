@@ -73,14 +73,6 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, error,
 }
 
 func (renderService *RenderService) Render(branch *models.Branch) {
-	// Set render status pending
-	branch.RenderStatus = models.Pending
-	if _, err := renderService.BranchRepository.Update(branch); err != nil {
-		renderService.FailBranch(branch)
-
-		return
-	}
-
 	// Checkout the branch
 	if err := renderService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branch.ID)); err != nil {
 		renderService.FailBranch(branch)
@@ -109,6 +101,7 @@ func (renderService *RenderService) Render(branch *models.Branch) {
 		return
 	}
 
+	// Set custom render config in yaml
 	if err := renderService.SetProjectConfig(); err != nil {
 		renderService.FailBranch(branch)
 

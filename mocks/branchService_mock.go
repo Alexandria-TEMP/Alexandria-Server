@@ -102,6 +102,21 @@ func (mr *MockBranchServiceMockRecorder) GetBranch(branchID any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBranch", reflect.TypeOf((*MockBranchService)(nil).GetBranch), branchID)
 }
 
+// GetBranchCollaborator mocks base method.
+func (m *MockBranchService) GetBranchCollaborator(branchCollaboratorID uint) (*models.BranchCollaborator, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBranchCollaborator", branchCollaboratorID)
+	ret0, _ := ret[0].(*models.BranchCollaborator)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBranchCollaborator indicates an expected call of GetBranchCollaborator.
+func (mr *MockBranchServiceMockRecorder) GetBranchCollaborator(branchCollaboratorID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBranchCollaborator", reflect.TypeOf((*MockBranchService)(nil).GetBranchCollaborator), branchCollaboratorID)
+}
+
 // GetFileFromProject mocks base method.
 func (m *MockBranchService) GetFileFromProject(branchID uint, relFilepath string) (string, error) {
 	m.ctrl.T.Helper()
@@ -194,7 +209,7 @@ func (mr *MockBranchServiceMockRecorder) MemberCanReview(branchID, memberID any)
 }
 
 // UpdateBranch mocks base method.
-func (m *MockBranchService) UpdateBranch(branchDTO models.BranchDTO) (models.Branch, error) {
+func (m *MockBranchService) UpdateBranch(branchDTO *models.BranchDTO) (models.Branch, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateBranch", branchDTO)
 	ret0, _ := ret[0].(models.Branch)

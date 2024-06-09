@@ -118,7 +118,7 @@ func (branchController *BranchController) UpdateBranch(c *gin.Context) {
 		return
 	}
 	// update branch
-	branch, err := branchController.BranchService.UpdateBranch(dto)
+	branch, err := branchController.BranchService.UpdateBranch(&dto)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -590,6 +590,6 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 // @Failure		404
 // @Failure		500
 // @Router		/branches/{branchID}/discussions 	[get]
-func (branchController *BranchController) GetDiscussions(c *gin.Context) {
+func (branchController *BranchController) GetDiscussions(_ *gin.Context) {
 	// TODO ahh its paginated
 }

@@ -216,7 +216,7 @@ func TestUpdateBranchSuccess(t *testing.T) {
 	mockProjectPostRepository.EXPECT().GetByID(uint(10)).Return(projectPost, nil)
 	mockBranchRepository.EXPECT().Update(expected).Return(expected, nil)
 
-	output, err := branchService.UpdateBranch(input)
+	output, err := branchService.UpdateBranch(&input)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, &output)
 }
@@ -232,7 +232,7 @@ func TestUpdateBranchNoSuchCollaborator(t *testing.T) {
 
 	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(5)).Return(&models.BranchCollaborator{MemberID: 19}, errors.New("failed"))
 
-	_, err := branchService.UpdateBranch(input)
+	_, err := branchService.UpdateBranch(&input)
 	assert.NotNil(t, err)
 }
 
@@ -249,7 +249,7 @@ func TestUpdateNoSuchDiscussion(t *testing.T) {
 	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(5)).Return(&models.BranchCollaborator{Model: gorm.Model{ID: 20}}, nil)
 	mockDiscussionRepository.EXPECT().GetByID(uint(6)).Return(&models.Discussion{Model: gorm.Model{ID: 21}}, errors.New("failed"))
 
-	_, err := branchService.UpdateBranch(input)
+	_, err := branchService.UpdateBranch(&input)
 	assert.NotNil(t, err)
 }
 
@@ -268,7 +268,7 @@ func TestUpdateBranchNoSuchProjectPost(t *testing.T) {
 	mockDiscussionRepository.EXPECT().GetByID(uint(6)).Return(&models.Discussion{Model: gorm.Model{ID: 21}}, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(10)).Return(projectPost, errors.New("failed"))
 
-	_, err := branchService.UpdateBranch(input)
+	_, err := branchService.UpdateBranch(&input)
 	assert.NotNil(t, err)
 }
 
@@ -297,7 +297,7 @@ func TestUpdateBranchFailedUpdate(t *testing.T) {
 	mockProjectPostRepository.EXPECT().GetByID(uint(10)).Return(projectPost, nil)
 	mockBranchRepository.EXPECT().Update(expected).Return(expected, errors.New("failed"))
 
-	_, err := branchService.UpdateBranch(input)
+	_, err := branchService.UpdateBranch(&input)
 	assert.NotNil(t, err)
 }
 
