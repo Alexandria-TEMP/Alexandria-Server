@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	pagination "github.com/webstradev/gin-pagination"
 	docs "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/docs"
 )
 
@@ -47,8 +48,8 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 
 func filterRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	filterRouter := v2.Group("/filter")
-	filterRouter.GET("/posts", controllers.filterController.FilterPosts)
-	filterRouter.GET("/project-posts", controllers.filterController.FilterProjectPosts)
+	filterRouter.GET("/posts", pagination.Default(), controllers.filterController.FilterPosts)
+	filterRouter.GET("/project-posts", pagination.Default(), controllers.filterController.FilterProjectPosts)
 }
 
 func tagRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {

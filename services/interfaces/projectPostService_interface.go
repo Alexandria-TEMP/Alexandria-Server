@@ -13,5 +13,5 @@ type ProjectPostService interface {
 	UpdateProjectPost(updatedPost *models.ProjectPost) error
 
 	// Return a filtered list of project post IDs
-	Filter(forms.FilterForm) ([]uint, error)
+	Filter(page, size int, form forms.FilterForm) ([]uint, error)
 }

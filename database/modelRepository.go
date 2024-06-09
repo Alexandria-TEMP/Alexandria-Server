@@ -87,3 +87,19 @@ func (repo *ModelRepository[T]) Query(conds ...interface{}) ([]T, error) {
 
 	return models, nil
 }
+
+func (repo *ModelRepository[T]) QueryPaginated(page, size int, conds ...interface{}) ([]T, error) {
+	var models []T
+
+	result := repo.Database.Scopes(func(db *gorm.DB) *gorm.DB {
+		// Performs pagination
+		offset := (page - 1) * size
+		return db.Offset(offset).Limit(size)
+	}).Find(&models, conds[0:]...)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("could not query: result.Error")
+	}
+
+	return models, nil
+}

@@ -22,9 +22,9 @@ type FilterController struct {
 // @Description Endpoint is offset-paginated
 // @Tags 		filtering
 // @Accept  	json
-// @Param		form		body		forms.FilterForm	true	"Filter form"
-// @Param 		page		query		uint				false	"page query"
-// @Param		pageSize	query		uint				false	"page size"
+// @Param		form	body		forms.FilterForm	true	"Filter form"
+// @Param 		page	query		uint				false	"page query"
+// @Param		size	query		uint				false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
@@ -47,7 +47,10 @@ func (filterController *FilterController) FilterPosts(c *gin.Context) {
 		return
 	}
 
-	postIDs, err := filterController.PostService.Filter(filterForm)
+	page := c.GetInt("page")
+	size := c.GetInt("size")
+
+	postIDs, err := filterController.PostService.Filter(page, size, filterForm)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering posts failed: %s", err)})
 
@@ -67,7 +70,7 @@ func (filterController *FilterController) FilterPosts(c *gin.Context) {
 // @Accept  	json
 // @Param		form		body		forms.FilterForm	true	"Filter form"
 // @Param 		page		query		uint				false	"page query"
-// @Param		pageSize	query		uint				false	"page size"
+// @Param		size		query		uint				false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
@@ -90,7 +93,10 @@ func (filterController *FilterController) FilterProjectPosts(c *gin.Context) {
 		return
 	}
 
-	projectPostIDs, err := filterController.ProjectPostService.Filter(filterForm)
+	page := c.GetInt("page")
+	size := c.GetInt("size")
+
+	projectPostIDs, err := filterController.ProjectPostService.Filter(page, size, filterForm)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering project posts failed: %s", err)})
 	}
