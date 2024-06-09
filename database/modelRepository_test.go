@@ -323,11 +323,11 @@ func TestGetPreloadedAssociations(t *testing.T) {
 				Discussions: []*models.Discussion{},
 			},
 		},
-		OpenBranches:        []*models.Branch{},
-		ClosedBranches:      []*models.ClosedBranch{},
-		CompletionStatus:    models.Ongoing,
-		FeedbackPreference:  models.FormalFeedback,
-		PostReviewStatusTag: models.Open,
+		OpenBranches:       []*models.Branch{},
+		ClosedBranches:     []*models.ClosedBranch{},
+		CompletionStatus:   models.Ongoing,
+		FeedbackPreference: models.FormalFeedback,
+		PostReviewStatus:   models.Open,
 	}
 
 	if err := projectPostRepository.Create(&createdProjectPost); err != nil {

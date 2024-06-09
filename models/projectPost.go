@@ -65,19 +65,19 @@ type ProjectPost struct {
 	// ProjectPost has many ClosedBranch
 	ClosedBranches []*ClosedBranch `gorm:"foreignKey:ProjectPostID"`
 
-	CompletionStatus    ProjectCompletionStatus
-	FeedbackPreference  ProjectFeedbackPreference
-	PostReviewStatusTag ProjectReviewStatus
+	CompletionStatus   ProjectCompletionStatus
+	FeedbackPreference ProjectFeedbackPreference
+	PostReviewStatus   ProjectReviewStatus
 }
 
 type ProjectPostDTO struct {
-	ID                  uint
-	PostDTO             PostDTO
-	OpenBranchIDs       []uint
-	ClosedBranchIDs     []uint
-	CompletionStatus    ProjectCompletionStatus
-	FeedbackPreference  ProjectFeedbackPreference
-	PostReviewStatusTag ProjectReviewStatus
+	ID                 uint                      `json:"id"`
+	PostDTO            PostDTO                   `json:"post"`
+	OpenBranchIDs      []uint                    `json:"openBranchIDs"`
+	ClosedBranchIDs    []uint                    `json:"closedBranchIDs"`
+	CompletionStatus   ProjectCompletionStatus   `json:"completionStatus"`
+	FeedbackPreference ProjectFeedbackPreference `json:"feedbackPreference"`
+	PostReviewStatus   ProjectReviewStatus       `json:"postReviewStatus"`
 }
 
 func (model *ProjectPost) GetID() uint {
@@ -92,7 +92,7 @@ func (model *ProjectPost) IntoDTO() ProjectPostDTO {
 		closedBranchesToIDs(model.ClosedBranches),
 		model.CompletionStatus,
 		model.FeedbackPreference,
-		model.PostReviewStatusTag,
+		model.PostReviewStatus,
 	}
 }
 

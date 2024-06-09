@@ -35,10 +35,10 @@ type PostCollaborator struct {
 }
 
 type PostCollaboratorDTO struct {
-	ID                uint
-	MemberID          uint
-	PostID            uint
-	CollaborationType CollaborationType
+	ID                uint              `json:"id"`
+	MemberID          uint              `json:"memberID"`
+	PostID            uint              `json:"postID"`
+	CollaborationType CollaborationType `json:"collaborationType"`
 }
 
 func (model *PostCollaborator) GetID() uint {
@@ -71,9 +71,9 @@ type BranchCollaborator struct {
 }
 
 type BranchCollaboratorDTO struct {
-	ID       uint
-	MemberID uint
-	BranchID uint
+	ID       uint `json:"id"`
+	MemberID uint `json:"memberID"`
+	BranchID uint `json:"branchID"`
 }
 
 func (model *BranchCollaborator) GetID() uint {

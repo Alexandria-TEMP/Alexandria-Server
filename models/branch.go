@@ -69,19 +69,19 @@ type Branch struct {
 }
 
 type BranchDTO struct {
-	ID uint
+	ID uint `json:"id"`
 	// MR's proposed changes
-	NewPostTitle            string
-	UpdatedCompletionStatus ProjectCompletionStatus
-	UpdatedScientificFields []tags.ScientificField
+	NewPostTitle            string                  `json:"newPostTitle"`
+	UpdatedCompletionStatus ProjectCompletionStatus `json:"updatedCompletionStatus"`
+	UpdatedScientificFields []tags.ScientificField  `json:"updatedScientificFields"`
 	// MR metadata
-	CollaboratorIDs    []uint
-	ReviewIDs          []uint
-	ProjectPostID      uint
-	BranchTitle        string
-	RenderStatus       RenderStatus
-	DiscussionIDs      []uint
-	BranchReviewStatus BranchOverallReviewStatus
+	CollaboratorIDs           []uint                    `json:"collaboratorIDs"`
+	ReviewIDs                 []uint                    `json:"reviewIDs"`
+	ProjectPostID             uint                      `json:"projectPostIDs"`
+	BranchTitle               string                    `json:"branchTitle"`
+	RenderStatus              RenderStatus              `json:"renderStatus"`
+	DiscussionIDs             []uint                    `json:"discussionIDs"`
+	BranchOverallReviewStatus BranchOverallReviewStatus `json:"branchOverallReviewStatus"`
 }
 
 func (model *Branch) GetID() uint {

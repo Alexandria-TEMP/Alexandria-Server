@@ -38,17 +38,17 @@ func TestBranchJSONMarshaling(t *testing.T) {
 
 	// should equal this DTO!
 	targetDTO := BranchDTO{
-		ID:                      44,
-		CollaboratorIDs:         []uint{100, 50},
-		ReviewIDs:               []uint{2},
-		ProjectPostID:           45,
-		BranchTitle:             "My Cool MR",
-		NewPostTitle:            "Updated Post Title",
-		UpdatedCompletionStatus: Idea,
-		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
-		DiscussionIDs:           []uint{},
-		RenderStatus:            Pending,
-		BranchReviewStatus:      BranchOpenForReview,
+		ID:                        44,
+		CollaboratorIDs:           []uint{100, 50},
+		ReviewIDs:                 []uint{2},
+		ProjectPostID:             45,
+		BranchTitle:               "My Cool MR",
+		NewPostTitle:              "Updated Post Title",
+		UpdatedCompletionStatus:   Idea,
+		UpdatedScientificFields:   []tags.ScientificField{tags.Mathematics},
+		DiscussionIDs:             []uint{},
+		RenderStatus:              Pending,
+		BranchOverallReviewStatus: BranchOpenForReview,
 	}
 
 	dto := BranchDTO{}

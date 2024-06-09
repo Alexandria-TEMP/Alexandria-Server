@@ -31,9 +31,9 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			{Model: gorm.Model{ID: 59}},
 			{Model: gorm.Model{ID: 20}},
 		},
-		CompletionStatus:    Completed,
-		FeedbackPreference:  FormalFeedback,
-		PostReviewStatusTag: RevisionNeeded,
+		CompletionStatus:   Completed,
+		FeedbackPreference: FormalFeedback,
+		PostReviewStatus:   RevisionNeeded,
 	}
 
 	// should equal this DTO!
@@ -46,11 +46,11 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
 			DiscussionIDs:       []uint{95},
 		},
-		OpenBranchIDs:       []uint{44},
-		ClosedBranchIDs:     []uint{59, 20},
-		CompletionStatus:    Completed,
-		FeedbackPreference:  FormalFeedback,
-		PostReviewStatusTag: RevisionNeeded,
+		OpenBranchIDs:      []uint{44},
+		ClosedBranchIDs:    []uint{59, 20},
+		CompletionStatus:   Completed,
+		FeedbackPreference: FormalFeedback,
+		PostReviewStatus:   RevisionNeeded,
 	}
 
 	dto := ProjectPostDTO{}

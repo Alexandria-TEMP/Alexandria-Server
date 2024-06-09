@@ -115,10 +115,10 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 				BranchReviewStatus: models.BranchOpenForReview,
 			},
 		},
-		ClosedBranches:      []*models.ClosedBranch{},
-		CompletionStatus:    models.Ongoing,
-		FeedbackPreference:  models.FormalFeedback,
-		PostReviewStatusTag: models.Open,
+		ClosedBranches:     []*models.ClosedBranch{},
+		CompletionStatus:   models.Ongoing,
+		FeedbackPreference: models.FormalFeedback,
+		PostReviewStatus:   models.Open,
 	}
 
 	if !reflect.DeepEqual(createdProjectPost, expectedProjectPost) {

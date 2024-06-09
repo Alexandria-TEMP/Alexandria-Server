@@ -82,7 +82,7 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 		ClosedBranches: []*models.ClosedBranch{},
 
 		// New project posts are always open for review
-		PostReviewStatusTag: models.Open,
+		PostReviewStatus: models.Open,
 	}
 
 	if err := projectPostService.ProjectPostRepository.Create(&projectPost); err != nil {
