@@ -20,6 +20,7 @@ type RepositoryEnv struct {
 	branchCollaboratorRepository  database.ModelRepositoryInterface[*models.BranchCollaborator]
 	discussionRepository          database.ModelRepositoryInterface[*models.Discussion]
 	discussionContainerRepository database.ModelRepositoryInterface[*models.DiscussionContainer]
+	closedBranchRepository        database.ModelRepositoryInterface[*models.ClosedBranch]
 }
 
 type ServiceEnv struct {
@@ -66,6 +67,9 @@ func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
 		discussionContainerRepository: &database.ModelRepository[*models.DiscussionContainer]{
 			Database: db,
 		},
+		closedBranchRepository: &database.ModelRepository[*models.ClosedBranch]{
+			Database: db,
+		},
 	}
 }
 
@@ -89,6 +93,7 @@ func initServiceEnv(repositories *RepositoryEnv, _ *filesystem.Filesystem) *Serv
 	projectPostService := &services.ProjectPostService{
 		ProjectPostRepository:     repositories.projectPostRepository,
 		MemberRepository:          repositories.memberRepository,
+		ClosedBranchRepository:    repositories.closedBranchRepository,
 		PostCollaboratorService:   postCollaboratorService,
 		BranchCollaboratorService: branchCollaboratorService,
 	}

@@ -20,6 +20,7 @@ var (
 	mockBranchCollaboratorRepository  *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
 	mockDiscussionRepository          *mocks.MockModelRepositoryInterface[*models.Discussion]
 	mockDiscussionContainerRepository *mocks.MockModelRepositoryInterface[*models.DiscussionContainer]
+	mockClosedBranchRepository        *mocks.MockModelRepositoryInterface[*models.ClosedBranch]
 )
 
 // Mocked services

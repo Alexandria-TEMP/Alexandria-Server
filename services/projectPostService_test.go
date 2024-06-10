@@ -32,6 +32,7 @@ func projectPostServiceSetup(t *testing.T) {
 	// Create mocks
 	mockProjectPostRepository = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	mockClosedBranchRepository = mocks.NewMockModelRepositoryInterface[*models.ClosedBranch](mockCtrl)
 
 	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
 	mockBranchCollaboratorService = mocks.NewMockBranchCollaboratorService(mockCtrl)
@@ -40,6 +41,7 @@ func projectPostServiceSetup(t *testing.T) {
 	projectPostService = ProjectPostService{
 		ProjectPostRepository:     mockProjectPostRepository,
 		MemberRepository:          mockMemberRepository,
+		ClosedBranchRepository:    mockClosedBranchRepository,
 		PostCollaboratorService:   mockPostCollaboratorService,
 		BranchCollaboratorService: mockBranchCollaboratorService,
 	}
@@ -339,5 +341,86 @@ func TestFilterProjectPostsFailed(t *testing.T) {
 
 	if err == nil {
 		t.Fatal("post filtering should have failed")
+	}
+}
+
+func TestGetDiscussionContainersFromMergeHistory(t *testing.T) {
+	projectPostServiceSetup(t)
+	t.Cleanup(projectPostServiceTeardown)
+
+	var projectPostID uint = 5
+
+	databaseProjectPost := &models.ProjectPost{
+		Post: models.Post{
+			DiscussionContainer: models.DiscussionContainer{
+				Model: gorm.Model{ID: 45},
+			},
+			DiscussionContainerID: 45,
+		},
+		ClosedBranches: []*models.ClosedBranch{
+			{
+				Model: gorm.Model{ID: 22},
+				Branch: models.Branch{
+					Model: gorm.Model{ID: 99},
+					DiscussionContainer: models.DiscussionContainer{
+						Model: gorm.Model{ID: 54},
+					},
+					DiscussionContainerID: 54,
+				},
+				BranchID:             99,
+				BranchReviewDecision: models.Approved,
+			},
+		},
+	}
+
+	// Setup mock function return values
+	mockProjectPostRepository.EXPECT().GetByID(projectPostID).Return(databaseProjectPost, nil).Times(1)
+	mockClosedBranchRepository.EXPECT().Query(gomock.Any()).Return([]*models.ClosedBranch{
+		{
+			Model: gorm.Model{ID: 22},
+			Branch: models.Branch{
+				Model: gorm.Model{ID: 99},
+				DiscussionContainer: models.DiscussionContainer{
+					Model: gorm.Model{ID: 54},
+				},
+				DiscussionContainerID: 54,
+			},
+			BranchID:             99,
+			BranchReviewDecision: models.Approved,
+		},
+	}, nil).Times(1)
+
+	// Function under test
+	discussionContainerHistory, err := projectPostService.GetDiscussionContainersFromMergeHistory(projectPostID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedDiscussionContainerHistory := &models.DiscussionContainerProjectHistoryDTO{
+		CurrentDiscussionContainerID: 45,
+		MergedBranchDiscussionContainers: []models.DiscussionContainerWithBranchDTO{
+			{
+				DiscussionContainerID: 54,
+				ClosedBranchID:        22,
+			},
+		},
+	}
+
+	if !reflect.DeepEqual(discussionContainerHistory, expectedDiscussionContainerHistory) {
+		t.Fatalf("discussion container history\n%+v\ndid not equal expected discussion container history\n%+v", discussionContainerHistory, expectedDiscussionContainerHistory)
+	}
+}
+
+func TestGetDiscussionContainersFromMergeHistoryPostNotFound(t *testing.T) {
+	projectPostServiceSetup(t)
+	t.Cleanup(projectPostServiceTeardown)
+
+	mockProjectPostRepository.EXPECT().GetByID(uint(50)).Return(nil, fmt.Errorf("oh no")).Times(1)
+
+	// Function under test
+	_, err := projectPostService.GetDiscussionContainersFromMergeHistory(50)
+
+	if err == nil {
+		t.Fatal("getting discussion container history should have returned error")
 	}
 }
