@@ -9,22 +9,31 @@ import (
 )
 
 // Variables that are used by all service tests
-// Tests are responsible for initializing their values
+// IMPORTANT: tests are responsible for initializing their values!
 
+// Mocked repositories
 var (
-	postRepositoryMock               *mocks.MockModelRepositoryInterface[*models.Post]
-	projectPostRepositoryMock        *mocks.MockModelRepositoryInterface[*models.ProjectPost]
-	memberRepositoryMock             *mocks.MockModelRepositoryInterface[*models.Member]
-	postCollaboratorRepositoryMock   *mocks.MockModelRepositoryInterface[*models.PostCollaborator]
-	branchCollaboratorRepositoryMock *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
+	mockPostRepository                *mocks.MockModelRepositoryInterface[*models.Post]
+	mockProjectPostRepository         *mocks.MockModelRepositoryInterface[*models.ProjectPost]
+	mockMemberRepository              *mocks.MockModelRepositoryInterface[*models.Member]
+	mockPostCollaboratorRepository    *mocks.MockModelRepositoryInterface[*models.PostCollaborator]
+	mockBranchCollaboratorRepository  *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
+	mockDiscussionRepository          *mocks.MockModelRepositoryInterface[*models.Discussion]
+	mockDiscussionContainerRepository *mocks.MockModelRepositoryInterface[*models.DiscussionContainer]
 )
 
+// Mocked services
 var (
-	postCollaboratorServiceMock   *mocks.MockPostCollaboratorService
-	branchCollaboratorServiceMock *mocks.MockBranchCollaboratorService
+	mockPostCollaboratorService   *mocks.MockPostCollaboratorService
+	mockBranchCollaboratorService *mocks.MockBranchCollaboratorService
 )
 
-var memberA, memberB, memberC models.Member
+// Data that can be used by tests
+var (
+	memberA, memberB, memberC models.Member
+	discussionA               models.Discussion
+	discussionContainerA      models.DiscussionContainer
+)
 
 func setupTestSuite() {
 }
