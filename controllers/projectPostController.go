@@ -171,9 +171,9 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 
 }
 
-// GetProjectPostDiscussions godoc
-// @Summary Returns all discussion IDs associated with the project post
-// @Description Returns all discussion IDs on this project post over all its previous versions, instead of only the current version
+// GetProjectPostDiscussionContainers godoc
+// @Summary Returns all discussion container IDs associated with the project post
+// @Description Returns all discussion container IDs on this project post over all its previous versions, instead of only the current version
 // @Tags 		project-posts
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
@@ -182,8 +182,8 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router		/project-posts/{postID}/all-discussions 	[get]
-func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ *gin.Context) {
+// @Router		/project-posts/{postID}/all-discussion-containers 	[get]
+func (projectPostController *ProjectPostController) GetProjectPostDiscussionContainers(_ *gin.Context) {
 	// TODO implement
 }
 
