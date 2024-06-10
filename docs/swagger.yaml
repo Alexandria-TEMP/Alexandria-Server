@@ -214,10 +214,6 @@ definitions:
     - Reviewer
   models.DiscussionDTO:
     properties:
-      anonymous:
-        type: boolean
-      deleted:
-        type: boolean
       id:
         type: integer
       memberID:

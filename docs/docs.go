@@ -2849,12 +2849,6 @@ const docTemplate = `{
         "models.DiscussionDTO": {
             "type": "object",
             "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "deleted": {
-                    "type": "boolean"
-                },
                 "id": {
                     "type": "integer"
                 },

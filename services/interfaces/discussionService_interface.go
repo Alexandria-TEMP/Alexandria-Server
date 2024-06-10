@@ -6,11 +6,12 @@ import (
 )
 
 type DiscussionService interface {
+	// GetDiscussion fetches a discussion from the database by its ID
 	GetDiscussion(id uint) (*models.Discussion, error)
 
-	// Add a discussion to a discussion container (on a Post, Branch...)
+	// CreateRootDiscussion adds a discussion to a discussion container of a post, branch, etc.
 	CreateRootDiscussion(form *forms.RootDiscussionCreationForm) (*models.Discussion, error)
 
-	// Add a discussion as a reply to another discussion
+	// CreateReply adds a discussion as a reply to another discussion
 	CreateReply(form *forms.ReplyDiscussionCreationForm) (*models.Discussion, error)
 }
