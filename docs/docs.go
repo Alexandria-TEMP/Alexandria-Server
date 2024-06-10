@@ -469,6 +469,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/discussion-containers/{discussionContainerID}": {
+            "get": {
+                "description": "Get a discussion container by its ID, to access its discussions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "discussion-containers"
+                ],
+                "summary": "Get discussion container",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Discussion Container ID",
+                        "name": "discussionContainerID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.DiscussionContainerDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/discussions/replies": {
             "post": {
                 "description": "Create a new reply-type discussion, so a discussion that is a child of another discussion.",
@@ -2845,6 +2895,17 @@ const docTemplate = `{
                 "Contributor",
                 "Reviewer"
             ]
+        },
+        "models.DiscussionContainerDTO": {
+            "type": "object",
+            "properties": {
+                "discussionIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "models.DiscussionDTO": {
             "type": "object",

@@ -212,6 +212,13 @@ definitions:
     - Author
     - Contributor
     - Reviewer
+  models.DiscussionContainerDTO:
+    properties:
+      discussionIDs:
+        items:
+          type: integer
+        type: array
+    type: object
   models.DiscussionDTO:
     properties:
       id:
@@ -686,6 +693,39 @@ paths:
       summary: Returns a branch review by ID
       tags:
       - branches
+  /discussion-containers/{discussionContainerID}:
+    get:
+      consumes:
+      - application/json
+      description: Get a discussion container by its ID, to access its discussions
+      parameters:
+      - description: Discussion Container ID
+        in: path
+        name: discussionContainerID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DiscussionContainerDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get discussion container
+      tags:
+      - discussion-containers
   /discussions/{discussionID}:
     delete:
       consumes:
