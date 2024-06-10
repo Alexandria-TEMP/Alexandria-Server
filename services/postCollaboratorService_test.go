@@ -29,10 +29,12 @@ func postCollaboratorServiceSetup(t *testing.T) {
 
 	// Setup mocks
 	memberRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	postCollaboratorRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.PostCollaborator](mockCtrl)
 
 	// Setup SUT
 	postCollaboratorService = PostCollaboratorService{
-		MemberRepository: memberRepositoryMock,
+		MemberRepository:           memberRepositoryMock,
+		PostCollaboratorRepository: postCollaboratorRepositoryMock,
 	}
 }
 
@@ -107,5 +109,33 @@ func TestMembersToPostCollaboratorsAtLeastOneAuthor(t *testing.T) {
 
 	if err == nil {
 		t.Fatalf("should have errored on empty author list when not anonymous")
+	}
+}
+
+func TestGetPostCollaborator(t *testing.T) {
+	postCollaboratorServiceSetup(t)
+	t.Cleanup(postCollaboratorServiceTeardown)
+
+	// Setup mock function return values
+	postCollaboratorRepositoryMock.EXPECT().GetByID(uint(10)).Return(&models.PostCollaborator{
+		Model:             gorm.Model{ID: 5},
+		Member:            models.Member{Model: gorm.Model{ID: 10}},
+		CollaborationType: models.Author,
+	}, nil).Times(1)
+
+	// Function under test
+	fetchedPostCollaborator, err := postCollaboratorService.GetPostCollaborator(10)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedPostCollaborator := &models.PostCollaborator{
+		Model:             gorm.Model{ID: 5},
+		Member:            models.Member{Model: gorm.Model{ID: 10}},
+		CollaborationType: models.Author,
+	}
+
+	if !reflect.DeepEqual(fetchedPostCollaborator, expectedPostCollaborator) {
+		t.Fatalf("fetched post collaborator \n%+v\nshould have equaled expected post collaborator \n%+v", fetchedPostCollaborator, expectedPostCollaborator)
 	}
 }

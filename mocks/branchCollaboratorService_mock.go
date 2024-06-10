@@ -39,6 +39,21 @@ func (m *MockBranchCollaboratorService) EXPECT() *MockBranchCollaboratorServiceM
 	return m.recorder
 }
 
+// GetBranchCollaborator mocks base method.
+func (m *MockBranchCollaboratorService) GetBranchCollaborator(id uint) (*models.BranchCollaborator, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBranchCollaborator", id)
+	ret0, _ := ret[0].(*models.BranchCollaborator)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBranchCollaborator indicates an expected call of GetBranchCollaborator.
+func (mr *MockBranchCollaboratorServiceMockRecorder) GetBranchCollaborator(id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBranchCollaborator", reflect.TypeOf((*MockBranchCollaboratorService)(nil).GetBranchCollaborator), id)
+}
+
 // MembersToBranchCollaborators mocks base method.
 func (m *MockBranchCollaboratorService) MembersToBranchCollaborators(memberIDs []uint, anonymous bool) ([]*models.BranchCollaborator, error) {
 	m.ctrl.T.Helper()

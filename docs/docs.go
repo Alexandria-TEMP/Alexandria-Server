@@ -845,7 +845,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "page size",
-                        "name": "pageSize",
+                        "name": "size",
                         "in": "query"
                     }
                 ],
@@ -912,7 +912,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "page size",
-                        "name": "pageSize",
+                        "name": "size",
                         "in": "query"
                     }
                 ],

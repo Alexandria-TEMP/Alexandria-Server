@@ -29,6 +29,7 @@ func branchCollaboratorServiceSetup(t *testing.T) {
 
 	// Setup mocks
 	memberRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	branchCollaboratorRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.BranchCollaborator](mockCtrl)
 
 	// Setup mock function return values
 	memberRepositoryMock.EXPECT().GetByID(memberA.ID).Return(&memberA, nil).AnyTimes()
@@ -36,7 +37,8 @@ func branchCollaboratorServiceSetup(t *testing.T) {
 
 	// Setup SUT
 	branchCollaboratorService = BranchCollaboratorService{
-		MemberRepository: memberRepositoryMock,
+		MemberRepository:             memberRepositoryMock,
+		BranchCollaboratorRepository: branchCollaboratorRepositoryMock,
 	}
 }
 
@@ -101,5 +103,31 @@ func TestCreateBranchCollaboratorsAtLeastOneMember(t *testing.T) {
 
 	if err == nil {
 		t.Fatalf("creating branch collaborators with empty member list should fail")
+	}
+}
+
+func TestGetBranchCollaborator(t *testing.T) {
+	branchCollaboratorServiceSetup(t)
+	t.Cleanup(branchCollaboratorServiceTeardown)
+
+	// Setup mock function return values
+	branchCollaboratorRepositoryMock.EXPECT().GetByID(uint(10)).Return(&models.BranchCollaborator{
+		Model:  gorm.Model{ID: 5},
+		Member: models.Member{Model: gorm.Model{ID: 10}},
+	}, nil).Times(1)
+
+	// Function under test
+	fetchedBranchCollaborator, err := branchCollaboratorService.GetBranchCollaborator(10)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedBranchCollaborator := &models.BranchCollaborator{
+		Model:  gorm.Model{ID: 5},
+		Member: models.Member{Model: gorm.Model{ID: 10}},
+	}
+
+	if !reflect.DeepEqual(fetchedBranchCollaborator, expectedBranchCollaborator) {
+		t.Fatalf("fetched branch collaborator \n%+v\nshould have equaled expected branch collaborator \n%+v", fetchedBranchCollaborator, expectedBranchCollaborator)
 	}
 }

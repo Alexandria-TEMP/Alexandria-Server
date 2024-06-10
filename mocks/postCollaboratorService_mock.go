@@ -39,6 +39,21 @@ func (m *MockPostCollaboratorService) EXPECT() *MockPostCollaboratorServiceMockR
 	return m.recorder
 }
 
+// GetPostCollaborator mocks base method.
+func (m *MockPostCollaboratorService) GetPostCollaborator(id uint) (*models.PostCollaborator, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPostCollaborator", id)
+	ret0, _ := ret[0].(*models.PostCollaborator)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPostCollaborator indicates an expected call of GetPostCollaborator.
+func (mr *MockPostCollaboratorServiceMockRecorder) GetPostCollaborator(id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPostCollaborator", reflect.TypeOf((*MockPostCollaboratorService)(nil).GetPostCollaborator), id)
+}
+
 // MembersToPostCollaborators mocks base method.
 func (m *MockPostCollaboratorService) MembersToPostCollaborators(IDs []uint, anonymous bool, collaborationType models.CollaborationType) ([]*models.PostCollaborator, error) {
 	m.ctrl.T.Helper()
