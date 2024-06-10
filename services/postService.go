@@ -3,6 +3,8 @@ package services
 import (
 	"fmt"
 	"mime/multipart"
+	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
@@ -10,6 +12,7 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 type PostService struct {
@@ -18,6 +21,7 @@ type PostService struct {
 	Filesystem       filesystemInterfaces.Filesystem
 
 	PostCollaboratorService interfaces.PostCollaboratorService
+	RenderService           interfaces.RenderService
 }
 
 func (postService *PostService) GetPost(id uint) (*models.Post, error) {
@@ -45,6 +49,7 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 			// The discussion list is initially empty
 			Discussions: []*models.Discussion{},
 		},
+		RenderStatus: models.Success,
 	}
 
 	if err := postService.PostRepository.Create(&post); err != nil {
@@ -67,16 +72,6 @@ func (postService *PostService) UpdatePost(_ *models.Post) error {
 	return nil
 }
 
-/*
-	Uploading Post (not ProjectPost) content:
-	- Requires having PostID
-	- CheckoutDirectory
-	- CheckoutBranch("master")
-	- SaveZipFile
-	- Response 200
-	- Start goroutine for rendering
-*/
-
 func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileHeader, postID uint) error {
 	// get post
 	post, err := postService.PostRepository.GetByID(postID)
@@ -87,9 +82,114 @@ func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileH
 
 	// select repository of the post and checkout master
 	postService.Filesystem.CheckoutDirectory(postID)
+
 	if err := postService.Filesystem.CheckoutBranch("master"); err != nil {
 		return err
 	}
 
+	// clean directory to remove all files
+	if err := postService.Filesystem.CleanDir(); err != nil {
+		return err
+	}
+
+	// save zipped project
+	if err := postService.Filesystem.SaveZipFile(c, file); err != nil {
+		// it fails so we set render status to failed and reset the branch
+		post.RenderStatus = models.Failure
+		_, _ = postService.PostRepository.Update(post)
+		_ = postService.Filesystem.Reset()
+
+		return fmt.Errorf("failed to save zip file")
+	}
+
+	// commit (or perhaps only commit after rendering?)
+	if err := postService.Filesystem.CreateCommit(); err != nil {
+		return err
+	}
+
+	// Set render status pending
+	post.RenderStatus = models.Pending
+	if _, err := postService.PostRepository.Update(post); err != nil {
+		return fmt.Errorf("failed to update post entity")
+	}
+
+	go postService.RenderService.RenderPost(post)
+
 	return nil
+}
+
+func (postService *PostService) GetMainProject(postID uint) (string, error) {
+	var filePath string
+
+	// check post exists
+	_, err := postService.PostRepository.GetByID(postID)
+
+	if err != nil {
+		return filePath, fmt.Errorf("failed to find post with id %v", postID)
+	}
+
+	// select repository of the parent post
+	postService.Filesystem.CheckoutDirectory(postID)
+
+	// checkout specified branch
+	if err := postService.Filesystem.CheckoutBranch("master"); err != nil {
+		return filePath, fmt.Errorf("failed to find master branch")
+	}
+
+	return postService.Filesystem.GetCurrentZipFilePath(), nil
+}
+
+func (postService *PostService) GetMainFiletree(postID uint) (map[string]int64, error, error) {
+	// check post exists
+	_, err := postService.PostRepository.GetByID(postID)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to find post with id %v", postID), nil
+	}
+
+	// select repository of the parent post
+	postService.Filesystem.CheckoutDirectory(postID)
+
+	// checkout specified branch
+	if err := postService.Filesystem.CheckoutBranch("master"); err != nil {
+		return nil, fmt.Errorf("failed to find master branch"), nil
+	}
+
+	// get file tree
+	fileTree, err := postService.Filesystem.GetFileTree()
+
+	return fileTree, nil, err
+}
+
+func (postService *PostService) GetMainFileFromProject(postID uint, relFilepath string) (string, error) {
+	var absFilepath string
+
+	// validate file path is inside of repository
+	if strings.Contains(relFilepath, "..") {
+		return absFilepath, fmt.Errorf("file is outside of repository")
+	}
+
+	// check post exists
+	_, err := postService.PostRepository.GetByID(postID)
+
+	if err != nil {
+		return absFilepath, fmt.Errorf("failed to find post with id %v", postID)
+	}
+
+	// select repository of the post
+	postService.Filesystem.CheckoutDirectory(postID)
+
+	// checkout master
+	if err := postService.Filesystem.CheckoutBranch("master"); err != nil {
+		return absFilepath, fmt.Errorf("failed to find master branch")
+	}
+
+	absFilepath = filepath.Join(postService.Filesystem.GetCurrentQuartoDirPath(), relFilepath)
+
+	// Check that file exists, if not return 404
+	if exists := utils.FileExists(absFilepath); !exists {
+		return "", fmt.Errorf("no such file exists")
+	}
+
+	return absFilepath, nil
 }

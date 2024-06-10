@@ -9,6 +9,6 @@ import (
 
 type ProjectPostService interface {
 	GetProjectPost(postID uint) (*models.ProjectPost, error)
-	CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error)
+	CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error, error)
 	UpdateProjectPost(updatedPost *models.ProjectPost) error
 }

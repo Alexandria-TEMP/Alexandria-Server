@@ -35,6 +35,8 @@ type Post struct {
 	// Post has a DiscussionContainer
 	DiscussionContainer   DiscussionContainer `gorm:"foreignKey:DiscussionContainerID"`
 	DiscussionContainerID uint
+
+	RenderStatus RenderStatus
 }
 
 type PostDTO struct {
@@ -42,8 +44,9 @@ type PostDTO struct {
 	CollaboratorIDs  []uint            `json:"collaboratorIDs"`
 	Title            string            `json:"title"`
 	PostType         PostType          `json:"postType"`
-	ScientificFields []ScientificField `json:"ScientificFields"`
+	ScientificFields []ScientificField `json:"scientificFields"`
 	DiscussionIDs    []uint            `json:"discussionIDs"`
+	RenderStatus     RenderStatus      `json:"renderStatus"`
 }
 
 func (model *Post) GetID() uint {
@@ -58,6 +61,7 @@ func (model *Post) IntoDTO() PostDTO {
 		model.PostType,
 		model.ScientificFields,
 		discussionContainerIntoIDs(&model.DiscussionContainer),
+		model.RenderStatus,
 	}
 }
 

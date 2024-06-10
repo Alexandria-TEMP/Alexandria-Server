@@ -128,4 +128,8 @@ func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	postRouter.GET("/reports/:reportID", controllers.postController.GetPostReport)
 	postRouter.GET("/collaborators/:collaboratorID", controllers.postController.GetPostCollaborator)
 	postRouter.POST("/:postID", controllers.postController.UploadPost)
+	postRouter.GET("/:postID/render", controllers.postController.GetMainRender)
+	postRouter.GET("/:postID/repository", controllers.postController.GetMainProject)
+	postRouter.GET("/:postID/tree", controllers.postController.GetMainFiletree)
+	postRouter.GET("/:postID/file/*filepath", controllers.postController.GetMainFileFromProject)
 }

@@ -28,6 +28,7 @@ func beforeEachBranch(t *testing.T) {
 	defer mockCtrl.Finish()
 	mockRenderService = mocks.NewMockRenderService(mockCtrl)
 	mockBranchRepository = mocks.NewMockModelRepositoryInterface[*models.Branch](mockCtrl)
+	mockClosedBranchRepository = mocks.NewMockModelRepositoryInterface[*models.ClosedBranch](mockCtrl)
 	mockProjectPostRepository = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
 	mockReviewRepository = mocks.NewMockModelRepositoryInterface[*models.BranchReview](mockCtrl)
 	mockBranchCollaboratorRepository = mocks.NewMockModelRepositoryInterface[*models.BranchCollaborator](mockCtrl)
@@ -35,6 +36,7 @@ func beforeEachBranch(t *testing.T) {
 	mockDiscussionRepository = mocks.NewMockModelRepositoryInterface[*models.Discussion](mockCtrl)
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
+	mockBranchCollaboratorService = mocks.NewMockBranchCollaboratorService(mockCtrl)
 
 	// Create branch service
 	branchService = BranchService{
@@ -47,6 +49,8 @@ func beforeEachBranch(t *testing.T) {
 		DiscussionRepository:          mockDiscussionRepository,
 		MemberRepository:              mockMemberRepository,
 		Filesystem:                    mockFilesystem,
+		BranchCollaboratorService:     mockBranchCollaboratorService,
+		ClosedBranchRepository:        mockClosedBranchRepository,
 	}
 }
 
@@ -99,6 +103,7 @@ func TestCreateBranchSuccess(t *testing.T) {
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(12))
 	mockFilesystem.EXPECT().CreateBranch("0")
 	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(12)).Return(collaborator, nil)
+	mockBranchCollaboratorService.EXPECT().MembersToBranchCollaborators([]uint{12}, false).Return([]*models.BranchCollaborator{collaborator}, nil)
 
 	branch, err404, err500 := branchService.CreateBranch(&forms.BranchCreationForm{
 		CollaboratingMemberIDs: []uint{12},
@@ -149,6 +154,7 @@ func TestCreateBranchFailedUpdateProjectPost(t *testing.T) {
 	mockProjectPostRepository.EXPECT().Update(gomock.Any()).Return(newProjectPost, errors.New("failed"))
 	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(12)).Return(&models.BranchCollaborator{MemberID: 12}, nil)
 	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(11)).Return(&models.BranchCollaborator{MemberID: 11}, nil)
+	mockBranchCollaboratorService.EXPECT().MembersToBranchCollaborators([]uint{12, 11}, false).Return([]*models.BranchCollaborator{{MemberID: 12, BranchID: 11}}, nil)
 
 	_, err404, err500 := branchService.CreateBranch(&forms.BranchCreationForm{
 		CollaboratingMemberIDs: []uint{12, 11},
@@ -188,6 +194,7 @@ func TestCreateBranchFailedGit(t *testing.T) {
 	mockFilesystem.EXPECT().CreateBranch("0").Return(errors.New("failed"))
 	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(12)).Return(&models.BranchCollaborator{MemberID: 12}, nil)
 	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(11)).Return(&models.BranchCollaborator{MemberID: 12}, nil)
+	mockBranchCollaboratorService.EXPECT().MembersToBranchCollaborators([]uint{12, 11}, false).Return([]*models.BranchCollaborator{{MemberID: 12, BranchID: 11}}, nil)
 
 	_, err404, err500 := branchService.CreateBranch(&forms.BranchCreationForm{
 		CollaboratingMemberIDs: []uint{12, 11},
@@ -196,118 +203,6 @@ func TestCreateBranchFailedGit(t *testing.T) {
 
 	assert.Nil(t, err404)
 	assert.NotNil(t, err500)
-}
-
-func TestUpdateBranchSuccess(t *testing.T) {
-	beforeEachBranch(t)
-
-	input := models.BranchDTO{
-		ID:               1,
-		UpdatedPostTitle: "test",
-		CollaboratorIDs:  []uint{5},
-		DiscussionIDs:    []uint{6},
-		ProjectPostID:    10,
-	}
-	collaborator := &models.BranchCollaborator{Model: gorm.Model{ID: 20}}
-	discussion := &models.Discussion{Model: gorm.Model{ID: 21}}
-	expected := &models.Branch{
-		Model:               gorm.Model{ID: 1},
-		UpdatedPostTitle:    "test",
-		ProjectPostID:       10,
-		Reviews:             []*models.BranchReview{},
-		Collaborators:       []*models.BranchCollaborator{collaborator},
-		DiscussionContainer: models.DiscussionContainer{Discussions: []*models.Discussion{discussion}},
-	}
-
-	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(5)).Return(collaborator, nil)
-	mockDiscussionRepository.EXPECT().GetByID(uint(6)).Return(discussion, nil)
-	mockProjectPostRepository.EXPECT().GetByID(uint(10)).Return(projectPost, nil)
-	mockBranchRepository.EXPECT().Update(expected).Return(expected, nil)
-
-	output, err := branchService.UpdateBranch(&input)
-	assert.Nil(t, err)
-	assert.Equal(t, expected, &output)
-}
-
-func TestUpdateBranchNoSuchCollaborator(t *testing.T) {
-	beforeEachBranch(t)
-
-	input := models.BranchDTO{
-		ID:               1,
-		UpdatedPostTitle: "test",
-		CollaboratorIDs:  []uint{5},
-	}
-
-	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(5)).Return(&models.BranchCollaborator{MemberID: 19}, errors.New("failed"))
-
-	_, err := branchService.UpdateBranch(&input)
-	assert.NotNil(t, err)
-}
-
-func TestUpdateNoSuchDiscussion(t *testing.T) {
-	beforeEachBranch(t)
-
-	input := models.BranchDTO{
-		ID:               1,
-		UpdatedPostTitle: "test",
-		CollaboratorIDs:  []uint{5},
-		DiscussionIDs:    []uint{6},
-	}
-
-	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(5)).Return(&models.BranchCollaborator{Model: gorm.Model{ID: 20}}, nil)
-	mockDiscussionRepository.EXPECT().GetByID(uint(6)).Return(&models.Discussion{Model: gorm.Model{ID: 21}}, errors.New("failed"))
-
-	_, err := branchService.UpdateBranch(&input)
-	assert.NotNil(t, err)
-}
-
-func TestUpdateBranchNoSuchProjectPost(t *testing.T) {
-	beforeEachBranch(t)
-
-	input := models.BranchDTO{
-		ID:               1,
-		UpdatedPostTitle: "test",
-		CollaboratorIDs:  []uint{5},
-		DiscussionIDs:    []uint{6},
-		ProjectPostID:    10,
-	}
-
-	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(5)).Return(&models.BranchCollaborator{Model: gorm.Model{ID: 20}}, nil)
-	mockDiscussionRepository.EXPECT().GetByID(uint(6)).Return(&models.Discussion{Model: gorm.Model{ID: 21}}, nil)
-	mockProjectPostRepository.EXPECT().GetByID(uint(10)).Return(projectPost, errors.New("failed"))
-
-	_, err := branchService.UpdateBranch(&input)
-	assert.NotNil(t, err)
-}
-
-func TestUpdateBranchFailedUpdate(t *testing.T) {
-	beforeEachBranch(t)
-
-	input := models.BranchDTO{
-		ID:               1,
-		UpdatedPostTitle: "test",
-		CollaboratorIDs:  []uint{5},
-		DiscussionIDs:    []uint{6},
-		ProjectPostID:    10,
-	}
-	collaborator := &models.BranchCollaborator{Model: gorm.Model{ID: 20}}
-	discussion := &models.Discussion{Model: gorm.Model{ID: 21}}
-	expected := &models.Branch{
-		Model:               gorm.Model{ID: 1},
-		UpdatedPostTitle:    "test",
-		ProjectPostID:       10,
-		Reviews:             []*models.BranchReview{},
-		Collaborators:       []*models.BranchCollaborator{collaborator},
-		DiscussionContainer: models.DiscussionContainer{Discussions: []*models.Discussion{discussion}},
-	}
-
-	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(5)).Return(collaborator, nil)
-	mockDiscussionRepository.EXPECT().GetByID(uint(6)).Return(discussion, nil)
-	mockProjectPostRepository.EXPECT().GetByID(uint(10)).Return(projectPost, nil)
-	mockBranchRepository.EXPECT().Update(expected).Return(expected, errors.New("failed"))
-
-	_, err := branchService.UpdateBranch(&input)
-	assert.NotNil(t, err)
 }
 
 func TestDeleteBranchSuccess(t *testing.T) {
@@ -866,7 +761,7 @@ func TestUploadProjectSuccess(t *testing.T) {
 	mockFilesystem.EXPECT().SaveZipFile(gomock.Any(), file).Return(nil)
 	mockFilesystem.EXPECT().CreateCommit().Return(nil)
 	mockBranchRepository.EXPECT().Update(expected).Return(expected, nil)
-	mockRenderService.EXPECT().Render(branch)
+	mockRenderService.EXPECT().RenderBranch(branch)
 
 	assert.Nil(t, branchService.UploadProject(c, file, 10))
 }

@@ -3,8 +3,10 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
@@ -14,7 +16,8 @@ import (
 // @BasePath /api/v2
 
 type PostController struct {
-	PostService interfaces.PostService
+	PostService   interfaces.PostService
+	RenderService interfaces.RenderService
 }
 
 // GetPost godoc
@@ -232,9 +235,9 @@ func (postController *PostController) GetPostReport(_ *gin.Context) {
 // UploadPost
 // @Summary 	Upload a new project version to a branch
 // @Description Upload a new project version to a specific, preexisting, branch as a zipped quarto project
-// @Tags 		branches
+// @Tags 		posts
 // @Accept  	multipart/form-data
-// @Param		branchID		path		string			true	"Branch ID"
+// @Param		postID		path		string			true	"Post ID"
 // @Param		file			formData	file			true	"Repository to create"
 // @Produce		application/json
 // @Success 	200
@@ -272,4 +275,183 @@ func (postController *PostController) UploadPost(c *gin.Context) {
 
 	// response
 	c.Status(http.StatusOK)
+}
+
+// GetMainRender
+// @Summary 	Get the main render of a post
+// @Description Get the main render of the repository underlying a post if it exists and has been rendered successfully
+// @Tags 		posts
+// @Param		postID		path		string				true	"Post ID"
+// @Produce		text/html
+// @Success 	200		{object}	[]byte
+// @Success		202		{object}	[]byte
+// @Failure		400
+// @Failure		404
+// @Router 		/posts/{postID}/render	[get]
+func (postController *PostController) GetMainRender(c *gin.Context) {
+	// extract postID
+	postIDStr := c.Param("postID")
+	postID, err := strconv.ParseUint(postIDStr, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
+
+		return
+	}
+
+	// get render filepath
+	filePath, err202, err404 := postController.RenderService.GetMainRenderFile(uint(postID))
+
+	// if render is pending return 202 accepted
+	if err202 != nil {
+		c.String(http.StatusAccepted, "text/plain", []byte("pending"))
+
+		return
+	}
+
+	// if render is failed return 404 not found
+	if err404 != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err404.Error()})
+
+		return
+	}
+
+	// Set the headers for the file transfer and return the file
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Disposition", "attachment; filename=render.html")
+	c.Header("Content-Type", "text/html")
+	c.File(filePath)
+}
+
+// GetMainProject godoc specs are subject to change
+// @Summary 	Get the main repository of a post
+// @Description Get the entire zipped main repository of a post
+// @Tags 		posts
+// @Param		postID	path		string				true	"Post ID"
+// @Produce		application/zip
+// @Success 	200		{object}	[]byte
+// @Failure		400
+// @Failure		404
+// @Router 		/posts/{postID}/repository	[get]
+func (postController *PostController) GetMainProject(c *gin.Context) {
+	// extract postID
+	postIDStr := c.Param("postID")
+	postID, err := strconv.ParseUint(postIDStr, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
+
+		return
+	}
+
+	// get repository filepath
+	filePath, err := postController.PostService.GetMainProject(uint(postID))
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	// Set the headers for the file transfer and return the file
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Disposition", "attachment; filename=quarto_project.zip")
+	c.Header("Content-Type", "application/zip")
+	c.File(filePath)
+}
+
+// GetMainFiletree godoc specs are subject to change
+// @Summary 	Get the filetree of a post
+// @Description Get the filetree of a the main version of a post
+// @Tags 		posts
+// @Param		postID	path		string				true	"Post ID"
+// @Produce		application/json
+// @Success 	200		{object}	map[string]int64
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router 		/posts/{postID}/tree		[get]
+func (postController *PostController) GetMainFiletree(c *gin.Context) {
+	// extract postID
+	postIDStr := c.Param("postID")
+	postID, err := strconv.ParseUint(postIDStr, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
+
+		return
+	}
+
+	fileTree, err404, err500 := postController.PostService.GetMainFiletree(uint(postID))
+
+	if err404 != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err404.Error()})
+
+		return
+	}
+
+	if err500 != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err500.Error()})
+
+		return
+	}
+
+	// response
+	c.JSON(http.StatusOK, fileTree)
+}
+
+// GetMainFileFromProject godoc specs are subject to change
+// @Summary 	Get a file from a post
+// @Description Get the contents of a single file from the main version of a post
+// @Tags 		posts
+// @Param		postID	path		string				true	"Post ID"
+// @Param		filepath	path		string				true	"Filepath"
+// @Produce		application/octet-stream
+// @Success 	200		{object}	[]byte
+// @Failure		404
+// @Failure		500
+// @Router 		/posts/{postID}/file/{filepath}	[get]
+func (postController *PostController) GetMainFileFromProject(c *gin.Context) {
+	// extract postID
+	postIDStr := c.Param("postID")
+	postID, err := strconv.ParseUint(postIDStr, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
+
+		return
+	}
+
+	relFilepath := c.Param("filepath")
+	absFilepath, err := postController.PostService.GetMainFileFromProject(uint(postID), relFilepath)
+
+	// if files doesnt exist return 404 not found
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	// get the file info
+	fileContentType, err1 := mimetype.DetectFile(absFilepath)
+	fileData, err2 := os.Open(absFilepath)
+	fileInfo, err3 := fileData.Stat()
+
+	if err1 != nil || err2 != nil || err3 != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file"})
+
+		return
+	}
+
+	defer fileData.Close()
+
+	// Set the headers for the file transfer and return the file
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileInfo.Name()))
+	c.Header("Content-Type", fileContentType.String())
+	c.Header("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
+	c.File(absFilepath)
 }

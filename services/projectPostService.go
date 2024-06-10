@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
+	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
@@ -12,20 +13,22 @@ import (
 type ProjectPostService struct {
 	ProjectPostRepository database.ModelRepositoryInterface[*models.ProjectPost]
 	MemberRepository      database.ModelRepositoryInterface[*models.Member]
+	Filesystem            filesystemInterfaces.Filesystem
 
 	PostCollaboratorService   interfaces.PostCollaboratorService
 	BranchCollaboratorService interfaces.BranchCollaboratorService
+	BranchService             interfaces.BranchService
 }
 
 func (projectPostService *ProjectPostService) GetProjectPost(id uint) (*models.ProjectPost, error) {
 	return projectPostService.ProjectPostRepository.GetByID(id)
 }
 
-func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error) {
+func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error, error) {
 	// This function may only be used to create Posts of type Project.
 	if form.PostCreationForm.PostType != models.Project {
 		return nil, fmt.Errorf("function CreateProjectPost may only create Post of type Project. received: %s",
-			form.PostCreationForm.PostType)
+			form.PostCreationForm.PostType), nil
 	}
 
 	// Information about the creators of this Project Post
@@ -34,7 +37,7 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 
 	postCollaborators, err := projectPostService.PostCollaboratorService.MembersToPostCollaborators(memberIDs, anonymous, models.Author)
 	if err != nil {
-		return nil, fmt.Errorf("could not create project post: %w", err)
+		return nil, fmt.Errorf("could not create project post: %w", err), nil
 	}
 
 	// This Post instance will be embedded into the Project Post
@@ -55,7 +58,7 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 	// branches may be opened on the Project Post.
 	branchCollaborators, err := projectPostService.BranchCollaboratorService.MembersToBranchCollaborators(memberIDs, anonymous)
 	if err != nil {
-		return nil, fmt.Errorf("could not create project post: %w", err)
+		return nil, fmt.Errorf("could not create project post: %w", err), nil
 	}
 
 	projectPost := models.ProjectPost{
@@ -75,7 +78,7 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 					Discussions: []*models.Discussion{},
 				},
 				BranchTitle:               models.InitialPeerReviewBranchName,
-				RenderStatus:              models.Pending,
+				RenderStatus:              models.Success,
 				BranchOverallReviewStatus: models.BranchOpenForReview,
 			},
 		},
@@ -85,11 +88,24 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 		PostReviewStatus: models.Open,
 	}
 
+	// Add the project post to db
 	if err := projectPostService.ProjectPostRepository.Create(&projectPost); err != nil {
-		return nil, fmt.Errorf("unable to create projectt post: %w", err)
+		return nil, nil, fmt.Errorf("unable to create project post: %w", err)
 	}
 
-	return &projectPost, nil
+	// Checkout directory where project post will store it's files
+	projectPostService.Filesystem.CheckoutDirectory(post.ID)
+
+	// Create a new git repo there
+	if err := projectPostService.Filesystem.CreateRepository(); err != nil {
+		return nil, nil, err
+	}
+
+	// Create initial branch in git repo
+	branch := projectPost.OpenBranches[0]
+	projectPostService.Filesystem.CreateBranch(fmt.Sprintf("%v", branch.ID))
+
+	return &projectPost, nil, nil
 }
 
 func (projectPostService *ProjectPostService) UpdateProjectPost(_ *models.ProjectPost) error {

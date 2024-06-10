@@ -9,7 +9,6 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -107,27 +106,7 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 // @Failure		400
 // @Failure		404
 // @Router 		/branches 		[put]
-func (branchController *BranchController) UpdateBranch(c *gin.Context) {
-	// extract branchDTO
-	dto := models.BranchDTO{}
-	err := c.BindJSON(&dto)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind BranchCreationForm from request body"})
-
-		return
-	}
-	// update branch
-	branch, err := branchController.BranchService.UpdateBranch(&dto)
-
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-
-		return
-	}
-
-	// response
-	c.JSON(http.StatusOK, branch.IntoDTO())
+func (branchController *BranchController) UpdateBranch(_ *gin.Context) {
 }
 
 // DeleteBranch godoc

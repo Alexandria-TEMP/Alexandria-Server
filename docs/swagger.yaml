@@ -247,10 +247,6 @@ definitions:
     type: object
   models.PostDTO:
     properties:
-      ScientificFields:
-        items:
-          $ref: '#/definitions/models.ScientificField'
-        type: array
       collaboratorIDs:
         items:
           type: integer
@@ -263,6 +259,12 @@ definitions:
         type: integer
       postType:
         $ref: '#/definitions/models.PostType'
+      renderStatus:
+        $ref: '#/definitions/models.RenderStatus'
+      scientificFields:
+        items:
+          $ref: '#/definitions/models.ScientificField'
+        type: array
       title:
         type: string
     type: object
@@ -1489,6 +1491,96 @@ paths:
       summary: Get post by ID
       tags:
       - posts
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a new project version to a specific, preexisting, branch
+        as a zipped quarto project
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      - description: Repository to create
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Upload a new project version to a branch
+      tags:
+      - posts
+  /posts/{postID}/file/{filepath}:
+    get:
+      description: Get the contents of a single file from the main version of a post
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      - description: Filepath
+        in: path
+        name: filepath
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get a file from a post
+      tags:
+      - posts
+  /posts/{postID}/render:
+    get:
+      description: Get the main render of the repository underlying a post if it exists
+        and has been rendered successfully
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "202":
+          description: Accepted
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Get the main render of a post
+      tags:
+      - posts
   /posts/{postID}/reports:
     get:
       consumes:
@@ -1548,6 +1640,58 @@ paths:
         "500":
           description: Internal Server Error
       summary: Add a new report to a post
+      tags:
+      - posts
+  /posts/{postID}/repository:
+    get:
+      description: Get the entire zipped main repository of a post
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/zip
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Get the main repository of a post
+      tags:
+      - posts
+  /posts/{postID}/tree:
+    get:
+      description: Get the filetree of a the main version of a post
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get the filetree of a post
       tags:
       - posts
   /posts/collaborators/{collaboratorID}:

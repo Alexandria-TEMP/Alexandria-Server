@@ -85,7 +85,7 @@ func testRenderSuccessTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().CreateCommit().Return(nil).Times(1)
 	mockBranchRepository.EXPECT().Update(successBranch).Return(successBranch, nil).Times(1)
 
-	renderService.Render(pendingBranch)
+	renderService.RenderBranch(pendingBranch)
 
 	_, err := os.Stat(renderDirPath)
 	assert.Nil(t, err)
@@ -103,8 +103,9 @@ func TestRenderUnzipFailed(t *testing.T) {
 	mockFilesystem.EXPECT().CheckoutBranch("10").Return(nil)
 	mockFilesystem.EXPECT().Unzip().Return(errors.New("failed")).Times(1)
 	mockBranchRepository.EXPECT().Update(failedBranch).Return(failedBranch, nil).Times(1)
+	mockFilesystem.EXPECT().Reset()
 
-	renderService.Render(pendingBranch)
+	renderService.RenderBranch(pendingBranch)
 
 	_, err := os.Stat(renderDirPath)
 	assert.NotNil(t, err)
@@ -131,7 +132,7 @@ func TestRenderExistsFailed(t *testing.T) {
 	mockFilesystem.EXPECT().RenderExists().Return(false, "").Times(1)
 	mockBranchRepository.EXPECT().Update(failedBranch).Return(failedBranch, nil).Times(1)
 
-	renderService.Render(pendingBranch)
+	renderService.RenderBranch(pendingBranch)
 }
 
 func TestIsValidProjectNoYamlorYml(t *testing.T) {

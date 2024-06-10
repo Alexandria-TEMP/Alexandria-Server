@@ -14,7 +14,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
-	"gorm.io/gorm"
 )
 
 const approvalsToMerge = 2 // 0 indexed
@@ -30,7 +29,8 @@ type BranchService struct {
 	MemberRepository              database.ModelRepositoryInterface[*models.Member]
 	Filesystem                    filesystemInterfaces.Filesystem
 
-	RenderService interfaces.RenderService
+	RenderService             interfaces.RenderService
+	BranchCollaboratorService interfaces.BranchCollaboratorService
 }
 
 func (branchService *BranchService) GetBranch(branchID uint) (models.Branch, error) {
@@ -61,7 +61,7 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 	}
 
 	// get all collaborators from ids
-	collaborators, err := branchService.getBranchCollaboratorsFromIDs(branchCreationForm.CollaboratingMemberIDs)
+	collaborators, err := branchService.BranchCollaboratorService.MembersToBranchCollaborators(branchCreationForm.CollaboratingMemberIDs, branchCreationForm.Anonymous)
 	if err != nil {
 		return branch, err, nil
 	}
@@ -95,92 +95,6 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 	}
 
 	return branch, nil, nil
-}
-
-func (branchService *BranchService) UpdateBranch(branchDTO *models.BranchDTO) (models.Branch, error) {
-	var branch models.Branch
-
-	// map collaborator IDs to collaborators
-	collaborators, err := branchService.getBranchCollaboratorsFromIDs(branchDTO.CollaboratorIDs)
-
-	if err != nil {
-		return branch, err
-	}
-
-	// map branchreview IDs to reviews
-	reviews, err := branchService.getBranchReviewsFromIDs(branchDTO.ReviewIDs)
-
-	if err != nil {
-		return branch, err
-	}
-
-	// map discussion IDs to discussion container
-	discussionContainer, err := branchService.getDiscussionContainerFromIDs(branchDTO.DiscussionIDs)
-
-	if err != nil {
-		return branch, err
-	}
-
-	// check project post exists
-	_, err = branchService.ProjectPostRepository.GetByID(branchDTO.ProjectPostID)
-
-	if err != nil {
-		return branch, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
-	}
-
-	// construct new branch
-	branch = models.Branch{
-		Model:                     gorm.Model{ID: branchDTO.ID},
-		UpdatedPostTitle:          branchDTO.UpdatedPostTitle,
-		UpdatedCompletionStatus:   branchDTO.UpdatedCompletionStatus,
-		UpdatedScientificFields:   branchDTO.UpdatedScientificFields,
-		Collaborators:             collaborators,
-		Reviews:                   reviews,
-		DiscussionContainer:       discussionContainer,
-		ProjectPostID:             branchDTO.ProjectPostID,
-		BranchTitle:               branch.BranchTitle,
-		RenderStatus:              branchDTO.RenderStatus,
-		BranchOverallReviewStatus: branchDTO.BranchOverallReviewStatus,
-	}
-
-	// update entity in DB
-	if _, err := branchService.BranchRepository.Update(&branch); err != nil {
-		return branch, fmt.Errorf("failed to update old branch with new values in DB")
-	}
-
-	return branch, nil
-}
-
-func (branchService *BranchService) getBranchCollaboratorsFromIDs(ids []uint) ([]*models.BranchCollaborator, error) {
-	collaborators := []*models.BranchCollaborator{}
-
-	for _, ID := range ids {
-		collaborator, err := branchService.BranchCollaboratorRepository.GetByID(ID)
-
-		if err != nil {
-			return collaborators, fmt.Errorf("failed to find branch collaborator with id=%v", ID)
-		}
-
-		collaborators = append(collaborators, collaborator)
-	}
-
-	return collaborators, nil
-}
-
-func (branchService *BranchService) getBranchReviewsFromIDs(ids []uint) ([]*models.BranchReview, error) {
-	reviews := []*models.BranchReview{}
-
-	for _, ID := range ids {
-		branchreview, err := branchService.ReviewRepository.GetByID(ID)
-
-		if err != nil {
-			return reviews, fmt.Errorf("failed to find branchreview with id=%v", ID)
-		}
-
-		reviews = append(reviews, branchreview)
-	}
-
-	return reviews, nil
 }
 
 func (branchService *BranchService) getDiscussionContainerFromIDs(ids []uint) (models.DiscussionContainer, error) {
@@ -477,7 +391,7 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 		_, _ = branchService.BranchRepository.Update(branch)
 		_ = branchService.Filesystem.Reset()
 
-		return fmt.Errorf("failed to remove all old files")
+		return fmt.Errorf("failed to save zip file")
 	}
 
 	// commit
@@ -491,7 +405,7 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 		return fmt.Errorf("failed to update branch entity")
 	}
 
-	go branchService.RenderService.Render(branch)
+	go branchService.RenderService.RenderBranch(branch)
 
 	return nil
 }
@@ -528,6 +442,7 @@ func (branchService *BranchService) GetFiletree(branchID uint) (map[string]int64
 func (branchService *BranchService) GetFileFromProject(branchID uint, relFilepath string) (string, error) {
 	var absFilepath string
 
+	// validate file path is inside of repository
 	if strings.Contains(relFilepath, "..") {
 		return absFilepath, fmt.Errorf("file is outside of repository")
 	}

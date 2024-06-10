@@ -208,21 +208,6 @@ func (mr *MockBranchServiceMockRecorder) MemberCanReview(branchID, memberID any)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MemberCanReview", reflect.TypeOf((*MockBranchService)(nil).MemberCanReview), branchID, memberID)
 }
 
-// UpdateBranch mocks base method.
-func (m *MockBranchService) UpdateBranch(branchDTO *models.BranchDTO) (models.Branch, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateBranch", branchDTO)
-	ret0, _ := ret[0].(models.Branch)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdateBranch indicates an expected call of UpdateBranch.
-func (mr *MockBranchServiceMockRecorder) UpdateBranch(branchDTO any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBranch", reflect.TypeOf((*MockBranchService)(nil).UpdateBranch), branchDTO)
-}
-
 // UploadProject mocks base method.
 func (m *MockBranchService) UploadProject(c *gin.Context, file *multipart.FileHeader, branchID uint) error {
 	m.ctrl.T.Helper()

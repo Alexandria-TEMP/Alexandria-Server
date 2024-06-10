@@ -1792,6 +1792,46 @@ const docTemplate = `{
                     }
                 }
             },
+            "post": {
+                "description": "Upload a new project version to a specific, preexisting, branch as a zipped quarto project",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Upload a new project version to a branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Repository to create",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
             "delete": {
                 "description": "Delete a post with given ID from database",
                 "consumes": [
@@ -1825,6 +1865,98 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}/file/{filepath}": {
+            "get": {
+                "description": "Get the contents of a single file from the main version of a post",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get a file from a post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filepath",
+                        "name": "filepath",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}/render": {
+            "get": {
+                "description": "Get the main render of the repository underlying a post if it exists and has been rendered successfully",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get the main render of a post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     }
                 }
             }
@@ -1907,6 +2039,85 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.ReportDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}/repository": {
+            "get": {
+                "description": "Get the entire zipped main repository of a post",
+                "produces": [
+                    "application/zip"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get the main repository of a post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}/tree": {
+            "get": {
+                "description": "Get the filetree of a the main version of a post",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get the filetree of a post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "integer"
+                            }
                         }
                     },
                     "400": {
@@ -2689,12 +2900,6 @@ const docTemplate = `{
         "models.PostDTO": {
             "type": "object",
             "properties": {
-                "ScientificFields": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ScientificField"
-                    }
-                },
                 "collaboratorIDs": {
                     "type": "array",
                     "items": {
@@ -2712,6 +2917,15 @@ const docTemplate = `{
                 },
                 "postType": {
                     "$ref": "#/definitions/models.PostType"
+                },
+                "renderStatus": {
+                    "$ref": "#/definitions/models.RenderStatus"
+                },
+                "scientificFields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ScientificField"
+                    }
                 },
                 "title": {
                     "type": "string"

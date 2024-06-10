@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
@@ -31,16 +32,20 @@ func projectPostServiceSetup(t *testing.T) {
 	// Create mocks
 	mockProjectPostRepository = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
 
 	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
 	mockBranchCollaboratorService = mocks.NewMockBranchCollaboratorService(mockCtrl)
+	mockBranchService = mocks.NewMockBranchService(mockCtrl)
 
 	// Setup SUT
 	projectPostService = ProjectPostService{
 		ProjectPostRepository:     mockProjectPostRepository,
 		MemberRepository:          mockMemberRepository,
+		Filesystem:                mockFilesystem,
 		PostCollaboratorService:   mockPostCollaboratorService,
 		BranchCollaboratorService: mockBranchCollaboratorService,
+		BranchService:             mockBranchService,
 	}
 }
 
@@ -76,13 +81,14 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 	}, nil).Times(1)
 
 	mockProjectPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
+	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
+	mockFilesystem.EXPECT().CreateRepository().Return(nil)
+	mockFilesystem.EXPECT().CreateBranch("0").Return(nil)
 
 	// Function under test
-	createdProjectPost, err := projectPostService.CreateProjectPost(&projectPostCreationForm)
-
-	if err != nil {
-		t.Fatalf("creating project post failed, reason: %s", err)
-	}
+	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
+	assert.Nil(t, err404)
+	assert.Nil(t, err500)
 
 	expectedProjectPost := &models.ProjectPost{
 		Post: models.Post{
@@ -110,7 +116,7 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 					Discussions: []*models.Discussion{},
 				},
 				BranchTitle:               models.InitialPeerReviewBranchName,
-				RenderStatus:              models.Pending,
+				RenderStatus:              models.Success,
 				BranchOverallReviewStatus: models.BranchOpenForReview,
 			},
 		},
@@ -149,15 +155,14 @@ func TestCreateProjectPostDatabaseFailure(t *testing.T) {
 	mockProjectPostRepository.EXPECT().Create(gomock.Any()).Return(fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
-	createdProjectPost, err := projectPostService.CreateProjectPost(&projectPostCreationForm)
+	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
 
 	if createdProjectPost != nil {
 		t.Fatalf("project post should not have been created:\n%+v", createdProjectPost)
 	}
 
-	if err == nil {
-		t.Fatal("project post creation should have thrown error")
-	}
+	assert.Nil(t, err404)
+	assert.NotNil(t, err500)
 }
 
 // Creating a project post must use the correct post type, otherwise creation should fail.
@@ -178,15 +183,14 @@ func TestCreateProjectPostWrongPostType(t *testing.T) {
 	}
 
 	// Function under test
-	createdProjectPost, err := projectPostService.CreateProjectPost(&projectPostCreationForm)
+	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
 
 	if createdProjectPost != nil {
 		t.Fatalf("project post should not have been created:\n%+v", createdProjectPost)
 	}
 
-	if err == nil {
-		t.Fatal("project post creation should have thrown error")
-	}
+	assert.NotNil(t, err404)
+	assert.Nil(t, err500)
 }
 
 // When creating a post collaborator list fails, project post creation should fail.
@@ -210,15 +214,14 @@ func TestCreateProjectPostCollaboratorsFail(t *testing.T) {
 	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{10, 15}, false, models.Author).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
-	createdProjectPost, err := projectPostService.CreateProjectPost(&projectPostCreationForm)
+	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
 
 	if createdProjectPost != nil {
 		t.Fatalf("project post should not have been created:\n%+v", createdProjectPost)
 	}
 
-	if err == nil {
-		t.Fatal("project post creation should have thrown error")
-	}
+	assert.NotNil(t, err404)
+	assert.Nil(t, err500)
 }
 
 // When creating a branch collaborator list fails, project post creation should fail.
@@ -246,13 +249,12 @@ func TestCreateProjectBranchCollaboratorsFail(t *testing.T) {
 	mockBranchCollaboratorService.EXPECT().MembersToBranchCollaborators([]uint{memberA.ID, memberB.ID}, false).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
-	createdProjectPost, err := projectPostService.CreateProjectPost(&projectPostCreationForm)
+	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
 
 	if createdProjectPost != nil {
 		t.Fatalf("project post should not have been created:\n%+v", createdProjectPost)
 	}
 
-	if err == nil {
-		t.Fatal("project post creation should have thrown error")
-	}
+	assert.NotNil(t, err404)
+	assert.Nil(t, err500)
 }

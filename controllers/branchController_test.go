@@ -151,56 +151,6 @@ func TestCreateBranch500(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Result().StatusCode)
 }
 
-func TestUpdateBranch200(t *testing.T) {
-	beforeEachBranch(t)
-
-	mockBranchService.EXPECT().UpdateBranch(gomock.Any()).Return(exampleBranch, nil)
-
-	dto := models.BranchDTO{ID: 1}
-	body, err := json.Marshal(dto)
-	assert.Nil(t, err)
-
-	req, _ := http.NewRequest("PUT", "/api/v2/branches", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
-}
-
-func TestUpdateBranch400(t *testing.T) {
-	beforeEachBranch(t)
-
-	mockBranchService.EXPECT().UpdateBranch(gomock.Any()).Times(0)
-
-	req, _ := http.NewRequest("PUT", "/api/v2/branches", http.NoBody)
-	req.Header.Set("Content-Type", "application/json")
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestUpdateBranch404(t *testing.T) {
-	beforeEachBranch(t)
-
-	mockBranchService.EXPECT().UpdateBranch(gomock.Any()).Return(exampleBranch, errors.New("branch not found"))
-
-	dto := models.BranchDTO{ID: 1}
-	body, err := json.Marshal(dto)
-	assert.Nil(t, err)
-
-	req, _ := http.NewRequest("PUT", "/api/v2/branches", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
-}
-
 func TestDeleteBranch200(t *testing.T) {
 	beforeEachBranch(t)
 

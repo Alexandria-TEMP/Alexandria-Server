@@ -39,6 +39,22 @@ func (m *MockRenderService) EXPECT() *MockRenderServiceMockRecorder {
 	return m.recorder
 }
 
+// GetMainRenderFile mocks base method.
+func (m *MockRenderService) GetMainRenderFile(postID uint) (string, error, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMainRenderFile", postID)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetMainRenderFile indicates an expected call of GetMainRenderFile.
+func (mr *MockRenderServiceMockRecorder) GetMainRenderFile(postID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMainRenderFile", reflect.TypeOf((*MockRenderService)(nil).GetMainRenderFile), postID)
+}
+
 // GetRenderFile mocks base method.
 func (m *MockRenderService) GetRenderFile(branchID uint) (string, error, error) {
 	m.ctrl.T.Helper()
@@ -55,14 +71,26 @@ func (mr *MockRenderServiceMockRecorder) GetRenderFile(branchID any) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRenderFile", reflect.TypeOf((*MockRenderService)(nil).GetRenderFile), branchID)
 }
 
-// Render mocks base method.
-func (m *MockRenderService) Render(arg0 *models.Branch) {
+// RenderBranch mocks base method.
+func (m *MockRenderService) RenderBranch(arg0 *models.Branch) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Render", arg0)
+	m.ctrl.Call(m, "RenderBranch", arg0)
 }
 
-// Render indicates an expected call of Render.
-func (mr *MockRenderServiceMockRecorder) Render(arg0 any) *gomock.Call {
+// RenderBranch indicates an expected call of RenderBranch.
+func (mr *MockRenderServiceMockRecorder) RenderBranch(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Render", reflect.TypeOf((*MockRenderService)(nil).Render), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenderBranch", reflect.TypeOf((*MockRenderService)(nil).RenderBranch), arg0)
+}
+
+// RenderPost mocks base method.
+func (m *MockRenderService) RenderPost(arg0 *models.Post) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "RenderPost", arg0)
+}
+
+// RenderPost indicates an expected call of RenderPost.
+func (mr *MockRenderServiceMockRecorder) RenderPost(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenderPost", reflect.TypeOf((*MockRenderService)(nil).RenderPost), arg0)
 }

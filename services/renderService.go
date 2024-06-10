@@ -17,6 +17,7 @@ import (
 
 type RenderService struct {
 	BranchRepository      database.ModelRepositoryInterface[*models.Branch]
+	PostRepository        database.ModelRepositoryInterface[*models.Post]
 	ProjectPostRepository database.ModelRepositoryInterface[*models.ProjectPost]
 	Filesystem            filesystemInterfaces.Filesystem
 }
@@ -72,10 +73,120 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, error,
 	return filePath, nil, nil
 }
 
-func (renderService *RenderService) Render(branch *models.Branch) {
+func (renderService *RenderService) GetMainRenderFile(postID uint) (string, error, error) {
+	var filePath string
+
+	// get post
+	post, err := renderService.PostRepository.GetByID(postID)
+
+	if err != nil {
+		return filePath, nil, fmt.Errorf("failed to find post with id %v", postID)
+	}
+
+	// if render is pending return 202
+	if post.RenderStatus == models.Pending {
+		return filePath, fmt.Errorf("render is still pending"), nil
+	}
+
+	// if render is failed return 404
+	if post.RenderStatus == models.Failure {
+		return filePath, nil, fmt.Errorf("render has failed")
+	}
+
+	// select repository of the post
+	renderService.Filesystem.CheckoutDirectory(postID)
+
+	// checkout master
+	if err := renderService.Filesystem.CheckoutBranch("master"); err != nil {
+		return filePath, nil, fmt.Errorf("failed to find master")
+	}
+
+	// verify render exists. if it doesn't set render status to failed
+	exists, fileName := renderService.Filesystem.RenderExists()
+
+	if !exists {
+		post.RenderStatus = models.Failure
+		_, _ = renderService.PostRepository.Update(post)
+
+		return filePath, nil, fmt.Errorf("render has failed")
+	}
+
+	// set filepath to absolute path to render file
+	filePath = filepath.Join(renderService.Filesystem.GetCurrentRenderDirPath(), fileName)
+
+	return filePath, nil, nil
+}
+
+func (renderService *RenderService) RenderPost(post *models.Post) {
+	// Checkout master
+	if err := renderService.Filesystem.CheckoutBranch("master"); err != nil {
+		renderService.FailPost(post)
+
+		return
+	}
+	// Unzip saved file
+	if err := renderService.Filesystem.Unzip(); err != nil {
+		renderService.FailPost(post)
+
+		return
+	}
+
+	// Validate project
+	if valid := renderService.IsValidProject(); !valid {
+		renderService.FailPost(post)
+
+		return
+	}
+
+	// Install dependencies
+	if err := renderService.InstallRenderDependencies(); err != nil {
+		renderService.FailPost(post)
+
+		return
+	}
+
+	// Set custom render config in yaml
+	if err := renderService.SetProjectConfig(); err != nil {
+		renderService.FailPost(post)
+
+		return
+	}
+
+	// Render quarto project
+	if err := renderService.RunRender(); err != nil {
+		renderService.FailPost(post)
+
+		return
+	}
+
+	// Verify that a render was produced in the form of a single file
+	if exists, _ := renderService.Filesystem.RenderExists(); !exists {
+		renderService.FailPost(post)
+
+		return
+	}
+
+	// Commit
+	if err := renderService.Filesystem.CreateCommit(); err != nil {
+		renderService.FailPost(post)
+
+		return
+	}
+
+	// Update post render status
+	post.RenderStatus = models.Success
+	if _, err := renderService.PostRepository.Update(post); err != nil {
+		renderService.FailPost(post)
+
+		return
+	}
+}
+
+func (renderService *RenderService) RenderBranch(branch *models.Branch) {
 	// Checkout the branch
 	if err := renderService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branch.ID)); err != nil {
 		renderService.FailBranch(branch)
+		_ = renderService.Filesystem.Reset()
 
 		return
 	}
@@ -83,6 +194,7 @@ func (renderService *RenderService) Render(branch *models.Branch) {
 	// Unzip saved file
 	if err := renderService.Filesystem.Unzip(); err != nil {
 		renderService.FailBranch(branch)
+		_ = renderService.Filesystem.Reset()
 
 		return
 	}
@@ -90,6 +202,7 @@ func (renderService *RenderService) Render(branch *models.Branch) {
 	// Validate project
 	if valid := renderService.IsValidProject(); !valid {
 		renderService.FailBranch(branch)
+		_ = renderService.Filesystem.Reset()
 
 		return
 	}
@@ -97,6 +210,7 @@ func (renderService *RenderService) Render(branch *models.Branch) {
 	// Install dependencies
 	if err := renderService.InstallRenderDependencies(); err != nil {
 		renderService.FailBranch(branch)
+		_ = renderService.Filesystem.Reset()
 
 		return
 	}
@@ -104,6 +218,7 @@ func (renderService *RenderService) Render(branch *models.Branch) {
 	// Set custom render config in yaml
 	if err := renderService.SetProjectConfig(); err != nil {
 		renderService.FailBranch(branch)
+		_ = renderService.Filesystem.Reset()
 
 		return
 	}
@@ -262,7 +377,7 @@ func (renderService *RenderService) RunRender() error {
 	out, err := cmd.CombinedOutput()
 
 	if err != nil {
-		return errors.New(string(out))
+		return fmt.Errorf("quarto failed to render:\n%v", out)
 	}
 
 	return nil
@@ -271,4 +386,10 @@ func (renderService *RenderService) RunRender() error {
 func (renderService *RenderService) FailBranch(branch *models.Branch) {
 	branch.RenderStatus = models.Failure
 	_, _ = renderService.BranchRepository.Update(branch)
+}
+
+func (renderService *RenderService) FailPost(post *models.Post) {
+	post.RenderStatus = models.Failure
+	_, _ = renderService.PostRepository.Update(post)
+	_ = renderService.Filesystem.Reset()
 }

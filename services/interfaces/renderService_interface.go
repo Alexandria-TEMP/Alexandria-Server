@@ -10,6 +10,14 @@ type RenderService interface {
 	// Error 2 is for status 404.
 	GetRenderFile(branchID uint) (string, error, error)
 
-	// Render first unzips a zipped project, validates it, configures it to render well, renders it, and checks it rendered well.
-	Render(*models.Branch)
+	// GetRender returns filepath of rendered repository ON MAIN.
+	// Error 1 is for status 202.
+	// Error 2 is for status 404.
+	GetMainRenderFile(postID uint) (string, error, error)
+
+	// RenderBranch first unzips a zipped project, validates it, configures it to render well, renders it, and checks it rendered well.
+	RenderBranch(*models.Branch)
+
+	// RenderPost first unzips a zipped project, validates it, configures it to render well, renders it, and checks it rendered well.
+	RenderPost(*models.Post)
 }

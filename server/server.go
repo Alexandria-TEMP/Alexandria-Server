@@ -55,19 +55,22 @@ func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
 }
 
 func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
-	postService := &services.PostService{
-		PostRepository:   repositoryEnv.postRepository,
-		MemberRepository: repositoryEnv.memberRepository,
-	}
-	projectPostService := &services.ProjectPostService{
-		ProjectPostRepository: repositoryEnv.projectPostRepository,
-	}
-	memberService := &services.MemberService{}
 	renderService := &services.RenderService{
 		BranchRepository:      repositoryEnv.branchRepository,
+		PostRepository:        repositoryEnv.postRepository,
 		ProjectPostRepository: repositoryEnv.projectPostRepository,
 		Filesystem:            fs,
 	}
+	postCollaboratorService := &services.PostCollaboratorService{MemberRepository: repositoryEnv.memberRepository}
+	branchCollaboratorService := &services.BranchCollaboratorService{MemberRepository: repositoryEnv.memberRepository}
+	postService := &services.PostService{
+		PostRepository:          repositoryEnv.postRepository,
+		MemberRepository:        repositoryEnv.memberRepository,
+		Filesystem:              fs,
+		RenderService:           renderService,
+		PostCollaboratorService: postCollaboratorService,
+	}
+	memberService := &services.MemberService{}
 	branchService := &services.BranchService{
 		BranchRepository:              repositoryEnv.branchRepository,
 		ProjectPostRepository:         repositoryEnv.projectPostRepository,
@@ -78,6 +81,14 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		MemberRepository:              repositoryEnv.memberRepository,
 		Filesystem:                    fs,
 		RenderService:                 renderService,
+	}
+	projectPostService := &services.ProjectPostService{
+		ProjectPostRepository:     repositoryEnv.projectPostRepository,
+		MemberRepository:          repositoryEnv.memberRepository,
+		Filesystem:                renderService.Filesystem,
+		PostCollaboratorService:   postCollaboratorService,
+		BranchCollaboratorService: branchCollaboratorService,
+		BranchService:             branchService,
 	}
 
 	return ServiceEnv{
@@ -91,11 +102,18 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 
 func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 	return ControllerEnv{
-		postController:        &controllers.PostController{PostService: serviceEnv.postService},
-		memberController:      &controllers.MemberController{MemberService: serviceEnv.memberService},
-		projectPostController: &controllers.ProjectPostController{ProjectPostService: serviceEnv.projectPostService},
-		discussionController:  &controllers.DiscussionController{},
-		filterController:      &controllers.FilterController{},
+		postController: &controllers.PostController{
+			PostService:   serviceEnv.postService,
+			RenderService: serviceEnv.renderService,
+		},
+		memberController: &controllers.MemberController{MemberService: serviceEnv.memberService},
+		projectPostController: &controllers.ProjectPostController{
+			PostService:        serviceEnv.postService,
+			ProjectPostService: serviceEnv.projectPostService,
+			RenderService:      serviceEnv.renderService,
+		},
+		discussionController: &controllers.DiscussionController{},
+		filterController:     &controllers.FilterController{},
 		branchController: &controllers.BranchController{
 			BranchService: serviceEnv.branchService,
 			RenderService: serviceEnv.renderService,

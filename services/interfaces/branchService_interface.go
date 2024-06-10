@@ -20,10 +20,6 @@ type BranchService interface {
 	// Error 2 500
 	CreateBranch(branchCreationForm *forms.BranchCreationForm) (models.Branch, error, error)
 
-	// UpdateBranch updates an existing branch using a DTO.
-	// This only effects the entity, not the filesystem.
-	UpdateBranch(branchDTO *models.BranchDTO) (models.Branch, error)
-
 	// DeleteBranch deletes an existing branch entity, as well as the branch in the vfs.
 	DeleteBranch(branchID uint) error
 

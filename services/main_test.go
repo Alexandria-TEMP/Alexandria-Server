@@ -17,8 +17,10 @@ var (
 	mockRenderService             *mocks.MockRenderService
 	mockPostCollaboratorService   *mocks.MockPostCollaboratorService
 	mockBranchCollaboratorService *mocks.MockBranchCollaboratorService
+	mockBranchService             *mocks.MockBranchService
 
 	mockBranchRepository              *mocks.MockModelRepositoryInterface[*models.Branch]
+	mockClosedBranchRepository        *mocks.MockModelRepositoryInterface[*models.ClosedBranch]
 	mockPostRepository                *mocks.MockModelRepositoryInterface[*models.Post]
 	mockProjectPostRepository         *mocks.MockModelRepositoryInterface[*models.ProjectPost]
 	mockReviewRepository              *mocks.MockModelRepositoryInterface[*models.BranchReview]
