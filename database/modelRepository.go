@@ -61,9 +61,6 @@ func (repo *ModelRepository[T]) Update(object T) (T, error) {
 		return zero, fmt.Errorf("could not update model with ID %d: %w", id, result.Error)
 	}
 
-	// Return the newly saved object, because some of its fields
-	// (e.g. last-updated) may have been changed automatically.
-	// TODO the "object" field may already have been modified by GORM's Save method above
 	return repo.GetByID(id)
 }
 
@@ -88,4 +85,32 @@ func (repo *ModelRepository[T]) GetAllIDs() ([]uint, error) {
 	}
 
 	return ids, nil
+}
+
+func (repo *ModelRepository[T]) Query(conds ...interface{}) ([]T, error) {
+	var models []T
+
+	result := repo.Database.Find(&models, conds[0:]...)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("could not query: result.Error")
+	}
+
+	return models, nil
+}
+
+func (repo *ModelRepository[T]) QueryPaginated(page, size int, conds ...interface{}) ([]T, error) {
+	var models []T
+
+	result := repo.Database.Scopes(func(db *gorm.DB) *gorm.DB {
+		// Performs pagination
+		offset := (page - 1) * size
+		return db.Offset(offset).Limit(size)
+	}).Find(&models, conds[0:]...)
+
+	if result.Error != nil {
+		return nil, fmt.Errorf("could not query: result.Error")
+	}
+
+	return models, nil
 }

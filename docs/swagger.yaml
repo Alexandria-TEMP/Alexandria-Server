@@ -1,6 +1,29 @@
 basePath: /api/v2
 definitions:
   forms.BranchCreationForm:
+    properties:
+      anonymous:
+        type: boolean
+      branchTitle:
+        type: string
+      collaboratingMemberIDs:
+        description: The branch's metadata
+        items:
+          type: integer
+        type: array
+      projectPostID:
+        type: integer
+      updatedCompletionStatus:
+        $ref: '#/definitions/models.ProjectCompletionStatus'
+      updatedFeedbackPreferences:
+        $ref: '#/definitions/models.ProjectFeedbackPreference'
+      updatedPostTitle:
+        description: Changes made by the branch
+        type: string
+      updatedScientificFields:
+        items:
+          $ref: '#/definitions/tags.ScientificField'
+        type: array
     type: object
   forms.DiscussionCreationForm:
     properties:
@@ -44,22 +67,17 @@ definitions:
           making the password just a string for now
           TODO: some hashing or semblance of security
         type: string
-      scientificFieldTagIDs:
-        items:
-          type: integer
-        type: array
     type: object
   forms.PostCreationForm:
     properties:
       anonymous:
         type: boolean
       authorMemberIDs:
-        description: Members that are authors of the post
         items:
           type: integer
         type: array
       postType:
-        $ref: '#/definitions/tags.PostType'
+        $ref: '#/definitions/models.PostType'
       scientificFieldTags:
         items:
           $ref: '#/definitions/tags.ScientificFieldTag'
@@ -70,9 +88,9 @@ definitions:
   forms.ProjectPostCreationForm:
     properties:
       completionStatus:
-        $ref: '#/definitions/tags.CompletionStatus'
+        $ref: '#/definitions/models.ProjectCompletionStatus'
       feedbackPreference:
-        $ref: '#/definitions/tags.FeedbackPreference'
+        $ref: '#/definitions/models.ProjectFeedbackPreference'
       postCreationForm:
         $ref: '#/definitions/forms.PostCreationForm'
     type: object
@@ -91,8 +109,6 @@ definitions:
     properties:
       branchID:
         type: integer
-      collaborationType:
-        $ref: '#/definitions/models.CollaborationType'
       id:
         type: integer
       memberID:
@@ -100,10 +116,8 @@ definitions:
     type: object
   models.BranchDTO:
     properties:
-      anonymous:
-        type: boolean
-      branchReviewStatus:
-        $ref: '#/definitions/models.BranchReviewStatus'
+      branchOverallReviewStatus:
+        $ref: '#/definitions/models.BranchOverallReviewStatus'
       branchTitle:
         type: string
       collaboratorIDs:
@@ -120,7 +134,7 @@ definitions:
       newPostTitle:
         description: MR's proposed changes
         type: string
-      projectPostID:
+      projectPostIDs:
         type: integer
       renderStatus:
         $ref: '#/definitions/models.RenderStatus'
@@ -129,12 +143,22 @@ definitions:
           type: integer
         type: array
       updatedCompletionStatus:
-        $ref: '#/definitions/tags.CompletionStatus'
-      updatedScientificFieldTagIDs:
+        $ref: '#/definitions/models.ProjectCompletionStatus'
+      updatedScientificFields:
         items:
           type: integer
         type: array
     type: object
+  models.BranchOverallReviewStatus:
+    enum:
+    - open for review
+    - peer reviewed
+    - rejected
+    type: string
+    x-enum-varnames:
+    - BranchOpenForReview
+    - BranchPeerReviewed
+    - BranchRejected
   models.BranchReviewDTO:
     properties:
       branchID:
@@ -158,16 +182,6 @@ definitions:
     x-enum-varnames:
     - Rejected
     - Approved
-  models.BranchReviewStatus:
-    enum:
-    - open for review
-    - peer reviewed
-    - rejected
-    type: string
-    x-enum-varnames:
-    - BranchOpenForReview
-    - BranchPeerReviewed
-    - BranchRejected
   models.CollaborationType:
     enum:
     - author
@@ -209,9 +223,9 @@ definitions:
         type: string
       password:
         type: string
-      scientificFieldTagIDs:
+      scientificFieldTags:
         items:
-          type: integer
+          $ref: '#/definitions/tags.ScientificField'
         type: array
     type: object
   models.PostCollaboratorDTO:
@@ -238,14 +252,42 @@ definitions:
       id:
         type: integer
       postType:
-        $ref: '#/definitions/tags.PostType'
-      scientificFieldTagIDs:
+        $ref: '#/definitions/models.PostType'
+      scientificFieldTags:
         items:
           type: integer
         type: array
       title:
         type: string
     type: object
+  models.PostType:
+    enum:
+    - project
+    - question
+    - reflection
+    type: string
+    x-enum-varnames:
+    - Project
+    - Question
+    - Reflection
+  models.ProjectCompletionStatus:
+    enum:
+    - idea
+    - ongoing
+    - completed
+    type: string
+    x-enum-varnames:
+    - Idea
+    - Ongoing
+    - Completed
+  models.ProjectFeedbackPreference:
+    enum:
+    - discussion feedback
+    - formal feedback
+    type: string
+    x-enum-varnames:
+    - DiscussionFeedback
+    - FormalFeedback
   models.ProjectPostDTO:
     properties:
       closedBranchIDs:
@@ -253,20 +295,30 @@ definitions:
           type: integer
         type: array
       completionStatus:
-        $ref: '#/definitions/tags.CompletionStatus'
+        $ref: '#/definitions/models.ProjectCompletionStatus'
       feedbackPreference:
-        $ref: '#/definitions/tags.FeedbackPreference'
+        $ref: '#/definitions/models.ProjectFeedbackPreference'
       id:
         type: integer
       openBranchIDs:
         items:
           type: integer
         type: array
-      postDTO:
+      post:
         $ref: '#/definitions/models.PostDTO'
-      postReviewStatusTag:
-        $ref: '#/definitions/tags.PostReviewStatus'
+      postReviewStatus:
+        $ref: '#/definitions/models.ProjectReviewStatus'
     type: object
+  models.ProjectReviewStatus:
+    enum:
+    - open
+    - revision needed
+    - reviewed
+    type: string
+    x-enum-varnames:
+    - Open
+    - RevisionNeeded
+    - Reviewed
   models.RenderStatus:
     enum:
     - success
@@ -289,44 +341,14 @@ definitions:
       postID:
         type: integer
     type: object
-  tags.CompletionStatus:
+  tags.ScientificField:
     enum:
-    - idea
-    - ongoing
-    - completed
+    - mathematics
+    - computer science
     type: string
     x-enum-varnames:
-    - Idea
-    - Ongoing
-    - Completed
-  tags.FeedbackPreference:
-    enum:
-    - discussion
-    - formal feedback
-    type: string
-    x-enum-varnames:
-    - Discussion
-    - FormalFeedback
-  tags.PostReviewStatus:
-    enum:
-    - open
-    - revision needed
-    - reviewed
-    type: string
-    x-enum-varnames:
-    - Open
-    - RevisionNeeded
-    - Reviewed
-  tags.PostType:
-    enum:
-    - project
-    - question
-    - reflection
-    type: string
-    x-enum-varnames:
-    - Project
-    - Question
-    - Reflection
+    - Mathematics
+    - ComputerScience
   tags.ScientificFieldTag:
     type: object
   utils.HTTPError:
@@ -469,7 +491,7 @@ paths:
       summary: Get branch
       tags:
       - branches
-  /branches/{branchID}/can-review/{memberID}:
+  /branches/{branchID}/can-review/{userID}:
     get:
       consumes:
       - application/json
@@ -484,7 +506,7 @@ paths:
         type: string
       - description: user ID
         in: path
-        name: memberID
+        name: userID
         required: true
         type: string
       produces:
@@ -527,7 +549,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.BranchReviewStatus'
+              $ref: '#/definitions/models.BranchOverallReviewStatus'
             type: array
         "400":
           description: Bad Request
@@ -875,7 +897,7 @@ paths:
         type: integer
       - description: page size
         in: query
-        name: pageSize
+        name: size
         type: integer
       produces:
       - application/json
@@ -921,7 +943,7 @@ paths:
         type: integer
       - description: page size
         in: query
-        name: pageSize
+        name: size
         type: integer
       produces:
       - application/json
@@ -1034,7 +1056,7 @@ paths:
       summary: Update a member
       tags:
       - members
-  /members/{memberID}:
+  /members/{userID}:
     delete:
       consumes:
       - application/json
@@ -1042,7 +1064,7 @@ paths:
       parameters:
       - description: member ID
         in: path
-        name: memberID
+        name: userID
         required: true
         type: string
       produces:
@@ -1068,11 +1090,11 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a member by member ID
+      description: Get a member by user ID
       parameters:
-      - description: member ID
+      - description: user ID
         in: path
-        name: memberID
+        name: userID
         required: true
         type: string
       produces:
@@ -1097,15 +1119,15 @@ paths:
       summary: Get member from database
       tags:
       - members
-  /members/{memberID}/branches:
+  /members/{userID}/branches:
     get:
       consumes:
       - application/json
       description: Get all branches that this member is a collaborator of
       parameters:
-      - description: member ID
+      - description: user ID
         in: path
-        name: memberID
+        name: userID
         required: true
         type: string
       produces:
@@ -1132,15 +1154,15 @@ paths:
       summary: Get all branches of this member
       tags:
       - members
-  /members/{memberID}/discussions:
+  /members/{userID}/discussions:
     get:
       consumes:
       - application/json
       description: Get all discussions that this member has participated in
       parameters:
-      - description: member ID
+      - description: user ID
         in: path
-        name: memberID
+        name: userID
         required: true
         type: string
       produces:
@@ -1167,15 +1189,15 @@ paths:
       summary: Get all discussions
       tags:
       - members
-  /members/{memberID}/posts:
+  /members/{userID}/posts:
     get:
       consumes:
       - application/json
       description: Get all posts that this member is a collaborator of
       parameters:
-      - description: member ID
+      - description: user ID
         in: path
-        name: memberID
+        name: userID
         required: true
         type: string
       produces:
@@ -1202,15 +1224,15 @@ paths:
       summary: Get all posts of this member
       tags:
       - members
-  /members/{memberID}/project-posts:
+  /members/{userID}/project-posts:
     get:
       consumes:
       - application/json
       description: Get all project posts that this member is a collaborator of
       parameters:
-      - description: member ID
+      - description: user ID
         in: path
-        name: memberID
+        name: userID
         required: true
         type: string
       produces:
@@ -1237,15 +1259,15 @@ paths:
       summary: Get all project posts of this member
       tags:
       - members
-  /members/{memberID}/saved-posts:
+  /members/{userID}/saved-posts:
     get:
       consumes:
       - application/json
       description: Get all posts that this member has saved
       parameters:
-      - description: member ID
+      - description: user ID
         in: path
-        name: memberID
+        name: userID
         required: true
         type: string
       produces:
@@ -1272,15 +1294,15 @@ paths:
       summary: Get all saved posts of this member
       tags:
       - members
-  /members/{memberID}/saved-posts/{postID}:
+  /members/{userID}/saved-posts/{postID}:
     post:
       consumes:
       - application/json
       description: Adds a post to the saved posts of a member
       parameters:
-      - description: member ID
+      - description: user ID
         in: path
-        name: memberID
+        name: userID
         required: true
         type: string
       - description: post ID
@@ -1304,15 +1326,15 @@ paths:
       summary: Adds new saved post
       tags:
       - members
-  /members/{memberID}/saved-project-posts:
+  /members/{userID}/saved-project-posts:
     get:
       consumes:
       - application/json
       description: Get all project posts that this member has saved
       parameters:
-      - description: member ID
+      - description: user ID
         in: path
-        name: memberID
+        name: userID
         required: true
         type: string
       produces:
@@ -1339,15 +1361,15 @@ paths:
       summary: Get all saved project posts of this member
       tags:
       - members
-  /members/{memberID}/saved-project-posts/{postID}:
+  /members/{userID}/saved-project-posts/{postID}:
     post:
       consumes:
       - application/json
       description: Adds a project post to the saved project posts of a member
       parameters:
-      - description: member ID
+      - description: user ID
         in: path
-        name: memberID
+        name: userID
         required: true
         type: string
       - description: post ID
@@ -1375,7 +1397,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new question or discussion post
+      description: Create a new question or discussion post. Cannot be a project post.
       parameters:
       - description: Post Creation Form
         in: body
@@ -1404,7 +1426,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update any number of the aspects of a question or discussion post
+      description: Update any number of aspects of a question or discussion post
       parameters:
       - description: Updated Post
         in: body
@@ -1466,7 +1488,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a post by post ID
+      description: Get a post by ID
       parameters:
       - description: Post ID
         in: path
@@ -1492,7 +1514,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Get post
+      summary: Get post by ID
       tags:
       - posts
   /posts/{postID}/reports:
@@ -1921,7 +1943,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/tags.CompletionStatus'
+              $ref: '#/definitions/models.ProjectCompletionStatus'
             type: array
         "400":
           description: Bad Request
@@ -1945,7 +1967,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/tags.FeedbackPreference'
+              $ref: '#/definitions/models.ProjectFeedbackPreference'
             type: array
         "400":
           description: Bad Request
@@ -1968,7 +1990,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/tags.PostType'
+              $ref: '#/definitions/models.PostType'
             type: array
         "400":
           description: Bad Request

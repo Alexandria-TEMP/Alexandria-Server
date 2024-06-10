@@ -12,7 +12,6 @@ type PostService interface {
 	CreatePost(form *forms.PostCreationForm) (*models.Post, error)
 	UpdatePost(updatedPost *models.Post) error
 
-	GetProjectPost(postID uint) (*models.ProjectPost, error)
-	CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error)
-	UpdateProjectPost(updatedPost *models.ProjectPost) error
+	// Return a filtered list of post IDs
+	Filter(page, size int, form forms.FilterForm) ([]uint, error)
 }

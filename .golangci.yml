@@ -4,7 +4,7 @@ linters-settings:
   dupl:
     threshold: 5000
   funlen:
-    lines: 60
+    lines: 80
     statements: 50
     ignore-comments: true
   goconst:

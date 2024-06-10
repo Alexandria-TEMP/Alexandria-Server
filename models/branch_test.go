@@ -30,9 +30,8 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		ProjectPostID:                      45,
 		BranchTitle:                        "My Cool MR",
 		NewPostTitle:                       "Updated Post Title",
-		UpdatedCompletionStatus:            tags.Idea,
+		UpdatedCompletionStatus:            Idea,
 		UpdatedScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
-		Anonymous:                          false,
 		RenderStatus:                       Pending,
 		BranchReviewStatus:                 BranchOpenForReview,
 	}
@@ -45,12 +44,11 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		ProjectPostID:                45,
 		BranchTitle:                  "My Cool MR",
 		NewPostTitle:                 "Updated Post Title",
-		UpdatedCompletionStatus:      tags.Idea,
+		UpdatedCompletionStatus:      Idea,
 		UpdatedScientificFieldTagIDs: []uint{},
-		Anonymous:                    false,
 		DiscussionIDs:                []uint{},
 		RenderStatus:                 Pending,
-		BranchReviewStatus:           BranchOpenForReview,
+		BranchOverallReviewStatus:    BranchOpenForReview,
 	}
 
 	dto := BranchDTO{}

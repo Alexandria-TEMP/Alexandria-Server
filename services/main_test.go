@@ -15,13 +15,29 @@ var (
 	c   *gin.Context
 	cwd string
 
+	postRepositoryMock               *mocks.MockModelRepositoryInterface[*models.Post]
+	projectPostRepositoryMock        *mocks.MockModelRepositoryInterface[*models.ProjectPost]
+	postCollaboratorRepositoryMock   *mocks.MockModelRepositoryInterface[*models.PostCollaborator]
+	branchCollaboratorRepositoryMock *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
+
+	postCollaboratorServiceMock   *mocks.MockPostCollaboratorService
+	branchCollaboratorServiceMock *mocks.MockBranchCollaboratorService
+
 	memberService        MemberService
 	exampleMember        models.Member
 	exampleMemberDTO     models.MemberDTO
 	exampleSTag1         *tags.ScientificFieldTag
 	exampleSTag2         *tags.ScientificFieldTag
 	mockMemberRepository *mocks.MockModelRepositoryInterface[*models.Member]
+
+	memberA, memberB, memberC models.Member
 )
+
+func setupTestSuite() {
+}
+
+func teardownTestSuite() {
+}
 
 func TestMain(m *testing.M) {
 	tag1 := tags.ScientificFieldTag{
@@ -59,6 +75,11 @@ func TestMain(m *testing.M) {
 	cwd, _ = os.Getwd()
 
 	c, _ = gin.CreateTestContext(httptest.NewRecorder())
+	setupTestSuite()
 
-	os.Exit(m.Run())
+	code := m.Run()
+
+	teardownTestSuite()
+
+	os.Exit(code)
 }

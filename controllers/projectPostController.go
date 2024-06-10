@@ -16,8 +16,7 @@ import (
 // @BasePath /api/v2
 
 type ProjectPostController struct {
-	//TODO: change to project post service
-	ProjectPostService interfaces.PostService
+	ProjectPostService interfaces.ProjectPostService
 }
 
 // GetProjectPost godoc
@@ -38,24 +37,22 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not interpret ID %s as unsigned integer, reason: %s", postIDStr, err)})
 
 		return
 	}
 
-	post, err := projectPostController.ProjectPostService.GetProjectPost(uint(postID))
+	projectPost, err := projectPostController.ProjectPostService.GetProjectPost(uint(postID))
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot get project post because no post with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get project post, reason: %s", err)})
 
 		return
 	}
 
 	// response
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, post)
+	c.JSON(http.StatusOK, projectPost)
 }
 
 // CreateProjectPost godoc
@@ -63,31 +60,38 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 // @Description Create a new project post
 // @Tags 		project-posts
 // @Accept  	json
-// @Param		form			body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
+// @Param		form	body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		500 		{object} 	utils.HTTPError
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		500 	{object} 	utils.HTTPError
 // @Router 		/project-posts		[post]
 func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Context) {
-	// extract post
 	form := forms.ProjectPostCreationForm{}
 	err := c.BindJSON(&form)
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind ProjectPostCreationForm from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid project post creation form: %s", err)})
 
 		return
 	}
 
-	// Create and add post to database here. For now just do this to test.
-	post, _ := projectPostController.ProjectPostService.CreateProjectPost(&form)
-	// TODO handle error
+	if !form.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
+
+		return
+	}
+
+	projectPost, err := projectPostController.ProjectPostService.CreateProjectPost(&form)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("internal server error: %s", err)})
+
+		return
+	}
 
 	// response
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, &post)
+	c.JSON(http.StatusOK, projectPost)
 }
 
 // UpdateProjectPost godoc
@@ -107,6 +111,8 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 	// extract post
 	updatedProjectPost := models.ProjectPost{}
 	err := c.BindJSON(&updatedProjectPost)
+
+	// TODO convert from project post DTO to updated project post
 
 	if err != nil {
 		fmt.Println(err)

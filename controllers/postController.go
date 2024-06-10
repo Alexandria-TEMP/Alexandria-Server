@@ -14,12 +14,13 @@ import (
 // @BasePath /api/v2
 
 type PostController struct {
-	PostService interfaces.PostService
+	PostService             interfaces.PostService
+	PostCollaboratorService interfaces.PostCollaboratorService
 }
 
 // GetPost godoc
-// @Summary 	Get post
-// @Description Get a post by post ID
+// @Summary 	Get post by ID
+// @Description Get a post by ID
 // @Tags 		posts
 // @Accept  	json
 // @Param		postID		path		string			true	"Post ID"
@@ -56,7 +57,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 
 // CreatePost godoc
 // @Summary 	Create new post
-// @Description Create a new question or discussion post
+// @Description Create a new question or discussion post. Cannot be a project post.
 // @Tags 		posts
 // @Accept  	json
 // @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
@@ -75,6 +76,12 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 		return
 	}
 
+	if !form.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
+
+		return
+	}
+
 	post, err := postController.PostService.CreatePost(&form)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post, reason: %s", err)})
@@ -89,7 +96,7 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 
 // UpdatePost godoc
 // @Summary 	Update post
-// @Description Update any number of the aspects of a question or discussion post
+// @Description Update any number of aspects of a question or discussion post
 // @Tags 		posts
 // @Accept  	json
 // @Param		post	body		models.PostDTO		true	"Updated Post"
@@ -103,6 +110,8 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 	// extract post
 	updatedPost := models.Post{}
 	err := c.BindJSON(&updatedPost)
+
+	// TODO convert from Post DTO to updated Post data
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated Post from request body"})
@@ -204,8 +213,26 @@ func (postController *PostController) GetPostReports(_ *gin.Context) {
 // @Failure		404 		{object} 	utils.HTTPError
 // @Failure		500 		{object} 	utils.HTTPError
 // @Router 		/posts/collaborators/{collaboratorID}	[get]
-func (postController *PostController) GetPostCollaborator(_ *gin.Context) {
-	// TODO return collaborator by ID
+func (postController *PostController) GetPostCollaborator(c *gin.Context) {
+	idString := c.Param("collaboratorID")
+
+	// Parse path parameter into an integer
+	id, err := strconv.ParseUint(idString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to parse ID '%s' as unsigned integer: %s", idString, err)})
+
+		return
+	}
+
+	// Fetch the post collaborator by ID
+	postCollaborator, err := postController.PostCollaboratorService.GetPostCollaborator(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get post collaborator: %s", err)})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, postCollaborator)
 }
 
 // GetPostReport godoc

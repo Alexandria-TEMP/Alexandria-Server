@@ -1,9 +1,16 @@
 package forms
 
-import "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
+import "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 
 type ProjectPostCreationForm struct {
-	PostCreationForm   PostCreationForm
-	CompletionStatus   tags.CompletionStatus
-	FeedbackPreference tags.FeedbackPreference
+	PostCreationForm   PostCreationForm                 `json:"postCreationForm"`
+	CompletionStatus   models.ProjectCompletionStatus   `json:"completionStatus"`
+	FeedbackPreference models.ProjectFeedbackPreference `json:"feedbackPreference"`
+}
+
+// Whether the form itself contains valid data. Should NOT contain business logic (such as "if Foo > 0, Bar may not be 1")
+func (form *ProjectPostCreationForm) IsValid() bool {
+	return form.PostCreationForm.IsValid() &&
+		form.CompletionStatus.IsValid() &&
+		form.FeedbackPreference.IsValid()
 }

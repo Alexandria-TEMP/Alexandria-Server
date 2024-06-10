@@ -17,7 +17,7 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			{Model: gorm.Model{ID: 1}},
 			{Model: gorm.Model{ID: 60}},
 		},
-		PostType:                    tags.Project,
+		PostType:                    Project,
 		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
 		DiscussionContainer:         DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
 	}
@@ -31,27 +31,26 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			{Model: gorm.Model{ID: 59}},
 			{Model: gorm.Model{ID: 20}},
 		},
-		CompletionStatus:    tags.Completed,
-		FeedbackPreference:  tags.FormalFeedback,
-		PostReviewStatusTag: tags.RevisionNeeded,
+		CompletionStatus:   Completed,
+		FeedbackPreference: FormalFeedback,
+		PostReviewStatus:   RevisionNeeded,
 	}
 
 	// should equal this DTO!
 	targetDTO := ProjectPostDTO{
 		ID: 42,
 		PostDTO: PostDTO{
-			ID:              88,
-			CollaboratorIDs: []uint{1, 60},
-
-			PostType:              tags.Project,
+			ID:                    88,
+			CollaboratorIDs:       []uint{1, 60},
+			PostType:              Project,
 			ScientificFieldTagIDs: []uint{},
 			DiscussionIDs:         []uint{95},
 		},
-		OpenBranchIDs:       []uint{44},
-		ClosedBranchIDs:     []uint{59, 20},
-		CompletionStatus:    tags.Completed,
-		FeedbackPreference:  tags.FormalFeedback,
-		PostReviewStatusTag: tags.RevisionNeeded,
+		OpenBranchIDs:      []uint{44},
+		ClosedBranchIDs:    []uint{59, 20},
+		CompletionStatus:   Completed,
+		FeedbackPreference: FormalFeedback,
+		PostReviewStatus:   RevisionNeeded,
 	}
 
 	dto := ProjectPostDTO{}

@@ -2,10 +2,24 @@ package models
 
 import (
 	"encoding/json"
+	"slices"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
+
+type PostType string
+
+const (
+	Project    PostType = "project"
+	Question   PostType = "question"
+	Reflection PostType = "reflection"
+)
+
+func (enum *PostType) IsValid() bool {
+	valid := []PostType{Project, Question, Reflection}
+	return slices.Contains(valid, *enum)
+}
 
 type Post struct {
 	gorm.Model
@@ -16,7 +30,7 @@ type Post struct {
 	// Post files and render can be implicitly accessed in the vfs with the postID
 
 	Title    string
-	PostType tags.PostType
+	PostType PostType
 	// Post has a ScientificFieldTagContainer
 	ScientificFieldTagContainer   tags.ScientificFieldTagContainer `gorm:"foreignKey:ScientificFieldTagContainerID"`
 	ScientificFieldTagContainerID uint
@@ -26,12 +40,12 @@ type Post struct {
 }
 
 type PostDTO struct {
-	ID                    uint
-	CollaboratorIDs       []uint
-	Title                 string
-	PostType              tags.PostType
-	ScientificFieldTagIDs []uint
-	DiscussionIDs         []uint
+	ID                    uint     `json:"id"`
+	CollaboratorIDs       []uint   `json:"collaboratorIDs"`
+	Title                 string   `json:"title"`
+	PostType              PostType `json:"postType"`
+	ScientificFieldTagIDs []uint   `json:"scientificFieldTagIDs"`
+	DiscussionIDs         []uint   `json:"discussionIDs"`
 }
 
 func (model *Post) GetID() uint {
