@@ -75,6 +75,7 @@ func TestMain(m *testing.M) {
 	cwd, _ = os.Getwd()
 
 	c, _ = gin.CreateTestContext(httptest.NewRecorder())
+
 	setupTestSuite()
 
 	code := m.Run()

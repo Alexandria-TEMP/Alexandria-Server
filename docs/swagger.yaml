@@ -1,29 +1,6 @@
 basePath: /api/v2
 definitions:
   forms.BranchCreationForm:
-    properties:
-      anonymous:
-        type: boolean
-      branchTitle:
-        type: string
-      collaboratingMemberIDs:
-        description: The branch's metadata
-        items:
-          type: integer
-        type: array
-      projectPostID:
-        type: integer
-      updatedCompletionStatus:
-        $ref: '#/definitions/models.ProjectCompletionStatus'
-      updatedFeedbackPreferences:
-        $ref: '#/definitions/models.ProjectFeedbackPreference'
-      updatedPostTitle:
-        description: Changes made by the branch
-        type: string
-      updatedScientificFields:
-        items:
-          $ref: '#/definitions/tags.ScientificField'
-        type: array
     type: object
   forms.DiscussionCreationForm:
     properties:
@@ -67,6 +44,10 @@ definitions:
           making the password just a string for now
           TODO: some hashing or semblance of security
         type: string
+      scientificFieldTagIDs:
+        items:
+          type: integer
+        type: array
     type: object
   forms.PostCreationForm:
     properties:
@@ -144,7 +125,7 @@ definitions:
         type: array
       updatedCompletionStatus:
         $ref: '#/definitions/models.ProjectCompletionStatus'
-      updatedScientificFields:
+      updatedScientificFieldTagIDs:
         items:
           type: integer
         type: array
@@ -223,9 +204,9 @@ definitions:
         type: string
       password:
         type: string
-      scientificFieldTags:
+      scientificFieldTagIDs:
         items:
-          $ref: '#/definitions/tags.ScientificField'
+          type: integer
         type: array
     type: object
   models.PostCollaboratorDTO:
@@ -253,7 +234,7 @@ definitions:
         type: integer
       postType:
         $ref: '#/definitions/models.PostType'
-      scientificFieldTags:
+      scientificFieldTagIDs:
         items:
           type: integer
         type: array
@@ -341,14 +322,6 @@ definitions:
       postID:
         type: integer
     type: object
-  tags.ScientificField:
-    enum:
-    - mathematics
-    - computer science
-    type: string
-    x-enum-varnames:
-    - Mathematics
-    - ComputerScience
   tags.ScientificFieldTag:
     type: object
   utils.HTTPError:
@@ -491,7 +464,7 @@ paths:
       summary: Get branch
       tags:
       - branches
-  /branches/{branchID}/can-review/{userID}:
+  /branches/{branchID}/can-review/{memberID}:
     get:
       consumes:
       - application/json
@@ -506,7 +479,7 @@ paths:
         type: string
       - description: user ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       produces:
@@ -1056,7 +1029,7 @@ paths:
       summary: Update a member
       tags:
       - members
-  /members/{userID}:
+  /members/{memberID}:
     delete:
       consumes:
       - application/json
@@ -1064,7 +1037,7 @@ paths:
       parameters:
       - description: member ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       produces:
@@ -1090,11 +1063,11 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a member by user ID
+      description: Get a member by member ID
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       produces:
@@ -1119,15 +1092,15 @@ paths:
       summary: Get member from database
       tags:
       - members
-  /members/{userID}/branches:
+  /members/{memberID}/branches:
     get:
       consumes:
       - application/json
       description: Get all branches that this member is a collaborator of
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       produces:
@@ -1154,15 +1127,15 @@ paths:
       summary: Get all branches of this member
       tags:
       - members
-  /members/{userID}/discussions:
+  /members/{memberID}/discussions:
     get:
       consumes:
       - application/json
       description: Get all discussions that this member has participated in
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       produces:
@@ -1189,15 +1162,15 @@ paths:
       summary: Get all discussions
       tags:
       - members
-  /members/{userID}/posts:
+  /members/{memberID}/posts:
     get:
       consumes:
       - application/json
       description: Get all posts that this member is a collaborator of
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       produces:
@@ -1224,15 +1197,15 @@ paths:
       summary: Get all posts of this member
       tags:
       - members
-  /members/{userID}/project-posts:
+  /members/{memberID}/project-posts:
     get:
       consumes:
       - application/json
       description: Get all project posts that this member is a collaborator of
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       produces:
@@ -1259,15 +1232,15 @@ paths:
       summary: Get all project posts of this member
       tags:
       - members
-  /members/{userID}/saved-posts:
+  /members/{memberID}/saved-posts:
     get:
       consumes:
       - application/json
       description: Get all posts that this member has saved
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       produces:
@@ -1294,15 +1267,15 @@ paths:
       summary: Get all saved posts of this member
       tags:
       - members
-  /members/{userID}/saved-posts/{postID}:
+  /members/{memberID}/saved-posts/{postID}:
     post:
       consumes:
       - application/json
       description: Adds a post to the saved posts of a member
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       - description: post ID
@@ -1326,15 +1299,15 @@ paths:
       summary: Adds new saved post
       tags:
       - members
-  /members/{userID}/saved-project-posts:
+  /members/{memberID}/saved-project-posts:
     get:
       consumes:
       - application/json
       description: Get all project posts that this member has saved
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       produces:
@@ -1361,15 +1334,15 @@ paths:
       summary: Get all saved project posts of this member
       tags:
       - members
-  /members/{userID}/saved-project-posts/{postID}:
+  /members/{memberID}/saved-project-posts/{postID}:
     post:
       consumes:
       - application/json
       description: Adds a project post to the saved project posts of a member
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
-        name: userID
+        name: memberID
         required: true
         type: string
       - description: post ID
