@@ -127,7 +127,7 @@ func (branchController *BranchController) CreateReview(_ *gin.Context) {
 // @Tags 		branches
 // @Accept  	json
 // @Param		branchID		path		string			true	"branch ID"
-// @Param		memberID			path		string			true	"user ID"
+// @Param		memberID			path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{object}		boolean
 // @Failure		400 	{object} 	utils.HTTPError

@@ -119,6 +119,9 @@ func TestCreateMemberUnsuccessful(t *testing.T) {
 func TestUpdateMemberSuccessful(t *testing.T) {
 	beforeEachMember(t)
 
+	// mock member repository to return the example member
+	mockMemberRepository.EXPECT().GetByID(gomock.Any()).Return(&exampleMember, nil)
+
 	// mock member repository here to return no error
 	mockMemberRepository.EXPECT().Update(&exampleMember).Return(&exampleMember, nil)
 
@@ -132,6 +135,9 @@ func TestUpdateMemberUnsuccessful(t *testing.T) {
 	beforeEachMember(t)
 
 	expectedErr := fmt.Errorf("error")
+
+	// mock member repository to return the example member
+	mockMemberRepository.EXPECT().GetByID(gomock.Any()).Return(&exampleMember, nil)
 
 	// mock member repository to return an error
 	mockMemberRepository.EXPECT().Update(&exampleMember).Return(&exampleMember, expectedErr)

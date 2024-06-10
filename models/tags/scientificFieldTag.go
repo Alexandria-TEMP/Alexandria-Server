@@ -29,6 +29,7 @@ type ScientificFieldTagDTO struct {
 	ID              uint
 	ScientificField string
 	SubtagIDs       []uint
+	ParentID        *uint
 }
 
 func (model *ScientificFieldTag) GetID() uint {
@@ -44,6 +45,7 @@ func (model *ScientificFieldTag) IntoDTO() ScientificFieldTagDTO {
 		model.ID,
 		model.ScientificField,
 		ScientificFieldTagIntoIDs(model.Subtags),
+		model.ParentID,
 	}
 }
 

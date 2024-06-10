@@ -38,17 +38,25 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 }
 
 func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, userFields *tags.ScientificFieldTagContainer) error {
+	oldMember, err := memberService.MemberRepository.GetByID(memberDTO.ID)
+	if err != nil {
+		return err
+	}
+
+	oldContainer := oldMember.ScientificFieldTagContainer
+	oldContainer.ScientificFieldTags = userFields.ScientificFieldTags
+
 	newMember := &models.Member{
 		FirstName:                   memberDTO.FirstName,
 		LastName:                    memberDTO.LastName,
 		Email:                       memberDTO.Email,
 		Password:                    memberDTO.Password,
 		Institution:                 memberDTO.Institution,
-		ScientificFieldTagContainer: *userFields,
+		ScientificFieldTagContainer: oldContainer,
 	}
-	newMember.ID = memberDTO.ID
-	_, err := memberService.MemberRepository.Update(newMember)
 
+	newMember.ID = memberDTO.ID
+	_, err = memberService.MemberRepository.Update(newMember)
 	return err
 }
 

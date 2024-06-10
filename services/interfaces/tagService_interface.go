@@ -9,5 +9,5 @@ import (
 
 type TagService interface {
 	GetAllScientificFieldTags() ([]*tags.ScientificFieldTag, error)
-	GetTagsFromUintIDs(_ []uint) ([]*tags.ScientificFieldTag, error)
+	GetTagsFromIDs(_ []uint) ([]*tags.ScientificFieldTag, error)
 }

@@ -15,7 +15,7 @@ func (tagService *TagService) GetAllScientificFieldTags() ([]*tags.ScientificFie
 	return returnedTags, err
 }
 
-func (tagService *TagService) GetTagsFromUintIDs(ids []uint) ([]*tags.ScientificFieldTag, error) {
+func (tagService *TagService) GetTagsFromIDs(ids []uint) ([]*tags.ScientificFieldTag, error) {
 	tagPointers := []*tags.ScientificFieldTag{}
 
 	for _, id := range ids {

@@ -51,9 +51,6 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 	// get the member through the service
 	member, err := memberController.MemberService.GetMember(memberID)
 
-	// move the member into a DTO format
-	memberDTO := member.IntoDTO()
-
 	// if there was an error, print it and return status 404: not found
 	if err != nil {
 		fmt.Println(err)
@@ -64,7 +61,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 
 	// if correct response send the member back
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, memberDTO)
+	c.JSON(http.StatusOK, member)
 }
 
 // CreateMember godoc
@@ -79,7 +76,6 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members 		[post]
 func (memberController *MemberController) CreateMember(c *gin.Context) {
-	// get the member
 	form := forms.MemberCreationForm{}
 	// bind the fields of the param to the JSON of the model
 	err := c.BindJSON(&form)
@@ -89,7 +85,6 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 		return
 	}
 
-	// check for errors
 	// if there is an error, return a 400 bad request status
 	if err != nil {
 		fmt.Println(err)
@@ -101,26 +96,23 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	// get array of strings, create array of tags
 	tagIDs := form.ScientificFieldTagIDs
 
-	// call the method from the tag service
-	tagArray, err := memberController.TagService.GetTagsFromUintIDs(tagIDs)
+	// getting the tags from tag service
+	tagArray, err := memberController.TagService.GetTagsFromIDs(tagIDs)
 
 	tagContainer := tags.ScientificFieldTagContainer{
 		ScientificFieldTags: tagArray,
 	}
 
-	// check for errors in the tags
-	// if there is an error, return a 400 bad request status
+	// if there is an error, return a 404 not found status
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind tag ids from request body"))
+		utils.ThrowHTTPError(c, http.StatusNotFound, errors.New("cannot bind tag ids from request body"))
 
 		return
 	}
 
 	// create and add to database through the memberService
 	member, err := memberController.MemberService.CreateMember(&form, &tagContainer)
-
-	memberDTO := member.IntoDTO()
 
 	// if the member service throws an error, return a 400 Bad request status
 	if err != nil {
@@ -132,7 +124,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 
 	// send back a positive response 200 status with the created member
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, memberDTO)
+	c.JSON(http.StatusOK, member)
 }
 
 // UpdateMember godoc
@@ -163,12 +155,11 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	// get array of strings, create array of tags
 	tagIDs := updatedMember.ScientificFieldTagIDs
 	// call the method from the tag service
-	tagArray, err := memberController.TagService.GetTagsFromUintIDs(tagIDs)
+	tagArray, err := memberController.TagService.GetTagsFromIDs(tagIDs)
 	tagContainer := tags.ScientificFieldTagContainer{
 		ScientificFieldTags: tagArray,
 	}
 
-	// check for errors in the tags
 	// if there is an error, return a 400 bad request status
 	if err != nil {
 		fmt.Println(err)
@@ -206,11 +197,11 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 func (memberController *MemberController) DeleteMember(c *gin.Context) {
 	// extract the id of the member
 	memberIDStr := c.Param("memberID")
-	initmemberID, err1 := strconv.ParseUint(memberIDStr, 10, 64)
+	initmemberID, err := strconv.ParseUint(memberIDStr, 10, 64)
 
 	// if this caused an error, print it and return status 400: bad input
-	if err1 != nil {
-		fmt.Println(err1)
+	if err != nil {
+		fmt.Println(err)
 		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid member ID, cannot interpret as integer, id=%s ", memberIDStr))
 
 		return
@@ -220,11 +211,11 @@ func (memberController *MemberController) DeleteMember(c *gin.Context) {
 	memberID := uint(initmemberID)
 
 	// get the member through the service
-	err2 := memberController.MemberService.DeleteMember(memberID)
+	err = memberController.MemberService.DeleteMember(memberID)
 
 	// if there was an error, print it and return status 404: not found
-	if err2 != nil {
-		fmt.Println(err2)
+	if err != nil {
+		fmt.Println(err)
 		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("cannot delete member because no member with this ID exists, id=%d", memberID))
 
 		return

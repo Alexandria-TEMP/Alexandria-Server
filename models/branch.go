@@ -44,7 +44,7 @@ type Branch struct {
 	NewPostTitle string
 
 	UpdatedCompletionStatus ProjectCompletionStatus
-	// Branch has a ScientificFieldTag
+	// Branch has a ScientificFieldTagContainer
 	UpdatedScientificFieldTagContainer   tags.ScientificFieldTagContainer `gorm:"foreignKey:UpdatedScientificFieldTagContainerID"`
 	UpdatedScientificFieldTagContainerID uint
 

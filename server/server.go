@@ -121,7 +121,9 @@ func initControllerEnv(serviceEnv *ServiceEnv) *ControllerEnv {
 			ProjectPostService: serviceEnv.projectPostService,
 		},
 		branchController: &controllers.BranchController{},
-		tagController:    &controllers.TagController{},
+		tagController: &controllers.TagController{
+			TagService: serviceEnv.tagService,
+		},
 	}
 }
 

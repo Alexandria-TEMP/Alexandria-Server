@@ -38,16 +38,14 @@ func TestMain(m *testing.M) {
 
 	router = SetUpRouter()
 
-	tag1 := tags.ScientificFieldTag{
+	exampleSTag1 = &tags.ScientificFieldTag{
 		ScientificField: "Mathematics",
 		Subtags:         []*tags.ScientificFieldTag{},
 	}
-	exampleSTag1 = &tag1
-	tag2 := tags.ScientificFieldTag{
+	exampleSTag2 = &tags.ScientificFieldTag{
 		ScientificField: "Computers",
 		Subtags:         []*tags.ScientificFieldTag{},
 	}
-	exampleSTag2 = &tag2
 
 	exampleMember = models.Member{
 		FirstName:   "John",
