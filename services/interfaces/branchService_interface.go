@@ -43,8 +43,8 @@ type BranchService interface {
 	// Error is for status 404.
 	GetProject(branchID uint) (string, error)
 
-	// UploadProject saves a zipper quarto project to its branch and sets the branch to pending.
-	// It the renders the project in a goroutine.
+	// UploadProject saves a zipped quarto project to its branch and starts the render pipeline.
+	// It renders the project in a goroutine.
 	UploadProject(c *gin.Context, file *multipart.FileHeader, branchID uint) error
 
 	// GetFiletree returns a map of all filepaths in a quarto project and their size in bytes

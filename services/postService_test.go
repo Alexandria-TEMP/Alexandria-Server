@@ -24,12 +24,14 @@ func postServiceSetup(t *testing.T) {
 	// Setup mocks
 	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
 	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
 
 	// Setup SUT
 	postService = PostService{
 		PostRepository:          mockPostRepository,
 		MemberRepository:        mockMemberRepository,
+		Filesystem:              mockFilesystem,
 		PostCollaboratorService: mockPostCollaboratorService,
 	}
 
@@ -73,7 +75,6 @@ func TestCreatePostGoodWeather(t *testing.T) {
 
 	// Setup mock function return values
 	mockPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
-
 	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, false, models.Author).Return([]*models.PostCollaborator{
 		{
 			Member:            memberA,
@@ -84,6 +85,8 @@ func TestCreatePostGoodWeather(t *testing.T) {
 			CollaborationType: models.Author,
 		},
 	}, nil).Times(1)
+	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
+	mockFilesystem.EXPECT().CreateRepository().Return(nil)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)
@@ -167,6 +170,8 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 	// Setup mock function return values
 	mockPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
 	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, true, models.Author).Return([]*models.PostCollaborator{}, nil)
+	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
+	mockFilesystem.EXPECT().CreateRepository().Return(nil)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)

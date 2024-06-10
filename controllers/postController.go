@@ -228,3 +228,48 @@ func (postController *PostController) GetPostCollaborator(_ *gin.Context) {
 func (postController *PostController) GetPostReport(_ *gin.Context) {
 	// TODO implement
 }
+
+// UploadPost
+// @Summary 	Upload a new project version to a branch
+// @Description Upload a new project version to a specific, preexisting, branch as a zipped quarto project
+// @Tags 		branches
+// @Accept  	multipart/form-data
+// @Param		branchID		path		string			true	"Branch ID"
+// @Param		file			formData	file			true	"Repository to create"
+// @Produce		application/json
+// @Success 	200
+// @Failure		400
+// @Failure		500
+// @Router 		/posts/{postID}		[post]
+func (postController *PostController) UploadPost(c *gin.Context) {
+	// extract file
+	file, err := c.FormFile("file")
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "no file found"})
+
+		return
+	}
+
+	// extract post id
+	postIDStr := c.Param("postID")
+	postID, err := strconv.ParseUint(postIDStr, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", postIDStr)})
+
+		return
+	}
+
+	// Create commit on branch with new files
+	err = postController.PostService.UploadPost(c, file, uint(postID))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+		return
+	}
+
+	// response
+	c.Status(http.StatusOK)
+}

@@ -127,4 +127,5 @@ func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	postRouter.GET("/:postID/reports", controllers.postController.GetPostReports)
 	postRouter.GET("/reports/:reportID", controllers.postController.GetPostReport)
 	postRouter.GET("/collaborators/:collaboratorID", controllers.postController.GetPostCollaborator)
+	postRouter.POST("/:postID", controllers.postController.UploadPost)
 }
