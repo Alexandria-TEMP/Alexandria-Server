@@ -207,6 +207,7 @@ func TestUpdateBranchSuccess(t *testing.T) {
 		Model:               gorm.Model{ID: 1},
 		NewPostTitle:        "test",
 		ProjectPostID:       10,
+		Reviews:             []*models.Review{},
 		Collaborators:       []*models.BranchCollaborator{collaborator},
 		DiscussionContainer: models.DiscussionContainer{Discussions: []*models.Discussion{discussion}},
 	}
@@ -288,6 +289,7 @@ func TestUpdateBranchFailedUpdate(t *testing.T) {
 		Model:               gorm.Model{ID: 1},
 		NewPostTitle:        "test",
 		ProjectPostID:       10,
+		Reviews:             []*models.Review{},
 		Collaborators:       []*models.BranchCollaborator{collaborator},
 		DiscussionContainer: models.DiscussionContainer{Discussions: []*models.Discussion{discussion}},
 	}
@@ -835,6 +837,12 @@ func TestUploadProjectSuccess(t *testing.T) {
 	beforeEachBranch(t)
 
 	branch := &models.Branch{
+		RenderStatus:  models.Success,
+		Model:         gorm.Model{ID: 10},
+		ProjectPostID: 5,
+	}
+	expected := &models.Branch{
+		RenderStatus:  models.Pending,
 		Model:         gorm.Model{ID: 10},
 		ProjectPostID: 5,
 	}
@@ -850,6 +858,7 @@ func TestUploadProjectSuccess(t *testing.T) {
 	mockFilesystem.EXPECT().CleanDir().Return(nil)
 	mockFilesystem.EXPECT().SaveZipFile(gomock.Any(), file).Return(nil)
 	mockFilesystem.EXPECT().CreateCommit().Return(nil)
+	mockBranchRepository.EXPECT().Update(expected).Return(expected, nil)
 	mockRenderService.EXPECT().Render(branch)
 
 	assert.Nil(t, branchService.UploadProject(c, file, 10))
