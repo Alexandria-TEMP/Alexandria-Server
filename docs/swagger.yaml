@@ -218,6 +218,8 @@ definitions:
         items:
           type: integer
         type: array
+      id:
+        type: integer
     type: object
   models.DiscussionDTO:
     properties:

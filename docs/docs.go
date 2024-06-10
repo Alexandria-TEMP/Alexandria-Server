@@ -2904,6 +2904,9 @@ const docTemplate = `{
                     "items": {
                         "type": "integer"
                     }
+                },
+                "id": {
+                    "type": "integer"
                 }
             }
         },
