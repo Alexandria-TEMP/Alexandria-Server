@@ -11,8 +11,8 @@ type TagService struct {
 }
 
 func (tagService *TagService) GetAllScientificFieldTags() ([]*tags.ScientificFieldTag, error) {
-	tags, err := tagService.TagRepository.Query()
-	return tags, err
+	returnedTags, err := tagService.TagRepository.Query()
+	return returnedTags, err
 }
 
 func (tagService *TagService) GetTagsFromUintIDs(ids []uint) ([]*tags.ScientificFieldTag, error) {

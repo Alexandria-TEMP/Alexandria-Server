@@ -30,7 +30,7 @@ func (tagController *TagController) GetScientificTags(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("cannot get tags, error: %v", err))
+		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("cannot get tags, error: %w", err))
 
 		return
 	}

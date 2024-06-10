@@ -103,5 +103,6 @@ func SetUpRouter() *gin.Engine {
 	router.GET("/api/v2/tags/scientific", func(c *gin.Context) {
 		tagController.GetScientificTags(c)
 	})
+
 	return router
 }
