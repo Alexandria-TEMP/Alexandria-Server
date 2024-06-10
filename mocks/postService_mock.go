@@ -57,6 +57,21 @@ func (mr *MockPostServiceMockRecorder) CreatePost(form any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePost", reflect.TypeOf((*MockPostService)(nil).CreatePost), form)
 }
 
+// Filter mocks base method.
+func (m *MockPostService) Filter(page, size int, form forms.FilterForm) ([]uint, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Filter", page, size, form)
+	ret0, _ := ret[0].([]uint)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Filter indicates an expected call of Filter.
+func (mr *MockPostServiceMockRecorder) Filter(page, size, form any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Filter", reflect.TypeOf((*MockPostService)(nil).Filter), page, size, form)
+}
+
 // GetMainFileFromProject mocks base method.
 func (m *MockPostService) GetMainFileFromProject(postID uint, relFilepath string) (string, error) {
 	m.ctrl.T.Helper()

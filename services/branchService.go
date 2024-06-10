@@ -152,13 +152,6 @@ func (branchService *BranchService) GetReviewStatus(branchID uint) ([]models.Bra
 		return nil, fmt.Errorf("failed to find branch with id %v", branchID)
 	}
 
-	// populate reviews
-	branch.Reviews, err = branchService.ReviewRepository.GetBy(&models.BranchReview{BranchID: branchID})
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to find reviews with branch id %v", branchID)
-	}
-
 	// get all decisions
 	decisions := []models.BranchReviewDecision{}
 	for _, branchreview := range branch.Reviews {
@@ -187,13 +180,6 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 
 	if err != nil {
 		return branchreview, fmt.Errorf("failed to find branch with id %v", form.BranchID)
-	}
-
-	// populate reviews
-	branch.Reviews, err = branchService.ReviewRepository.GetBy(&models.BranchReview{BranchID: form.BranchID})
-
-	if err != nil {
-		return branchreview, fmt.Errorf("failed to find reviews with branch id %v", form.BranchID)
 	}
 
 	// get member

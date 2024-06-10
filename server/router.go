@@ -5,10 +5,11 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	pagination "github.com/webstradev/gin-pagination"
 	docs "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/docs"
 )
 
-func SetUpRouter(controllers ControllerEnv) *gin.Engine {
+func SetUpRouter(controllers *ControllerEnv) *gin.Engine {
 	// Get router
 	router := gin.Default()
 	router.Use(cors.Default())
@@ -45,13 +46,13 @@ func SetUpRouter(controllers ControllerEnv) *gin.Engine {
 	return router
 }
 
-func filterRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+func filterRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	filterRouter := v2.Group("/filter")
-	filterRouter.GET("/posts", controllers.filterController.FilterPosts)
-	filterRouter.GET("/project-posts", controllers.filterController.FilterProjectPosts)
+	filterRouter.GET("/posts", pagination.Default(), controllers.filterController.FilterPosts)
+	filterRouter.GET("/project-posts", pagination.Default(), controllers.filterController.FilterProjectPosts)
 }
 
-func tagRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+func tagRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	tagRouter := v2.Group("/tags")
 	tagRouter.GET("/scientific", controllers.tagController.GetScientificTags)
 	tagRouter.GET("/completion-status", controllers.tagController.GetCompletionStatusTags)
@@ -59,7 +60,7 @@ func tagRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	tagRouter.GET("/feedback-preference", controllers.tagController.GetFeedbackPreferenceTags)
 }
 
-func discussionRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+func discussionRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	discussionRouter := v2.Group("/discussions")
 	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
 	discussionRouter.POST("", controllers.discussionController.CreateDiscussion)
@@ -69,7 +70,7 @@ func discussionRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	discussionRouter.GET("/reports/:reportID", controllers.discussionController.GetDiscussionReport)
 }
 
-func branchRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+func branchRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	branchRouter := v2.Group("/branches")
 	branchRouter.GET("/:branchID", controllers.branchController.GetBranch)
 	branchRouter.POST("", controllers.branchController.CreateBranch)
@@ -88,7 +89,7 @@ func branchRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	branchRouter.GET("/:branchID/discussions", controllers.branchController.GetDiscussions)
 }
 
-func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+func memberRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	memberRouter := v2.Group("/members")
 	memberRouter.GET("/:memberID", controllers.memberController.GetMember)
 	memberRouter.POST("", controllers.memberController.CreateMember)
@@ -105,7 +106,7 @@ func memberRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	memberRouter.GET("/:memberID/saved-project-posts", controllers.memberController.GetMemberSavedProjectPosts)
 }
 
-func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+func projectPostRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	projectPostRouter := v2.Group("/project-posts")
 	projectPostRouter.GET("/:postID", controllers.projectPostController.GetProjectPost)
 	projectPostRouter.POST("", controllers.projectPostController.CreateProjectPost)
@@ -116,7 +117,7 @@ func projectPostRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
 	projectPostRouter.GET("/:postID/branches-by-status", controllers.projectPostController.GetProjectPostBranchesByStatus)
 }
 
-func postRouter(v2 *gin.RouterGroup, controllers ControllerEnv) {
+func postRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	postRouter := v2.Group("/posts")
 	postRouter.GET("/:postID", controllers.postController.GetPost)
 	postRouter.POST("", controllers.postController.CreatePost)

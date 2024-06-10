@@ -8,7 +8,12 @@ import (
 )
 
 type BranchCollaboratorService struct {
-	MemberRepository database.ModelRepositoryInterface[*models.Member]
+	BranchCollaboratorRepository database.ModelRepositoryInterface[*models.BranchCollaborator]
+	MemberRepository             database.ModelRepositoryInterface[*models.Member]
+}
+
+func (branchCollaboratorService *BranchCollaboratorService) GetBranchCollaborator(id uint) (*models.BranchCollaborator, error) {
+	return branchCollaboratorService.BranchCollaboratorRepository.GetByID(id)
 }
 
 func (branchCollaboratorService *BranchCollaboratorService) MembersToBranchCollaborators(memberIDs []uint, anonymous bool) ([]*models.BranchCollaborator, error) {

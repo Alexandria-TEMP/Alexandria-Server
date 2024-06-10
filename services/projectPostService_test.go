@@ -258,3 +258,86 @@ func TestCreateProjectBranchCollaboratorsFail(t *testing.T) {
 	assert.NotNil(t, err404)
 	assert.Nil(t, err500)
 }
+
+func TestGetProjectPost(t *testing.T) {
+	projectPostServiceSetup(t)
+	t.Cleanup(projectPostServiceTeardown)
+
+	databasePost := &models.ProjectPost{
+		Model: gorm.Model{ID: 10},
+		Post: models.Post{
+			Model:         gorm.Model{ID: 20},
+			Collaborators: []*models.PostCollaborator{},
+			Title:         "My Awesome Project Post",
+			PostType:      models.Project,
+			DiscussionContainer: models.DiscussionContainer{
+				Model:       gorm.Model{ID: 1},
+				Discussions: []*models.Discussion{},
+			},
+			DiscussionContainerID: 1,
+		},
+		PostID:                    20,
+		OpenBranches:              []*models.Branch{{Model: gorm.Model{ID: 25}}},
+		ClosedBranches:            []*models.ClosedBranch{},
+		ProjectCompletionStatus:   models.Ongoing,
+		ProjectFeedbackPreference: models.FormalFeedback,
+		PostReviewStatus:          models.Open,
+	}
+
+	mockProjectPostRepository.EXPECT().GetByID(uint(10)).Return(databasePost, nil).Times(1)
+
+	// Function under test
+	fetchedPost, err := projectPostService.GetProjectPost(10)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(fetchedPost, databasePost) {
+		t.Fatalf("fetched post\n%+v\nshould have equaled expected post\n%+v", fetchedPost, databasePost)
+	}
+}
+
+func TestFilterAllProjectPosts(t *testing.T) {
+	projectPostServiceSetup(t)
+	t.Cleanup(projectPostServiceTeardown)
+
+	page := 1
+	size := 2
+
+	// For this test, we leave the form empty - we want all posts!
+	form := forms.FilterForm{}
+
+	// Setup mock function return values
+	mockProjectPostRepository.EXPECT().QueryPaginated(page, size, gomock.Any()).Return([]*models.ProjectPost{
+		{Model: gorm.Model{ID: 2}},
+		{Model: gorm.Model{ID: 3}},
+		{Model: gorm.Model{ID: 6}},
+		{Model: gorm.Model{ID: 10}},
+	}, nil).Times(1)
+
+	// Function under test
+	fetchedPostIDs, err := projectPostService.Filter(page, size, form)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedPostIDs := []uint{2, 3, 6, 10}
+
+	if !reflect.DeepEqual(fetchedPostIDs, expectedPostIDs) {
+		t.Fatalf("fetched post IDs\n%+v\nshould have equaled expected post IDs\n%+v", fetchedPostIDs, expectedPostIDs)
+	}
+}
+
+func TestFilterProjectPostsFailed(t *testing.T) {
+	projectPostServiceSetup(t)
+	t.Cleanup(projectPostServiceTeardown)
+
+	mockProjectPostRepository.EXPECT().QueryPaginated(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
+
+	// Function under test
+	_, err := projectPostService.Filter(1, 10, forms.FilterForm{})
+
+	if err == nil {
+		t.Fatal("post filtering should have failed")
+	}
+}

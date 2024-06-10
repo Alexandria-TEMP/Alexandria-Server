@@ -8,7 +8,12 @@ import (
 )
 
 type PostCollaboratorService struct {
-	MemberRepository database.ModelRepositoryInterface[*models.Member]
+	PostCollaboratorRepository database.ModelRepositoryInterface[*models.PostCollaborator]
+	MemberRepository           database.ModelRepositoryInterface[*models.Member]
+}
+
+func (postCollaboratorService *PostCollaboratorService) GetPostCollaborator(id uint) (*models.PostCollaborator, error) {
+	return postCollaboratorService.PostCollaboratorRepository.GetByID(id)
 }
 
 func (postCollaboratorService *PostCollaboratorService) MembersToPostCollaborators(memberIDs []uint, anonymous bool, collaborationType models.CollaborationType) ([]*models.PostCollaborator, error) {

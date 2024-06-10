@@ -25,6 +25,7 @@ var (
 	mockProjectPostRepository         *mocks.MockModelRepositoryInterface[*models.ProjectPost]
 	mockReviewRepository              *mocks.MockModelRepositoryInterface[*models.BranchReview]
 	mockBranchCollaboratorRepository  *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
+	mockPostCollaboratorRepository    *mocks.MockModelRepositoryInterface[*models.PostCollaborator]
 	mockDiscussionContainerRepository *mocks.MockModelRepositoryInterface[*models.DiscussionContainer]
 	mockDiscussionRepository          *mocks.MockModelRepositoryInterface[*models.Discussion]
 	mockMemberRepository              *mocks.MockModelRepositoryInterface[*models.Member]

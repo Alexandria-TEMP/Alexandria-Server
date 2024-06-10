@@ -21,4 +21,7 @@ type PostService interface {
 	GetMainProject(postID uint) (string, error)
 	GetMainFiletree(branchID uint) (map[string]int64, error, error)
 	GetMainFileFromProject(postID uint, relFilepath string) (string, error)
+
+	// Return a filtered list of post IDs
+	Filter(page, size int, form forms.FilterForm) ([]uint, error)
 }

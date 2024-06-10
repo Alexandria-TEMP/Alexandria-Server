@@ -549,3 +549,78 @@ func TestGetMainFileFromProjectFileNotExist(t *testing.T) {
 	_, err := postService.GetMainFileFromProject(postID, relFilepath)
 	assert.NotNil(t, err)
 }
+
+func TestGetPost(t *testing.T) {
+	postServiceSetup(t)
+	t.Cleanup(postServiceTeardown)
+
+	databasePost := &models.Post{
+		Model:            gorm.Model{ID: 5},
+		Collaborators:    []*models.PostCollaborator{},
+		Title:            "Hello, world!",
+		PostType:         models.Project,
+		ScientificFields: []models.ScientificField{},
+		DiscussionContainer: models.DiscussionContainer{
+			Model:       gorm.Model{ID: 6},
+			Discussions: []*models.Discussion{},
+		},
+		DiscussionContainerID: 6,
+	}
+
+	mockPostRepository.EXPECT().GetByID(uint(10)).Return(databasePost, nil).Times(1)
+
+	// Function under test
+	fetchedPost, err := postService.GetPost(10)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(fetchedPost, databasePost) {
+		t.Fatalf("fetched post\n%+v\nshould have equaled expected post\n%+v", fetchedPost, databasePost)
+	}
+}
+
+func TestFilterAllPosts(t *testing.T) {
+	postServiceSetup(t)
+	t.Cleanup(postServiceTeardown)
+
+	page := 1
+	size := 2
+
+	// For this test, we leave the form empty - we want all posts!
+	form := forms.FilterForm{}
+
+	// Setup mock function return values
+	mockPostRepository.EXPECT().QueryPaginated(page, size, gomock.Any()).Return([]*models.Post{
+		{Model: gorm.Model{ID: 2}},
+		{Model: gorm.Model{ID: 3}},
+		{Model: gorm.Model{ID: 6}},
+		{Model: gorm.Model{ID: 10}},
+	}, nil).Times(1)
+
+	// Function under test
+	fetchedPostIDs, err := postService.Filter(page, size, form)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedPostIDs := []uint{2, 3, 6, 10}
+
+	if !reflect.DeepEqual(fetchedPostIDs, expectedPostIDs) {
+		t.Fatalf("fetched post IDs\n%+v\nshould have equaled expected post IDs\n%+v", fetchedPostIDs, expectedPostIDs)
+	}
+}
+
+func TestFilterFailed(t *testing.T) {
+	postServiceSetup(t)
+	t.Cleanup(postServiceTeardown)
+
+	mockPostRepository.EXPECT().QueryPaginated(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
+
+	// Function under test
+	_, err := postService.Filter(1, 10, forms.FilterForm{})
+
+	if err == nil {
+		t.Fatal("post filtering should have failed")
+	}
+}

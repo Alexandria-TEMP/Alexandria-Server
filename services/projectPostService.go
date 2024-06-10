@@ -111,3 +111,19 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 func (projectPostService *ProjectPostService) UpdateProjectPost(_ *models.ProjectPost) error {
 	return fmt.Errorf("TODO")
 }
+
+func (projectPostService *ProjectPostService) Filter(page, size int, _ forms.FilterForm) ([]uint, error) {
+	// TODO construct query based off filter form
+	posts, err := projectPostService.ProjectPostRepository.QueryPaginated(page, size)
+	if err != nil {
+		return nil, err
+	}
+
+	// Extract IDs from the list of posts
+	ids := make([]uint, len(posts))
+	for i, post := range posts {
+		ids[i] = post.ID
+	}
+
+	return ids, nil
+}

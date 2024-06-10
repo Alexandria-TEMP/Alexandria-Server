@@ -295,14 +295,25 @@ func TestDeleteBranchFailedDelete(t *testing.T) {
 func TestGetReviewStatusSuccess(t *testing.T) {
 	beforeEachBranch(t)
 
+	approved := &models.BranchReview{
+		// Model:          gorm.Model{ID: 1},
+		BranchID:             10,
+		Member:               models.Member{Model: gorm.Model{ID: 11}},
+		BranchReviewDecision: models.Approved,
+	}
+	rejected := &models.BranchReview{
+		// Model:          gorm.Model{ID: 1},
+		BranchID:             10,
+		Member:               models.Member{Model: gorm.Model{ID: 12}},
+		BranchReviewDecision: models.Rejected,
+	}
 	branch := &models.Branch{
 		Model:            gorm.Model{ID: 10},
 		UpdatedPostTitle: "title",
+		Reviews:          []*models.BranchReview{approved, rejected},
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockReviewRepository.EXPECT().GetBy(&models.BranchReview{BranchID: 10}).Return([]*models.BranchReview{{BranchReviewDecision: models.Approved}, {BranchReviewDecision: models.Rejected}}, nil)
-
 	decisions, err := branchService.GetReviewStatus(uint(10))
 	assert.Nil(t, err)
 	assert.Equal(t, []models.BranchReviewDecision{models.Approved, models.Rejected}, decisions)
@@ -350,7 +361,6 @@ func TestCreateReviewSuccess(t *testing.T) {
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockReviewRepository.EXPECT().GetBy(&models.BranchReview{BranchID: 10}).Return([]*models.BranchReview{}, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, nil)
 	mockReviewRepository.EXPECT().Create(expected).Return(nil)
 	mockBranchRepository.EXPECT().Update(newBranch).Return(newBranch, nil)
@@ -381,6 +391,7 @@ func TestCreateReviewSuccessMerge(t *testing.T) {
 		Model:                     gorm.Model{ID: 10},
 		BranchOverallReviewStatus: models.BranchOpenForReview,
 		ProjectPostID:             5,
+		Reviews:                   []*models.BranchReview{expected, expected},
 	}
 	newBranch := &models.Branch{
 		Model:                     gorm.Model{ID: 10},
@@ -405,7 +416,6 @@ func TestCreateReviewSuccessMerge(t *testing.T) {
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockReviewRepository.EXPECT().GetBy(&models.BranchReview{BranchID: 10}).Return([]*models.BranchReview{expected, expected}, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, nil)
 	mockFilesystem.EXPECT().Merge("10", "master").Return(nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(5)).Return(projectPost, nil)
@@ -445,6 +455,7 @@ func TestCreateReviewSuccessReject(t *testing.T) {
 		Model:                     gorm.Model{ID: 10},
 		BranchOverallReviewStatus: models.BranchOpenForReview,
 		ProjectPostID:             5,
+		Reviews:                   []*models.BranchReview{approval, approval},
 	}
 	newBranch := &models.Branch{
 		Model:                     gorm.Model{ID: 10},
@@ -468,7 +479,6 @@ func TestCreateReviewSuccessReject(t *testing.T) {
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockReviewRepository.EXPECT().GetBy(&models.BranchReview{BranchID: 10}).Return([]*models.BranchReview{approval, approval}, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(5)).Return(projectPost, nil)
 	mockProjectPostRepository.EXPECT().Update(gomock.Any()).Return(newProjectPost, nil)
@@ -514,7 +524,6 @@ func TestCreateReviewFailedGetMember(t *testing.T) {
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockReviewRepository.EXPECT().GetBy(&models.BranchReview{BranchID: 10}).Return([]*models.BranchReview{}, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, errors.New("failed"))
 
 	_, err := branchService.CreateReview(form)
@@ -549,7 +558,6 @@ func TestCreateReviewFailedUpdateBranch(t *testing.T) {
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockReviewRepository.EXPECT().GetBy(&models.BranchReview{BranchID: 10}).Return([]*models.BranchReview{}, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, nil)
 	mockReviewRepository.EXPECT().Create(expected).Return(nil)
 	mockBranchRepository.EXPECT().Update(newBranch).Return(newBranch, errors.New("failed"))
@@ -576,7 +584,6 @@ func TestMemberCanReviewSuccessTrue(t *testing.T) {
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockReviewRepository.EXPECT().GetBy(&models.BranchReview{BranchID: 10}).Return([]*models.BranchReview{}, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(20)).Return(projectPost, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, nil)
 

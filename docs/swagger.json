@@ -928,7 +928,7 @@
                     {
                         "type": "integer",
                         "description": "page size",
-                        "name": "pageSize",
+                        "name": "size",
                         "in": "query"
                     }
                 ],
@@ -986,7 +986,7 @@
                     {
                         "type": "integer",
                         "description": "page size",
-                        "name": "pageSize",
+                        "name": "size",
                         "in": "query"
                     }
                 ],

@@ -16,8 +16,9 @@ import (
 // @BasePath /api/v2
 
 type PostController struct {
-	PostService   interfaces.PostService
-	RenderService interfaces.RenderService
+	PostService             interfaces.PostService
+	RenderService           interfaces.RenderService
+	PostCollaboratorService interfaces.PostCollaboratorService
 }
 
 // GetPost godoc
@@ -213,8 +214,26 @@ func (postController *PostController) GetPostReports(_ *gin.Context) {
 // @Failure		404
 // @Failure		500
 // @Router 		/posts/collaborators/{collaboratorID}	[get]
-func (postController *PostController) GetPostCollaborator(_ *gin.Context) {
-	// TODO return collaborator by ID
+func (postController *PostController) GetPostCollaborator(c *gin.Context) {
+	idString := c.Param("collaboratorID")
+
+	// Parse path parameter into an integer
+	id, err := strconv.ParseUint(idString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to parse ID '%s' as unsigned integer: %s", idString, err)})
+
+		return
+	}
+
+	// Fetch the post collaborator by ID
+	postCollaborator, err := postController.PostCollaboratorService.GetPostCollaborator(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get post collaborator: %s", err)})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, postCollaborator)
 }
 
 // GetPostReport godoc

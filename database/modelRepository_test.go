@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"reflect"
 	"testing"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
@@ -81,6 +82,31 @@ func TestCreateWithID(t *testing.T) {
 
 	if memberWithID.ID != id {
 		t.Fatalf("creation did not use ID %d", id)
+	}
+}
+
+func TestCreateFails(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	memberA := models.Member{
+		Model: gorm.Model{ID: 5},
+	}
+
+	err := memberRepository.Create(&memberA)
+
+	if err != nil {
+		t.Fatalf("could not create first member: %s", err)
+	}
+
+	err = memberRepository.Create(&memberA)
+
+	if err == nil {
+		t.Fatal("creation should have returned error")
 	}
 }
 
@@ -342,5 +368,122 @@ func TestGetPreloadedAssociations(t *testing.T) {
 	// If pre-loading worked, the nested Post's fields will be updated.
 	if !(fetchedProjectPost.Post.Title == "TEST POST") {
 		t.Fatal("nested Post object did not pre load")
+	}
+}
+
+func TestQuerySimple(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	// Create dummy members in the database, with specific IDs
+	membersToCreate := []models.Member{
+		{Model: gorm.Model{ID: 5}},
+		{Model: gorm.Model{ID: 10}},
+		{Model: gorm.Model{ID: 12}},
+	}
+
+	for _, member := range membersToCreate {
+		if err := memberRepository.Create(&member); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Try to fetch some via a query
+	fetchedMembers, err := memberRepository.Query("id > 6")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedIDs := []uint{10, 12}
+
+	if len(fetchedMembers) != len(expectedIDs) {
+		t.Fatalf("expected %d records, got %d", len(expectedIDs), len(fetchedMembers))
+	}
+
+	// Check each fetched member's ID
+	for i, fetchedMember := range fetchedMembers {
+		if fetchedMember.ID != expectedIDs[i] {
+			t.Fatalf("encountered ID %d expecting %d", fetchedMember.ID, expectedIDs[i])
+		}
+	}
+}
+
+func TestQueryNonExistingField(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	// Function under test
+	_, err := memberRepository.Query("AsadhjahDJWduadua = DAASDc!121*@@@@")
+
+	if err == nil {
+		t.Fatal("nonsense query should have thrown error")
+	}
+
+	// Also test paginated here, since it should be exactly the same
+	_, err = memberRepository.QueryPaginated(1, 1, "ASDjASHDjahsd123 = ASD2@@@")
+
+	if err == nil {
+		t.Fatal("nonsense paginated query should have thrown error")
+	}
+}
+
+func TestQueryPaginated(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	memberIDs := []uint{
+		10, 11, 12, 13, 15, 20, 21, 41,
+		42, 43, 60, 61, 62, 78, 88,
+	}
+
+	// Add members with the above IDs to the database
+	for _, memberID := range memberIDs {
+		if err := memberRepository.Create(&models.Member{Model: gorm.Model{ID: memberID}}); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Test paginated queries on this created data
+	size := 4
+	condition := "id >= 20"
+
+	expectedPages := [][]uint{
+		{20, 21, 41, 42},
+		{43, 60, 61, 62},
+		{78, 88},
+	}
+
+	// For each page in the expected pages, perform a paginated query,
+	// and compare the outcome against expected.
+	for i, expectedMemberIDs := range expectedPages {
+		// The page number we're querying
+		page := i + 1
+
+		fetchedMembers, err := memberRepository.QueryPaginated(page, size, condition)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Extract member IDs for easier comparisons
+		fetchedMemberIDs := make([]uint, len(fetchedMembers))
+		for i, member := range fetchedMembers {
+			fetchedMemberIDs[i] = member.ID
+		}
+
+		if !reflect.DeepEqual(fetchedMemberIDs, expectedMemberIDs) {
+			t.Fatalf("fetched member IDs\n%+v\ndid not equal expected member IDs\n%+v", fetchedMemberIDs, expectedMemberIDs)
+		}
 	}
 }

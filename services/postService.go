@@ -193,3 +193,21 @@ func (postService *PostService) GetMainFileFromProject(postID uint, relFilepath 
 
 	return absFilepath, nil
 }
+
+func (postService *PostService) Filter(page, size int, _ forms.FilterForm) ([]uint, error) {
+	// TODO construct query based off filter form
+	// Future changes: make sure to exclude any posts of type 'Project' from the result!
+	// Posts are composed into Project Posts, and those composed Posts shouldn't be returned.
+	posts, err := postService.PostRepository.QueryPaginated(page, size, "post_type != 'project'")
+	if err != nil {
+		return nil, err
+	}
+
+	// Extract IDs from the list of posts
+	ids := make([]uint, len(posts))
+	for i, post := range posts {
+		ids[i] = post.ID
+	}
+
+	return ids, nil
+}
