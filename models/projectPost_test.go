@@ -17,9 +17,10 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			{Model: gorm.Model{ID: 1}},
 			{Model: gorm.Model{ID: 60}},
 		},
-		PostType:            Project,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
-		DiscussionContainer: DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
+		PostType:              Project,
+		ScientificFieldTags:   []tags.ScientificField{tags.Mathematics},
+		DiscussionContainer:   DiscussionContainer{Model: gorm.Model{ID: 50}, Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
+		DiscussionContainerID: 50,
 	}
 
 	model := ProjectPost{
@@ -40,11 +41,11 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 	targetDTO := ProjectPostDTO{
 		ID: 42,
 		PostDTO: PostDTO{
-			ID:                  88,
-			CollaboratorIDs:     []uint{1, 60},
-			PostType:            Project,
-			ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
-			DiscussionIDs:       []uint{95},
+			ID:                    88,
+			CollaboratorIDs:       []uint{1, 60},
+			PostType:              Project,
+			ScientificFieldTags:   []tags.ScientificField{tags.Mathematics},
+			DiscussionContainerID: 50,
 		},
 		OpenBranchIDs:      []uint{44},
 		ClosedBranchIDs:    []uint{59, 20},
@@ -66,6 +67,6 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(dto, targetDTO) {
-		t.Fatal("parsed DTO did not equal target DTO")
+		t.Fatalf("parsed DTO\n%+v\ndid not equal target DTO\n%+v", dto, targetDTO)
 	}
 }

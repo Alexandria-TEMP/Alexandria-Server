@@ -27,6 +27,7 @@ func TestBranchJSONMarshaling(t *testing.T) {
 				Feedback:             "LGTM",
 			},
 		},
+		DiscussionContainerID:   5,
 		ProjectPostID:           45,
 		BranchTitle:             "My Cool MR",
 		NewPostTitle:            "Updated Post Title",
@@ -46,7 +47,7 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		NewPostTitle:              "Updated Post Title",
 		UpdatedCompletionStatus:   Idea,
 		UpdatedScientificFields:   []tags.ScientificField{tags.Mathematics},
-		DiscussionIDs:             []uint{},
+		DiscussionContainerID:     5,
 		RenderStatus:              Pending,
 		BranchOverallReviewStatus: BranchOpenForReview,
 	}

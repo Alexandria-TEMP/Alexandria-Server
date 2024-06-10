@@ -80,7 +80,7 @@ type BranchDTO struct {
 	ProjectPostID             uint                      `json:"projectPostIDs"`
 	BranchTitle               string                    `json:"branchTitle"`
 	RenderStatus              RenderStatus              `json:"renderStatus"`
-	DiscussionIDs             []uint                    `json:"discussionIDs"`
+	DiscussionContainerID     uint                      `json:"discussionContainerID"`
 	BranchOverallReviewStatus BranchOverallReviewStatus `json:"branchOverallReviewStatus"`
 }
 
@@ -99,7 +99,7 @@ func (model *Branch) IntoDTO() BranchDTO {
 		model.ProjectPostID,
 		model.BranchTitle,
 		model.RenderStatus,
-		discussionContainerIntoIDs(&model.DiscussionContainer),
+		model.DiscussionContainerID,
 		model.BranchReviewStatus,
 	}
 }
@@ -125,17 +125,6 @@ func reviewsToIDs(reviews []*BranchReview) []uint {
 
 	for i, review := range reviews {
 		ids[i] = review.ID
-	}
-
-	return ids
-}
-
-// Helper function for JSON marshaling
-func discussionContainerIntoIDs(discussions *DiscussionContainer) []uint {
-	ids := make([]uint, len(discussions.Discussions))
-
-	for i, discussion := range discussions.Discussions {
-		ids[i] = discussion.ID
 	}
 
 	return ids

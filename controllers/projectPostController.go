@@ -16,7 +16,8 @@ import (
 // @BasePath /api/v2
 
 type ProjectPostController struct {
-	ProjectPostService interfaces.ProjectPostService
+	ProjectPostService         interfaces.ProjectPostService
+	DiscussionContainerService interfaces.DiscussionContainerService
 }
 
 // GetProjectPost godoc
@@ -173,18 +174,36 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 
 // GetProjectPostDiscussionContainers godoc
 // @Summary Returns all discussion container IDs associated with the project post
-// @Description Returns all discussion container IDs on this project post over all its previous versions, instead of only the current version
+// @Description Returns all discussion container IDs on this project post over all its previous merged versions, instead of only the current version
 // @Tags 		project-posts
 // @Accept  	json
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
-// @Success 	200		{array}		uint
+// @Success 	200		{object}	models.DiscussionContainerProjectHistoryDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/project-posts/{postID}/all-discussion-containers 	[get]
-func (projectPostController *ProjectPostController) GetProjectPostDiscussionContainers(_ *gin.Context) {
-	// TODO implement
+func (projectPostController *ProjectPostController) GetProjectPostDiscussionContainers(c *gin.Context) {
+	// Get project post ID from path
+	projectPostIDString := c.Param("postID")
+
+	projectPostID, err := strconv.ParseUint(projectPostIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not parse project post ID '%s' as unsigned integer: %s", projectPostIDString, err)})
+
+		return
+	}
+
+	// Get the discussion container history!
+	discussionContainerHistory, err := projectPostController.ProjectPostService.GetDiscussionContainersFromMergeHistory(uint(projectPostID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get discussion containers of project post: %s", err)})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, discussionContainerHistory)
 }
 
 // GetProjectPostMRsByStatus godoc

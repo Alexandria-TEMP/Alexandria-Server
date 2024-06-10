@@ -39,12 +39,12 @@ type Post struct {
 }
 
 type PostDTO struct {
-	ID                  uint                   `json:"id"`
-	CollaboratorIDs     []uint                 `json:"collaboratorIDs"`
-	Title               string                 `json:"title"`
-	PostType            PostType               `json:"postType"`
-	ScientificFieldTags []tags.ScientificField `json:"scientificFieldTags"`
-	DiscussionIDs       []uint                 `json:"discussionIDs"`
+	ID                    uint                   `json:"id"`
+	CollaboratorIDs       []uint                 `json:"collaboratorIDs"`
+	Title                 string                 `json:"title"`
+	PostType              PostType               `json:"postType"`
+	ScientificFieldTags   []tags.ScientificField `json:"scientificFieldTags"`
+	DiscussionContainerID uint                   `json:"discussionContainerID"`
 }
 
 func (model *Post) GetID() uint {
@@ -58,7 +58,7 @@ func (model *Post) IntoDTO() PostDTO {
 		model.Title,
 		model.PostType,
 		model.ScientificFieldTags,
-		discussionContainerIntoIDs(&model.DiscussionContainer),
+		model.DiscussionContainerID,
 	}
 }
 

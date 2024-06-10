@@ -32,3 +32,16 @@ func (model *DiscussionContainer) IntoDTO() DiscussionContainerDTO {
 func (model *DiscussionContainer) MarshalJSON() ([]byte, error) {
 	return json.Marshal(model.IntoDTO())
 }
+
+// Links discussion containers with their place of origin, for purpose
+// of sending a project post's entire discussion history.
+type DiscussionContainerProjectHistoryDTO struct {
+	CurrentDiscussionContainerID     uint                               `json:"currentDiscussionContainerID"`
+	MergedBranchDiscussionContainers []DiscussionContainerWithBranchDTO `json:"mergedBranchDiscussionContainers"`
+}
+
+// Represents a discussion container plus the branch it originated from
+type DiscussionContainerWithBranchDTO struct {
+	DiscussionContainerID uint `json:"discussionContainerID"`
+	ClosedBranchID        uint `json:"closedBranchID"`
+}

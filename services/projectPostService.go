@@ -111,3 +111,26 @@ func (projectPostService *ProjectPostService) Filter(page, size int, _ forms.Fil
 
 	return ids, nil
 }
+
+func (projectPostService *ProjectPostService) GetDiscussionContainersFromMergeHistory(postID uint) (*models.DiscussionContainerProjectHistoryDTO, error) {
+	// Get each discussion container, from every closed & merged branch. Sources of containers:
+	// 1) On the underlying post
+	// 2) On each closed + merged branch
+
+	// TODO Get the post's discussion container
+
+	// TODO Get each closed + merged branch's discussion container
+
+	// TODO append into one big list
+
+	// TODO remove me
+	return &models.DiscussionContainerProjectHistoryDTO{
+		CurrentDiscussionContainerID: 99,
+		MergedBranchDiscussionContainers: []models.DiscussionContainerWithBranchDTO{
+			{
+				DiscussionContainerID: 420,
+				ClosedBranchID:        69,
+			},
+		},
+	}, nil
+}
