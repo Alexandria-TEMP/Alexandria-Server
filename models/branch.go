@@ -24,7 +24,7 @@ func (enum *RenderStatus) IsValid() bool {
 type BranchOverallReviewStatus string
 
 const (
-	BranchOpenForReview BranchOverallReviewStatus = "open for branchreview"
+	BranchOpenForReview BranchOverallReviewStatus = "open for review"
 	BranchPeerReviewed  BranchOverallReviewStatus = "peer reviewed"
 	BranchRejected      BranchOverallReviewStatus = "rejected"
 )
@@ -59,7 +59,7 @@ type Branch struct {
 	DiscussionContainerID uint
 
 	// ProjectPost has many Branch
-	ProjectPostID uint
+	ProjectPostID *uint
 
 	BranchTitle string
 
@@ -76,7 +76,7 @@ type BranchDTO struct {
 	// MR metadata
 	CollaboratorIDs           []uint                    `json:"collaboratorIDs"`
 	ReviewIDs                 []uint                    `json:"reviewIDs"`
-	ProjectPostID             uint                      `json:"projectPostIDs"`
+	ProjectPostID             *uint                     `json:"projectPostID"`
 	BranchTitle               string                    `json:"branchTitle"`
 	RenderStatus              RenderStatus              `json:"renderStatus"`
 	DiscussionIDs             []uint                    `json:"discussionIDs"`

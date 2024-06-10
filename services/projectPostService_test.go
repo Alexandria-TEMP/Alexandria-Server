@@ -102,6 +102,7 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 			DiscussionContainer: models.DiscussionContainer{
 				Discussions: []*models.Discussion{},
 			},
+			RenderStatus: models.Success,
 		},
 		OpenBranches: []*models.Branch{
 			{

@@ -77,6 +77,12 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 		return
 	}
 
+	if !form.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
+
+		return
+	}
+
 	branch, err404, err500 := branchController.BranchService.CreateBranch(&form)
 
 	if err404 != nil {
@@ -152,7 +158,7 @@ func (branchController *BranchController) DeleteBranch(c *gin.Context) {
 // @Success 	200		{array}		models.BranchOverallReviewStatus
 // @Failure		400
 // @Failure		404
-// @Router 		/branches/{branchID}/branchreview-statuses	[get]
+// @Router 		/branches/{branchID}/review-statuses	[get]
 func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 	// extract branchID
 	branchIDStr := c.Param("branchID")
@@ -217,7 +223,6 @@ func (branchController *BranchController) GetReview(c *gin.Context) {
 // @Description Adds a branchreview to a branch
 // @Tags 		branches
 // @Accept  	json
-// @Param		branchID		path		string			true	"branch ID"
 // @Param		form	body	forms.ReviewCreationForm	true	"branchreview creation form"
 // @Produce		json
 // @Success 	200		{object}	models.BranchReviewDTO
@@ -232,6 +237,12 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind ReviewCreationForm from request body"})
+
+		return
+	}
+
+	if !form.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
 
 		return
 	}
@@ -262,7 +273,7 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router 		/branches/{branchID}/can-branchreview/{memberID}		[get]
+// @Router 		/branches/{branchID}/can-review/{memberID}		[get]
 func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 	// extract branchID
 	branchIDStr := c.Param("branchID")

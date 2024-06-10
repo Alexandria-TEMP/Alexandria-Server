@@ -26,24 +26,24 @@ type ProjectPostController struct {
 // @Description Get a project post by ID
 // @Tags 		project-posts
 // @Accept  	json
-// @Param		postID		path		string			true	"Post ID"
+// @Param		projectPostID		path		string			true	"Post ID"
 // @Produce		json
 // @Success 	200 		{object}	models.ProjectPostDTO
 // @Failure		400
 // @Failure		404
-// @Router 		/project-posts/{postID}	[get]
+// @Router 		/project-posts/{projectPostID}	[get]
 func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Context) {
-	// extract postID
-	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseUint(postIDStr, 10, 64)
+	// extract projectPostID
+	projectPostIDStr := c.Param("projectPostID")
+	projectPostID, err := strconv.ParseUint(projectPostIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not interpret ID %s as unsigned integer, reason: %s", postIDStr, err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not interpret ID %s as unsigned integer, reason: %s", projectPostIDStr, err)})
 
 		return
 	}
 
-	projectPost, err := projectPostController.ProjectPostService.GetProjectPost(uint(postID))
+	projectPost, err := projectPostController.ProjectPostService.GetProjectPost(uint(projectPostID))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get project post, reason: %s", err)})
@@ -145,13 +145,13 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 // @Description Delete a project post with given ID from database
 // @Tags 		project-posts
 // @Accept  	json
-// @Param		postID		path		string			true	"post ID"
+// @Param		projectPostID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router 		/project-posts/{postID} 		[delete]
+// @Router 		/project-posts/{projectPostID} 		[delete]
 func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Context) {
 	// delete method goes here
 }
@@ -180,13 +180,13 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Description Returns all discussion IDs on this project post over all its previous versions, instead of only the current version
 // @Tags 		project-posts
 // @Accept  	json
-// @Param		postID		path		string			true	"post ID"
+// @Param		projectPostID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router		/project-posts/{postID}/all-discussions 	[get]
+// @Router		/project-posts/{projectPostID}/all-discussions 	[get]
 func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ *gin.Context) {
 	// TODO implement
 }
@@ -196,13 +196,13 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ 
 // @Description Returns all branch IDs of this project post, grouped by each branch's branchreview status
 // @Tags		project-posts
 // @Accept		json
-// @Param		postID	path	string	true	"post ID"
+// @Param		projectPostID	path	string	true	"post ID"
 // @Produce		json
 // @Success		200		{object}	forms.GroupedBranchForm
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router		/project-posts/{postID}/branches-by-status	[get]
+// @Router		/project-posts/{projectPostID}/branches-by-status	[get]
 func (projectPostController *ProjectPostController) GetProjectPostBranchesByStatus(_ *gin.Context) {
 	// TODO implement
 }
@@ -239,7 +239,7 @@ func (projectPostController *ProjectPostController) GetMainRender(c *gin.Context
 	}
 
 	// get render filepath
-	filePath, err202, err404 := projectPostController.RenderService.GetMainRenderFile(uint(projectPost.PostID))
+	filePath, err202, err404 := projectPostController.RenderService.GetMainRenderFile(projectPost.PostID)
 
 	// if render is pending return 202 accepted
 	if err202 != nil {
@@ -294,7 +294,7 @@ func (projectPostController *ProjectPostController) GetMainProject(c *gin.Contex
 	}
 
 	// get repository filepath
-	filePath, err := projectPostController.PostService.GetMainProject(uint(projectPost.PostID))
+	filePath, err := projectPostController.PostService.GetMainProject(projectPost.PostID)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -341,7 +341,7 @@ func (projectPostController *ProjectPostController) GetMainFiletree(c *gin.Conte
 		return
 	}
 
-	fileTree, err404, err500 := projectPostController.PostService.GetMainFiletree(uint(projectPost.PostID))
+	fileTree, err404, err500 := projectPostController.PostService.GetMainFiletree(projectPost.PostID)
 
 	if err404 != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err404.Error()})

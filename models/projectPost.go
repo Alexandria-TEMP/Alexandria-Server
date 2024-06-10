@@ -68,10 +68,6 @@ type ProjectPost struct {
 	ProjectCompletionStatus   ProjectCompletionStatus
 	ProjectFeedbackPreference ProjectFeedbackPreference
 	PostReviewStatus          ProjectReviewStatus
-
-	// ProjectPost may have a Branch (it won't if its master)
-	LastMergedBranch   *Branch `gorm:"foreignKey:LastMergedBranchID"`
-	LastMergedBranchID *uint
 }
 
 type ProjectPostDTO struct {

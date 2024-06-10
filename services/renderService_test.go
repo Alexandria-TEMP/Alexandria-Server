@@ -172,9 +172,10 @@ func TestGetRenderFileSuccess(t *testing.T) {
 	beforeEachRender(t)
 	defer cleanup(t)
 
+	projectPostID := uint(99)
 	renderFilePath := filepath.Join(cwd, "..", "utils", "test_files", "good_repository_setup", "render", "test.html")
 	successBranch.ID = 0
-	successBranch.ProjectPostID = 99
+	successBranch.ProjectPostID = &projectPostID
 	projectPost.ID = 99
 	projectPost.PostID = 100
 
@@ -208,8 +209,9 @@ func TestGetRenderFileNoProjectPost(t *testing.T) {
 	beforeEachRender(t)
 	defer cleanup(t)
 
+	projectPostID := uint(99)
 	successBranch.ID = 0
-	successBranch.ProjectPostID = 99
+	successBranch.ProjectPostID = &projectPostID
 
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(successBranch, nil).Times(1)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, errors.New("failed")).Times(1)
@@ -224,8 +226,9 @@ func TestGetRenderFilePending(t *testing.T) {
 	beforeEachRender(t)
 	defer cleanup(t)
 
+	projectPostID := uint(99)
 	pendingBranch.ID = 0
-	pendingBranch.ProjectPostID = 99
+	pendingBranch.ProjectPostID = &projectPostID
 
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(pendingBranch, nil).Times(1)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
@@ -240,8 +243,9 @@ func TestGetRenderFileFailed(t *testing.T) {
 	beforeEachRender(t)
 	defer cleanup(t)
 
+	projectPostID := uint(99)
 	failedBranch.ID = 0
-	failedBranch.ProjectPostID = 99
+	failedBranch.ProjectPostID = &projectPostID
 
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(failedBranch, nil).Times(1)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
@@ -256,8 +260,9 @@ func TestGetRenderNoGitBranch(t *testing.T) {
 	beforeEachRender(t)
 	defer cleanup(t)
 
+	projectPostID := uint(99)
 	successBranch.ID = 0
-	successBranch.ProjectPostID = 99
+	successBranch.ProjectPostID = &projectPostID
 	projectPost.ID = 99
 	projectPost.PostID = 100
 
@@ -276,8 +281,9 @@ func TestGetRenderDoesntExist(t *testing.T) {
 	beforeEachRender(t)
 	defer cleanup(t)
 
+	projectPostID := uint(99)
 	successBranch.ID = 0
-	successBranch.ProjectPostID = 99
+	successBranch.ProjectPostID = &projectPostID
 	projectPost.ID = 99
 	projectPost.PostID = 100
 

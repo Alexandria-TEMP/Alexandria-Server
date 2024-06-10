@@ -81,13 +81,13 @@ func TestCreateBranchSuccess(t *testing.T) {
 	collaborator := &models.BranchCollaborator{MemberID: 12}
 	expectedBranch := &models.Branch{
 		Collaborators:             []*models.BranchCollaborator{collaborator},
-		ProjectPostID:             10,
+		ProjectPostID:             &projectPost.ID,
 		RenderStatus:              models.Success,
 		BranchOverallReviewStatus: models.BranchOpenForReview,
 	}
 	outputBranch := &models.Branch{
 		Collaborators:             []*models.BranchCollaborator{collaborator},
-		ProjectPostID:             10,
+		ProjectPostID:             &projectPost.ID,
 		RenderStatus:              models.Success,
 		BranchOverallReviewStatus: models.BranchOpenForReview,
 	}
@@ -136,7 +136,7 @@ func TestCreateBranchFailedUpdateProjectPost(t *testing.T) {
 	projectPost.PostID = 12
 	expectedBranch := &models.Branch{
 		Collaborators:             []*models.BranchCollaborator{{MemberID: 12, BranchID: 11}},
-		ProjectPostID:             10,
+		ProjectPostID:             &projectPost.ID,
 		RenderStatus:              models.Success,
 		BranchOverallReviewStatus: models.BranchOpenForReview,
 		DiscussionContainer:       models.DiscussionContainer{},
@@ -172,7 +172,7 @@ func TestCreateBranchFailedGit(t *testing.T) {
 	projectPost.PostID = 12
 	expectedBranch := &models.Branch{
 		Collaborators:             []*models.BranchCollaborator{{MemberID: 12, BranchID: 11}},
-		ProjectPostID:             10,
+		ProjectPostID:             &projectPost.ID,
 		RenderStatus:              models.Success,
 		BranchOverallReviewStatus: models.BranchOpenForReview,
 	}
@@ -209,10 +209,11 @@ func TestDeleteBranchSuccess(t *testing.T) {
 	beforeEachBranch(t)
 
 	projectPost.PostID = 50
+	projectPostID := uint(5)
 
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
@@ -228,10 +229,11 @@ func TestDeleteBranchFailedGetBranch(t *testing.T) {
 	beforeEachBranch(t)
 
 	projectPost.PostID = 50
+	projectPostID := uint(5)
 
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, errors.New("failed"))
@@ -243,10 +245,11 @@ func TestDeleteBranchFailedGetProjectPost(t *testing.T) {
 	beforeEachBranch(t)
 
 	projectPost.PostID = 50
+	projectPostID := uint(5)
 
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
@@ -259,10 +262,11 @@ func TestDeleteBranchFailedDeleteGitBranch(t *testing.T) {
 	beforeEachBranch(t)
 
 	projectPost.PostID = 50
+	projectPostID := uint(5)
 
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
@@ -277,10 +281,11 @@ func TestDeleteBranchFailedDelete(t *testing.T) {
 	beforeEachBranch(t)
 
 	projectPost.PostID = 50
+	projectPostID := uint(5)
 
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
@@ -370,9 +375,10 @@ func TestCreateReviewSuccess(t *testing.T) {
 	assert.Equal(t, expected, &branchreview)
 }
 
-func TestCreateReviewSuccessMerge(t *testing.T) {
+func TestCreateReviewSuccessMergeDoesntSupercede(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	member := &models.Member{
 		Model: gorm.Model{ID: 11},
 	}
@@ -390,14 +396,14 @@ func TestCreateReviewSuccessMerge(t *testing.T) {
 	branch := &models.Branch{
 		Model:                     gorm.Model{ID: 10},
 		BranchOverallReviewStatus: models.BranchOpenForReview,
-		ProjectPostID:             5,
+		ProjectPostID:             &projectPostID,
 		Reviews:                   []*models.BranchReview{expected, expected},
 	}
 	newBranch := &models.Branch{
 		Model:                     gorm.Model{ID: 10},
 		Reviews:                   []*models.BranchReview{expected, expected, expected},
 		BranchOverallReviewStatus: models.BranchPeerReviewed,
-		ProjectPostID:             5,
+		ProjectPostID:             nil,
 	}
 	closed := &models.ClosedBranch{
 		Branch:               *newBranch,
@@ -407,87 +413,106 @@ func TestCreateReviewSuccessMerge(t *testing.T) {
 	}
 	projectPost.ID = 5
 	projectPost.OpenBranches = append(projectPost.OpenBranches, branch)
-	projectPost.LastMergedBranch = &models.Branch{Model: gorm.Model{ID: 50}}
 	newProjectPost := &models.ProjectPost{
-		Model:            gorm.Model{ID: 5},
-		LastMergedBranch: newBranch,
-		OpenBranches:     []*models.Branch{},
-		ClosedBranches:   []*models.ClosedBranch{closed},
+		Model:          gorm.Model{ID: 5},
+		OpenBranches:   []*models.Branch{},
+		ClosedBranches: []*models.ClosedBranch{closed},
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, nil)
+	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
 	mockFilesystem.EXPECT().Merge("10", "master").Return(nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(5)).Return(projectPost, nil)
 	mockProjectPostRepository.EXPECT().Update(gomock.Any()).Return(newProjectPost, nil)
+	mockClosedBranchRepository.EXPECT().Query(&models.ClosedBranch{
+		ProjectPostID:        5,
+		BranchReviewDecision: models.Approved,
+	}).Return(nil, nil)
+	mockBranchRepository.EXPECT().Update(newBranch).Return(newBranch, nil)
 
 	branchreview, err := branchService.CreateReview(form)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, &branchreview)
 	assert.Equal(t, models.BranchPeerReviewed, branch.BranchOverallReviewStatus)
-	assert.Equal(t, projectPost.LastMergedBranch, newBranch)
+	assert.Nil(t, projectPost.ClosedBranches[0].SupercededBranchID)
 }
 
-func TestCreateReviewSuccessReject(t *testing.T) {
+func TestCreateReviewSuccessMergeSupercedes(t *testing.T) {
 	beforeEachBranch(t)
 
-	member := &models.Member{
-		Model: gorm.Model{ID: 11},
-	}
+	projectPostID := uint(8)
 	form := forms.ReviewCreationForm{
 		BranchID:             10,
 		ReviewingMemberID:    11,
-		BranchReviewDecision: models.Rejected,
+		BranchReviewDecision: models.Approved,
 	}
-	approval := &models.BranchReview{
-		// Model:          gorm.Model{ID: 1},
+	oldReviews := &models.BranchReview{
 		BranchID:             10,
 		Member:               models.Member{Model: gorm.Model{ID: 11}},
 		BranchReviewDecision: models.Approved,
 	}
-	expected := &models.BranchReview{
-		// Model:          gorm.Model{ID: 1},
+	expectedReview := &models.BranchReview{
 		BranchID:             10,
 		Member:               models.Member{Model: gorm.Model{ID: 11}},
-		BranchReviewDecision: models.Rejected,
+		BranchReviewDecision: models.Approved,
 	}
-	branch := &models.Branch{
+	oldApprovedBranch := &models.ClosedBranch{
+		Model:         gorm.Model{ID: 11},
+		ProjectPostID: 8,
+		Branch: models.Branch{
+			Model:                     gorm.Model{ID: 9},
+			BranchOverallReviewStatus: models.BranchPeerReviewed,
+			Reviews:                   []*models.BranchReview{oldReviews, oldReviews},
+		},
+	}
+	initialBranch := &models.Branch{
 		Model:                     gorm.Model{ID: 10},
 		BranchOverallReviewStatus: models.BranchOpenForReview,
-		ProjectPostID:             5,
-		Reviews:                   []*models.BranchReview{approval, approval},
+		Reviews:                   []*models.BranchReview{oldReviews, oldReviews},
+		ProjectPostID:             &projectPostID,
 	}
-	newBranch := &models.Branch{
+	expectedBranch := &models.Branch{
 		Model:                     gorm.Model{ID: 10},
-		Reviews:                   []*models.BranchReview{approval, approval, expected},
 		BranchOverallReviewStatus: models.BranchPeerReviewed,
-		ProjectPostID:             5,
+		Reviews:                   []*models.BranchReview{oldReviews, oldReviews, expectedReview},
+		ProjectPostID:             nil,
 	}
-	closed := &models.ClosedBranch{
-		Branch:               *newBranch,
+	expectedClosedBranch := &models.ClosedBranch{
+		Branch:               *expectedBranch,
+		SupercededBranch:     &oldApprovedBranch.Branch,
+		ProjectPostID:        8,
+		BranchReviewDecision: models.Approved,
+	}
+	initialProjectPost := &models.ProjectPost{
+		Model:          gorm.Model{ID: 5},
+		OpenBranches:   []*models.Branch{initialBranch},
+		ClosedBranches: []*models.ClosedBranch{oldApprovedBranch},
+		PostID:         7,
+	}
+	expectedProjectPost := &models.ProjectPost{
+		Model:          gorm.Model{ID: 5},
+		OpenBranches:   []*models.Branch{},
+		ClosedBranches: []*models.ClosedBranch{oldApprovedBranch, expectedClosedBranch},
+		PostID:         7,
+	}
+
+	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(initialBranch, nil)
+	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(&models.Member{Model: gorm.Model{ID: 11}}, nil)
+	mockProjectPostRepository.EXPECT().GetByID(uint(8)).Return(initialProjectPost, nil)
+	mockFilesystem.EXPECT().CheckoutDirectory(uint(7))
+	mockFilesystem.EXPECT().Merge("10", "master")
+	mockClosedBranchRepository.EXPECT().Query(&models.ClosedBranch{
 		ProjectPostID:        5,
-		BranchReviewDecision: models.Rejected,
-	}
-	projectPost.ID = 5
-	projectPost.OpenBranches = append(projectPost.OpenBranches, branch)
-	projectPost.LastMergedBranch = &models.Branch{Model: gorm.Model{ID: 50}}
-	newProjectPost := &models.ProjectPost{
-		Model:            gorm.Model{ID: 5},
-		OpenBranches:     []*models.Branch{},
-		ClosedBranches:   []*models.ClosedBranch{closed},
-		LastMergedBranch: &models.Branch{Model: gorm.Model{ID: 50}},
-	}
+		BranchReviewDecision: models.Approved,
+	}).Return([]*models.ClosedBranch{oldApprovedBranch}, nil)
+	mockBranchRepository.EXPECT().Update(expectedBranch).Return(expectedBranch, nil)
+	mockProjectPostRepository.EXPECT().Update(expectedProjectPost).Return(expectedProjectPost, nil)
 
-	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, nil)
-	mockProjectPostRepository.EXPECT().GetByID(uint(5)).Return(projectPost, nil)
-	mockProjectPostRepository.EXPECT().Update(gomock.Any()).Return(newProjectPost, nil)
-
-	branchreview, err := branchService.CreateReview(form)
+	review, err := branchService.CreateReview(form)
 	assert.Nil(t, err)
-	assert.Equal(t, expected, &branchreview)
-	assert.Equal(t, models.BranchRejected, branch.BranchOverallReviewStatus)
-	assert.Equal(t, &models.Branch{Model: gorm.Model{ID: 50}}, newProjectPost.LastMergedBranch)
+	assert.Equal(t, expectedReview, &review)
+	assert.Equal(t, expectedProjectPost, initialProjectPost)
 }
 
 func TestCreateReviewFailedGetBranch(t *testing.T) {
@@ -569,13 +594,14 @@ func TestCreateReviewFailedUpdateBranch(t *testing.T) {
 func TestMemberCanReviewSuccessTrue(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(20)
 	member := &models.Member{
 		Model:            gorm.Model{ID: 11},
 		ScientificFields: []models.ScientificField{models.Mathematics},
 	}
 	branch := &models.Branch{
 		Model:                     gorm.Model{ID: 10},
-		ProjectPostID:             20,
+		ProjectPostID:             &projectPostID,
 		BranchOverallReviewStatus: models.BranchOpenForReview,
 	}
 	projectPost := &models.ProjectPost{
@@ -595,13 +621,14 @@ func TestMemberCanReviewSuccessTrue(t *testing.T) {
 func TestMemberCanReviewSuccessFalse(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(20)
 	member := &models.Member{
 		Model:            gorm.Model{ID: 11},
 		ScientificFields: []models.ScientificField{models.Mathematics},
 	}
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 20,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		Model: gorm.Model{ID: 20},
@@ -633,9 +660,10 @@ func TestMemberCanReviewFailedGetBranch(t *testing.T) {
 func TestMemberCanReviewFailedGetProjectPost(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(20)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 20,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		Model: gorm.Model{ID: 20},
@@ -652,12 +680,13 @@ func TestMemberCanReviewFailedGetProjectPost(t *testing.T) {
 func TestMemberCanReviewFailedGetMember(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(20)
 	member := &models.Member{
 		Model: gorm.Model{ID: 11},
 	}
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 20,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		Model: gorm.Model{ID: 20},
@@ -675,9 +704,10 @@ func TestMemberCanReviewFailedGetMember(t *testing.T) {
 func TestGetProjectSuccess(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		PostID: 50,
@@ -708,9 +738,10 @@ func TestGetProjectFailedGetBranch(t *testing.T) {
 func TestGetProjectFailedGetProjectPost(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
@@ -724,9 +755,10 @@ func TestGetProjectFailedGetProjectPost(t *testing.T) {
 func TestGetProjectFailedCheckoutBranch(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		PostID: 50,
@@ -745,15 +777,16 @@ func TestGetProjectFailedCheckoutBranch(t *testing.T) {
 func TestUploadProjectSuccess(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		RenderStatus:  models.Success,
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	expected := &models.Branch{
 		RenderStatus:  models.Pending,
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		PostID: 50,
@@ -784,9 +817,10 @@ func TestUploadProjectFailedGetBranch(t *testing.T) {
 func TestUploadProjectFailedGetProjectPost(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
@@ -798,9 +832,10 @@ func TestUploadProjectFailedGetProjectPost(t *testing.T) {
 func TestUploadProjectFailedCheckoutBranch(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		PostID: 50,
@@ -817,9 +852,10 @@ func TestUploadProjectFailedCheckoutBranch(t *testing.T) {
 func TestUploadProjectFailedCleanDir(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		PostID: 50,
@@ -837,9 +873,10 @@ func TestUploadProjectFailedCleanDir(t *testing.T) {
 func TestUploadProjectFailedSaveZipFile(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 		RenderStatus:  models.Success,
 	}
 	projectPost := &models.ProjectPost{
@@ -863,9 +900,10 @@ func TestUploadProjectFailedSaveZipFile(t *testing.T) {
 func TestGetFiletreeSuccess(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		PostID: 50,
@@ -901,9 +939,10 @@ func TestGetFiletreeFailedGetBranch(t *testing.T) {
 func TestGetFiletreeFailedGetProjectPost(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
@@ -918,9 +957,10 @@ func TestGetFiletreeFailedGetProjectPost(t *testing.T) {
 func TestGetFiletreeFailedCheckoutBranch(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		PostID: 50,
@@ -940,9 +980,10 @@ func TestGetFiletreeFailedCheckoutBranch(t *testing.T) {
 func TestGetFiletreeFailedGetFileTree(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		PostID: 50,
@@ -963,9 +1004,10 @@ func TestGetFiletreeFailedGetFileTree(t *testing.T) {
 func TestGetFileFromProjectSuccess(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		PostID: 50,
@@ -1009,9 +1051,10 @@ func TestGetFileFromProjectFailedGetBranch(t *testing.T) {
 func TestGetFileFromProjectFailedGetProjectPost(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	relFilepath := "example.qmd"
 
@@ -1026,9 +1069,10 @@ func TestGetFileFromProjectFailedGetProjectPost(t *testing.T) {
 func TestGetFileFromProjectFailedCheckoutBranch(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		PostID: 50,
@@ -1048,9 +1092,10 @@ func TestGetFileFromProjectFailedCheckoutBranch(t *testing.T) {
 func TestGetFileFromProjectFileDoesNotExist(t *testing.T) {
 	beforeEachBranch(t)
 
+	projectPostID := uint(5)
 	branch := &models.Branch{
 		Model:         gorm.Model{ID: 10},
-		ProjectPostID: 5,
+		ProjectPostID: &projectPostID,
 	}
 	projectPost := &models.ProjectPost{
 		PostID: 50,

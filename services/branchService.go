@@ -73,7 +73,7 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 		UpdatedScientificFields:   branchCreationForm.UpdatedScientificFields,
 		Collaborators:             collaborators,
 		DiscussionContainer:       discussionContainer,
-		ProjectPostID:             branchCreationForm.ProjectPostID,
+		ProjectPostID:             &branchCreationForm.ProjectPostID,
 		BranchTitle:               branchCreationForm.BranchTitle,
 		RenderStatus:              models.Success,
 		BranchOverallReviewStatus: models.BranchOpenForReview,
@@ -122,7 +122,7 @@ func (branchService *BranchService) DeleteBranch(branchID uint) error {
 	}
 
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(branch.ProjectPostID)
+	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
 
 	if err != nil {
 		return fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
@@ -220,32 +220,56 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 
 func (branchService *BranchService) closeBranch(branch *models.Branch) error {
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(branch.ProjectPostID)
+	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
 
-	// close branch
 	if err != nil {
-		return fmt.Errorf("failed to merge branch into main")
+		return fmt.Errorf("failed to get project post")
 	}
 
+	// close branch
 	closedBranch := &models.ClosedBranch{
-		Branch:               *branch,
-		ProjectPostID:        branch.ProjectPostID,
-		BranchReviewDecision: models.Approved,
+		ProjectPostID:        *branch.ProjectPostID,
+		BranchReviewDecision: models.Rejected,
 	}
 
 	// merge into master if approved
 	if branch.BranchOverallReviewStatus == models.BranchPeerReviewed {
+		closedBranch.BranchReviewDecision = models.Approved
+
+		// checkout repo and then merge
+		branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+
 		if err := branchService.Filesystem.Merge(fmt.Sprintf("%v", branch.ID), "master"); err != nil {
-			return fmt.Errorf("failed to merge branch into main")
+			return err
 		}
 
-		closedBranch.SupercededBranch = projectPost.LastMergedBranch
-		projectPost.LastMergedBranch = branch
+		// find the last branch merged into this project post
+		mergedBranches, err := branchService.ClosedBranchRepository.Query(&models.ClosedBranch{
+			ProjectPostID:        projectPost.ID,
+			BranchReviewDecision: models.Approved,
+		})
+
+		if err != nil {
+			return fmt.Errorf("failed to find merged branches in ClosedBranchRepository")
+		}
+
+		if len(mergedBranches) >= 1 {
+			closedBranch.SupercededBranch = &mergedBranches[0].Branch
+		}
 	}
 
+	// remove project post id so that it is no longer in open branches
+	branch.ProjectPostID = nil
+	closedBranch.Branch = *branch
+
+	// add branch to closed branches
 	projectPost.ClosedBranches = append(projectPost.ClosedBranches, closedBranch)
 
 	// remove branch from open branches
+	if _, err := branchService.BranchRepository.Update(branch); err != nil {
+		return fmt.Errorf("failed to update branch")
+	}
+
 	newOpenBranches := []*models.Branch{}
 
 	for _, b := range projectPost.OpenBranches {
@@ -291,7 +315,7 @@ func (branchService *BranchService) MemberCanReview(branchID, memberID uint) (bo
 	}
 
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(branch.ProjectPostID)
+	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
 
 	if err != nil {
 		return false, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
@@ -325,7 +349,7 @@ func (branchService *BranchService) GetProject(branchID uint) (string, error) {
 	}
 
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(branch.ProjectPostID)
+	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
 
 	if err != nil {
 		return filePath, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
@@ -351,7 +375,7 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 	}
 
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(branch.ProjectPostID)
+	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
 
 	if err != nil {
 		return fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
@@ -405,7 +429,7 @@ func (branchService *BranchService) GetFiletree(branchID uint) (map[string]int64
 	}
 
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(branch.ProjectPostID)
+	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID), nil
@@ -441,7 +465,7 @@ func (branchService *BranchService) GetFileFromProject(branchID uint, relFilepat
 	}
 
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(branch.ProjectPostID)
+	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
 
 	if err != nil {
 		return absFilepath, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)

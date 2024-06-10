@@ -88,7 +88,15 @@ func TestCreateBranch200(t *testing.T) {
 
 	mockBranchService.EXPECT().CreateBranch(gomock.Any()).Return(exampleBranch, nil, nil)
 
-	form := forms.BranchCreationForm{ProjectPostID: 5}
+	form := forms.BranchCreationForm{
+		UpdatedPostTitle:           "test",
+		UpdatedCompletionStatus:    models.Completed,
+		UpdatedFeedbackPreferences: models.DiscussionFeedback,
+		UpdatedScientificFields:    []models.ScientificField{models.Mathematics},
+		CollaboratingMemberIDs:     []uint{1},
+		ProjectPostID:              5,
+		BranchTitle:                "test",
+	}
 	body, err := json.Marshal(form)
 	assert.Nil(t, err)
 
@@ -120,7 +128,15 @@ func TestCreateBranch404(t *testing.T) {
 
 	mockBranchService.EXPECT().CreateBranch(gomock.Any()).Return(exampleBranch, errors.New("parent branch not found"), nil)
 
-	form := forms.BranchCreationForm{ProjectPostID: 5}
+	form := forms.BranchCreationForm{
+		UpdatedPostTitle:           "test",
+		UpdatedCompletionStatus:    models.Completed,
+		UpdatedFeedbackPreferences: models.DiscussionFeedback,
+		UpdatedScientificFields:    []models.ScientificField{models.Mathematics},
+		CollaboratingMemberIDs:     []uint{1},
+		ProjectPostID:              5,
+		BranchTitle:                "test",
+	}
 	body, err := json.Marshal(form)
 	assert.Nil(t, err)
 
@@ -138,7 +154,15 @@ func TestCreateBranch500(t *testing.T) {
 
 	mockBranchService.EXPECT().CreateBranch(gomock.Any()).Return(exampleBranch, nil, errors.New("internal server error"))
 
-	form := forms.BranchCreationForm{ProjectPostID: 5}
+	form := forms.BranchCreationForm{
+		UpdatedPostTitle:           "test",
+		UpdatedCompletionStatus:    models.Completed,
+		UpdatedFeedbackPreferences: models.DiscussionFeedback,
+		UpdatedScientificFields:    []models.ScientificField{models.Mathematics},
+		CollaboratingMemberIDs:     []uint{1},
+		ProjectPostID:              5,
+		BranchTitle:                "test",
+	}
 	body, err := json.Marshal(form)
 	assert.Nil(t, err)
 
@@ -273,7 +297,11 @@ func TestCreateReview200(t *testing.T) {
 
 	mockBranchService.EXPECT().CreateReview(gomock.Any()).Return(exampleReview, nil)
 
-	form := forms.ReviewCreationForm{BranchID: 1}
+	form := forms.ReviewCreationForm{
+		BranchReviewDecision: models.Approved,
+		BranchID:             1,
+		ReviewingMemberID:    2,
+	}
 	body, err := json.Marshal(form)
 	assert.Nil(t, err)
 
@@ -305,7 +333,11 @@ func TestCreateReview404(t *testing.T) {
 
 	mockBranchService.EXPECT().CreateReview(gomock.Any()).Return(exampleReview, errors.New("branch not found"))
 
-	form := forms.ReviewCreationForm{BranchID: 1}
+	form := forms.ReviewCreationForm{
+		BranchReviewDecision: models.Approved,
+		BranchID:             1,
+		ReviewingMemberID:    2,
+	}
 	body, err := json.Marshal(form)
 	assert.Nil(t, err)
 

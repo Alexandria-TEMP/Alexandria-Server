@@ -47,6 +47,7 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 		Title:            form.PostCreationForm.Title,
 		PostType:         form.PostCreationForm.PostType,
 		ScientificFields: form.PostCreationForm.ScientificFields,
+		RenderStatus:     models.Success,
 
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
@@ -94,7 +95,7 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 	}
 
 	// Checkout directory where project post will store it's files
-	projectPostService.Filesystem.CheckoutDirectory(post.ID)
+	projectPostService.Filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// Create a new git repo there
 	if err := projectPostService.Filesystem.CreateRepository(); err != nil {
@@ -103,7 +104,9 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 
 	// Create initial branch in git repo
 	branch := projectPost.OpenBranches[0]
-	projectPostService.Filesystem.CreateBranch(fmt.Sprintf("%v", branch.ID))
+	if err := projectPostService.Filesystem.CreateBranch(fmt.Sprintf("%v", branch.ID)); err != nil {
+		return nil, nil, err
+	}
 
 	return &projectPost, nil, nil
 }

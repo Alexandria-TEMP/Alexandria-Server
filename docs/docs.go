@@ -2169,7 +2169,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create a new project post",
+                "description": "Create a new project post with a single open branch. Upload to this branch in order to have your post reviewed.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2402,6 +2402,177 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/forms.GroupedBranchForm"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/project-posts/{projectPostID}/file/{filepath}": {
+            "get": {
+                "description": "Get the contents of a single file from the main version of a project post",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "project-posts"
+                ],
+                "summary": "Get a file from a project post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project Post ID",
+                        "name": "projectPostID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filepath",
+                        "name": "filepath",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/project-posts/{projectPostID}/render": {
+            "get": {
+                "description": "Get the main render of the repository underlying a project post if it exists and has been rendered successfully",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "project-posts"
+                ],
+                "summary": "Get the main render of a project post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project Post ID",
+                        "name": "projectPostID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/project-posts/{projectPostID}/repository": {
+            "get": {
+                "description": "Get the entire zipped main repository of a project post",
+                "produces": [
+                    "application/zip"
+                ],
+                "tags": [
+                    "project-posts"
+                ],
+                "summary": "Get the main repository of a project post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project Post ID",
+                        "name": "projectPostID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/project-posts/{projectPostID}/tree": {
+            "get": {
+                "description": "Get the filetree of a the main version of a project post",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "project-posts"
+                ],
+                "summary": "Get the filetree of a project post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Project Post ID",
+                        "name": "projectPostID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "integer"
+                            }
                         }
                     },
                     "400": {

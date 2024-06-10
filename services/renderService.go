@@ -33,7 +33,7 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, error,
 	}
 
 	// get project post
-	projectPost, err := renderService.ProjectPostRepository.GetByID(branch.ProjectPostID)
+	projectPost, err := renderService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
 
 	if err != nil {
 		return filePath, nil, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
