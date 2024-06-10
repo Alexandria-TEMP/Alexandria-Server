@@ -117,7 +117,6 @@ func (projectPostService *ProjectPostService) GetDiscussionContainersFromMergeHi
 	// Get each discussion container, from every closed & merged branch. Sources of containers:
 	// 1) On the underlying post
 	// 2) On each closed + merged branch
-
 	// Get the post's discussion container
 	projectPost, err := projectPostService.ProjectPostRepository.GetByID(projectPostID)
 	if err != nil {
