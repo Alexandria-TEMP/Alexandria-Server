@@ -209,6 +209,15 @@ definitions:
           type: integer
         type: array
     type: object
+  models.MemberShortFormDTO:
+    properties:
+      firstName:
+        type: string
+      id:
+        type: integer
+      lastName:
+        type: string
+    type: object
   models.PostCollaboratorDTO:
     properties:
       collaborationType:
@@ -323,6 +332,17 @@ definitions:
         type: integer
     type: object
   tags.ScientificFieldTag:
+    type: object
+  tags.ScientificFieldTagDTO:
+    properties:
+      id:
+        type: integer
+      scientificField:
+        type: string
+      subtagIDs:
+        items:
+          type: integer
+        type: array
     type: object
   utils.HTTPError:
     properties:
@@ -952,12 +972,8 @@ paths:
           description: OK
           schema:
             items:
-              type: integer
+              $ref: '#/definitions/models.MemberShortFormDTO'
             type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
           schema:
@@ -1978,7 +1994,7 @@ paths:
       - tags
   /tags/scientific:
     get:
-      description: Returns all scientific tags (an array of strings) in the database
+      description: Returns all scientific tags in the database
       produces:
       - application/json
       responses:
@@ -1986,10 +2002,10 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/tags.ScientificFieldTag'
+              $ref: '#/definitions/tags.ScientificFieldTagDTO'
             type: array
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/utils.HTTPError'
         "500":

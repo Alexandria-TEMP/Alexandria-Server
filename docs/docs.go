@@ -929,14 +929,8 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "integer"
+                                "$ref": "#/definitions/models.MemberShortFormDTO"
                             }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
                         }
                     },
                     "404": {
@@ -2465,7 +2459,7 @@ const docTemplate = `{
         },
         "/tags/scientific": {
             "get": {
-                "description": "Returns all scientific tags (an array of strings) in the database",
+                "description": "Returns all scientific tags in the database",
                 "produces": [
                     "application/json"
                 ],
@@ -2479,12 +2473,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.ScientificFieldTag"
+                                "$ref": "#/definitions/tags.ScientificFieldTagDTO"
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
@@ -2809,6 +2803,20 @@ const docTemplate = `{
                 }
             }
         },
+        "models.MemberShortFormDTO": {
+            "type": "object",
+            "properties": {
+                "firstName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastName": {
+                    "type": "string"
+                }
+            }
+        },
         "models.PostCollaboratorDTO": {
             "type": "object",
             "properties": {
@@ -2974,6 +2982,23 @@ const docTemplate = `{
         },
         "tags.ScientificFieldTag": {
             "type": "object"
+        },
+        "tags.ScientificFieldTagDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "scientificField": {
+                    "type": "string"
+                },
+                "subtagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "utils.HTTPError": {
             "type": "object",
