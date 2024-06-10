@@ -1,23 +1,51 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	tags "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
+)
 
 // @BasePath /api/v2
 
 type TagController struct {
+	TagService interfaces.TagService
 }
 
 // GetScientificTags godoc
 // @Summary 	Returns all scientific tags
-// @Description Returns all scientific tags (an array of strings) in the database
+// @Description Returns all scientific tags in the database
 // @Tags 		tags
 // @Produce		json
-// @Success 	200		{array}		tags.ScientificFieldTag
-// @Failure		400 	{object}	utils.HTTPError
+// @Success 	200		{array}		tags.ScientificFieldTagDTO
+// @Failure		404 	{object}	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/tags/scientific	[get]
-func (tagController *TagController) GetScientificTags(_ *gin.Context) {
-	// TODO implement
+func (tagController *TagController) GetScientificTags(c *gin.Context) {
+	tagObjects, err := tagController.TagService.GetAllScientificFieldTags()
+
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("cannot get tags, error: %v", err))
+
+		return
+	}
+
+	tagDTOs := []tags.ScientificFieldTagDTO{}
+
+	for _, tag := range tagObjects {
+		dto := tag.IntoDTO()
+
+		tagDTOs = append(tagDTOs, dto)
+	}
+
+	// if correct response send the tags back
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, tagDTOs)
 }
 
 // GetCompletionStatusTags godoc

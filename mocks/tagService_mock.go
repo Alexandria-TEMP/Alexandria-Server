@@ -39,6 +39,21 @@ func (m *MockTagService) EXPECT() *MockTagServiceMockRecorder {
 	return m.recorder
 }
 
+// GetAllScientificFieldTags mocks base method.
+func (m *MockTagService) GetAllScientificFieldTags() ([]*tags.ScientificFieldTag, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllScientificFieldTags")
+	ret0, _ := ret[0].([]*tags.ScientificFieldTag)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllScientificFieldTags indicates an expected call of GetAllScientificFieldTags.
+func (mr *MockTagServiceMockRecorder) GetAllScientificFieldTags() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllScientificFieldTags", reflect.TypeOf((*MockTagService)(nil).GetAllScientificFieldTags))
+}
+
 // GetTagsFromUintIDs mocks base method.
 func (m *MockTagService) GetTagsFromUintIDs(arg0 []uint) ([]*tags.ScientificFieldTag, error) {
 	m.ctrl.T.Helper()

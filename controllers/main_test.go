@@ -19,6 +19,7 @@ var (
 	mockMemberService *mock_interfaces.MockMemberService
 	mockTagService    *mock_interfaces.MockTagService
 	memberController  *MemberController
+	tagController     *TagController
 
 	responseRecorder *httptest.ResponseRecorder
 
@@ -40,13 +41,11 @@ func TestMain(m *testing.M) {
 	tag1 := tags.ScientificFieldTag{
 		ScientificField: "Mathematics",
 		Subtags:         []*tags.ScientificFieldTag{},
-		ParentID:        nil,
 	}
 	exampleSTag1 = &tag1
 	tag2 := tags.ScientificFieldTag{
-		ScientificField: "",
+		ScientificField: "Computers",
 		Subtags:         []*tags.ScientificFieldTag{},
-		ParentID:        nil,
 	}
 	exampleSTag2 = &tag2
 
@@ -101,6 +100,8 @@ func SetUpRouter() *gin.Engine {
 	router.GET("/api/v2/members", func(c *gin.Context) {
 		memberController.GetAllMembers(c)
 	})
-
+	router.GET("/api/v2/tags/scientific", func(c *gin.Context) {
+		tagController.GetScientificTags(c)
+	})
 	return router
 }
