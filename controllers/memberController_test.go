@@ -188,13 +188,23 @@ func TestUpdateMember404(t *testing.T) {
 
 func TestGetAllMembers200(t *testing.T) {
 	beforeEachMember(t)
-	mockMemberService.EXPECT().GetAllMembers().Return([]uint{2, 3}, nil)
+	mockMemberService.EXPECT().GetAllMembers().Return([]*models.MemberShortFormDTO{
+		{ID: 3, FirstName: "eve", LastName: "eeve"},
+	}, nil)
 
 	req, _ := http.NewRequest("GET", "/api/v2/members", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
 
+	var responseMember []*models.MemberShortFormDTO
+
+	responseJSON, _ := io.ReadAll(responseRecorder.Body)
+	_ = json.Unmarshal(responseJSON, &responseMember)
+
+	assert.Equal(t, responseMember, []*models.MemberShortFormDTO{
+		{ID: 3, FirstName: "eve", LastName: "eeve"},
+	})
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
 }
 

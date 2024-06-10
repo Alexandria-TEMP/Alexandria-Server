@@ -31,6 +31,12 @@ type MemberDTO struct {
 	ScientificFieldTagIDs []uint `json:"scientificFieldTagIDs"`
 }
 
+type MemberShortFormDTO struct {
+	ID        uint   `json:"id"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+}
+
 func (model *Member) GetID() uint {
 	return model.Model.ID
 }

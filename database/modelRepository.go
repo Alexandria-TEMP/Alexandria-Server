@@ -76,15 +76,9 @@ func (repo *ModelRepository[T]) Delete(id uint) error {
 	return result.Error
 }
 
-func (repo *ModelRepository[T]) GetAllIDs() ([]uint, error) {
-	var ids []uint
-	// using "pluck" to get a single column to extract only the IDs
-	result := repo.Database.Model(new(T)).Pluck("ID", &ids)
-	if result.Error != nil {
-		return nil, fmt.Errorf("could not retrieve IDs of model: %w", result.Error)
-	}
-
-	return ids, nil
+func (repo *ModelRepository[T]) GetFields(wanted []interface{}) ([]interface{}, error) {
+	result := repo.Database.Model(new(T)).Find(&wanted)
+	return wanted, result.Error
 }
 
 func (repo *ModelRepository[T]) Query(conds ...interface{}) ([]T, error) {

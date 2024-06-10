@@ -236,14 +236,13 @@ func (memberController *MemberController) DeleteMember(c *gin.Context) {
 // TODO this should eventually be paginated?
 // @Tags		members
 // @Produce		json
-// @Success		200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
+// @Success		200		{array}		models.MemberShortFormDTO
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/members	[get]
 func (memberController *MemberController) GetAllMembers(c *gin.Context) {
-	// TODO: this should probably not return 400, because how can it be a bad request?
 	members, err := memberController.MemberService.GetAllMembers()
+
 	// if there was an error, print it and return status 404: not found
 	if err != nil {
 		fmt.Println(err)
@@ -252,9 +251,9 @@ func (memberController *MemberController) GetAllMembers(c *gin.Context) {
 		return
 	}
 
-	// if correct response send the member ids back
+	// if correct response send the member ids and names back
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, members)
+	c.JSON(http.StatusOK, &members)
 }
 
 // GetMemberPosts godoc

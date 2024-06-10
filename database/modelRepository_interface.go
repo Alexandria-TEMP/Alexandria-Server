@@ -5,7 +5,7 @@ type ModelRepositoryInterface[T Model] interface {
 	GetByID(id uint) (T, error)
 	Update(object T) (T, error)
 	Delete(id uint) error
-	GetAllIDs() ([]uint, error)
+	GetFields(wanted []interface{}) ([]interface{}, error)
 	Query(conds ...interface{}) ([]T, error)
 	QueryPaginated(page, size int, conds ...interface{}) ([]T, error)
 }

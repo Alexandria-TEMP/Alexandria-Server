@@ -71,10 +71,10 @@ func (mr *MockMemberServiceMockRecorder) DeleteMember(memberID any) *gomock.Call
 }
 
 // GetAllMembers mocks base method.
-func (m *MockMemberService) GetAllMembers() ([]uint, error) {
+func (m *MockMemberService) GetAllMembers() ([]*models.MemberShortFormDTO, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllMembers")
-	ret0, _ := ret[0].([]uint)
+	ret0, _ := ret[0].([]*models.MemberShortFormDTO)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -57,7 +57,17 @@ func (memberService *MemberService) DeleteMember(memberID uint) error {
 	return err
 }
 
-func (memberService *MemberService) GetAllMembers() ([]uint, error) {
-	result, err := memberService.MemberRepository.GetAllIDs()
-	return result, err
+func (memberService *MemberService) GetAllMembers() ([]*models.MemberShortFormDTO, error) {
+	members, err := memberService.MemberRepository.Query()
+
+	shortFormDTOs := make([]*models.MemberShortFormDTO, len(members))
+	for i, member := range members {
+		shortFormDTOs[i] = &models.MemberShortFormDTO{
+			ID:        member.ID,
+			FirstName: member.FirstName,
+			LastName:  member.LastName,
+		}
+	}
+
+	return shortFormDTOs, err
 }

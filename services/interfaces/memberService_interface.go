@@ -13,5 +13,5 @@ type MemberService interface {
 	CreateMember(memberForm *forms.MemberCreationForm, userFields *tags.ScientificFieldTagContainer) (*models.Member, error)
 	UpdateMember(updatedMember *models.MemberDTO, userFields *tags.ScientificFieldTagContainer) error
 	DeleteMember(memberID uint) error
-	GetAllMembers() ([]uint, error)
+	GetAllMembers() ([]*models.MemberShortFormDTO, error)
 }

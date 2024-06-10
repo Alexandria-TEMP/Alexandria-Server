@@ -29,6 +29,9 @@ func beforeEach() {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		},
 	}
 
 	memberRepository = ModelRepository[*models.Member]{Database: testDB}
@@ -73,6 +76,9 @@ func TestCreateWithID(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		},
 	}
 
 	err := memberRepository.Create(&memberWithID)
@@ -95,6 +101,9 @@ func TestCreateFails(t *testing.T) {
 
 	memberA := models.Member{
 		Model: gorm.Model{ID: 5},
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		},
 	}
 
 	err := memberRepository.Create(&memberA)
@@ -126,6 +135,9 @@ func TestGetById(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		},
 	}
 
 	err := memberRepository.Create(&model)
@@ -196,6 +208,9 @@ func TestUpdateWithNewModelWithSameID(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		},
 	}
 
 	updated, err := memberRepository.Update(&newModel)
@@ -273,6 +288,9 @@ func TestUpdateWithNonExistingID(t *testing.T) {
 		Email:       "C",
 		Password:    "D",
 		Institution: "E",
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		},
 	}
 
 	_, err = memberRepository.Update(&newModel)
@@ -373,6 +391,97 @@ func TestGetPreloadedAssociations(t *testing.T) {
 	}
 }
 
+// func TestGetQueryFieldsSimple(t *testing.T) {
+// 	if testing.Short() {
+// 		t.SkipNow()
+// 	}
+
+// 	beforeEach()
+// 	t.Cleanup(afterEach)
+// 	fmt.Println("All is well up to point 1")
+// 	// Create dummy members in the database, with specific IDs
+// 	membersToCreate := []models.Member{
+// 		{Model: gorm.Model{ID: 5},
+// 			FirstName:   "one",
+// 			LastName:    "One",
+// 			Institution: "TU Delft",
+// 			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+// 				ScientificFieldTags: []*tags.ScientificFieldTag{},
+// 			}},
+// 		{Model: gorm.Model{ID: 10},
+// 			FirstName:   "two",
+// 			LastName:    "Two",
+// 			Institution: "Vrije Universiteit Berlin",
+// 			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+// 				ScientificFieldTags: []*tags.ScientificFieldTag{},
+// 			}},
+// 		{Model: gorm.Model{ID: 12},
+// 			FirstName:   "three",
+// 			LastName:    "Three",
+// 			Institution: "Politechnika Poznanska",
+// 			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+// 				ScientificFieldTags: []*tags.ScientificFieldTag{},
+// 			}},
+// 	}
+
+// 	for _, member := range membersToCreate {
+// 		if err := memberRepository.Create(&member); err != nil {
+// 			t.Fatal(err)
+// 		}
+// 	}
+
+// 	fmt.Println("All is well up to point 2")
+
+// 	// Try to get all members in the database
+// 	fetchedMembers, err := memberRepository.GetFields([]models.MemberShortFormDTO{})
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	fmt.Println("All is well up to point 3")
+// 	// cast result as the expected data type
+
+// 	memberShortFormDTOs := fetchedMembers.([]models.MemberShortFormDTO)
+// 	fmt.Println("All is well up to point 4")
+// 	// define expected result
+// 	expectedMemberShortFormDTOs := []models.MemberShortFormDTO{
+// 		{
+// 			ID:        5,
+// 			FirstName: "one",
+// 			LastName:  "One",
+// 		},
+// 		{
+// 			ID:        10,
+// 			FirstName: "two",
+// 			LastName:  "Two",
+// 		},
+// 		{
+// 			ID:        12,
+// 			FirstName: "three",
+// 			LastName:  "Three",
+// 		},
+// 	}
+
+// 	// Check that the results have the same length
+// 	if len(memberShortFormDTOs) != len(expectedMemberShortFormDTOs) {
+// 		t.Fatalf("expected %d records, got %d", len(expectedMemberShortFormDTOs), len(memberShortFormDTOs))
+// 	}
+
+// 	fmt.Println("All is well up to point 5")
+
+// 	// Check each fetched member's ID, first and last name
+// 	for i, fetchedMember := range memberShortFormDTOs {
+// 		if fetchedMember.ID != expectedMemberShortFormDTOs[i].ID {
+// 			t.Fatalf("encountered ID %d expecting %d", fetchedMember.ID, expectedMemberShortFormDTOs[i].ID)
+// 		}
+// 		if fetchedMember.FirstName != expectedMemberShortFormDTOs[i].FirstName {
+// 			t.Fatalf("encountered first name %s expecting %s", fetchedMember.FirstName, expectedMemberShortFormDTOs[i].FirstName)
+// 		}
+// 		if fetchedMember.LastName != expectedMemberShortFormDTOs[i].LastName {
+// 			t.Fatalf("encountered last name %s expecting %s", fetchedMember.LastName, expectedMemberShortFormDTOs[i].LastName)
+// 		}
+// 	}
+// }
+
 func TestQuerySimple(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
@@ -383,9 +492,18 @@ func TestQuerySimple(t *testing.T) {
 
 	// Create dummy members in the database, with specific IDs
 	membersToCreate := []models.Member{
-		{Model: gorm.Model{ID: 5}},
-		{Model: gorm.Model{ID: 10}},
-		{Model: gorm.Model{ID: 12}},
+		{Model: gorm.Model{ID: 5},
+			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+				ScientificFieldTags: []*tags.ScientificFieldTag{},
+			}},
+		{Model: gorm.Model{ID: 10},
+			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+				ScientificFieldTags: []*tags.ScientificFieldTag{},
+			}},
+		{Model: gorm.Model{ID: 12},
+			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+				ScientificFieldTags: []*tags.ScientificFieldTag{},
+			}},
 	}
 
 	for _, member := range membersToCreate {
@@ -449,10 +567,12 @@ func TestQueryPaginated(t *testing.T) {
 		10, 11, 12, 13, 15, 20, 21, 41,
 		42, 43, 60, 61, 62, 78, 88,
 	}
-
+	container := tags.ScientificFieldTagContainer{
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
+	}
 	// Add members with the above IDs to the database
 	for _, memberID := range memberIDs {
-		if err := memberRepository.Create(&models.Member{Model: gorm.Model{ID: memberID}}); err != nil {
+		if err := memberRepository.Create(&models.Member{Model: gorm.Model{ID: memberID}, ScientificFieldTagContainer: container}); err != nil {
 			t.Fatal(err)
 		}
 	}
