@@ -28,12 +28,12 @@ func postCollaboratorServiceSetup(t *testing.T) {
 	}
 
 	// Setup mocks
-	memberRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 	postCollaboratorRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.PostCollaborator](mockCtrl)
 
 	// Setup SUT
 	postCollaboratorService = PostCollaboratorService{
-		MemberRepository:           memberRepositoryMock,
+		MemberRepository:           mockMemberRepository,
 		PostCollaboratorRepository: postCollaboratorRepositoryMock,
 	}
 }
@@ -51,8 +51,8 @@ func TestMembersToPostCollaboratorsGoodWeather(t *testing.T) {
 	collaborationType := models.Contributor
 
 	// Setup mock function return values
-	memberRepositoryMock.EXPECT().GetByID(memberA.ID).Return(&memberA, nil).Times(1)
-	memberRepositoryMock.EXPECT().GetByID(memberB.ID).Return(&memberB, nil).Times(1)
+	mockMemberRepository.EXPECT().GetByID(memberA.ID).Return(&memberA, nil).Times(1)
+	mockMemberRepository.EXPECT().GetByID(memberB.ID).Return(&memberB, nil).Times(1)
 
 	// Function under test
 	createdPostCollaborators, err := postCollaboratorService.MembersToPostCollaborators(memberIDs, anonymous, collaborationType)

@@ -341,10 +341,12 @@ func TestGetPreloadedAssociations(t *testing.T) {
 
 	createdProjectPost := models.ProjectPost{
 		Post: models.Post{
-			Collaborators:       []*models.PostCollaborator{},
-			Title:               "TEST POST",
-			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{},
+			Collaborators: []*models.PostCollaborator{},
+			Title:         "TEST POST",
+			PostType:      models.Project,
+			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+				ScientificFieldTags: []*tags.ScientificFieldTag{},
+			},
 			DiscussionContainer: models.DiscussionContainer{
 				Discussions: []*models.Discussion{},
 			},

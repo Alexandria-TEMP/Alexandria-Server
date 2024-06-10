@@ -8,7 +8,7 @@ type MemberCreationForm struct {
 	// TODO: some hashing or semblance of security
 	Password              string `json:"password"`
 	Institution           string `json:"institution"`
-	ScientificFieldTagIDs []uint `json:"scientificFieldTagIds"`
+	ScientificFieldTagIDs []uint `json:"scientificFieldTagIDs"`
 }
 
 // Whether the form itself contains valid data. Should NOT contain business logic (such as "if Foo > 0, Bar may not be 1")

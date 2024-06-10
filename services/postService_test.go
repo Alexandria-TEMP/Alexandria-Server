@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,13 +25,13 @@ func postServiceSetup(t *testing.T) {
 
 	// Setup mocks
 	postRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
-	memberRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 	postCollaboratorServiceMock = mocks.NewMockPostCollaboratorService(mockCtrl)
 
 	// Setup SUT
 	postService = PostService{
 		PostRepository:          postRepositoryMock,
-		MemberRepository:        memberRepositoryMock,
+		MemberRepository:        mockMemberRepository,
 		PostCollaboratorService: postCollaboratorServiceMock,
 	}
 
@@ -47,10 +48,10 @@ func postServiceSetup(t *testing.T) {
 		Model: gorm.Model{ID: 12},
 	}
 
-	memberRepositoryMock.EXPECT().GetByID(memberA.ID).Return(&memberA, nil).AnyTimes()
-	memberRepositoryMock.EXPECT().GetByID(memberB.ID).Return(&memberB, nil).AnyTimes()
-	memberRepositoryMock.EXPECT().GetByID(memberC.ID).Return(&memberC, nil).AnyTimes()
-	memberRepositoryMock.EXPECT().GetByID(uint(0)).Return(nil, fmt.Errorf("member does not exist")).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(memberA.ID).Return(&memberA, nil).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(memberB.ID).Return(&memberB, nil).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(memberC.ID).Return(&memberC, nil).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(uint(0)).Return(nil, fmt.Errorf("member does not exist")).AnyTimes()
 }
 
 func postServiceTeardown() {
@@ -125,7 +126,7 @@ func TestCreatePostNonExistingMembers(t *testing.T) {
 		Title:               "My Broken Post",
 		Anonymous:           false,
 		PostType:            models.Reflection,
-		ScientificFieldTags: ScientificFieldTags: []*tags.ScientificFieldTag{},
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	// Setup mock function return values
@@ -151,10 +152,10 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 
 	// The input we will be sending to the function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs: []uint{memberA.ID, memberB.ID},
-		Title:           "My Awesome Question",
-		Anonymous:       true,
-		PostType:        models.Question,
+		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
+		Title:               "My Awesome Question",
+		Anonymous:           true,
+		PostType:            models.Question,
 		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
@@ -255,11 +256,13 @@ func TestGetPost(t *testing.T) {
 	t.Cleanup(postServiceTeardown)
 
 	databasePost := &models.Post{
-		Model:               gorm.Model{ID: 5},
-		Collaborators:       []*models.PostCollaborator{},
-		Title:               "Hello, world!",
-		PostType:            models.Project,
-		ScientificFieldTags: []tags.ScientificField{},
+		Model:         gorm.Model{ID: 5},
+		Collaborators: []*models.PostCollaborator{},
+		Title:         "Hello, world!",
+		PostType:      models.Project,
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		},
 		DiscussionContainer: models.DiscussionContainer{
 			Model:       gorm.Model{ID: 6},
 			Discussions: []*models.Discussion{},

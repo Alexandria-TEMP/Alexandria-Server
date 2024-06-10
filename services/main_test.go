@@ -19,16 +19,16 @@ var (
 	projectPostRepositoryMock        *mocks.MockModelRepositoryInterface[*models.ProjectPost]
 	postCollaboratorRepositoryMock   *mocks.MockModelRepositoryInterface[*models.PostCollaborator]
 	branchCollaboratorRepositoryMock *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
+	mockMemberRepository             *mocks.MockModelRepositoryInterface[*models.Member]
 
 	postCollaboratorServiceMock   *mocks.MockPostCollaboratorService
 	branchCollaboratorServiceMock *mocks.MockBranchCollaboratorService
 
-	memberService        MemberService
-	exampleMember        models.Member
-	exampleMemberDTO     models.MemberDTO
-	exampleSTag1         *tags.ScientificFieldTag
-	exampleSTag2         *tags.ScientificFieldTag
-	mockMemberRepository *mocks.MockModelRepositoryInterface[*models.Member]
+	memberService    MemberService
+	exampleMember    models.Member
+	exampleMemberDTO models.MemberDTO
+	exampleSTag1     *tags.ScientificFieldTag
+	exampleSTag2     *tags.ScientificFieldTag
 
 	memberA, memberB, memberC models.Member
 )

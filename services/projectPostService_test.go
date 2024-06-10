@@ -31,7 +31,7 @@ func projectPostServiceSetup(t *testing.T) {
 
 	// Create mocks
 	projectPostRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
-	memberRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 
 	postCollaboratorServiceMock = mocks.NewMockPostCollaboratorService(mockCtrl)
 	branchCollaboratorServiceMock = mocks.NewMockBranchCollaboratorService(mockCtrl)
@@ -39,7 +39,7 @@ func projectPostServiceSetup(t *testing.T) {
 	// Setup SUT
 	projectPostService = ProjectPostService{
 		ProjectPostRepository:     projectPostRepositoryMock,
-		MemberRepository:          memberRepositoryMock,
+		MemberRepository:          mockMemberRepository,
 		PostCollaboratorService:   postCollaboratorServiceMock,
 		BranchCollaboratorService: branchCollaboratorServiceMock,
 	}
@@ -60,7 +60,7 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 			Title:               "My Awesome Project Post",
 			Anonymous:           false,
 			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
 		},
 		CompletionStatus:   models.Ongoing,
 		FeedbackPreference: models.FormalFeedback,
@@ -91,9 +91,11 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 				{Member: memberA, CollaborationType: models.Author},
 				{Member: memberB, CollaborationType: models.Author},
 			},
-			Title:               "My Awesome Project Post",
-			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+			Title:    "My Awesome Project Post",
+			PostType: models.Project,
+			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+				ScientificFieldTags: []*tags.ScientificFieldTag{},
+			},
 			DiscussionContainer: models.DiscussionContainer{
 				Discussions: []*models.Discussion{},
 			},
@@ -102,7 +104,9 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 			{
 				NewPostTitle:            "My Awesome Project Post",
 				UpdatedCompletionStatus: models.Ongoing,
-				UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
+				UpdatedScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+					ScientificFieldTags: []*tags.ScientificFieldTag{},
+				},
 				Collaborators: []*models.BranchCollaborator{
 					{Member: memberA}, {Member: memberB},
 				},
@@ -138,7 +142,7 @@ func TestCreateProjectPostDatabaseFailure(t *testing.T) {
 			Title:               "My Broken Project Post",
 			Anonymous:           true,
 			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{},
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
 		},
 		CompletionStatus:   models.Completed,
 		FeedbackPreference: models.FormalFeedback,
@@ -172,7 +176,7 @@ func TestCreateProjectPostWrongPostType(t *testing.T) {
 			Title:               "",
 			Anonymous:           true,
 			PostType:            models.Question,
-			ScientificFieldTags: []tags.ScientificField{},
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
 		},
 		CompletionStatus:   models.Idea,
 		FeedbackPreference: models.DiscussionFeedback,
@@ -201,7 +205,7 @@ func TestCreateProjectPostCollaboratorsFail(t *testing.T) {
 			Title:               "",
 			Anonymous:           false,
 			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{},
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
 		},
 		CompletionStatus:   models.Idea,
 		FeedbackPreference: models.DiscussionFeedback,
@@ -233,7 +237,7 @@ func TestCreateProjectBranchCollaboratorsFail(t *testing.T) {
 			Title:               "",
 			Anonymous:           false,
 			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{},
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
 		},
 		CompletionStatus:   models.Idea,
 		FeedbackPreference: models.DiscussionFeedback,
@@ -265,11 +269,13 @@ func TestGetProjectPost(t *testing.T) {
 	databasePost := &models.ProjectPost{
 		Model: gorm.Model{ID: 10},
 		Post: models.Post{
-			Model:               gorm.Model{ID: 20},
-			Collaborators:       []*models.PostCollaborator{},
-			Title:               "My Awesome Project Post",
-			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{},
+			Model:         gorm.Model{ID: 20},
+			Collaborators: []*models.PostCollaborator{},
+			Title:         "My Awesome Project Post",
+			PostType:      models.Project,
+			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+				ScientificFieldTags: []*tags.ScientificFieldTag{},
+			},
 			DiscussionContainer: models.DiscussionContainer{
 				Model:       gorm.Model{ID: 1},
 				Discussions: []*models.Discussion{},
