@@ -93,9 +93,12 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 			ProjectPostService: serviceEnv.projectPostService,
 		},
 		discussionController: &controllers.DiscussionController{},
-		filterController:     &controllers.FilterController{},
-		branchController:     &controllers.BranchController{},
-		tagController:        &controllers.TagController{},
+		filterController: &controllers.FilterController{
+			PostService:        serviceEnv.postService,
+			ProjectPostService: serviceEnv.projectPostService,
+		},
+		branchController: &controllers.BranchController{},
+		tagController:    &controllers.TagController{},
 	}
 }
 

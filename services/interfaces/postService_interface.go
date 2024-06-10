@@ -11,4 +11,7 @@ type PostService interface {
 	GetPost(postID uint) (*models.Post, error)
 	CreatePost(form *forms.PostCreationForm) (*models.Post, error)
 	UpdatePost(updatedPost *models.Post) error
+
+	// Return a filtered list of post IDs
+	Filter(page, size int, form forms.FilterForm) ([]uint, error)
 }
