@@ -12,7 +12,7 @@ type TagController struct {
 // @Description Returns all scientific tags (an array of strings) in the database
 // @Tags 		tags
 // @Produce		json
-// @Success 	200		{array}		tags.ScientificFieldTag
+// @Success 	200		{array}		models.ScientificField
 // @Failure		400
 // @Failure		500
 // @Router 		/tags/scientific	[get]
@@ -25,7 +25,7 @@ func (tagController *TagController) GetScientificTags(_ *gin.Context) {
 // @Description Returns every possible completion status that a Post can have
 // @Tags		tags
 // @Produce		json
-// @Success		200		{array}		tags.CompletionStatus
+// @Success		200		{array}		models.ProjectCompletionStatus
 // @Failure		400
 // @Failure		500
 // @Router		/tags/completion-status	[get]
@@ -38,7 +38,7 @@ func (tagController *TagController) GetCompletionStatusTags(_ *gin.Context) {
 // @Description Returns every possible post type that a Post can have
 // @Tags		tags
 // @Produce		json
-// @Success		200		{array}		tags.PostType
+// @Success		200		{array}		models.PostType
 // @Failure		400
 // @Failure		500
 // @Router		/tags/post-type	[get]
@@ -51,7 +51,7 @@ func (tagController *TagController) GetPostTypeTags(_ *gin.Context) {
 // @Description Returns every possible feedback preference that a Project Post can have
 // @Tags		tags
 // @Produce		json
-// @Success		200		{array}		tags.FeedbackPreference
+// @Success		200		{array}		models.ProjectFeedbackPreference
 // @Failure		400
 // @Failure		500
 // @Router		/tags/feedback-preference	[get]

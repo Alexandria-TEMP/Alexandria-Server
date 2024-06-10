@@ -124,16 +124,13 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 }
             }
         },
-        "/branches/reviews/{reviewID}": {
-            "get": {
-                "description": "Returns a review with given ID",
+        "/branches/reviews": {
+            "post": {
+                "description": "Adds a branchreview to a branch",
                 "consumes": [
                     "application/json"
                 ],
@@ -143,11 +140,61 @@ const docTemplate = `{
                 "tags": [
                     "branches"
                 ],
-                "summary": "Returns a review",
+                "summary": "Adds a branchreview to a branch",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "review ID",
+                        "description": "branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "branchreview creation form",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.ReviewCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.BranchReviewDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/branches/reviews/{reviewID}": {
+            "get": {
+                "description": "Returns a branchreview with given ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Returns a branchreview",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "branchreview ID",
                         "name": "reviewID",
                         "in": "path",
                         "required": true
@@ -157,7 +204,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ReviewDTO"
+                            "$ref": "#/definitions/models.BranchReviewDTO"
                         }
                     },
                     "400": {
@@ -283,9 +330,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/branches/{branchID}/can-review/{memberID}": {
+        "/branches/{branchID}/branchreview-statuses": {
             "get": {
-                "description": "Returns true if the user fulfills the requirements to review the branch\nReturns false if user is unauthorized to review the branch",
+                "description": "Returns an array of the statuses of all the reviews of this branch",
                 "consumes": [
                     "application/json"
                 ],
@@ -295,7 +342,48 @@ const docTemplate = `{
                 "tags": [
                     "branches"
                 ],
-                "summary": "Returns whether the user is allowed to review this branch",
+                "summary": "Returns status of all branch reviews",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.BranchOverallReviewStatus"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/branches/{branchID}/can-branchreview/{memberID}": {
+            "get": {
+                "description": "Returns true if the user fulfills the requirements to branchreview the branch\nReturns false if user is unauthorized to branchreview the branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Returns whether the user is allowed to branchreview this branch",
                 "parameters": [
                     {
                         "type": "string",
@@ -510,94 +598,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found"
-                    }
-                }
-            }
-        },
-        "/branches/{branchID}/review-statuses": {
-            "get": {
-                "description": "Returns an array of the statuses of all the reviews of this branch",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Returns status of all branch reviews",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "branch ID",
-                        "name": "branchID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.ReviewStatus"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    }
-                }
-            }
-        },
-        "/branches/{branchID}/reviews": {
-            "post": {
-                "description": "Adds a review to a branch",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Adds a review to a branch",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "branch ID",
-                        "name": "branchID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "review creation form",
-                        "name": "form",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/forms.ReviewCreationForm"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1547,7 +1547,7 @@ const docTemplate = `{
         },
         "/posts": {
             "put": {
-                "description": "Update any number of the aspects of a question or discussion post",
+                "description": "Update any number of aspects of a question or discussion post",
                 "consumes": [
                     "application/json"
                 ],
@@ -1585,7 +1585,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create a new question or discussion post",
+                "description": "Create a new question or discussion post. Cannot be a project post.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1754,7 +1754,7 @@ const docTemplate = `{
         },
         "/posts/{postID}": {
             "get": {
-                "description": "Get a post by post ID",
+                "description": "Get a post by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1764,7 +1764,7 @@ const docTemplate = `{
                 "tags": [
                     "posts"
                 ],
-                "summary": "Get post",
+                "summary": "Get post by ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -2166,7 +2166,7 @@ const docTemplate = `{
         },
         "/project-posts/{postID}/branches-by-status": {
             "get": {
-                "description": "Returns all branch IDs of this project post, grouped by each branch's review status",
+                "description": "Returns all branch IDs of this project post, grouped by each branch's branchreview status",
                 "consumes": [
                     "application/json"
                 ],
@@ -2221,7 +2221,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.CompletionStatus"
+                                "$ref": "#/definitions/models.ProjectCompletionStatus"
                             }
                         }
                     },
@@ -2250,7 +2250,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.FeedbackPreference"
+                                "$ref": "#/definitions/models.ProjectFeedbackPreference"
                             }
                         }
                     },
@@ -2279,7 +2279,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.PostType"
+                                "$ref": "#/definitions/models.PostType"
                             }
                         }
                     },
@@ -2308,7 +2308,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.ScientificFieldTag"
+                                "$ref": "#/definitions/models.ScientificField"
                             }
                         }
                     },
@@ -2324,7 +2324,41 @@ const docTemplate = `{
     },
     "definitions": {
         "forms.BranchCreationForm": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "anonymous": {
+                    "type": "boolean"
+                },
+                "branchTitle": {
+                    "type": "string"
+                },
+                "collaboratingMemberIDs": {
+                    "description": "The branch's metadata",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "projectPostID": {
+                    "type": "integer"
+                },
+                "updatedCompletionStatus": {
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                },
+                "updatedFeedbackPreferences": {
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                },
+                "updatedPostTitle": {
+                    "description": "Changes made by the branch",
+                    "type": "string"
+                },
+                "updatedScientificFields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ScientificField"
+                    }
+                }
+            }
         },
         "forms.DiscussionCreationForm": {
             "type": "object",
@@ -2376,7 +2410,7 @@ const docTemplate = `{
                 "fields": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/tags.ScientificFieldTag"
+                        "$ref": "#/definitions/models.ScientificField"
                     }
                 },
                 "firstName": {
@@ -2397,24 +2431,23 @@ const docTemplate = `{
         "forms.PostCreationForm": {
             "type": "object",
             "properties": {
+                "ScientificFields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ScientificField"
+                    }
+                },
                 "anonymous": {
                     "type": "boolean"
                 },
                 "authorMemberIDs": {
-                    "description": "Members that are authors of the post",
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
                 },
                 "postType": {
-                    "$ref": "#/definitions/tags.PostType"
-                },
-                "scientificFieldTags": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/tags.ScientificField"
-                    }
+                    "$ref": "#/definitions/models.PostType"
                 },
                 "title": {
                     "type": "string"
@@ -2424,14 +2457,14 @@ const docTemplate = `{
         "forms.ProjectPostCreationForm": {
             "type": "object",
             "properties": {
-                "completionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
-                },
-                "feedbackPreference": {
-                    "$ref": "#/definitions/tags.FeedbackPreference"
-                },
                 "postCreationForm": {
                     "$ref": "#/definitions/forms.PostCreationForm"
+                },
+                "projectCompletionStatus": {
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                },
+                "projectFeedbackPreference": {
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 }
             }
         },
@@ -2441,16 +2474,16 @@ const docTemplate = `{
         "forms.ReviewCreationForm": {
             "type": "object",
             "properties": {
-                "branchDecision": {
-                    "$ref": "#/definitions/models.BranchDecision"
-                },
                 "branchID": {
                     "type": "integer"
+                },
+                "branchReviewDecision": {
+                    "$ref": "#/definitions/models.BranchReviewDecision"
                 },
                 "feedback": {
                     "type": "string"
                 },
-                "memberID": {
+                "reviewingMemberID": {
                     "type": "integer"
                 }
             }
@@ -2460,9 +2493,6 @@ const docTemplate = `{
             "properties": {
                 "branchID": {
                     "type": "integer"
-                },
-                "collaborationType": {
-                    "$ref": "#/definitions/models.CollaborationType"
                 },
                 "id": {
                     "type": "integer"
@@ -2475,20 +2505,24 @@ const docTemplate = `{
         "models.BranchDTO": {
             "type": "object",
             "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "branch_title": {
+                "UpdatedPostTitle": {
+                    "description": "MR's proposed changes",
                     "type": "string"
                 },
-                "collaborator_ids": {
-                    "description": "Branch metadata",
+                "branchOverallReviewStatus": {
+                    "$ref": "#/definitions/models.BranchOverallReviewStatus"
+                },
+                "branchTitle": {
+                    "type": "string"
+                },
+                "collaboratorIDs": {
+                    "description": "MR metadata",
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
                 },
-                "discussion_ids": {
+                "discussionIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -2497,37 +2531,66 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "new_post_title": {
-                    "description": "Branch's proposed changes",
-                    "type": "string"
-                },
-                "project_post_id": {
+                "projectPostIDs": {
                     "type": "integer"
                 },
-                "render_status": {
+                "renderStatus": {
                     "$ref": "#/definitions/models.RenderStatus"
                 },
-                "review_ids": {
+                "reviewIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
                     }
                 },
-                "review_status": {
-                    "$ref": "#/definitions/models.ReviewStatus"
+                "updatedCompletionStatus": {
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
                 },
-                "updated_completion_status": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
-                },
-                "updated_scientific_fields": {
+                "updatedScientificFields": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/tags.ScientificField"
+                        "$ref": "#/definitions/models.ScientificField"
                     }
                 }
             }
         },
-        "models.BranchDecision": {
+        "models.BranchOverallReviewStatus": {
+            "type": "string",
+            "enum": [
+                "open for branchreview",
+                "peer reviewed",
+                "rejected"
+            ],
+            "x-enum-varnames": [
+                "BranchOpenForReview",
+                "BranchPeerReviewed",
+                "BranchRejected"
+            ]
+        },
+        "models.BranchReviewDTO": {
+            "type": "object",
+            "properties": {
+                "branchID": {
+                    "type": "integer"
+                },
+                "branchReviewDecision": {
+                    "$ref": "#/definitions/models.BranchReviewDecision"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "feedback": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "memberID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.BranchReviewDecision": {
             "type": "string",
             "enum": [
                 "rejected",
@@ -2580,6 +2643,12 @@ const docTemplate = `{
         "models.MemberDTO": {
             "type": "object",
             "properties": {
+                "ScientificFields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ScientificField"
+                    }
+                },
                 "email": {
                     "type": "string"
                 },
@@ -2597,12 +2666,6 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
-                },
-                "scientificFieldTags": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/tags.ScientificField"
-                    }
                 }
             }
         },
@@ -2626,6 +2689,12 @@ const docTemplate = `{
         "models.PostDTO": {
             "type": "object",
             "properties": {
+                "ScientificFields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ScientificField"
+                    }
+                },
                 "collaboratorIDs": {
                     "type": "array",
                     "items": {
@@ -2642,18 +2711,49 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "postType": {
-                    "$ref": "#/definitions/tags.PostType"
-                },
-                "scientificFieldTags": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/tags.ScientificField"
-                    }
+                    "$ref": "#/definitions/models.PostType"
                 },
                 "title": {
                     "type": "string"
                 }
             }
+        },
+        "models.PostType": {
+            "type": "string",
+            "enum": [
+                "project",
+                "question",
+                "reflection"
+            ],
+            "x-enum-varnames": [
+                "Project",
+                "Question",
+                "Reflection"
+            ]
+        },
+        "models.ProjectCompletionStatus": {
+            "type": "string",
+            "enum": [
+                "idea",
+                "ongoing",
+                "completed"
+            ],
+            "x-enum-varnames": [
+                "Idea",
+                "Ongoing",
+                "Completed"
+            ]
+        },
+        "models.ProjectFeedbackPreference": {
+            "type": "string",
+            "enum": [
+                "discussion feedback",
+                "formal feedback"
+            ],
+            "x-enum-varnames": [
+                "DiscussionFeedback",
+                "FormalFeedback"
+            ]
         },
         "models.ProjectPostDTO": {
             "type": "object",
@@ -2664,12 +2764,6 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "completionStatus": {
-                    "$ref": "#/definitions/tags.CompletionStatus"
-                },
-                "feedbackPreference": {
-                    "$ref": "#/definitions/tags.FeedbackPreference"
-                },
                 "id": {
                     "type": "integer"
                 },
@@ -2679,13 +2773,32 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "postDTO": {
+                "post": {
                     "$ref": "#/definitions/models.PostDTO"
                 },
-                "postReviewStatusTag": {
-                    "$ref": "#/definitions/tags.PostReviewStatus"
+                "postReviewStatus": {
+                    "$ref": "#/definitions/models.ProjectReviewStatus"
+                },
+                "projectCompletionStatus": {
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                },
+                "projectFeedbackPreference": {
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 }
             }
+        },
+        "models.ProjectReviewStatus": {
+            "type": "string",
+            "enum": [
+                "open",
+                "revision needed",
+                "reviewed"
+            ],
+            "x-enum-varnames": [
+                "Open",
+                "RevisionNeeded",
+                "Reviewed"
+            ]
         },
         "models.RenderStatus": {
             "type": "string",
@@ -2703,40 +2816,15 @@ const docTemplate = `{
         "models.ReportDTO": {
             "type": "object"
         },
-        "models.ReviewDTO": {
-            "type": "object",
-            "properties": {
-                "branchDecision": {
-                    "$ref": "#/definitions/models.BranchDecision"
-                },
-                "branchID": {
-                    "type": "integer"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "feedback": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "memberID": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.ReviewStatus": {
+        "models.ScientificField": {
             "type": "string",
             "enum": [
-                "open for review",
-                "peer reviewed",
-                "rejected"
+                "mathematics",
+                "computer science"
             ],
             "x-enum-varnames": [
-                "BranchOpenForReview",
-                "BranchPeerReviewed",
-                "BranchRejected"
+                "Mathematics",
+                "ComputerScience"
             ]
         },
         "reports.DiscussionReportDTO": {
@@ -2754,70 +2842,6 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
-        },
-        "tags.CompletionStatus": {
-            "type": "string",
-            "enum": [
-                "idea",
-                "ongoing",
-                "completed"
-            ],
-            "x-enum-varnames": [
-                "Idea",
-                "Ongoing",
-                "Completed"
-            ]
-        },
-        "tags.FeedbackPreference": {
-            "type": "string",
-            "enum": [
-                "discussion",
-                "formal feedback"
-            ],
-            "x-enum-varnames": [
-                "Discussion",
-                "FormalFeedback"
-            ]
-        },
-        "tags.PostReviewStatus": {
-            "type": "string",
-            "enum": [
-                "open",
-                "revision needed",
-                "reviewed"
-            ],
-            "x-enum-varnames": [
-                "Open",
-                "RevisionNeeded",
-                "Reviewed"
-            ]
-        },
-        "tags.PostType": {
-            "type": "string",
-            "enum": [
-                "project",
-                "question",
-                "reflection"
-            ],
-            "x-enum-varnames": [
-                "Project",
-                "Question",
-                "Reflection"
-            ]
-        },
-        "tags.ScientificField": {
-            "type": "string",
-            "enum": [
-                "mathematics",
-                "computer science"
-            ],
-            "x-enum-varnames": [
-                "Mathematics",
-                "ComputerScience"
-            ]
-        },
-        "tags.ScientificFieldTag": {
-            "type": "object"
         }
     }
 }`

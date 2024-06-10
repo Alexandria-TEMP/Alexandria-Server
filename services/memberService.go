@@ -40,21 +40,3 @@ func (memberService *MemberService) GetCollaborator(_ uint) (*models.PostCollabo
 	// TODO: actually get from database based on UUID
 	return new(models.PostCollaborator), nil
 }
-
-func (memberService *MemberService) CreateCollaborator(form *forms.CollaboratorCreationForm) *models.PostCollaborator {
-	collaborator := &models.PostCollaborator{
-		Member: form.Member,
-		// TODO: is this correct? will it assign the right thing?
-		// honestly have no clue yet
-		CollaborationType: models.CollaborationType(form.CollaborationType),
-	}
-
-	// TODO: add this one to the database as well
-
-	return collaborator
-}
-
-func (memberService *MemberService) UpdateCollaborator(_ *models.PostCollaborator) error {
-	// TODO: update data in database
-	return nil
-}

@@ -2,20 +2,28 @@ package forms
 
 import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 )
 
 type BranchCreationForm struct {
-	NewPostTitle string `json:"new_post_title"`
+	// TODO New files to add to the version
 
-	UpdatedCompletionStatus tags.CompletionStatus  `json:"updated_completion_status"`
-	UpdatedScientificFields []tags.ScientificField `json:"updated_scientific_fields"`
+	// Changes made by the branch
+	UpdatedPostTitle           string                           `json:"updatedPostTitle"`
+	UpdatedCompletionStatus    models.ProjectCompletionStatus   `json:"updatedCompletionStatus"`
+	UpdatedScientificFields    []models.ScientificField         `json:"updatedScientificFields"`
+	UpdatedFeedbackPreferences models.ProjectFeedbackPreference `json:"updatedFeedbackPreferences"`
 
-	Collaborators []*models.BranchCollaborator `json:"collaborators"`
+	// The branch's metadata
+	CollaboratingMemberIDs []uint `json:"collaboratingMemberIDs"`
+	ProjectPostID          uint   `json:"projectPostID"`
+	BranchTitle            string `json:"branchTitle"`
+	Anonymous              bool   `json:"anonymous"`
+}
 
-	ProjectPostID uint `json:"project_post_id"`
-
-	BranchTitle string `json:"branch_title"`
-
-	Anonymous bool `json:"anonymous"`
+// Whether the form itself contains valid data. Should NOT contain business logic (such as "if Foo > 0, Bar may not be 1")
+func (form *BranchCreationForm) IsValid() bool {
+	return form.UpdatedCompletionStatus.IsValid() &&
+		form.UpdatedFeedbackPreferences.IsValid() &&
+		form.UpdatedPostTitle != "" &&
+		form.BranchTitle != ""
 }

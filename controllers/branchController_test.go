@@ -23,7 +23,7 @@ func beforeEachBranch(t *testing.T) {
 	exampleBranch = models.Branch{
 		Model: gorm.Model{ID: 1},
 	}
-	exampleReview = models.Review{
+	exampleReview = models.BranchReview{
 		Model: gorm.Model{ID: 2},
 	}
 	exampleCollaborator = models.BranchCollaborator{
@@ -243,9 +243,9 @@ func TestDeleteBranch404(t *testing.T) {
 func TestGetReviewStatus200(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().GetReviewStatus(uint(1)).Return([]models.BranchDecision{models.Approved, models.Rejected}, nil)
+	mockBranchService.EXPECT().GetReviewStatus(uint(1)).Return([]models.BranchReviewDecision{models.Approved, models.Rejected}, nil)
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/review-statuses", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/branches/1/branchreview-statuses", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -258,7 +258,7 @@ func TestGetReviewStatus400(t *testing.T) {
 
 	mockBranchService.EXPECT().GetReviewStatus(gomock.Any()).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/bad/review-statuses", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/branches/bad/branchreview-statuses", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -271,7 +271,7 @@ func TestGetReviewStatus404(t *testing.T) {
 
 	mockBranchService.EXPECT().GetReviewStatus(uint(1)).Return(nil, errors.New("branch not found"))
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/review-statuses", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/branches/1/branchreview-statuses", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -308,7 +308,7 @@ func TestGetReview400(t *testing.T) {
 func TestGetReview404(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().GetReview(uint(1)).Return(exampleReview, errors.New("review not found"))
+	mockBranchService.EXPECT().GetReview(uint(1)).Return(exampleReview, errors.New("branchreview not found"))
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/reviews/1", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -373,7 +373,7 @@ func TestMemberCanReview200(t *testing.T) {
 
 	mockBranchService.EXPECT().MemberCanReview(uint(1), uint(1)).Return(true, nil)
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/can-review/1", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/branches/1/can-branchreview/1", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -386,7 +386,7 @@ func TestMemberCanReview400BranchID(t *testing.T) {
 
 	mockBranchService.EXPECT().MemberCanReview(gomock.Any(), gomock.Any()).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/bad/can-review/1", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/branches/bad/can-branchreview/1", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -399,7 +399,7 @@ func TestMemberCanReview400MemberID(t *testing.T) {
 
 	mockBranchService.EXPECT().MemberCanReview(gomock.Any(), gomock.Any()).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/can-review/bad", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/branches/1/can-branchreview/bad", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -412,7 +412,7 @@ func TestMemberCanReview404(t *testing.T) {
 
 	mockBranchService.EXPECT().MemberCanReview(uint(1), uint(1)).Return(false, errors.New("branch or member not found"))
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/members/1/can-review", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/branches/1/members/1/can-branchreview", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()

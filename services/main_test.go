@@ -14,20 +14,26 @@ var (
 	renderService RenderService
 	branchService BranchService
 
-	mockRenderService *mocks.MockRenderService
+	mockRenderService             *mocks.MockRenderService
+	mockPostCollaboratorService   *mocks.MockPostCollaboratorService
+	mockBranchCollaboratorService *mocks.MockBranchCollaboratorService
 
 	mockBranchRepository              *mocks.MockModelRepositoryInterface[*models.Branch]
+	mockPostRepository                *mocks.MockModelRepositoryInterface[*models.Post]
 	mockProjectPostRepository         *mocks.MockModelRepositoryInterface[*models.ProjectPost]
-	mockReviewRepository              *mocks.MockModelRepositoryInterface[*models.Review]
+	mockReviewRepository              *mocks.MockModelRepositoryInterface[*models.BranchReview]
 	mockBranchCollaboratorRepository  *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
 	mockDiscussionContainerRepository *mocks.MockModelRepositoryInterface[*models.DiscussionContainer]
 	mockDiscussionRepository          *mocks.MockModelRepositoryInterface[*models.Discussion]
 	mockMemberRepository              *mocks.MockModelRepositoryInterface[*models.Member]
-	mockFilesystem                    *mocks.MockFilesystem
+
+	mockFilesystem *mocks.MockFilesystem
 
 	pendingBranch *models.Branch
 	successBranch *models.Branch
 	failedBranch  *models.Branch
+
+	memberA, memberB, memberC models.Member
 
 	projectPost *models.ProjectPost
 
@@ -35,10 +41,19 @@ var (
 	cwd string
 )
 
+func setupTestSuite() {
+}
+
+func teardownTestSuite() {
+}
+
 func TestMain(m *testing.M) {
+	setupTestSuite()
+
 	cwd, _ = os.Getwd()
-
 	c, _ = gin.CreateTestContext(httptest.NewRecorder())
+	code := m.Run()
 
-	os.Exit(m.Run())
+	teardownTestSuite()
+	os.Exit(code)
 }

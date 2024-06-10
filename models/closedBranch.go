@@ -21,15 +21,15 @@ type ClosedBranch struct {
 	// ProjectPost has many ClosedBranch
 	ProjectPostID uint
 
-	BranchDecision BranchDecision
+	BranchReviewDecision BranchReviewDecision
 }
 
 type ClosedBranchDTO struct {
-	ID                 uint
-	BranchID           uint
-	SupercededBranchID *uint
-	ProjectPostID      uint
-	BranchDecision     BranchDecision
+	ID                   uint                 `json:"id"`
+	BranchID             uint                 `json:"branchID"`
+	SupercededBranchID   *uint                `json:"supercededBranchID"`
+	ProjectPostID        uint                 `json:"projectPostID"`
+	BranchReviewDecision BranchReviewDecision `json:"branchReviewDecision"`
 }
 
 func (model *ClosedBranch) GetID() uint {
@@ -42,7 +42,7 @@ func (model *ClosedBranch) IntoDTO() ClosedBranchDTO {
 		model.BranchID,
 		model.SupercededBranchID,
 		model.ProjectPostID,
-		model.BranchDecision,
+		model.BranchReviewDecision,
 	}
 }
 

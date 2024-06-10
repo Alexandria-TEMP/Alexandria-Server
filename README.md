@@ -47,7 +47,7 @@ SSH into `ssh [NetID]@student-linux.tudelft.nl` and when prompted enter your SSO
 - Run `go get go.uber.org/mock/gomock` and `go get github.com/golang/mock/mockgen`
 - Run `go generate ./...` to generate all mocks
 
-## Default readme info to review and consider
+## Default readme info to branchreview and consider
 
 - [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
 - [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)

@@ -1,6 +1,29 @@
 basePath: /api/v2
 definitions:
   forms.BranchCreationForm:
+    properties:
+      anonymous:
+        type: boolean
+      branchTitle:
+        type: string
+      collaboratingMemberIDs:
+        description: The branch's metadata
+        items:
+          type: integer
+        type: array
+      projectPostID:
+        type: integer
+      updatedCompletionStatus:
+        $ref: '#/definitions/models.ProjectCompletionStatus'
+      updatedFeedbackPreferences:
+        $ref: '#/definitions/models.ProjectFeedbackPreference'
+      updatedPostTitle:
+        description: Changes made by the branch
+        type: string
+      updatedScientificFields:
+        items:
+          $ref: '#/definitions/models.ScientificField'
+        type: array
     type: object
   forms.DiscussionCreationForm:
     properties:
@@ -35,7 +58,7 @@ definitions:
         type: string
       fields:
         items:
-          $ref: '#/definitions/tags.ScientificFieldTag'
+          $ref: '#/definitions/models.ScientificField'
         type: array
       firstName:
         type: string
@@ -51,50 +74,47 @@ definitions:
     type: object
   forms.PostCreationForm:
     properties:
+      ScientificFields:
+        items:
+          $ref: '#/definitions/models.ScientificField'
+        type: array
       anonymous:
         type: boolean
       authorMemberIDs:
-        description: Members that are authors of the post
         items:
           type: integer
         type: array
       postType:
-        $ref: '#/definitions/tags.PostType'
-      scientificFieldTags:
-        items:
-          $ref: '#/definitions/tags.ScientificField'
-        type: array
+        $ref: '#/definitions/models.PostType'
       title:
         type: string
     type: object
   forms.ProjectPostCreationForm:
     properties:
-      completionStatus:
-        $ref: '#/definitions/tags.CompletionStatus'
-      feedbackPreference:
-        $ref: '#/definitions/tags.FeedbackPreference'
       postCreationForm:
         $ref: '#/definitions/forms.PostCreationForm'
+      projectCompletionStatus:
+        $ref: '#/definitions/models.ProjectCompletionStatus'
+      projectFeedbackPreference:
+        $ref: '#/definitions/models.ProjectFeedbackPreference'
     type: object
   forms.ReportCreationForm:
     type: object
   forms.ReviewCreationForm:
     properties:
-      branchDecision:
-        $ref: '#/definitions/models.BranchDecision'
       branchID:
         type: integer
+      branchReviewDecision:
+        $ref: '#/definitions/models.BranchReviewDecision'
       feedback:
         type: string
-      memberID:
+      reviewingMemberID:
         type: integer
     type: object
   models.BranchCollaboratorDTO:
     properties:
       branchID:
         type: integer
-      collaborationType:
-        $ref: '#/definitions/models.CollaborationType'
       id:
         type: integer
       memberID:
@@ -102,42 +122,65 @@ definitions:
     type: object
   models.BranchDTO:
     properties:
-      anonymous:
-        type: boolean
-      branch_title:
+      UpdatedPostTitle:
+        description: MR's proposed changes
         type: string
-      collaborator_ids:
-        description: Branch metadata
+      branchOverallReviewStatus:
+        $ref: '#/definitions/models.BranchOverallReviewStatus'
+      branchTitle:
+        type: string
+      collaboratorIDs:
+        description: MR metadata
         items:
           type: integer
         type: array
-      discussion_ids:
+      discussionIDs:
         items:
           type: integer
         type: array
       id:
         type: integer
-      new_post_title:
-        description: Branch's proposed changes
-        type: string
-      project_post_id:
+      projectPostIDs:
         type: integer
-      render_status:
+      renderStatus:
         $ref: '#/definitions/models.RenderStatus'
-      review_ids:
+      reviewIDs:
         items:
           type: integer
         type: array
-      review_status:
-        $ref: '#/definitions/models.ReviewStatus'
-      updated_completion_status:
-        $ref: '#/definitions/tags.CompletionStatus'
-      updated_scientific_fields:
+      updatedCompletionStatus:
+        $ref: '#/definitions/models.ProjectCompletionStatus'
+      updatedScientificFields:
         items:
-          $ref: '#/definitions/tags.ScientificField'
+          $ref: '#/definitions/models.ScientificField'
         type: array
     type: object
-  models.BranchDecision:
+  models.BranchOverallReviewStatus:
+    enum:
+    - open for branchreview
+    - peer reviewed
+    - rejected
+    type: string
+    x-enum-varnames:
+    - BranchOpenForReview
+    - BranchPeerReviewed
+    - BranchRejected
+  models.BranchReviewDTO:
+    properties:
+      branchID:
+        type: integer
+      branchReviewDecision:
+        $ref: '#/definitions/models.BranchReviewDecision'
+      createdAt:
+        type: string
+      feedback:
+        type: string
+      id:
+        type: integer
+      memberID:
+        type: integer
+    type: object
+  models.BranchReviewDecision:
     enum:
     - rejected
     - approved
@@ -174,6 +217,10 @@ definitions:
     type: object
   models.MemberDTO:
     properties:
+      ScientificFields:
+        items:
+          $ref: '#/definitions/models.ScientificField'
+        type: array
       email:
         type: string
       firstName:
@@ -186,10 +233,6 @@ definitions:
         type: string
       password:
         type: string
-      scientificFieldTags:
-        items:
-          $ref: '#/definitions/tags.ScientificField'
-        type: array
     type: object
   models.PostCollaboratorDTO:
     properties:
@@ -204,6 +247,10 @@ definitions:
     type: object
   models.PostDTO:
     properties:
+      ScientificFields:
+        items:
+          $ref: '#/definitions/models.ScientificField'
+        type: array
       collaboratorIDs:
         items:
           type: integer
@@ -215,35 +262,69 @@ definitions:
       id:
         type: integer
       postType:
-        $ref: '#/definitions/tags.PostType'
-      scientificFieldTags:
-        items:
-          $ref: '#/definitions/tags.ScientificField'
-        type: array
+        $ref: '#/definitions/models.PostType'
       title:
         type: string
     type: object
+  models.PostType:
+    enum:
+    - project
+    - question
+    - reflection
+    type: string
+    x-enum-varnames:
+    - Project
+    - Question
+    - Reflection
+  models.ProjectCompletionStatus:
+    enum:
+    - idea
+    - ongoing
+    - completed
+    type: string
+    x-enum-varnames:
+    - Idea
+    - Ongoing
+    - Completed
+  models.ProjectFeedbackPreference:
+    enum:
+    - discussion feedback
+    - formal feedback
+    type: string
+    x-enum-varnames:
+    - DiscussionFeedback
+    - FormalFeedback
   models.ProjectPostDTO:
     properties:
       closedBranchIDs:
         items:
           type: integer
         type: array
-      completionStatus:
-        $ref: '#/definitions/tags.CompletionStatus'
-      feedbackPreference:
-        $ref: '#/definitions/tags.FeedbackPreference'
       id:
         type: integer
       openBranchIDs:
         items:
           type: integer
         type: array
-      postDTO:
+      post:
         $ref: '#/definitions/models.PostDTO'
-      postReviewStatusTag:
-        $ref: '#/definitions/tags.PostReviewStatus'
+      postReviewStatus:
+        $ref: '#/definitions/models.ProjectReviewStatus'
+      projectCompletionStatus:
+        $ref: '#/definitions/models.ProjectCompletionStatus'
+      projectFeedbackPreference:
+        $ref: '#/definitions/models.ProjectFeedbackPreference'
     type: object
+  models.ProjectReviewStatus:
+    enum:
+    - open
+    - revision needed
+    - reviewed
+    type: string
+    x-enum-varnames:
+    - Open
+    - RevisionNeeded
+    - Reviewed
   models.RenderStatus:
     enum:
     - success
@@ -256,31 +337,14 @@ definitions:
     - Failure
   models.ReportDTO:
     type: object
-  models.ReviewDTO:
-    properties:
-      branchDecision:
-        $ref: '#/definitions/models.BranchDecision'
-      branchID:
-        type: integer
-      createdAt:
-        type: string
-      feedback:
-        type: string
-      id:
-        type: integer
-      memberID:
-        type: integer
-    type: object
-  models.ReviewStatus:
+  models.ScientificField:
     enum:
-    - open for review
-    - peer reviewed
-    - rejected
+    - mathematics
+    - computer science
     type: string
     x-enum-varnames:
-    - BranchOpenForReview
-    - BranchPeerReviewed
-    - BranchRejected
+    - Mathematics
+    - ComputerScience
   reports.DiscussionReportDTO:
     properties:
       discussionID:
@@ -290,54 +354,6 @@ definitions:
     properties:
       postID:
         type: integer
-    type: object
-  tags.CompletionStatus:
-    enum:
-    - idea
-    - ongoing
-    - completed
-    type: string
-    x-enum-varnames:
-    - Idea
-    - Ongoing
-    - Completed
-  tags.FeedbackPreference:
-    enum:
-    - discussion
-    - formal feedback
-    type: string
-    x-enum-varnames:
-    - Discussion
-    - FormalFeedback
-  tags.PostReviewStatus:
-    enum:
-    - open
-    - revision needed
-    - reviewed
-    type: string
-    x-enum-varnames:
-    - Open
-    - RevisionNeeded
-    - Reviewed
-  tags.PostType:
-    enum:
-    - project
-    - question
-    - reflection
-    type: string
-    x-enum-varnames:
-    - Project
-    - Question
-    - Reflection
-  tags.ScientificField:
-    enum:
-    - mathematics
-    - computer science
-    type: string
-    x-enum-varnames:
-    - Mathematics
-    - ComputerScience
-  tags.ScientificFieldTag:
     type: object
 host: localhost:8080
 info:
@@ -474,13 +490,40 @@ paths:
       summary: Upload a new project version to a branch
       tags:
       - branches
-  /branches/{branchID}/can-review/{memberID}:
+  /branches/{branchID}/branchreview-statuses:
+    get:
+      consumes:
+      - application/json
+      description: Returns an array of the statuses of all the reviews of this branch
+      parameters:
+      - description: branch ID
+        in: path
+        name: branchID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.BranchOverallReviewStatus'
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Returns status of all branch reviews
+      tags:
+      - branches
+  /branches/{branchID}/can-branchreview/{memberID}:
     get:
       consumes:
       - application/json
       description: |-
-        Returns true if the user fulfills the requirements to review the branch
-        Returns false if user is unauthorized to review the branch
+        Returns true if the user fulfills the requirements to branchreview the branch
+        Returns false if user is unauthorized to branchreview the branch
       parameters:
       - description: branch ID
         in: path
@@ -505,7 +548,7 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-      summary: Returns whether the user is allowed to review this branch
+      summary: Returns whether the user is allowed to branchreview this branch
       tags:
       - branches
   /branches/{branchID}/discussions:
@@ -632,64 +675,6 @@ paths:
       summary: Get the repository of a branch
       tags:
       - branches
-  /branches/{branchID}/review-statuses:
-    get:
-      consumes:
-      - application/json
-      description: Returns an array of the statuses of all the reviews of this branch
-      parameters:
-      - description: branch ID
-        in: path
-        name: branchID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.ReviewStatus'
-            type: array
-        "400":
-          description: Bad Request
-        "404":
-          description: Not Found
-      summary: Returns status of all branch reviews
-      tags:
-      - branches
-  /branches/{branchID}/reviews:
-    post:
-      consumes:
-      - application/json
-      description: Adds a review to a branch
-      parameters:
-      - description: branch ID
-        in: path
-        name: branchID
-        required: true
-        type: string
-      - description: review creation form
-        in: body
-        name: form
-        required: true
-        schema:
-          $ref: '#/definitions/forms.ReviewCreationForm'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-        "404":
-          description: Not Found
-        "500":
-          description: Internal Server Error
-      summary: Adds a review to a branch
-      tags:
-      - branches
   /branches/{branchID}/tree:
     get:
       description: Get the filetree of a project of a branch
@@ -740,18 +725,49 @@ paths:
           description: Bad Request
         "404":
           description: Not Found
+      summary: Get a branch collaborator by ID
+      tags:
+      - branches
+  /branches/reviews:
+    post:
+      consumes:
+      - application/json
+      description: Adds a branchreview to a branch
+      parameters:
+      - description: branch ID
+        in: path
+        name: branchID
+        required: true
+        type: string
+      - description: branchreview creation form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.ReviewCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BranchReviewDTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
-      summary: Get a branch collaborator by ID
+      summary: Adds a branchreview to a branch
       tags:
       - branches
   /branches/reviews/{reviewID}:
     get:
       consumes:
       - application/json
-      description: Returns a review with given ID
+      description: Returns a branchreview with given ID
       parameters:
-      - description: review ID
+      - description: branchreview ID
         in: path
         name: reviewID
         required: true
@@ -762,12 +778,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ReviewDTO'
+            $ref: '#/definitions/models.BranchReviewDTO'
         "400":
           description: Bad Request
         "404":
           description: Not Found
-      summary: Returns a review
+      summary: Returns a branchreview
       tags:
       - branches
   /discussions:
@@ -1375,7 +1391,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new question or discussion post
+      description: Create a new question or discussion post. Cannot be a project post.
       parameters:
       - description: Post Creation Form
         in: body
@@ -1400,7 +1416,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update any number of the aspects of a question or discussion post
+      description: Update any number of aspects of a question or discussion post
       parameters:
       - description: Updated Post
         in: body
@@ -1450,7 +1466,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a post by post ID
+      description: Get a post by ID
       parameters:
       - description: Post ID
         in: path
@@ -1470,7 +1486,7 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-      summary: Get post
+      summary: Get post by ID
       tags:
       - posts
   /posts/{postID}/reports:
@@ -1756,7 +1772,7 @@ paths:
       consumes:
       - application/json
       description: Returns all branch IDs of this project post, grouped by each branch's
-        review status
+        branchreview status
       parameters:
       - description: post ID
         in: path
@@ -1825,7 +1841,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/tags.CompletionStatus'
+              $ref: '#/definitions/models.ProjectCompletionStatus'
             type: array
         "400":
           description: Bad Request
@@ -1845,7 +1861,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/tags.FeedbackPreference'
+              $ref: '#/definitions/models.ProjectFeedbackPreference'
             type: array
         "400":
           description: Bad Request
@@ -1864,7 +1880,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/tags.PostType'
+              $ref: '#/definitions/models.PostType'
             type: array
         "400":
           description: Bad Request
@@ -1883,7 +1899,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/tags.ScientificFieldTag'
+              $ref: '#/definitions/models.ScientificField'
             type: array
         "400":
           description: Bad Request

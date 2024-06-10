@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -17,40 +16,38 @@ func TestBranchJSONMarshaling(t *testing.T) {
 			{Model: gorm.Model{ID: 100}},
 			{Model: gorm.Model{ID: 50}},
 		},
-		Reviews: []*Review{
+		Reviews: []*BranchReview{
 			{
-				Model:          gorm.Model{ID: 2},
-				BranchID:       44,
-				Member:         Member{},
-				MemberID:       88,
-				BranchDecision: Approved,
-				Feedback:       "LGTM",
+				Model:                gorm.Model{ID: 2},
+				BranchID:             44,
+				Member:               Member{},
+				MemberID:             88,
+				BranchReviewDecision: Approved,
+				Feedback:             "LGTM",
 			},
 		},
-		ProjectPostID:           45,
-		BranchTitle:             "My Cool MR",
-		NewPostTitle:            "Updated Post Title",
-		UpdatedCompletionStatus: tags.Idea,
-		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
-		Anonymous:               false,
-		RenderStatus:            Pending,
-		ReviewStatus:            BranchOpenForReview,
+		ProjectPostID:             45,
+		BranchTitle:               "My Cool MR",
+		UpdatedPostTitle:          "Updated Post Title",
+		UpdatedCompletionStatus:   Idea,
+		UpdatedScientificFields:   []ScientificField{Mathematics},
+		RenderStatus:              Pending,
+		BranchOverallReviewStatus: BranchOpenForReview,
 	}
 
 	// should equal this DTO!
 	targetDTO := BranchDTO{
-		ID:                      44,
-		CollaboratorIDs:         []uint{100, 50},
-		ReviewIDs:               []uint{2},
-		ProjectPostID:           45,
-		BranchTitle:             "My Cool MR",
-		NewPostTitle:            "Updated Post Title",
-		UpdatedCompletionStatus: tags.Idea,
-		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
-		Anonymous:               false,
-		DiscussionIDs:           []uint{},
-		RenderStatus:            Pending,
-		ReviewStatus:            BranchOpenForReview,
+		ID:                        44,
+		CollaboratorIDs:           []uint{100, 50},
+		ReviewIDs:                 []uint{2},
+		ProjectPostID:             45,
+		BranchTitle:               "My Cool MR",
+		UpdatedPostTitle:          "Updated Post Title",
+		UpdatedCompletionStatus:   Idea,
+		UpdatedScientificFields:   []ScientificField{Mathematics},
+		DiscussionIDs:             []uint{},
+		RenderStatus:              Pending,
+		BranchOverallReviewStatus: BranchOpenForReview,
 	}
 
 	dto := BranchDTO{}

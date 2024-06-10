@@ -59,10 +59,10 @@ func (mr *MockBranchServiceMockRecorder) CreateBranch(branchCreationForm any) *g
 }
 
 // CreateReview mocks base method.
-func (m *MockBranchService) CreateReview(reviewCreationForm forms.ReviewCreationForm) (models.Review, error) {
+func (m *MockBranchService) CreateReview(reviewCreationForm forms.ReviewCreationForm) (models.BranchReview, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateReview", reviewCreationForm)
-	ret0, _ := ret[0].(models.Review)
+	ret0, _ := ret[0].(models.BranchReview)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -164,10 +164,10 @@ func (mr *MockBranchServiceMockRecorder) GetProject(branchID any) *gomock.Call {
 }
 
 // GetReview mocks base method.
-func (m *MockBranchService) GetReview(reviewID uint) (models.Review, error) {
+func (m *MockBranchService) GetReview(reviewID uint) (models.BranchReview, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetReview", reviewID)
-	ret0, _ := ret[0].(models.Review)
+	ret0, _ := ret[0].(models.BranchReview)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -179,10 +179,10 @@ func (mr *MockBranchServiceMockRecorder) GetReview(reviewID any) *gomock.Call {
 }
 
 // GetReviewStatus mocks base method.
-func (m *MockBranchService) GetReviewStatus(branchID uint) ([]models.BranchDecision, error) {
+func (m *MockBranchService) GetReviewStatus(branchID uint) ([]models.BranchReviewDecision, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetReviewStatus", branchID)
-	ret0, _ := ret[0].([]models.BranchDecision)
+	ret0, _ := ret[0].([]models.BranchReviewDecision)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

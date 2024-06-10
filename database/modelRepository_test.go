@@ -5,11 +5,13 @@ import (
 	"testing"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+
 	"gorm.io/gorm"
 )
 
 var testDB *gorm.DB
-var modelRepository ModelRepository[*models.Member]
+var memberRepository ModelRepository[*models.Member]
+var projectPostRepository ModelRepository[*models.ProjectPost]
 var member models.Member
 
 func beforeEach() {
@@ -28,12 +30,15 @@ func beforeEach() {
 		Institution: "institution",
 	}
 
-	modelRepository = ModelRepository[*models.Member]{Database: testDB}
+	memberRepository = ModelRepository[*models.Member]{Database: testDB}
+	projectPostRepository = ModelRepository[*models.ProjectPost]{Database: testDB}
 }
 
 func afterEach() {
-	// Delete all members
+	// Delete all models created by tests
 	testDB.Unscoped().Where("id >= 0").Delete(&models.Member{})
+	testDB.Unscoped().Where("id >= 0").Delete(&models.Post{})
+	testDB.Unscoped().Where("id >= 0").Delete(&models.ProjectPost{})
 }
 
 func TestCreateWithoutSpecifyingID(t *testing.T) {
@@ -44,7 +49,7 @@ func TestCreateWithoutSpecifyingID(t *testing.T) {
 	beforeEach()
 	t.Cleanup(afterEach)
 
-	err := modelRepository.Create(&member)
+	err := memberRepository.Create(&member)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +74,7 @@ func TestCreateWithID(t *testing.T) {
 		Institution: "institution",
 	}
 
-	err := modelRepository.Create(&memberWithID)
+	err := memberRepository.Create(&memberWithID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,14 +102,14 @@ func TestGetById(t *testing.T) {
 		Institution: "institution",
 	}
 
-	err := modelRepository.Create(&model)
+	err := memberRepository.Create(&model)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Try to fetch the member
 	id := model.ID
-	found, err := modelRepository.GetByID(id)
+	found, err := memberRepository.GetByID(id)
 
 	if err != nil {
 		t.Fatal(err)
@@ -128,12 +133,12 @@ func TestGetByIDReturnsError(t *testing.T) {
 
 	member.Model = gorm.Model{ID: idA}
 
-	err := modelRepository.Create(&member)
+	err := memberRepository.Create(&member)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	found, err := modelRepository.GetByID(idB)
+	found, err := memberRepository.GetByID(idB)
 	if err == nil {
 		t.Fatalf("expected not to find model, but found model with ID %d", found.Model.ID)
 	}
@@ -152,7 +157,7 @@ func TestUpdateWithNewModelWithSameID(t *testing.T) {
 	var id uint = 99
 	member.Model = gorm.Model{ID: id}
 
-	err := modelRepository.Create(&member)
+	err := memberRepository.Create(&member)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -167,7 +172,7 @@ func TestUpdateWithNewModelWithSameID(t *testing.T) {
 		Institution: "institution",
 	}
 
-	updated, err := modelRepository.Update(&newModel)
+	updated, err := memberRepository.Update(&newModel)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -194,20 +199,20 @@ func TestUpdateWithModelFetchedFromDB(t *testing.T) {
 	var id uint = 55
 	member.Model = gorm.Model{ID: id}
 
-	err := modelRepository.Create(&member)
+	err := memberRepository.Create(&member)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Fetch the model, change data, and update it
-	found, err := modelRepository.GetByID(id)
+	found, err := memberRepository.GetByID(id)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	found.FirstName = "new value"
 
-	updated, err := modelRepository.Update(found)
+	updated, err := memberRepository.Update(found)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -229,7 +234,7 @@ func TestUpdateWithNonExistingID(t *testing.T) {
 	var idA, idB uint = 100, 500
 	member.Model = gorm.Model{ID: idA}
 
-	err := modelRepository.Create(&member)
+	err := memberRepository.Create(&member)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -244,7 +249,7 @@ func TestUpdateWithNonExistingID(t *testing.T) {
 		Institution: "E",
 	}
 
-	_, err = modelRepository.Update(&newModel)
+	_, err = memberRepository.Update(&newModel)
 	if err == nil {
 		t.Fatal("expected error after update using new ID")
 	}
@@ -262,13 +267,13 @@ func TestDeleteExistingModel(t *testing.T) {
 	var id uint = 100
 	member.Model = gorm.Model{ID: id}
 
-	err := modelRepository.Create(&member)
+	err := memberRepository.Create(&member)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Delete it again
-	err = modelRepository.Delete(id)
+	err = memberRepository.Delete(id)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -286,14 +291,56 @@ func TestDeleteNonExistingModel(t *testing.T) {
 	var idA, idB uint = 100, 500
 	member.Model = gorm.Model{ID: idA}
 
-	err := modelRepository.Create(&member)
+	err := memberRepository.Create(&member)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Delete a different ID
-	err = modelRepository.Delete(idB)
+	err = memberRepository.Delete(idB)
 	if err == nil {
 		t.Fatal("deletion should have failed")
+	}
+}
+
+// Project Post contains Post. When we fetch Project Post, we want to pre-load Post
+// so that it is also included in the result. We test that here.
+func TestGetPreloadedAssociations(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	beforeEach()
+	t.Cleanup(afterEach)
+
+	createdProjectPost := models.ProjectPost{
+		Post: models.Post{
+			Collaborators:    []*models.PostCollaborator{},
+			Title:            "TEST POST",
+			PostType:         models.Project,
+			ScientificFields: []models.ScientificField{},
+			DiscussionContainer: models.DiscussionContainer{
+				Discussions: []*models.Discussion{},
+			},
+		},
+		OpenBranches:              []*models.Branch{},
+		ClosedBranches:            []*models.ClosedBranch{},
+		ProjectCompletionStatus:   models.Ongoing,
+		ProjectFeedbackPreference: models.FormalFeedback,
+		PostReviewStatus:          models.Open,
+	}
+
+	if err := projectPostRepository.Create(&createdProjectPost); err != nil {
+		log.Fatal(err)
+	}
+
+	fetchedProjectPost, err := projectPostRepository.GetByID(createdProjectPost.ID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// If pre-loading worked, the nested Post's fields will be updated.
+	if !(fetchedProjectPost.Post.Title == "TEST POST") {
+		t.Fatal("nested Post object did not pre load")
 	}
 }

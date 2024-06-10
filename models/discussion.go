@@ -37,12 +37,12 @@ type Discussion struct {
 }
 
 type DiscussionDTO struct {
-	ID        uint
-	MemberID  uint
-	ReplyIDs  []uint
-	Text      string
-	Deleted   bool
-	Anonymous bool
+	ID        uint   `json:"id"`
+	MemberID  uint   `json:"memberID"`
+	ReplyIDs  []uint `json:"replyIDs"`
+	Text      string `json:"text"`
+	Deleted   bool   `json:"deleted"`
+	Anonymous bool   `json:"anonymous"`
 }
 
 func (model *Discussion) GetID() uint {

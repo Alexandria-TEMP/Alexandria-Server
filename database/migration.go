@@ -25,7 +25,7 @@ func autoMigrateAllModels(db *gorm.DB) error {
 		&models.BranchCollaborator{},  // FK to Member, Branch
 		&models.Discussion{},          // FK to Member
 		&models.DiscussionContainer{}, // FK to Discussion
-		&models.Review{},              // FK to Branch, Member
+		&models.BranchReview{},        // FK to Branch, Member
 		&reports.DiscussionReport{},   // FK to Discussion
 		&reports.PostReport{},         // FK to Post
 	)

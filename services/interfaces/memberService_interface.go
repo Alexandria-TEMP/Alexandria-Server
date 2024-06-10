@@ -8,11 +8,9 @@ import (
 //go:generate mockgen -package=mocks -source=./memberService_interface.go -destination=../../mocks/memberService_mock.go
 
 type MemberService interface {
-	GetMember(memberID uint) (*models.Member, error)
+	GetMember(userID uint) (*models.Member, error)
 	CreateMember(memberForm *forms.MemberCreationForm) *models.Member
 	UpdateMember(updatedMember *models.Member) error
 
 	GetCollaborator(collaboratorID uint) (*models.PostCollaborator, error)
-	CreateCollaborator(collaboratorForm *forms.CollaboratorCreationForm) *models.PostCollaborator
-	UpdateCollaborator(updatedCollaborator *models.PostCollaborator) error
 }

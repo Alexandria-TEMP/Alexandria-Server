@@ -7,8 +7,12 @@ import (
 type ReviewCreationForm struct {
 	BranchID uint
 
-	MemberID uint
+	ReviewingMemberID    uint                        `json:"reviewingMemberID"`
+	BranchReviewDecision models.BranchReviewDecision `json:"branchReviewDecision"`
+	Feedback             string                      `json:"feedback"`
+}
 
-	BranchDecision models.BranchDecision
-	Feedback       string
+// Whether the form itself contains valid data. Should NOT contain business logic (such as "if Foo > 0, Bar may not be 1")
+func (form *ReviewCreationForm) IsValid() bool {
+	return form.BranchReviewDecision.IsValid()
 }

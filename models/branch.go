@@ -2,8 +2,8 @@ package models
 
 import (
 	"encoding/json"
+	"slices"
 
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -15,13 +15,24 @@ const (
 	Failure RenderStatus = "failure"
 )
 
-type ReviewStatus string
+func (enum *RenderStatus) IsValid() bool {
+	valid := []RenderStatus{Success, Pending, Failure}
+	return slices.Contains(valid, *enum)
+}
+
+// The branch's aggregated branchreview status, derived from its individual reviews' statuses
+type BranchOverallReviewStatus string
 
 const (
-	BranchOpenForReview ReviewStatus = "open for review"
-	BranchPeerReviewed  ReviewStatus = "peer reviewed"
-	BranchRejected      ReviewStatus = "rejected"
+	BranchOpenForReview BranchOverallReviewStatus = "open for branchreview"
+	BranchPeerReviewed  BranchOverallReviewStatus = "peer reviewed"
+	BranchRejected      BranchOverallReviewStatus = "rejected"
 )
+
+func (enum *BranchOverallReviewStatus) IsValid() bool {
+	valid := []BranchOverallReviewStatus{BranchOpenForReview, BranchPeerReviewed, BranchRejected}
+	return slices.Contains(valid, *enum)
+}
 
 type Branch struct {
 	gorm.Model
@@ -29,10 +40,10 @@ type Branch struct {
 	/////////////////////////////////////////////
 	// The branch's proposed changes:
 
-	NewPostTitle string
+	UpdatedPostTitle string
 
-	UpdatedCompletionStatus tags.CompletionStatus
-	UpdatedScientificFields []tags.ScientificField `gorm:"serializer:json"`
+	UpdatedCompletionStatus ProjectCompletionStatus
+	UpdatedScientificFields []ScientificField `gorm:"serializer:json"`
 
 	/////////////////////////////////////////////
 	// The branch's metadata:
@@ -40,8 +51,8 @@ type Branch struct {
 	// Branch has many BranchCollaborator
 	Collaborators []*BranchCollaborator `gorm:"foreignKey:BranchID"`
 
-	// Branch has many Review
-	Reviews []*Review `gorm:"foreignKey:BranchID"`
+	// Branch has many BranchReview
+	Reviews []*BranchReview `gorm:"foreignKey:BranchID"`
 
 	// Branch has a DiscussionContainer
 	DiscussionContainer   DiscussionContainer `gorm:"foreignKey:DiscussionContainerID"`
@@ -52,27 +63,24 @@ type Branch struct {
 
 	BranchTitle string
 
-	Anonymous bool
-
-	RenderStatus RenderStatus
-	ReviewStatus ReviewStatus
+	RenderStatus              RenderStatus
+	BranchOverallReviewStatus BranchOverallReviewStatus
 }
 
 type BranchDTO struct {
 	ID uint `json:"id"`
-	// Branch's proposed changes
-	NewPostTitle            string                 `json:"new_post_title"`
-	UpdatedCompletionStatus tags.CompletionStatus  `json:"updated_completion_status"`
-	UpdatedScientificFields []tags.ScientificField `json:"updated_scientific_fields"`
-	// Branch metadata
-	CollaboratorIDs []uint       `json:"collaborator_ids"`
-	ReviewIDs       []uint       `json:"review_ids"`
-	ProjectPostID   uint         `json:"project_post_id"`
-	BranchTitle     string       `json:"branch_title"`
-	Anonymous       bool         `json:"anonymous"`
-	RenderStatus    RenderStatus `json:"render_status"`
-	DiscussionIDs   []uint       `json:"discussion_ids"`
-	ReviewStatus    ReviewStatus `json:"review_status"`
+	// MR's proposed changes
+	UpdatedPostTitle        string                  `json:"UpdatedPostTitle"`
+	UpdatedCompletionStatus ProjectCompletionStatus `json:"updatedCompletionStatus"`
+	UpdatedScientificFields []ScientificField       `json:"updatedScientificFields"`
+	// MR metadata
+	CollaboratorIDs           []uint                    `json:"collaboratorIDs"`
+	ReviewIDs                 []uint                    `json:"reviewIDs"`
+	ProjectPostID             uint                      `json:"projectPostIDs"`
+	BranchTitle               string                    `json:"branchTitle"`
+	RenderStatus              RenderStatus              `json:"renderStatus"`
+	DiscussionIDs             []uint                    `json:"discussionIDs"`
+	BranchOverallReviewStatus BranchOverallReviewStatus `json:"branchOverallReviewStatus"`
 }
 
 func (model *Branch) GetID() uint {
@@ -82,17 +90,16 @@ func (model *Branch) GetID() uint {
 func (model *Branch) IntoDTO() BranchDTO {
 	return BranchDTO{
 		model.ID,
-		model.NewPostTitle,
+		model.UpdatedPostTitle,
 		model.UpdatedCompletionStatus,
 		model.UpdatedScientificFields,
 		branchCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
 		model.ProjectPostID,
 		model.BranchTitle,
-		model.Anonymous,
 		model.RenderStatus,
 		discussionContainerIntoIDs(&model.DiscussionContainer),
-		model.ReviewStatus,
+		model.BranchOverallReviewStatus,
 	}
 }
 
@@ -112,11 +119,11 @@ func branchCollaboratorsToIDs(collaborators []*BranchCollaborator) []uint {
 }
 
 // Helper function for JSON marshaling
-func reviewsToIDs(reviews []*Review) []uint {
+func reviewsToIDs(reviews []*BranchReview) []uint {
 	ids := make([]uint, len(reviews))
 
-	for i, review := range reviews {
-		ids[i] = review.ID
+	for i, branchreview := range reviews {
+		ids[i] = branchreview.ID
 	}
 
 	return ids

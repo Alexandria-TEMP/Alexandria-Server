@@ -20,7 +20,7 @@ var (
 	mockRenderService *mocks.MockRenderService
 
 	exampleBranch       models.Branch
-	exampleReview       models.Review
+	exampleReview       models.BranchReview
 	exampleCollaborator models.BranchCollaborator
 )
 
@@ -43,10 +43,10 @@ func SetUpRouter() *gin.Engine {
 	branchRouter.POST("", branchController.CreateBranch)
 	branchRouter.PUT("", branchController.UpdateBranch)
 	branchRouter.DELETE("/:branchID", branchController.DeleteBranch)
-	branchRouter.GET("/:branchID/review-statuses", branchController.GetReviewStatus)
+	branchRouter.GET("/:branchID/branchreview-statuses", branchController.GetReviewStatus)
 	branchRouter.GET("/reviews/:reviewID", branchController.GetReview)
 	branchRouter.POST("/reviews", branchController.CreateReview)
-	branchRouter.GET("/:branchID/can-review/:memberID", branchController.MemberCanReview)
+	branchRouter.GET("/:branchID/can-branchreview/:memberID", branchController.MemberCanReview)
 	branchRouter.GET("/collaborators/:collaboratorID", branchController.GetBranchCollaborator)
 	branchRouter.GET("/:branchID/render", branchController.GetRender)
 	branchRouter.GET("/:branchID/repository", branchController.GetProject)

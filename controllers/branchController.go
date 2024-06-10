@@ -170,10 +170,10 @@ func (branchController *BranchController) DeleteBranch(c *gin.Context) {
 // @Accept  	json
 // @Param		branchID		path		string			true	"branch ID"
 // @Produce		json
-// @Success 	200		{array}		models.ReviewStatus
+// @Success 	200		{array}		models.BranchOverallReviewStatus
 // @Failure		400
 // @Failure		404
-// @Router 		/branches/{branchID}/review-statuses	[get]
+// @Router 		/branches/{branchID}/branchreview-statuses	[get]
 func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 	// extract branchID
 	branchIDStr := c.Param("branchID")
@@ -199,13 +199,13 @@ func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 }
 
 // GetReview godoc
-// @Summary 	Returns a review
-// @Description Returns a review with given ID
+// @Summary 	Returns a branchreview
+// @Description Returns a branchreview with given ID
 // @Tags 		branches
 // @Accept  	json
-// @Param		reviewID			path		string			true	"review ID"
+// @Param		reviewID			path		string			true	"branchreview ID"
 // @Produce		json
-// @Success 	200		{object}	models.ReviewDTO
+// @Success 	200		{object}	models.BranchReviewDTO
 // @Failure		400
 // @Failure		404
 // @Router 		/branches/reviews/{reviewID}		[get]
@@ -215,13 +215,13 @@ func (branchController *BranchController) GetReview(c *gin.Context) {
 	reviewID, err := strconv.ParseInt(reviewIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid review ID, cannot interpret as integer, id=%s ", reviewIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branchreview ID, cannot interpret as integer, id=%s ", reviewIDStr)})
 
 		return
 	}
 
-	// get review
-	review, err := branchController.BranchService.GetReview(uint(reviewID))
+	// get branchreview
+	branchreview, err := branchController.BranchService.GetReview(uint(reviewID))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -230,18 +230,18 @@ func (branchController *BranchController) GetReview(c *gin.Context) {
 	}
 
 	// response
-	c.JSON(http.StatusOK, review)
+	c.JSON(http.StatusOK, branchreview.IntoDTO())
 }
 
 // CreateReview godoc
-// @Summary 	Adds a review to a branch
-// @Description Adds a review to a branch
+// @Summary 	Adds a branchreview to a branch
+// @Description Adds a branchreview to a branch
 // @Tags 		branches
 // @Accept  	json
 // @Param		branchID		path		string			true	"branch ID"
-// @Param		form	body	forms.ReviewCreationForm	true	"review creation form"
+// @Param		form	body	forms.ReviewCreationForm	true	"branchreview creation form"
 // @Produce		json
-// @Success 	200
+// @Success 	200		{object}	models.BranchReviewDTO
 // @Failure		400
 // @Failure		404
 // @Failure		500
@@ -257,8 +257,8 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 		return
 	}
 
-	// create review and add to branch
-	review, err := branchController.BranchService.CreateReview(form)
+	// create branchreview and add to branch
+	branchreview, err := branchController.BranchService.CreateReview(form)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -267,13 +267,13 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 	}
 
 	// response
-	c.JSON(http.StatusOK, review)
+	c.JSON(http.StatusOK, branchreview.IntoDTO())
 }
 
 // UserCanReview godoc
-// @Summary 	Returns whether the user is allowed to review this branch
-// @Description Returns true if the user fulfills the requirements to review the branch
-// @Description Returns false if user is unauthorized to review the branch
+// @Summary 	Returns whether the user is allowed to branchreview this branch
+// @Description Returns true if the user fulfills the requirements to branchreview the branch
+// @Description Returns false if user is unauthorized to branchreview the branch
 // @Tags 		branches
 // @Accept  	json
 // @Param		branchID		path		string			true	"branch ID"
@@ -283,7 +283,7 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router 		/branches/{branchID}/can-review/{memberID}		[get]
+// @Router 		/branches/{branchID}/can-branchreview/{memberID}		[get]
 func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 	// extract branchID
 	branchIDStr := c.Param("branchID")
@@ -305,7 +305,7 @@ func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 		return
 	}
 
-	// create review and add to branch
+	// create branchreview and add to branch
 	canReview, err := branchController.BranchService.MemberCanReview(uint(branchID), uint(memberID))
 
 	if err != nil {

@@ -28,15 +28,15 @@ type BranchService interface {
 	DeleteBranch(branchID uint) error
 
 	// GetReviewStatus gets the decisions for all reviews of a branch, given its ID,
-	GetReviewStatus(branchID uint) ([]models.BranchDecision, error)
+	GetReviewStatus(branchID uint) ([]models.BranchReviewDecision, error)
 
-	// GetReview gets an existing review from the DB
-	GetReview(reviewID uint) (models.Review, error)
+	// GetReview gets an existing branchreview from the DB
+	GetReview(reviewID uint) (models.BranchReview, error)
 
-	// CreateReview creates a new review and adds it to the branch.
-	CreateReview(reviewCreationForm forms.ReviewCreationForm) (models.Review, error)
+	// CreateReview creates a new branchreview and adds it to the branch.
+	CreateReview(reviewCreationForm forms.ReviewCreationForm) (models.BranchReview, error)
 
-	// MemberCanReview checks whether a user is elligible to review a branch, dpending on whether there is an overlap of the scientific fields.
+	// MemberCanReview checks whether a user is elligible to branchreview a branch, dpending on whether there is an overlap of the scientific fields.
 	MemberCanReview(branchID, memberID uint) (bool, error)
 
 	// GetProjectFile returns filepath of zipped repository.

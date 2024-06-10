@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -30,19 +29,19 @@ func TestPostJSONMarshaling(t *testing.T) {
 			},
 		},
 		Title:               "Nice Post",
-		PostType:            tags.Question,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+		PostType:            Question,
+		ScientificFields:    []ScientificField{Mathematics},
 		DiscussionContainer: DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
 	}
 
 	// should equal this DTO!
 	targetDTO := PostDTO{
-		ID:                  88,
-		CollaboratorIDs:     []uint{1, 60},
-		Title:               "Nice Post",
-		PostType:            tags.Question,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
-		DiscussionIDs:       []uint{95},
+		ID:               88,
+		CollaboratorIDs:  []uint{1, 60},
+		Title:            "Nice Post",
+		PostType:         Question,
+		ScientificFields: []ScientificField{Mathematics},
+		DiscussionIDs:    []uint{95},
 	}
 
 	dto := PostDTO{}
