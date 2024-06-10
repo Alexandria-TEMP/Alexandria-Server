@@ -84,6 +84,11 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	// bind the fields of the param to the JSON of the model
 	err := c.BindJSON(&form)
 
+	if !form.IsValid() {
+		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("form fails validation"))
+		return
+	}
+
 	// check for errors
 	// if there is an error, return a 400 bad request status
 	if err != nil {
@@ -146,6 +151,7 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	// get the new member object
 	updatedMember := models.MemberDTO{}
 	err := c.BindJSON(&updatedMember)
+
 	// check for errors
 	if err != nil {
 		fmt.Println(err)
