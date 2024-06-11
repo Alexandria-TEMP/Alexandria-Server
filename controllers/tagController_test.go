@@ -68,3 +68,45 @@ func TestGetScientificTags404(t *testing.T) {
 	// assert that the correct response was returned
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
+
+func TestGetScientificFieldTag200(t *testing.T) {
+	beforeEachTag(t)
+
+	mockTagService.EXPECT().GetTagByID(uint(1)).Return(exampleSTag1, nil).Times(1)
+
+	req, _ := http.NewRequest("GET", "/api/v2/tags/scientific/1", http.NoBody)
+	router.ServeHTTP(responseRecorder, req)
+
+	var responsetag tags.ScientificFieldTagDTO
+
+	responseJSON, _ := io.ReadAll(responseRecorder.Body)
+	_ = json.Unmarshal(responseJSON, &responsetag)
+
+	assert.Equal(t, exampleSTag1DTO, responsetag)
+}
+
+func TestGetScientificFieldTag400(t *testing.T) {
+	beforeEachTag(t)
+
+	mockTagService.EXPECT().GetTagByID(gomock.Any()).Return(exampleSTag1, nil).Times(0)
+
+	req, _ := http.NewRequest("GET", "/api/v2/tags/scientific/bad", http.NoBody)
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestGetScientificFieldTag404(t *testing.T) {
+	beforeEachTag(t)
+
+	mockTagService.EXPECT().GetTagByID(uint(1)).Return(&tags.ScientificFieldTag{}, errors.New("some error")).Times(1)
+
+	req, _ := http.NewRequest("GET", "/api/v2/tags/scientific/1", http.NoBody)
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}

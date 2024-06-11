@@ -8,6 +8,7 @@ import (
 //go:generate mockgen -package=mocks -source=./tagService_interface.go -destination=../../mocks/tagService_mock.go
 
 type TagService interface {
+	GetTagByID(id uint) (*tags.ScientificFieldTag, error)
 	GetAllScientificFieldTags() ([]*tags.ScientificFieldTag, error)
 	GetTagsFromIDs(_ []uint) ([]*tags.ScientificFieldTag, error)
 }

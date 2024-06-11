@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	tags "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
@@ -14,6 +15,53 @@ import (
 
 type TagController struct {
 	TagService interfaces.TagService
+}
+
+// GetScientificFieldTag godoc
+// @Summary 	Get scientific field tag from database
+// @Description Get a scientific field tag by tag ID
+// @Tags 		members
+// @Accept  	json
+// @Param		tagID		path		string			true	"tag ID"
+// @Produce		json
+// @Success 	200 		{object}	models.ScientificFieldTagDTO
+// @Failure		400 		{object} 	utils.HTTPError
+// @Failure		404 		{object} 	utils.HTTPError
+// @Failure		500			{object}	utils.HTTPError
+// @Router 		/members/{memberID}	[get]
+// @Router 		/tags/scientific/:tagID	[get]
+func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
+	// extract the id of the scientific field tag
+	tagIDStr := c.Param("tagID")
+	initTagID, err := strconv.ParseUint(tagIDStr, 10, 64)
+	fmt.Println("We parsed the int")
+	// if this caused an error, print it and return status 400: bad input
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid tag ID, cannot interpret as integer, id=%s ", tagIDStr))
+
+		return
+	}
+
+	// cast tag ID as uint instead of uint64, because database only accepts those
+	tagID := uint(initTagID)
+	fmt.Printf("This is the tag id: %d", tagID)
+	fmt.Println("We got the tag id")
+	// get the tag through the service
+	tag, err := tagController.TagService.GetTagByID(tagID)
+	fmt.Println("We called the service method")
+	fmt.Printf("This is the tag: %v", tag)
+	// if there was an error, print it and return status 404: not found
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("cannot get member because no tag with this ID exists, id=%d", tagID))
+
+		return
+	}
+	fmt.Println("We didn't throw an error")
+	// if correct response send the tag back
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, tag)
 }
 
 // GetScientificTags godoc

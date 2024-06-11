@@ -57,6 +57,7 @@ func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, us
 
 	newMember.ID = memberDTO.ID
 	_, err = memberService.MemberRepository.Update(newMember)
+
 	return err
 }
 

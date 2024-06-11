@@ -54,6 +54,21 @@ func (mr *MockTagServiceMockRecorder) GetAllScientificFieldTags() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllScientificFieldTags", reflect.TypeOf((*MockTagService)(nil).GetAllScientificFieldTags))
 }
 
+// GetTagByID mocks base method.
+func (m *MockTagService) GetTagByID(id uint) (*tags.ScientificFieldTag, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTagByID", id)
+	ret0, _ := ret[0].(*tags.ScientificFieldTag)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTagByID indicates an expected call of GetTagByID.
+func (mr *MockTagServiceMockRecorder) GetTagByID(id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTagByID", reflect.TypeOf((*MockTagService)(nil).GetTagByID), id)
+}
+
 // GetTagsFromIDs mocks base method.
 func (m *MockTagService) GetTagsFromIDs(arg0 []uint) ([]*tags.ScientificFieldTag, error) {
 	m.ctrl.T.Helper()

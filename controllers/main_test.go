@@ -28,6 +28,7 @@ var (
 	exampleMemberForm forms.MemberCreationForm
 	exampleSTag1      *tags.ScientificFieldTag
 	exampleSTag2      *tags.ScientificFieldTag
+	exampleSTag1DTO   tags.ScientificFieldTagDTO
 )
 
 // TestMain is a keyword function, this is run by the testing package before other tests
@@ -46,7 +47,10 @@ func TestMain(m *testing.M) {
 		ScientificField: "Computers",
 		Subtags:         []*tags.ScientificFieldTag{},
 	}
-
+	exampleSTag1DTO = tags.ScientificFieldTagDTO{
+		ScientificField: "Mathematics",
+		SubtagIDs:       []uint{},
+	}
 	exampleMember = models.Member{
 		FirstName:   "John",
 		LastName:    "Smith",
@@ -100,6 +104,9 @@ func SetUpRouter() *gin.Engine {
 	})
 	router.GET("/api/v2/tags/scientific", func(c *gin.Context) {
 		tagController.GetScientificTags(c)
+	})
+	router.GET("/api/v2/tags/scientific/:tagID", func(c *gin.Context) {
+		tagController.GetScientificFieldTag(c)
 	})
 
 	return router

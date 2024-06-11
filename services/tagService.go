@@ -10,6 +10,11 @@ type TagService struct {
 	// TagContainerRepository database.RepositoryInterface[*tags.ScientificFieldTagContainer]
 }
 
+func (tagService *TagService) GetTagByID(id uint) (*tags.ScientificFieldTag, error) {
+	returnedTag, err := tagService.TagRepository.GetByID(id)
+	return returnedTag, err
+}
+
 func (tagService *TagService) GetAllScientificFieldTags() ([]*tags.ScientificFieldTag, error) {
 	returnedTags, err := tagService.TagRepository.Query()
 	return returnedTags, err
