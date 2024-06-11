@@ -36,10 +36,10 @@ test_reports:
   stage: test
   script:
     - go test ./... -short -coverprofile=coverage.out -covermode count
-    - go install github.com/boumenot/gocover-cobertura@v1.2.0
+    - go get github.com/boumenot/gocover-cobertura@v1.2.0
     - go run github.com/boumenot/gocover-cobertura < coverage.out > coverage.xml 
     
-    - go install gotest.tools/gotestsum@v1.12.0
+    - go get gotest.tools/gotestsum@v1.12.0
     - go run gotest.tools/gotestsum --junitfile junit.xml --format testname -- -short
     
   artifacts:
