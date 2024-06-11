@@ -24,7 +24,7 @@ type TagController struct {
 // @Accept  	json
 // @Param		tagID		path		string			true	"tag ID"
 // @Produce		json
-// @Success 	200 		{object}	models.ScientificFieldTagDTO
+// @Success 	200 		{object}	tags.ScientificFieldTagDTO
 // @Failure		400 		{object} 	utils.HTTPError
 // @Failure		404 		{object} 	utils.HTTPError
 // @Failure		500			{object}	utils.HTTPError

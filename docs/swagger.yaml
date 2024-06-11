@@ -337,6 +337,8 @@ definitions:
     properties:
       id:
         type: integer
+      parentID:
+        type: integer
       scientificField:
         type: string
       subtagIDs:
@@ -497,7 +499,7 @@ paths:
         name: branchID
         required: true
         type: string
-      - description: user ID
+      - description: member ID
         in: path
         name: memberID
         required: true
@@ -1079,20 +1081,14 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a member by member ID
-      parameters:
-      - description: member ID
-        in: path
-        name: memberID
-        required: true
-        type: string
+      description: Get a scientific field tag by tag ID
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.MemberDTO'
+            $ref: '#/definitions/tags.ScientificFieldTagDTO'
         "400":
           description: Bad Request
           schema:
@@ -1105,7 +1101,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Get member from database
+      summary: Get scientific field tag from database
       tags:
       - members
   /members/{memberID}/branches:
@@ -2015,4 +2011,37 @@ paths:
       summary: Returns all scientific tags
       tags:
       - tags
+  /tags/scientific/:tagID:
+    get:
+      consumes:
+      - application/json
+      description: Get a scientific field tag by tag ID
+      parameters:
+      - description: tag ID
+        in: path
+        name: tagID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/tags.ScientificFieldTagDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Get scientific field tag from database
+      tags:
+      - members
 swagger: "2.0"

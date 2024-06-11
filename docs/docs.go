@@ -326,7 +326,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "user ID",
+                        "description": "member ID",
                         "name": "memberID",
                         "in": "path",
                         "required": true
@@ -1041,7 +1041,7 @@ const docTemplate = `{
         },
         "/members/{memberID}": {
             "get": {
-                "description": "Get a member by member ID",
+                "description": "Get a scientific field tag by tag ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1051,21 +1051,12 @@ const docTemplate = `{
                 "tags": [
                     "members"
                 ],
-                "summary": "Get member from database",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "member ID",
-                        "name": "memberID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
+                "summary": "Get scientific field tag from database",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.MemberDTO"
+                            "$ref": "#/definitions/tags.ScientificFieldTagDTO"
                         }
                     },
                     "400": {
@@ -2491,6 +2482,56 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/tags/scientific/:tagID": {
+            "get": {
+                "description": "Get a scientific field tag by tag ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "members"
+                ],
+                "summary": "Get scientific field tag from database",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tag ID",
+                        "name": "tagID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/tags.ScientificFieldTagDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -2987,6 +3028,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
+                    "type": "integer"
+                },
+                "parentID": {
                     "type": "integer"
                 },
                 "scientificField": {
