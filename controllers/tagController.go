@@ -34,7 +34,7 @@ func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 	// extract the id of the scientific field tag
 	tagIDStr := c.Param("tagID")
 	initTagID, err := strconv.ParseUint(tagIDStr, 10, 64)
-	fmt.Println("We parsed the int")
+
 	// if this caused an error, print it and return status 400: bad input
 	if err != nil {
 		fmt.Println(err)
@@ -45,12 +45,10 @@ func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 
 	// cast tag ID as uint instead of uint64, because database only accepts those
 	tagID := uint(initTagID)
-	fmt.Printf("This is the tag id: %d", tagID)
-	fmt.Println("We got the tag id")
+
 	// get the tag through the service
 	tag, err := tagController.TagService.GetTagByID(tagID)
-	fmt.Println("We called the service method")
-	fmt.Printf("This is the tag: %v", tag)
+
 	// if there was an error, print it and return status 404: not found
 	if err != nil {
 		fmt.Println(err)
@@ -58,7 +56,7 @@ func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 
 		return
 	}
-	fmt.Println("We didn't throw an error")
+
 	// if correct response send the tag back
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, tag)
