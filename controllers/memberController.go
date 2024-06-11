@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -10,7 +9,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 // @BasePath /api/v2
@@ -37,8 +35,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 	userID, err := strconv.ParseUint(userIDStr, 10, 64)
 	// if this caused an error, print it
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr)})
 
 		return
 	}
@@ -47,8 +44,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 
 	// if there was an error, print it and return
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusNotFound, errors.New("cannot get member because no user with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get member: %s", err)})
 
 		return
 	}
@@ -77,8 +73,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 
 	// check for errors
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind userCreationForm from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind userCreationForm from request body: %s", err)})
 
 		return
 	}
@@ -110,8 +105,7 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 
 	// check for errors
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind updated user from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind updated user from request body: %s", err)})
 
 		return
 	}
@@ -120,7 +114,6 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	// err = memberController.MemberService.UpdateMember(&updatedMember)
 	// check for errors again
 	// if err != nil {
-	// 	fmt.Println(err)
 	// 	utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update user because no user with this ID exists"))
 
 	// 	return

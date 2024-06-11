@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -10,7 +9,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 // @BasePath /api/v2
@@ -115,8 +113,7 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 	// TODO convert from project post DTO to updated project post
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind updated ProjectPost from request body"))
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind updated ProjectPost from request body: %s", err)})
 
 		return
 	}
@@ -125,8 +122,7 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 	err = projectPostController.ProjectPostService.UpdateProjectPost(&updatedProjectPost)
 
 	if err != nil {
-		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update post because no ProjectPost with this ID exists"))
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot update post: %s", err)})
 
 		return
 	}
