@@ -469,9 +469,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/discussions": {
+        "/discussions/replies": {
             "post": {
-                "description": "Create a new discussion\nEither parent ID or version ID must be specified. This determines whether it's a reply or not, respectively.",
+                "description": "Create a new reply-type discussion, so a discussion that is a child of another discussion.",
                 "consumes": [
                     "application/json"
                 ],
@@ -481,28 +481,16 @@ const docTemplate = `{
                 "tags": [
                     "discussions"
                 ],
-                "summary": "Create new discussion",
+                "summary": "Create new reply discussion",
                 "parameters": [
                     {
-                        "description": "Discussion Creation Form",
+                        "description": "Reply Discussion Creation Form",
                         "name": "form",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.DiscussionCreationForm"
+                            "$ref": "#/definitions/forms.ReplyDiscussionCreationForm"
                         }
-                    },
-                    {
-                        "type": "string",
-                        "description": "Parent ID",
-                        "name": "parentID",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Version ID",
-                        "name": "versionID",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -561,6 +549,52 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/discussions/roots": {
+            "post": {
+                "description": "Create a new root-level discussion, meaning a discussion that is not a reply.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "discussions"
+                ],
+                "summary": "Create new root discussion",
+                "parameters": [
+                    {
+                        "description": "Root Discussion Creation Form",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.RootDiscussionCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.DiscussionDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
@@ -2645,6 +2679,18 @@ const docTemplate = `{
                 }
             }
         },
+        "forms.ReplyDiscussionCreationForm": {
+            "type": "object",
+            "properties": {
+                "discussion": {
+                    "$ref": "#/definitions/forms.DiscussionCreationForm"
+                },
+                "parentID": {
+                    "description": "The Discussion this Discussion will be added to",
+                    "type": "integer"
+                }
+            }
+        },
         "forms.ReportCreationForm": {
             "type": "object"
         },
@@ -2659,6 +2705,18 @@ const docTemplate = `{
                 },
                 "reviewingMemberID": {
                     "type": "integer"
+                }
+            }
+        },
+        "forms.RootDiscussionCreationForm": {
+            "type": "object",
+            "properties": {
+                "containerID": {
+                    "description": "The DiscussionContainer this Discussion will be added to",
+                    "type": "integer"
+                },
+                "discussion": {
+                    "$ref": "#/definitions/forms.DiscussionCreationForm"
                 }
             }
         },
@@ -2791,12 +2849,6 @@ const docTemplate = `{
         "models.DiscussionDTO": {
             "type": "object",
             "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "deleted": {
-                    "type": "boolean"
-                },
                 "id": {
                     "type": "integer"
                 },
