@@ -43,6 +43,8 @@ func SetUpRouter(controllers *ControllerEnv) *gin.Engine {
 
 	discussionRouter(v2, controllers)
 
+	discussionContainerRouter(v2, controllers)
+
 	return router
 }
 
@@ -123,4 +125,9 @@ func postRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	postRouter.GET("/:postID/reports", controllers.postController.GetPostReports)
 	postRouter.GET("/reports/:reportID", controllers.postController.GetPostReport)
 	postRouter.GET("/collaborators/:collaboratorID", controllers.postController.GetPostCollaborator)
+}
+
+func discussionContainerRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
+	discussionContainerRouter := v2.Group("/discussion-containers")
+	discussionContainerRouter.GET("/:discussionContainerID", controllers.discussionContainerController.GetDiscussionContainer)
 }
