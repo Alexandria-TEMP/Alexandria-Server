@@ -23,6 +23,7 @@ type BranchCreationForm struct {
 // Whether the form itself contains valid data. Should NOT contain business logic (such as "if Foo > 0, Bar may not be 1")
 func (form *BranchCreationForm) IsValid() bool {
 	exampleString := ""
+
 	return form.UpdatedCompletionStatus.IsValid() &&
 		form.UpdatedFeedbackPreferences.IsValid() &&
 		form.UpdatedPostTitle != &exampleString &&

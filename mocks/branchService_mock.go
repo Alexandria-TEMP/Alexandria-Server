@@ -102,19 +102,34 @@ func (mr *MockBranchServiceMockRecorder) GetBranch(branchID any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBranch", reflect.TypeOf((*MockBranchService)(nil).GetBranch), branchID)
 }
 
-// GetBranchCollaborator mocks base method.
-func (m *MockBranchService) GetBranchCollaborator(branchCollaboratorID uint) (*models.BranchCollaborator, error) {
+// GetBranchProjectPost mocks base method.
+func (m *MockBranchService) GetBranchProjectPost(branch *models.Branch) (*models.ProjectPost, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetBranchCollaborator", branchCollaboratorID)
-	ret0, _ := ret[0].(*models.BranchCollaborator)
+	ret := m.ctrl.Call(m, "GetBranchProjectPost", branch)
+	ret0, _ := ret[0].(*models.ProjectPost)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetBranchCollaborator indicates an expected call of GetBranchCollaborator.
-func (mr *MockBranchServiceMockRecorder) GetBranchCollaborator(branchCollaboratorID any) *gomock.Call {
+// GetBranchProjectPost indicates an expected call of GetBranchProjectPost.
+func (mr *MockBranchServiceMockRecorder) GetBranchProjectPost(branch any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBranchCollaborator", reflect.TypeOf((*MockBranchService)(nil).GetBranchCollaborator), branchCollaboratorID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBranchProjectPost", reflect.TypeOf((*MockBranchService)(nil).GetBranchProjectPost), branch)
+}
+
+// GetClosedBranch mocks base method.
+func (m *MockBranchService) GetClosedBranch(closedBranchID uint) (*models.ClosedBranch, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetClosedBranch", closedBranchID)
+	ret0, _ := ret[0].(*models.ClosedBranch)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetClosedBranch indicates an expected call of GetClosedBranch.
+func (mr *MockBranchServiceMockRecorder) GetClosedBranch(closedBranchID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetClosedBranch", reflect.TypeOf((*MockBranchService)(nil).GetClosedBranch), closedBranchID)
 }
 
 // GetFileFromProject mocks base method.

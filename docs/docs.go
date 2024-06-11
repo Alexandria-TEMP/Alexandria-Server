@@ -90,6 +90,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/branches/closed/{closedBranchID}": {
+            "get": {
+                "description": "Returns a closed branch given an id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Returns a closed branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Closed Branch ID",
+                        "name": "closedBranchID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ClosedBranchDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
         "/branches/collaborators/{collaboratorID}": {
             "get": {
                 "description": "Get a branch collaborator by ID, a member who has collaborated on a branch",
@@ -2976,6 +3014,26 @@ const docTemplate = `{
                 "Approved"
             ]
         },
+        "models.ClosedBranchDTO": {
+            "type": "object",
+            "properties": {
+                "branchID": {
+                    "type": "integer"
+                },
+                "branchReviewDecision": {
+                    "$ref": "#/definitions/models.BranchReviewDecision"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "projectPostID": {
+                    "type": "integer"
+                },
+                "supercededBranchID": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.CollaborationType": {
             "type": "string",
             "enum": [
@@ -3151,8 +3209,8 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "post": {
-                    "$ref": "#/definitions/models.PostDTO"
+                "postID": {
+                    "type": "integer"
                 },
                 "postReviewStatus": {
                     "$ref": "#/definitions/models.ProjectReviewStatus"

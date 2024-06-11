@@ -52,6 +52,8 @@ type BranchService interface {
 	// Error is for status 404.
 	GetFileFromProject(branchID uint, relFilepath string) (string, error)
 
-	// GetBranchCollaborator returns the corresponding BranchCollaborator
-	GetBranchCollaborator(branchCollaboratorID uint) (*models.BranchCollaborator, error)
+	// GetBranchProjectPost returns a deeply preloaded project post for a branch.
+	GetBranchProjectPost(branch *models.Branch) (*models.ProjectPost, error)
+
+	GetClosedBranch(closedBranchID uint) (*models.ClosedBranch, error)
 }

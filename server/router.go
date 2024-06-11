@@ -87,6 +87,7 @@ func branchRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	branchRouter.GET("/:branchID/tree", controllers.branchController.GetFiletree)
 	branchRouter.GET("/:branchID/file/*filepath", controllers.branchController.GetFileFromProject)
 	branchRouter.GET("/:branchID/discussions", controllers.branchController.GetDiscussions)
+	branchRouter.GET("/closed/:closedBranchID", controllers.branchController.GetClosedBranch)
 }
 
 func memberRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {

@@ -37,14 +37,8 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 
 	// should equal this DTO!
 	targetDTO := ProjectPostDTO{
-		ID: 42,
-		PostDTO: PostDTO{
-			ID:               88,
-			CollaboratorIDs:  []uint{1, 60},
-			PostType:         Project,
-			ScientificFields: []ScientificField{Mathematics},
-			DiscussionIDs:    []uint{95},
-		},
+		ID:                        42,
+		PostID:                    88,
 		OpenBranchIDs:             []uint{44},
 		ClosedBranchIDs:           []uint{59, 20},
 		ProjectCompletionStatus:   Completed,

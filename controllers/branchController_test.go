@@ -36,9 +36,11 @@ func beforeEachBranch(t *testing.T) {
 
 	mockBranchService = mocks.NewMockBranchService(mockCtrl)
 	mockRenderService = mocks.NewMockRenderService(mockCtrl)
+	mockBranchCollaboratorService = mocks.NewMockBranchCollaboratorService(mockCtrl)
 	branchController = BranchController{
-		BranchService: mockBranchService,
-		RenderService: mockRenderService,
+		BranchService:             mockBranchService,
+		RenderService:             mockRenderService,
+		BranchCollaboratorService: mockBranchCollaboratorService,
 	}
 
 	responseRecorder = httptest.NewRecorder()
@@ -88,7 +90,7 @@ func TestCreateBranch200(t *testing.T) {
 
 	mockBranchService.EXPECT().CreateBranch(gomock.Any()).Return(exampleBranch, nil, nil)
 
-	updatedPostTitle := "test"
+	updatedPostTitle := "post title"
 	updatedCompletionStatus := models.Completed
 	updatedFeedbackPreferences := models.DiscussionFeedback
 	form := forms.BranchCreationForm{
@@ -160,7 +162,7 @@ func TestCreateBranch500(t *testing.T) {
 
 	mockBranchService.EXPECT().CreateBranch(gomock.Any()).Return(exampleBranch, nil, errors.New("internal server error"))
 
-	updatedPostTitle := "test"
+	updatedPostTitle := "title"
 	updatedCompletionStatus := models.Completed
 	updatedFeedbackPreferences := models.DiscussionFeedback
 	form := forms.BranchCreationForm{
@@ -414,7 +416,7 @@ func TestMemberCanReview404(t *testing.T) {
 func TestGetBranchCollaborator200(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().GetBranchCollaborator(uint(1)).Return(&exampleCollaborator, nil)
+	mockBranchCollaboratorService.EXPECT().GetBranchCollaborator(uint(1)).Return(&exampleCollaborator, nil)
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/collaborators/1", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -427,7 +429,7 @@ func TestGetBranchCollaborator200(t *testing.T) {
 func TestGetBranchCollaborator400(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().GetBranchCollaborator(gomock.Any()).Times(0)
+	mockBranchCollaboratorService.EXPECT().GetBranchCollaborator(gomock.Any()).Times(0)
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/collaborators/bad", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -440,7 +442,7 @@ func TestGetBranchCollaborator400(t *testing.T) {
 func TestGetBranchCollaborator404(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().GetBranchCollaborator(uint(1)).Return(nil, errors.New("collaborator not found"))
+	mockBranchCollaboratorService.EXPECT().GetBranchCollaborator(uint(1)).Return(nil, errors.New("collaborator not found"))
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/collaborators/1", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)

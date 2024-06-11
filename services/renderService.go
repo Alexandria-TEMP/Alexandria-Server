@@ -11,6 +11,7 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 	"gopkg.in/yaml.v3"
 )
@@ -20,6 +21,7 @@ type RenderService struct {
 	PostRepository        database.ModelRepositoryInterface[*models.Post]
 	ProjectPostRepository database.ModelRepositoryInterface[*models.ProjectPost]
 	Filesystem            filesystemInterfaces.Filesystem
+	BranchService         interfaces.BranchService
 }
 
 func (renderService *RenderService) GetRenderFile(branchID uint) (string, error, error) {
@@ -33,7 +35,7 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, error,
 	}
 
 	// get project post
-	projectPost, err := renderService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
+	projectPost, err := renderService.BranchService.GetBranchProjectPost(branch)
 
 	if err != nil {
 		return filePath, nil, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)

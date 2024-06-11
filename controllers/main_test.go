@@ -15,9 +15,10 @@ var (
 	router           *gin.Engine
 	responseRecorder *httptest.ResponseRecorder
 
-	branchController  BranchController
-	mockBranchService *mocks.MockBranchService
-	mockRenderService *mocks.MockRenderService
+	branchController              BranchController
+	mockBranchService             *mocks.MockBranchService
+	mockRenderService             *mocks.MockRenderService
+	mockBranchCollaboratorService *mocks.MockBranchCollaboratorService
 
 	exampleBranch       models.Branch
 	exampleReview       models.BranchReview

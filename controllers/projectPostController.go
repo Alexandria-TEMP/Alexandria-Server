@@ -53,7 +53,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 
 	// response
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, projectPost)
+	c.JSON(http.StatusOK, projectPost.IntoDTO())
 }
 
 // CreateProjectPost godoc
@@ -99,7 +99,7 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 
 	// response
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, projectPost)
+	c.JSON(http.StatusOK, projectPost.IntoDTO())
 }
 
 // UpdateProjectPost godoc

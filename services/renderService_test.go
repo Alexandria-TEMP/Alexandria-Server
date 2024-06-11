@@ -27,12 +27,14 @@ func beforeEachRender(t *testing.T) {
 	mockBranchRepository = mocks.NewMockModelRepositoryInterface[*models.Branch](mockCtrl)
 	mockProjectPostRepository = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
+	mockBranchService = mocks.NewMockBranchService(mockCtrl)
 
 	// Create render service
 	renderService = RenderService{
 		BranchRepository:      mockBranchRepository,
 		ProjectPostRepository: mockProjectPostRepository,
 		Filesystem:            mockFilesystem,
+		BranchService:         mockBranchService,
 	}
 }
 
@@ -180,6 +182,7 @@ func TestGetRenderFileSuccess(t *testing.T) {
 	projectPost.PostID = 100
 
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(successBranch, nil).Times(1)
+	mockBranchService.EXPECT().GetBranchProjectPost(successBranch).Return(projectPost, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(100)).Times(1)
 	mockFilesystem.EXPECT().CheckoutBranch("0").Return(nil).Times(1)
@@ -214,7 +217,7 @@ func TestGetRenderFileNoProjectPost(t *testing.T) {
 	successBranch.ProjectPostID = &projectPostID
 
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(successBranch, nil).Times(1)
-	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, errors.New("failed")).Times(1)
+	mockBranchService.EXPECT().GetBranchProjectPost(successBranch).Return(projectPost, errors.New("failed"))
 
 	_, err202, err404 := renderService.GetRenderFile(successBranch.ID)
 
@@ -231,6 +234,7 @@ func TestGetRenderFilePending(t *testing.T) {
 	pendingBranch.ProjectPostID = &projectPostID
 
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(pendingBranch, nil).Times(1)
+	mockBranchService.EXPECT().GetBranchProjectPost(pendingBranch).Return(projectPost, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
 
 	_, err202, err404 := renderService.GetRenderFile(pendingBranch.ID)
@@ -248,6 +252,7 @@ func TestGetRenderFileFailed(t *testing.T) {
 	failedBranch.ProjectPostID = &projectPostID
 
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(failedBranch, nil).Times(1)
+	mockBranchService.EXPECT().GetBranchProjectPost(failedBranch).Return(projectPost, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
 
 	_, err202, err404 := renderService.GetRenderFile(failedBranch.ID)
@@ -267,6 +272,7 @@ func TestGetRenderNoGitBranch(t *testing.T) {
 	projectPost.PostID = 100
 
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(successBranch, nil).Times(1)
+	mockBranchService.EXPECT().GetBranchProjectPost(successBranch).Return(projectPost, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(100)).Times(1)
 	mockFilesystem.EXPECT().CheckoutBranch("0").Return(errors.New("failed")).Times(1)
@@ -288,6 +294,7 @@ func TestGetRenderDoesntExist(t *testing.T) {
 	projectPost.PostID = 100
 
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(successBranch, nil).Times(1)
+	mockBranchService.EXPECT().GetBranchProjectPost(successBranch).Return(projectPost, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(100)).Times(1)
 	mockFilesystem.EXPECT().CheckoutBranch("0").Return(nil).Times(1)

@@ -15,8 +15,9 @@ import (
 // @BasePath /api/v2
 
 type BranchController struct {
-	BranchService interfaces.BranchService
-	RenderService interfaces.RenderService
+	BranchService             interfaces.BranchService
+	RenderService             interfaces.RenderService
+	BranchCollaboratorService interfaces.BranchCollaboratorService
 }
 
 // GetBranch godoc
@@ -330,7 +331,7 @@ func (branchController *BranchController) GetBranchCollaborator(c *gin.Context) 
 		return
 	}
 
-	collaborator, err := branchController.BranchService.GetBranchCollaborator(uint(collaboratorID))
+	collaborator, err := branchController.BranchCollaboratorService.GetBranchCollaborator(uint(collaboratorID))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -582,4 +583,37 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 // @Router		/branches/{branchID}/discussions 	[get]
 func (branchController *BranchController) GetDiscussions(_ *gin.Context) {
 	// TODO ahh its paginated
+}
+
+// GetClosedBranch godoc
+// @Summary Returns a closed branch
+// @Description Returns a closed branch given an id
+// @Tags 		branches
+// @Param		closedBranchID	path		string			true	"Closed Branch ID"
+// @Produce		application/json
+// @Success 	200		{array}		models.ClosedBranchDTO
+// @Failure		400
+// @Failure		404
+// @Router		/branches/closed/{closedBranchID}		[get]
+func (branchController *BranchController) GetClosedBranch(c *gin.Context) {
+	// extract branchID id
+	closedBranchIDStr := c.Param("closedBranchID")
+	closedBranchID, err := strconv.ParseUint(closedBranchIDStr, 10, 64)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid closed branch ID, cannot interpret as integer, id=%v ", closedBranchIDStr)})
+
+		return
+	}
+
+	closedBranch, err := branchController.BranchService.GetClosedBranch(uint(closedBranchID))
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
+
+		return
+	}
+
+	// response
+	c.JSON(http.StatusOK, closedBranch.IntoDTO())
 }

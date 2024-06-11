@@ -72,7 +72,7 @@ type ProjectPost struct {
 
 type ProjectPostDTO struct {
 	ID                        uint                      `json:"id"`
-	PostDTO                   PostDTO                   `json:"post"`
+	PostID                    uint                      `json:"postID"`
 	OpenBranchIDs             []uint                    `json:"openBranchIDs"`
 	ClosedBranchIDs           []uint                    `json:"closedBranchIDs"`
 	ProjectCompletionStatus   ProjectCompletionStatus   `json:"projectCompletionStatus"`
@@ -87,7 +87,7 @@ func (model *ProjectPost) GetID() uint {
 func (model *ProjectPost) IntoDTO() ProjectPostDTO {
 	return ProjectPostDTO{
 		model.ID,
-		model.Post.IntoDTO(),
+		model.PostID,
 		branchesToIDs(model.OpenBranches),
 		closedBranchesToIDs(model.ClosedBranches),
 		model.ProjectCompletionStatus,

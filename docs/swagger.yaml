@@ -188,6 +188,19 @@ definitions:
     x-enum-varnames:
     - Rejected
     - Approved
+  models.ClosedBranchDTO:
+    properties:
+      branchID:
+        type: integer
+      branchReviewDecision:
+        $ref: '#/definitions/models.BranchReviewDecision'
+      id:
+        type: integer
+      projectPostID:
+        type: integer
+      supercededBranchID:
+        type: integer
+    type: object
   models.CollaborationType:
     enum:
     - author
@@ -308,8 +321,8 @@ definitions:
         items:
           type: integer
         type: array
-      post:
-        $ref: '#/definitions/models.PostDTO'
+      postID:
+        type: integer
       postReviewStatus:
         $ref: '#/definitions/models.ProjectReviewStatus'
       projectCompletionStatus:
@@ -702,6 +715,31 @@ paths:
         "500":
           description: Internal Server Error
       summary: Get the filetree of a project
+      tags:
+      - branches
+  /branches/closed/{closedBranchID}:
+    get:
+      description: Returns a closed branch given an id
+      parameters:
+      - description: Closed Branch ID
+        in: path
+        name: closedBranchID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ClosedBranchDTO'
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Returns a closed branch
       tags:
       - branches
   /branches/collaborators/{collaboratorID}:

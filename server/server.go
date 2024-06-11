@@ -86,15 +86,16 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 	branchService := &services.BranchService{
 		BranchRepository:              repositoryEnv.branchRepository,
 		ClosedBranchRepository:        repositoryEnv.closedBranchRepository,
+		PostRepository:                repositoryEnv.postRepository,
 		ProjectPostRepository:         repositoryEnv.projectPostRepository,
 		ReviewRepository:              repositoryEnv.reviewRepository,
-		BranchCollaboratorRepository:  repositoryEnv.branchCollaboratorRepository,
 		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
 		DiscussionRepository:          repositoryEnv.discussionRepository,
 		MemberRepository:              repositoryEnv.memberRepository,
 		Filesystem:                    fs,
 		RenderService:                 renderService,
 		BranchCollaboratorService:     branchCollaboratorService,
+		PostCollaboratorService:       postCollaboratorService,
 	}
 	projectPostService := &services.ProjectPostService{
 		ProjectPostRepository:     repositoryEnv.projectPostRepository,
@@ -104,6 +105,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		BranchCollaboratorService: branchCollaboratorService,
 		BranchService:             branchService,
 	}
+	renderService.BranchService = branchService // added afterwards since both require eachother
 
 	return ServiceEnv{
 		postService:               postService,
@@ -132,8 +134,9 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 		discussionController: &controllers.DiscussionController{},
 		filterController:     &controllers.FilterController{},
 		branchController: &controllers.BranchController{
-			BranchService: serviceEnv.branchService,
-			RenderService: serviceEnv.renderService,
+			BranchService:             serviceEnv.branchService,
+			RenderService:             serviceEnv.renderService,
+			BranchCollaboratorService: serviceEnv.branchCollaboratorService,
 		},
 		tagController: &controllers.TagController{},
 	}

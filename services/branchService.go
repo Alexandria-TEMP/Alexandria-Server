@@ -21,9 +21,9 @@ const approvalsToMerge = 2 // 0 indexed
 type BranchService struct {
 	BranchRepository              database.ModelRepositoryInterface[*models.Branch]
 	ClosedBranchRepository        database.ModelRepositoryInterface[*models.ClosedBranch]
+	PostRepository                database.ModelRepositoryInterface[*models.Post]
 	ProjectPostRepository         database.ModelRepositoryInterface[*models.ProjectPost]
 	ReviewRepository              database.ModelRepositoryInterface[*models.BranchReview]
-	BranchCollaboratorRepository  database.ModelRepositoryInterface[*models.BranchCollaborator]
 	DiscussionContainerRepository database.ModelRepositoryInterface[*models.DiscussionContainer]
 	DiscussionRepository          database.ModelRepositoryInterface[*models.Discussion]
 	MemberRepository              database.ModelRepositoryInterface[*models.Member]
@@ -31,6 +31,7 @@ type BranchService struct {
 
 	RenderService             interfaces.RenderService
 	BranchCollaboratorService interfaces.BranchCollaboratorService
+	PostCollaboratorService   interfaces.PostCollaboratorService
 }
 
 func (branchService *BranchService) GetBranch(branchID uint) (models.Branch, error) {
@@ -97,22 +98,6 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 	return branch, nil, nil
 }
 
-func (branchService *BranchService) getDiscussionContainerFromIDs(ids []uint) (models.DiscussionContainer, error) {
-	discussions := []*models.Discussion{}
-
-	for _, ID := range ids {
-		discussion, err := branchService.DiscussionRepository.GetByID(ID)
-
-		if err != nil {
-			return models.DiscussionContainer{}, fmt.Errorf("failed to find discussion with id=%v", ID)
-		}
-
-		discussions = append(discussions, discussion)
-	}
-
-	return models.DiscussionContainer{Discussions: discussions}, nil
-}
-
 func (branchService *BranchService) DeleteBranch(branchID uint) error {
 	// get branch
 	branch, err := branchService.BranchRepository.GetByID(branchID)
@@ -122,10 +107,10 @@ func (branchService *BranchService) DeleteBranch(branchID uint) error {
 	}
 
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
+	projectPost, err := branchService.GetBranchProjectPost(branch)
 
 	if err != nil {
-		return fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
+		return err
 	}
 
 	// checkout repository
@@ -197,9 +182,13 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 		Feedback:             form.Feedback,
 	}
 
+	if err := branchService.ReviewRepository.Create(&branchreview); err != nil {
+		return branchreview, fmt.Errorf("failed to add branch review to db")
+	}
+
 	// update branch with new branchreview and update branchreview status accordingly
 	branch.Reviews = append(branch.Reviews, &branchreview)
-	branch.BranchOverallReviewStatus = branchService.UpdateReviewStatus(branch.Reviews)
+	branch.BranchOverallReviewStatus = branchService.updateReviewStatus(branch.Reviews)
 
 	// if approved or rejected we close the branch
 	if branch.BranchOverallReviewStatus == models.BranchPeerReviewed || branch.BranchOverallReviewStatus == models.BranchRejected {
@@ -220,15 +209,15 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 
 func (branchService *BranchService) closeBranch(branch *models.Branch) error {
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
+	projectPost, err := branchService.GetBranchProjectPost(branch)
 
 	if err != nil {
-		return fmt.Errorf("failed to get project post")
+		return err
 	}
 
 	// close branch
 	closedBranch := &models.ClosedBranch{
-		ProjectPostID:        *branch.ProjectPostID,
+		ProjectPostID:        projectPost.ID,
 		BranchReviewDecision: models.Rejected,
 	}
 
@@ -311,75 +300,28 @@ func (branchService *BranchService) merge(branch *models.Branch, closedBranch *m
 	}
 
 	// update project post contributors
-	branchService.mergeContributors(projectPost, branch.Collaborators)
+	if err := branchService.PostCollaboratorService.MergeContributors(projectPost, branch.Collaborators); err != nil {
+		return err
+	}
 
 	// update project post reviewers
-	branchService.mergeReviewers(projectPost, branch.Reviews)
+	if err := branchService.PostCollaboratorService.MergeReviewers(projectPost, branch.Reviews); err != nil {
+		return err
+	}
+
+	// save changes to post (isn't being saved properly at the end for some reason)
+	if _, err := branchService.PostRepository.Update(&projectPost.Post); err != nil {
+		return fmt.Errorf("failed to update post metadata")
+	}
 
 	return nil
 }
 
-// We add all branch collaborators to the project post as post collaborators with the "reviewer" type, unless they have already been added as such
-func (branchService *BranchService) mergeReviewers(projectPost *models.ProjectPost, reviews []*models.BranchReview) {
-	// get all member ids which are reviewers present in post collaborators initially
-	collaboratorMemberIDs := []uint{}
-
-	for _, c := range projectPost.Post.Collaborators {
-		if c.CollaborationType == models.Reviewer {
-			collaboratorMemberIDs = append(collaboratorMemberIDs, c.MemberID)
-		}
-	}
-
-	// add all new post collaborators
-	for _, review := range reviews {
-		// if the member is already present as a post collaborator, we do not add it again
-		if slices.Contains(collaboratorMemberIDs, review.MemberID) {
-			continue
-		}
-
-		// otherwise we add this post collaborator
-		asPostCollaborator := models.PostCollaborator{
-			Member:            review.Member,
-			PostID:            projectPost.PostID,
-			CollaborationType: models.Reviewer,
-		}
-		projectPost.Post.Collaborators = append(projectPost.Post.Collaborators, &asPostCollaborator)
-	}
-}
-
-// We add all branch collaborators to the project post as post collaborators with the "contributor" type, unless they have already been added as such
-func (branchService *BranchService) mergeContributors(projectPost *models.ProjectPost, branchCollaborators []*models.BranchCollaborator) {
-	// get all member ids which are collaborators present in post collaborators initially
-	collaboratorMemberIDs := []uint{}
-
-	for _, c := range projectPost.Post.Collaborators {
-		if c.CollaborationType == models.Contributor {
-			collaboratorMemberIDs = append(collaboratorMemberIDs, c.MemberID)
-		}
-	}
-
-	// add all new post collaborators
-	for _, branchCollaborator := range branchCollaborators {
-		// if the member is already present as a post collaborator, we do not add it again
-		if slices.Contains(collaboratorMemberIDs, branchCollaborator.MemberID) {
-			continue
-		}
-
-		// otherwise we add this post collaborator
-		asPostCollaborator := models.PostCollaborator{
-			Member:            branchCollaborator.Member,
-			PostID:            projectPost.PostID,
-			CollaborationType: models.Contributor,
-		}
-		projectPost.Post.Collaborators = append(projectPost.Post.Collaborators, &asPostCollaborator)
-	}
-}
-
-// UpdateReviewStatus finds the current branchreview status
+// updateReviewStatus finds the current branchreview status
 // If there are 3 approvals, approve the branch
 // If there are any rejections, reject the branch
 // Otherwise leave open for branchreview
-func (branchService *BranchService) UpdateReviewStatus(reviews []*models.BranchReview) models.BranchOverallReviewStatus {
+func (branchService *BranchService) updateReviewStatus(reviews []*models.BranchReview) models.BranchOverallReviewStatus {
 	for i, r := range reviews {
 		if r.BranchReviewDecision == models.Rejected {
 			return models.BranchRejected
@@ -402,10 +344,10 @@ func (branchService *BranchService) MemberCanReview(branchID, memberID uint) (bo
 	}
 
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
+	projectPost, err := branchService.GetBranchProjectPost(branch)
 
 	if err != nil {
-		return false, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
+		return false, err
 	}
 
 	// get member
@@ -436,10 +378,10 @@ func (branchService *BranchService) GetProject(branchID uint) (string, error) {
 	}
 
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
+	projectPost, err := branchService.GetBranchProjectPost(branch)
 
 	if err != nil {
-		return filePath, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
+		return "", err
 	}
 
 	// select repository of the parent post
@@ -462,10 +404,10 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 	}
 
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
+	projectPost, err := branchService.GetBranchProjectPost(branch)
 
 	if err != nil {
-		return fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
+		return err
 	}
 
 	// select repository of the parent post
@@ -515,11 +457,11 @@ func (branchService *BranchService) GetFiletree(branchID uint) (map[string]int64
 		return nil, fmt.Errorf("failed to find branch with id %v", branchID), nil
 	}
 
-	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
+	// get project post. if branch is clsoed we need to get the project post id via the closed branch
+	projectPost, err := branchService.GetBranchProjectPost(branch)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID), nil
+		return nil, err, nil
 	}
 
 	// select repository of the parent post
@@ -534,6 +476,45 @@ func (branchService *BranchService) GetFiletree(branchID uint) (map[string]int64
 	fileTree, err := branchService.Filesystem.GetFileTree()
 
 	return fileTree, nil, err
+}
+
+func (branchService *BranchService) GetBranchProjectPost(branch *models.Branch) (*models.ProjectPost, error) {
+	var projectPostID uint
+
+	if branch.ProjectPostID == nil {
+		closedBranches, err := branchService.ClosedBranchRepository.Query(&models.ClosedBranch{BranchID: branch.ID})
+		if err != nil || len(closedBranches) == 0 {
+			return nil, fmt.Errorf("failed to find the closed branch for branch with id %v", branch.ID)
+		}
+
+		projectPostID = closedBranches[0].ProjectPostID
+	} else {
+		projectPostID = *branch.ProjectPostID
+	}
+
+	projectPost, err := branchService.ProjectPostRepository.GetByID(projectPostID)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get project post with id %v", projectPostID)
+	}
+
+	// set discussion container (isn't preloaded properly)
+	discussionContainer, err := branchService.DiscussionContainerRepository.GetByID(projectPost.Post.DiscussionContainerID)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get discussion container")
+	}
+
+	projectPost.Post.DiscussionContainer = *discussionContainer
+
+	// set closed branches (isn't preloaded properly)
+	projectPost.ClosedBranches, err = branchService.ClosedBranchRepository.Query(&models.ClosedBranch{ProjectPostID: projectPost.ID})
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get closed branches for project post")
+	}
+
+	return projectPost, nil
 }
 
 func (branchService *BranchService) GetFileFromProject(branchID uint, relFilepath string) (string, error) {
@@ -552,10 +533,10 @@ func (branchService *BranchService) GetFileFromProject(branchID uint, relFilepat
 	}
 
 	// get project post
-	projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
+	projectPost, err := branchService.GetBranchProjectPost(branch)
 
 	if err != nil {
-		return absFilepath, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
+		return "", err
 	}
 
 	// select repository of the parent post
@@ -576,12 +557,12 @@ func (branchService *BranchService) GetFileFromProject(branchID uint, relFilepat
 	return absFilepath, nil
 }
 
-func (branchService *BranchService) GetBranchCollaborator(branchCollaboratorID uint) (*models.BranchCollaborator, error) {
-	branchCollaborator, err := branchService.BranchCollaboratorRepository.GetByID(branchCollaboratorID)
+func (branchService *BranchService) GetClosedBranch(closedBranchID uint) (*models.ClosedBranch, error) {
+	closedBranch, err := branchService.ClosedBranchRepository.GetByID(closedBranchID)
 
 	if err != nil {
-		return branchCollaborator, fmt.Errorf("failed to get branch collaborator")
+		return nil, fmt.Errorf("failed to find closed branch with id %v", closedBranchID)
 	}
 
-	return branchCollaborator, nil
+	return closedBranch, nil
 }
