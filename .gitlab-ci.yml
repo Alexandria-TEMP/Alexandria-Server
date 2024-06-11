@@ -17,7 +17,6 @@ stages:
 lint:
     image: golangci/golangci-lint:v1.57.2
     stage: lint
-    extends: .go-cache
     allow_failure: false
     script:
       - mkdir -p .go
