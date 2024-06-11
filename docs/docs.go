@@ -3023,10 +3023,7 @@ const docTemplate = `{
         "utils.HTTPError": {
             "type": "object",
             "properties": {
-                "code": {
-                    "type": "integer"
-                },
-                "message": {
+                "error": {
                     "type": "string"
                 }
             }

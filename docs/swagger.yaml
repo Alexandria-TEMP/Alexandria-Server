@@ -357,9 +357,7 @@ definitions:
     type: object
   utils.HTTPError:
     properties:
-      code:
-        type: integer
-      message:
+      error:
         type: string
     type: object
 host: localhost:8080
