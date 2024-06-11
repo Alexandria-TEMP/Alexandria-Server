@@ -37,6 +37,10 @@ func cleanup(t *testing.T) {
 }
 
 func TestInitsystem(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	defer cleanup(t)
 
 	CurrentFilesystem.CheckoutDirectory(1)
@@ -49,6 +53,10 @@ func TestInitsystem(t *testing.T) {
 }
 
 func TestGit(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	defer cleanup(t)
 
 	// Set current dir
@@ -124,6 +132,10 @@ func TestGit(t *testing.T) {
 }
 
 func TestGitOperationsWithoutRepo(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	defer cleanup(t)
 
 	// Create branch without repo
@@ -147,6 +159,10 @@ func TestGitOperationsWithoutRepo(t *testing.T) {
 }
 
 func TestCheckoutNonexistantBranch(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	defer cleanup(t)
 
 	// Set current dir
@@ -160,6 +176,10 @@ func TestCheckoutNonexistantBranch(t *testing.T) {
 }
 
 func TestGitOperationsOnBareRepo(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	defer cleanup(t)
 
 	// get repository path
@@ -193,6 +213,10 @@ func TestGitOperationsOnBareRepo(t *testing.T) {
 }
 
 func TestFileHandling(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	defer cleanup(t)
 
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
@@ -227,6 +251,10 @@ func TestFileHandling(t *testing.T) {
 }
 
 func TestUnzipDoesntExist(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	defer cleanup(t)
 
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
@@ -245,6 +273,10 @@ func TestUnzipDoesntExist(t *testing.T) {
 }
 
 func TestRenderExistsSuccess(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup", "render")
 
 	exists, name := CurrentFilesystem.RenderExists()
@@ -253,6 +285,10 @@ func TestRenderExistsSuccess(t *testing.T) {
 }
 
 func TestRenderExistsNoFile(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup", "badpath")
 
 	exists, _ := CurrentFilesystem.RenderExists()
@@ -260,6 +296,10 @@ func TestRenderExistsNoFile(t *testing.T) {
 }
 
 func TestRenderExistsMultipleFiles(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_1")
 
 	exists, _ := CurrentFilesystem.RenderExists()
@@ -267,6 +307,10 @@ func TestRenderExistsMultipleFiles(t *testing.T) {
 }
 
 func TestRenderExistsMultipleNotHtml(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_2")
 
 	exists, _ := CurrentFilesystem.RenderExists()
@@ -274,6 +318,10 @@ func TestRenderExistsMultipleNotHtml(t *testing.T) {
 }
 
 func TestGetFileTreeSuccess(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	defer cleanup(t)
 
 	CurrentFilesystem.CurrentQuartoDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "file_tree")
@@ -286,6 +334,10 @@ func TestGetFileTreeSuccess(t *testing.T) {
 }
 
 func TestGetFileTreeFailure(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	CurrentFilesystem.CurrentQuartoDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "file_tree", "doesntexist")
 
 	_, err := CurrentFilesystem.GetFileTree()
