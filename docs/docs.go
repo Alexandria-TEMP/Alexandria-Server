@@ -143,13 +143,6 @@ const docTemplate = `{
                 "summary": "Adds a branchreview to a branch",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "branch ID",
-                        "name": "branchID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "branchreview creation form",
                         "name": "form",
                         "in": "body",
@@ -330,48 +323,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/branches/{branchID}/branchreview-statuses": {
-            "get": {
-                "description": "Returns an array of the statuses of all the reviews of this branch",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Returns status of all branch reviews",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "branch ID",
-                        "name": "branchID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.BranchOverallReviewStatus"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    }
-                }
-            }
-        },
-        "/branches/{branchID}/can-branchreview/{memberID}": {
+        "/branches/{branchID}/can-review/{memberID}": {
             "get": {
                 "description": "Returns true if the user fulfills the requirements to branchreview the branch\nReturns false if user is unauthorized to branchreview the branch",
                 "consumes": [
@@ -590,6 +542,47 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "type": "integer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/branches/{branchID}/review-statuses": {
+            "get": {
+                "description": "Returns an array of the statuses of all the reviews of this branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Returns status of all branch reviews",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.BranchOverallReviewStatus"
                             }
                         }
                     },
@@ -2257,7 +2250,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/project-posts/{postID}": {
+        "/project-posts/{projectPostID}": {
             "get": {
                 "description": "Get a project post by ID",
                 "consumes": [
@@ -2274,7 +2267,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Post ID",
-                        "name": "postID",
+                        "name": "projectPostID",
                         "in": "path",
                         "required": true
                     }
@@ -2310,7 +2303,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "post ID",
-                        "name": "postID",
+                        "name": "projectPostID",
                         "in": "path",
                         "required": true
                     }
@@ -2331,7 +2324,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/project-posts/{postID}/all-discussions": {
+        "/project-posts/{projectPostID}/all-discussions": {
             "get": {
                 "description": "Returns all discussion IDs on this project post over all its previous versions, instead of only the current version",
                 "consumes": [
@@ -2348,7 +2341,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "post ID",
-                        "name": "postID",
+                        "name": "projectPostID",
                         "in": "path",
                         "required": true
                     }
@@ -2375,7 +2368,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/project-posts/{postID}/branches-by-status": {
+        "/project-posts/{projectPostID}/branches-by-status": {
             "get": {
                 "description": "Returns all branch IDs of this project post, grouped by each branch's branchreview status",
                 "consumes": [
@@ -2392,7 +2385,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "post ID",
-                        "name": "postID",
+                        "name": "projectPostID",
                         "in": "path",
                         "required": true
                     }
@@ -2913,7 +2906,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "projectPostIDs": {
+                "projectPostID": {
                     "type": "integer"
                 },
                 "renderStatus": {
@@ -2939,7 +2932,7 @@ const docTemplate = `{
         "models.BranchOverallReviewStatus": {
             "type": "string",
             "enum": [
-                "open for branchreview",
+                "open for review",
                 "peer reviewed",
                 "rejected"
             ],

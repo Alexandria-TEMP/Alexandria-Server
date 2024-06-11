@@ -40,10 +40,10 @@ type Branch struct {
 	/////////////////////////////////////////////
 	// The branch's proposed changes:
 
-	UpdatedPostTitle string
-
-	UpdatedCompletionStatus ProjectCompletionStatus
-	UpdatedScientificFields []ScientificField `gorm:"serializer:json"`
+	UpdatedPostTitle           *string
+	UpdatedCompletionStatus    *ProjectCompletionStatus
+	UpdatedScientificFields    []ScientificField `gorm:"serializer:json"`
+	UpdatedFeedbackPreferences *ProjectFeedbackPreference
 
 	/////////////////////////////////////////////
 	// The branch's metadata:
@@ -70,9 +70,9 @@ type Branch struct {
 type BranchDTO struct {
 	ID uint `json:"id"`
 	// MR's proposed changes
-	UpdatedPostTitle        string                  `json:"UpdatedPostTitle"`
-	UpdatedCompletionStatus ProjectCompletionStatus `json:"updatedCompletionStatus"`
-	UpdatedScientificFields []ScientificField       `json:"updatedScientificFields"`
+	UpdatedPostTitle        *string                  `json:"UpdatedPostTitle"`
+	UpdatedCompletionStatus *ProjectCompletionStatus `json:"updatedCompletionStatus"`
+	UpdatedScientificFields []ScientificField        `json:"updatedScientificFields"`
 	// MR metadata
 	CollaboratorIDs           []uint                    `json:"collaboratorIDs"`
 	ReviewIDs                 []uint                    `json:"reviewIDs"`

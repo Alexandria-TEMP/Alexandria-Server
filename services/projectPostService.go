@@ -70,8 +70,8 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 		OpenBranches: []*models.Branch{
 			{
 				// TODO make these fields optional maybe? so they dont have to be filled in
-				UpdatedPostTitle:        form.PostCreationForm.Title,
-				UpdatedCompletionStatus: form.ProjectCompletionStatus,
+				UpdatedPostTitle:        &form.PostCreationForm.Title,
+				UpdatedCompletionStatus: &form.ProjectCompletionStatus,
 				UpdatedScientificFields: form.PostCreationForm.ScientificFields,
 				Collaborators:           branchCollaborators,
 				Reviews:                 []*models.BranchReview{},

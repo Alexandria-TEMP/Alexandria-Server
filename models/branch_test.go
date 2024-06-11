@@ -10,6 +10,8 @@ import (
 
 func TestBranchJSONMarshaling(t *testing.T) {
 	projectPostID := uint(45)
+	updatedPostTitle := "Updated Post Title"
+	updatedCompletionStatus := Idea
 	// This model...
 	model := Branch{
 		Model: gorm.Model{ID: 44},
@@ -29,8 +31,8 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		},
 		ProjectPostID:             &projectPostID,
 		BranchTitle:               "My Cool MR",
-		UpdatedPostTitle:          "Updated Post Title",
-		UpdatedCompletionStatus:   Idea,
+		UpdatedPostTitle:          &updatedPostTitle,
+		UpdatedCompletionStatus:   &updatedCompletionStatus,
 		UpdatedScientificFields:   []ScientificField{Mathematics},
 		RenderStatus:              Pending,
 		BranchOverallReviewStatus: BranchOpenForReview,
@@ -43,8 +45,8 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		ReviewIDs:                 []uint{2},
 		ProjectPostID:             &projectPostID,
 		BranchTitle:               "My Cool MR",
-		UpdatedPostTitle:          "Updated Post Title",
-		UpdatedCompletionStatus:   Idea,
+		UpdatedPostTitle:          &updatedPostTitle,
+		UpdatedCompletionStatus:   &updatedCompletionStatus,
 		UpdatedScientificFields:   []ScientificField{Mathematics},
 		DiscussionIDs:             []uint{},
 		RenderStatus:              Pending,

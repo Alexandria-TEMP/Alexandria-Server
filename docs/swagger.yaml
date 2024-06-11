@@ -140,7 +140,7 @@ definitions:
         type: array
       id:
         type: integer
-      projectPostIDs:
+      projectPostID:
         type: integer
       renderStatus:
         $ref: '#/definitions/models.RenderStatus'
@@ -157,7 +157,7 @@ definitions:
     type: object
   models.BranchOverallReviewStatus:
     enum:
-    - open for branchreview
+    - open for review
     - peer reviewed
     - rejected
     type: string
@@ -492,34 +492,7 @@ paths:
       summary: Upload a new project version to a branch
       tags:
       - branches
-  /branches/{branchID}/branchreview-statuses:
-    get:
-      consumes:
-      - application/json
-      description: Returns an array of the statuses of all the reviews of this branch
-      parameters:
-      - description: branch ID
-        in: path
-        name: branchID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.BranchOverallReviewStatus'
-            type: array
-        "400":
-          description: Bad Request
-        "404":
-          description: Not Found
-      summary: Returns status of all branch reviews
-      tags:
-      - branches
-  /branches/{branchID}/can-branchreview/{memberID}:
+  /branches/{branchID}/can-review/{memberID}:
     get:
       consumes:
       - application/json
@@ -677,6 +650,33 @@ paths:
       summary: Get the repository of a branch
       tags:
       - branches
+  /branches/{branchID}/review-statuses:
+    get:
+      consumes:
+      - application/json
+      description: Returns an array of the statuses of all the reviews of this branch
+      parameters:
+      - description: branch ID
+        in: path
+        name: branchID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.BranchOverallReviewStatus'
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Returns status of all branch reviews
+      tags:
+      - branches
   /branches/{branchID}/tree:
     get:
       description: Get the filetree of a project of a branch
@@ -736,11 +736,6 @@ paths:
       - application/json
       description: Adds a branchreview to a branch
       parameters:
-      - description: branch ID
-        in: path
-        name: branchID
-        required: true
-        type: string
       - description: branchreview creation form
         in: body
         name: form
@@ -1833,7 +1828,7 @@ paths:
       summary: Update project post
       tags:
       - project-posts
-  /project-posts/{postID}:
+  /project-posts/{projectPostID}:
     delete:
       consumes:
       - application/json
@@ -1841,7 +1836,7 @@ paths:
       parameters:
       - description: post ID
         in: path
-        name: postID
+        name: projectPostID
         required: true
         type: string
       produces:
@@ -1865,7 +1860,7 @@ paths:
       parameters:
       - description: Post ID
         in: path
-        name: postID
+        name: projectPostID
         required: true
         type: string
       produces:
@@ -1882,7 +1877,7 @@ paths:
       summary: Get project post
       tags:
       - project-posts
-  /project-posts/{postID}/all-discussions:
+  /project-posts/{projectPostID}/all-discussions:
     get:
       consumes:
       - application/json
@@ -1891,7 +1886,7 @@ paths:
       parameters:
       - description: post ID
         in: path
-        name: postID
+        name: projectPostID
         required: true
         type: string
       produces:
@@ -1912,7 +1907,7 @@ paths:
       summary: Returns all discussion IDs associated with the project post
       tags:
       - project-posts
-  /project-posts/{postID}/branches-by-status:
+  /project-posts/{projectPostID}/branches-by-status:
     get:
       consumes:
       - application/json
@@ -1921,7 +1916,7 @@ paths:
       parameters:
       - description: post ID
         in: path
-        name: postID
+        name: projectPostID
         required: true
         type: string
       produces:

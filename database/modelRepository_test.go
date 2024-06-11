@@ -398,7 +398,7 @@ func TestQuerySimple(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedIDs := []uint{10, 12}
+	expectedIDs := []uint{12, 10}
 
 	if len(fetchedMembers) != len(expectedIDs) {
 		t.Fatalf("expected %d records, got %d", len(expectedIDs), len(fetchedMembers))
@@ -460,9 +460,9 @@ func TestQueryPaginated(t *testing.T) {
 	condition := "id >= 20"
 
 	expectedPages := [][]uint{
-		{20, 21, 41, 42},
-		{43, 60, 61, 62},
-		{78, 88},
+		{88, 78, 62, 61},
+		{60, 43, 42, 41},
+		{21, 20},
 	}
 
 	// For each page in the expected pages, perform a paginated query,

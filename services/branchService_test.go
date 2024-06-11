@@ -313,9 +313,8 @@ func TestGetReviewStatusSuccess(t *testing.T) {
 		BranchReviewDecision: models.Rejected,
 	}
 	branch := &models.Branch{
-		Model:            gorm.Model{ID: 10},
-		UpdatedPostTitle: "title",
-		Reviews:          []*models.BranchReview{approved, rejected},
+		Model:   gorm.Model{ID: 10},
+		Reviews: []*models.BranchReview{approved, rejected},
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
@@ -328,8 +327,7 @@ func TestGetReviewStatusFailedGetBranch(t *testing.T) {
 	beforeEachBranch(t)
 
 	branch := &models.Branch{
-		Model:            gorm.Model{ID: 10},
-		UpdatedPostTitle: "title",
+		Model: gorm.Model{ID: 10},
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, errors.New("failed"))
@@ -1112,4 +1110,74 @@ func TestGetFileFromProjectFileDoesNotExist(t *testing.T) {
 	absFilepath, err := branchService.GetFileFromProject(10, relFilepath)
 	assert.NotNil(t, err)
 	assert.Equal(t, "", absFilepath)
+}
+
+func TestMergeContributors(t *testing.T) {
+	postCollaborator1 := &models.PostCollaborator{
+		MemberID:          1,
+		CollaborationType: models.Contributor,
+	}
+	postCollaborator2 := &models.PostCollaborator{
+		MemberID:          2,
+		CollaborationType: models.Reviewer,
+	}
+	postCollaborator2again := &models.PostCollaborator{
+		MemberID:          0, // 0 since we haven't saved to db yet, at which point it will be 2
+		CollaborationType: models.Contributor,
+	}
+	branchCollaborator1 := &models.BranchCollaborator{
+		MemberID: 1,
+	}
+	branchCollaborator2 := &models.BranchCollaborator{
+		MemberID: 2,
+	}
+	projectPostBefore := &models.ProjectPost{
+		Post: models.Post{
+			Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2},
+		},
+	}
+	projectPostAfter := &models.ProjectPost{
+		Post: models.Post{
+			Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2, postCollaborator2again},
+		},
+	}
+
+	branchService.mergeContributors(projectPostBefore, []*models.BranchCollaborator{branchCollaborator1, branchCollaborator2})
+
+	assert.Equal(t, projectPostAfter, projectPostBefore)
+}
+
+func TestMergeReviewers(t *testing.T) {
+	postCollaborator1 := &models.PostCollaborator{
+		MemberID:          1,
+		CollaborationType: models.Contributor,
+	}
+	postCollaborator2 := &models.PostCollaborator{
+		MemberID:          2,
+		CollaborationType: models.Reviewer,
+	}
+	postCollaborator1again := &models.PostCollaborator{
+		MemberID:          0, // 0 since we haven't saved to db yet, at which point it will be 2
+		CollaborationType: models.Reviewer,
+	}
+	review1 := &models.BranchReview{
+		MemberID: 1,
+	}
+	review2 := &models.BranchReview{
+		MemberID: 2,
+	}
+	projectPostBefore := &models.ProjectPost{
+		Post: models.Post{
+			Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2},
+		},
+	}
+	projectPostAfter := &models.ProjectPost{
+		Post: models.Post{
+			Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2, postCollaborator1again},
+		},
+	}
+
+	branchService.mergeReviewers(projectPostBefore, []*models.BranchReview{review1, review2})
+
+	assert.Equal(t, projectPostAfter, projectPostBefore)
 }

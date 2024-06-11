@@ -88,10 +88,13 @@ func TestCreateBranch200(t *testing.T) {
 
 	mockBranchService.EXPECT().CreateBranch(gomock.Any()).Return(exampleBranch, nil, nil)
 
+	updatedPostTitle := "test"
+	updatedCompletionStatus := models.Completed
+	updatedFeedbackPreferences := models.DiscussionFeedback
 	form := forms.BranchCreationForm{
-		UpdatedPostTitle:           "test",
-		UpdatedCompletionStatus:    models.Completed,
-		UpdatedFeedbackPreferences: models.DiscussionFeedback,
+		UpdatedPostTitle:           &updatedPostTitle,
+		UpdatedCompletionStatus:    &updatedCompletionStatus,
+		UpdatedFeedbackPreferences: &updatedFeedbackPreferences,
 		UpdatedScientificFields:    []models.ScientificField{models.Mathematics},
 		CollaboratingMemberIDs:     []uint{1},
 		ProjectPostID:              5,
@@ -128,10 +131,13 @@ func TestCreateBranch404(t *testing.T) {
 
 	mockBranchService.EXPECT().CreateBranch(gomock.Any()).Return(exampleBranch, errors.New("parent branch not found"), nil)
 
+	updatedPostTitle := "test"
+	updatedCompletionStatus := models.Completed
+	updatedFeedbackPreferences := models.DiscussionFeedback
 	form := forms.BranchCreationForm{
-		UpdatedPostTitle:           "test",
-		UpdatedCompletionStatus:    models.Completed,
-		UpdatedFeedbackPreferences: models.DiscussionFeedback,
+		UpdatedPostTitle:           &updatedPostTitle,
+		UpdatedCompletionStatus:    &updatedCompletionStatus,
+		UpdatedFeedbackPreferences: &updatedFeedbackPreferences,
 		UpdatedScientificFields:    []models.ScientificField{models.Mathematics},
 		CollaboratingMemberIDs:     []uint{1},
 		ProjectPostID:              5,
@@ -154,10 +160,13 @@ func TestCreateBranch500(t *testing.T) {
 
 	mockBranchService.EXPECT().CreateBranch(gomock.Any()).Return(exampleBranch, nil, errors.New("internal server error"))
 
+	updatedPostTitle := "test"
+	updatedCompletionStatus := models.Completed
+	updatedFeedbackPreferences := models.DiscussionFeedback
 	form := forms.BranchCreationForm{
-		UpdatedPostTitle:           "test",
-		UpdatedCompletionStatus:    models.Completed,
-		UpdatedFeedbackPreferences: models.DiscussionFeedback,
+		UpdatedPostTitle:           &updatedPostTitle,
+		UpdatedCompletionStatus:    &updatedCompletionStatus,
+		UpdatedFeedbackPreferences: &updatedFeedbackPreferences,
 		UpdatedScientificFields:    []models.ScientificField{models.Mathematics},
 		CollaboratingMemberIDs:     []uint{1},
 		ProjectPostID:              5,

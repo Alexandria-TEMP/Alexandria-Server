@@ -90,6 +90,8 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 	assert.Nil(t, err404)
 	assert.Nil(t, err500)
 
+	updatedPostTitle := "My Awesome Project Post"
+	updatedCompletionStatus := models.Ongoing
 	expectedProjectPost := &models.ProjectPost{
 		Post: models.Post{
 			Collaborators: []*models.PostCollaborator{
@@ -106,8 +108,8 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 		},
 		OpenBranches: []*models.Branch{
 			{
-				UpdatedPostTitle:        "My Awesome Project Post",
-				UpdatedCompletionStatus: models.Ongoing,
+				UpdatedPostTitle:        &updatedPostTitle,
+				UpdatedCompletionStatus: &updatedCompletionStatus,
 				UpdatedScientificFields: []models.ScientificField{models.Mathematics},
 				Collaborators: []*models.BranchCollaborator{
 					{Member: memberA}, {Member: memberB},

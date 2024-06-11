@@ -234,27 +234,8 @@ func (branchService *BranchService) closeBranch(branch *models.Branch) error {
 
 	// merge into master if approved
 	if branch.BranchOverallReviewStatus == models.BranchPeerReviewed {
-		closedBranch.BranchReviewDecision = models.Approved
-
-		// checkout repo and then merge
-		branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
-
-		if err := branchService.Filesystem.Merge(fmt.Sprintf("%v", branch.ID), "master"); err != nil {
+		if err := branchService.merge(branch, closedBranch, projectPost); err != nil {
 			return err
-		}
-
-		// find the last branch merged into this project post
-		mergedBranches, err := branchService.ClosedBranchRepository.Query(&models.ClosedBranch{
-			ProjectPostID:        projectPost.ID,
-			BranchReviewDecision: models.Approved,
-		})
-
-		if err != nil {
-			return fmt.Errorf("failed to find merged branches in ClosedBranchRepository")
-		}
-
-		if len(mergedBranches) >= 1 {
-			closedBranch.SupercededBranch = &mergedBranches[0].Branch
 		}
 	}
 
@@ -286,6 +267,112 @@ func (branchService *BranchService) closeBranch(branch *models.Branch) error {
 	}
 
 	return nil
+}
+
+func (branchService *BranchService) merge(branch *models.Branch, closedBranch *models.ClosedBranch, projectPost *models.ProjectPost) error {
+	closedBranch.BranchReviewDecision = models.Approved
+
+	// checkout repo and then merge
+	branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+
+	if err := branchService.Filesystem.Merge(fmt.Sprintf("%v", branch.ID), "master"); err != nil {
+		return err
+	}
+
+	// find the last branch merged into this project post
+	mergedBranches, err := branchService.ClosedBranchRepository.Query(&models.ClosedBranch{
+		ProjectPostID:        projectPost.ID,
+		BranchReviewDecision: models.Approved,
+	})
+
+	if err != nil {
+		return fmt.Errorf("failed to find merged branches in ClosedBranchRepository")
+	}
+
+	if len(mergedBranches) >= 1 {
+		closedBranch.SupercededBranch = &mergedBranches[0].Branch
+	}
+
+	// merge metadata updates to the project post
+	if branch.UpdatedPostTitle != nil {
+		projectPost.Post.Title = *branch.UpdatedPostTitle
+	}
+
+	if branch.UpdatedCompletionStatus != nil {
+		projectPost.ProjectCompletionStatus = *branch.UpdatedCompletionStatus
+	}
+
+	if branch.UpdatedScientificFields != nil {
+		projectPost.Post.ScientificFields = branch.UpdatedScientificFields
+	}
+
+	if branch.UpdatedFeedbackPreferences != nil {
+		projectPost.ProjectFeedbackPreference = *branch.UpdatedFeedbackPreferences
+	}
+
+	// update project post contributors
+	branchService.mergeContributors(projectPost, branch.Collaborators)
+
+	// update project post reviewers
+	branchService.mergeReviewers(projectPost, branch.Reviews)
+
+	return nil
+}
+
+// We add all branch collaborators to the project post as post collaborators with the "reviewer" type, unless they have already been added as such
+func (branchService *BranchService) mergeReviewers(projectPost *models.ProjectPost, reviews []*models.BranchReview) {
+	// get all member ids which are reviewers present in post collaborators initially
+	collaboratorMemberIDs := []uint{}
+
+	for _, c := range projectPost.Post.Collaborators {
+		if c.CollaborationType == models.Reviewer {
+			collaboratorMemberIDs = append(collaboratorMemberIDs, c.MemberID)
+		}
+	}
+
+	// add all new post collaborators
+	for _, review := range reviews {
+		// if the member is already present as a post collaborator, we do not add it again
+		if slices.Contains(collaboratorMemberIDs, review.MemberID) {
+			continue
+		}
+
+		// otherwise we add this post collaborator
+		asPostCollaborator := models.PostCollaborator{
+			Member:            review.Member,
+			PostID:            projectPost.PostID,
+			CollaborationType: models.Reviewer,
+		}
+		projectPost.Post.Collaborators = append(projectPost.Post.Collaborators, &asPostCollaborator)
+	}
+}
+
+// We add all branch collaborators to the project post as post collaborators with the "contributor" type, unless they have already been added as such
+func (branchService *BranchService) mergeContributors(projectPost *models.ProjectPost, branchCollaborators []*models.BranchCollaborator) {
+	// get all member ids which are collaborators present in post collaborators initially
+	collaboratorMemberIDs := []uint{}
+
+	for _, c := range projectPost.Post.Collaborators {
+		if c.CollaborationType == models.Contributor {
+			collaboratorMemberIDs = append(collaboratorMemberIDs, c.MemberID)
+		}
+	}
+
+	// add all new post collaborators
+	for _, branchCollaborator := range branchCollaborators {
+		// if the member is already present as a post collaborator, we do not add it again
+		if slices.Contains(collaboratorMemberIDs, branchCollaborator.MemberID) {
+			continue
+		}
+
+		// otherwise we add this post collaborator
+		asPostCollaborator := models.PostCollaborator{
+			Member:            branchCollaborator.Member,
+			PostID:            projectPost.PostID,
+			CollaborationType: models.Contributor,
+		}
+		projectPost.Post.Collaborators = append(projectPost.Post.Collaborators, &asPostCollaborator)
+	}
 }
 
 // UpdateReviewStatus finds the current branchreview status
