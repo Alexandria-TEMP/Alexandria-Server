@@ -24,9 +24,9 @@ type TagController struct {
 // @Param		tagID		path		string			true	"tag ID"
 // @Produce		json
 // @Success 	200 		{object}	models.ScientificFieldTagDTO
-// @Failure		400 		
-// @Failure		404 		
-// @Failure		500			
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/tags/scientific/:tagID	[get]
 func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 	// extract the id of the scientific field tag
@@ -64,8 +64,8 @@ func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 // @Tags 		tags
 // @Produce		json
 // @Success 	200		{array}		models.ScientificFieldTagDTO
-// @Failure		404 	
-// @Failure		500		
+// @Failure		404
+// @Failure		500
 // @Router 		/tags/scientific	[get]
 func (tagController *TagController) GetScientificTags(c *gin.Context) {
 	tagObjects, err := tagController.TagService.GetAllScientificFieldTags()
