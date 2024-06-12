@@ -16,9 +16,10 @@ import (
 )
 
 type PostService struct {
-	PostRepository   database.ModelRepositoryInterface[*models.Post]
-	MemberRepository database.ModelRepositoryInterface[*models.Member]
-	Filesystem       filesystemInterfaces.Filesystem
+	PostRepository                        database.ModelRepositoryInterface[*models.Post]
+	MemberRepository                      database.ModelRepositoryInterface[*models.Member]
+	ScientificFieldTagContainerRepository database.ModelRepositoryInterface[*models.ScientificFieldTagContainer]
+	Filesystem                            filesystemInterfaces.Filesystem
 
 	PostCollaboratorService interfaces.PostCollaboratorService
 	RenderService           interfaces.RenderService
@@ -40,16 +41,22 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 		return nil, fmt.Errorf("could not create post: %w", err)
 	}
 
+	// create and save the tag container to avoid issues with saving later (preloading stuff?)
 	postFields := form.ScientificFieldTags
-	postTagContainer := models.ScientificFieldTagContainer{
+	postTagContainer := &models.ScientificFieldTagContainer{
 		ScientificFieldTags: postFields,
 	}
 
+	if err := postService.ScientificFieldTagContainerRepository.Create(postTagContainer); err != nil {
+		return nil, fmt.Errorf("failed to add tag container to db: %w", err)
+	}
+
+	// construct post
 	post := models.Post{
 		Collaborators:               postCollaborators,
 		Title:                       form.Title,
 		PostType:                    form.PostType,
-		ScientificFieldTagContainer: postTagContainer,
+		ScientificFieldTagContainer: *postTagContainer,
 		DiscussionContainer: models.DiscussionContainer{
 			// The discussion list is initially empty
 			Discussions: []*models.Discussion{},
