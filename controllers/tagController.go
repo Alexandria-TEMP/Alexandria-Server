@@ -28,7 +28,6 @@ type TagController struct {
 // @Failure		400 		{object} 	utils.HTTPError
 // @Failure		404 		{object} 	utils.HTTPError
 // @Failure		500			{object}	utils.HTTPError
-// @Router 		/members/{memberID}	[get]
 // @Router 		/tags/scientific/:tagID	[get]
 func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 	// extract the id of the scientific field tag

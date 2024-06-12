@@ -1125,7 +1125,7 @@ const docTemplate = `{
         },
         "/members/{memberID}": {
             "get": {
-                "description": "Get a scientific field tag by tag ID",
+                "description": "Get a member by member ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1135,12 +1135,21 @@ const docTemplate = `{
                 "tags": [
                     "members"
                 ],
-                "summary": "Get scientific field tag from database",
+                "summary": "Get member from database",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "member ID",
+                        "name": "memberID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/tags.ScientificFieldTagDTO"
+                            "$ref": "#/definitions/models.MemberDTO"
                         }
                     },
                     "400": {

@@ -1157,14 +1157,20 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a scientific field tag by tag ID
+      description: Get a member by member ID
+      parameters:
+      - description: member ID
+        in: path
+        name: memberID
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/tags.ScientificFieldTagDTO'
+            $ref: '#/definitions/models.MemberDTO'
         "400":
           description: Bad Request
           schema:
@@ -1177,7 +1183,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Get scientific field tag from database
+      summary: Get member from database
       tags:
       - members
   /members/{memberID}/branches:
