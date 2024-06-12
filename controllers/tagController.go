@@ -20,7 +20,7 @@ type TagController struct {
 // GetScientificFieldTag godoc
 // @Summary 	Get scientific field tag from database
 // @Description Get a scientific field tag by tag ID
-// @Tags 		members
+// @Tags 		tags
 // @Accept  	json
 // @Param		tagID		path		string			true	"tag ID"
 // @Produce		json
