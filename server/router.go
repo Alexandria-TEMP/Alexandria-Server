@@ -43,6 +43,8 @@ func SetUpRouter(controllers *ControllerEnv) *gin.Engine {
 
 	discussionRouter(v2, controllers)
 
+	discussionContainerRouter(v2, controllers)
+
 	return router
 }
 
@@ -63,7 +65,8 @@ func tagRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 func discussionRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	discussionRouter := v2.Group("/discussions")
 	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
-	discussionRouter.POST("", controllers.discussionController.CreateDiscussion)
+	discussionRouter.POST("/roots", controllers.discussionController.CreateRootDiscussion)
+	discussionRouter.POST("/replies", controllers.discussionController.CreateReplyDiscussion)
 	discussionRouter.DELETE("/:discussionID", controllers.discussionController.DeleteDiscussion)
 	discussionRouter.POST("/:discussionID/reports", controllers.discussionController.AddDiscussionReport)
 	discussionRouter.GET("/:discussionID/reports", controllers.discussionController.GetDiscussionReports)
@@ -138,4 +141,9 @@ func postRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	postRouter.GET("/:postID/repository", controllers.postController.GetMainProject)
 	postRouter.GET("/:postID/tree", controllers.postController.GetMainFiletree)
 	postRouter.GET("/:postID/file/*filepath", controllers.postController.GetMainFileFromProject)
+}
+
+func discussionContainerRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
+	discussionContainerRouter := v2.Group("/discussion-containers")
+	discussionContainerRouter.GET("/:discussionContainerID", controllers.discussionContainerController.GetDiscussionContainer)
 }

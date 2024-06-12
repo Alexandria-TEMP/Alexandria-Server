@@ -1,15 +1,12 @@
 image: golang:1.22.2
-
-.go-cache:
-    variables:
-      GOPATH: $CI_PROJECT_DIR/.go
-    before_script:
-      - mkdir -p .go
-    cache:
-      paths:
-        - .go/pkg/mod/
+      
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .go/pkg/mod/
 
 variables:
+  GOPATH: $CI_PROJECT_DIR/.go
   OUTPUT_NAME: __bin__/$CI_PROJECT_NAME
 
 stages:
@@ -20,9 +17,9 @@ stages:
 lint:
     image: golangci/golangci-lint:v1.57.2
     stage: lint
-    extends: .go-cache
     allow_failure: false
     script:
+      - mkdir -p .go
       - golangci-lint run -vc .golangci.yml
 
 build:
@@ -31,6 +28,7 @@ build:
     - mkdir -p $OUTPUT_NAME
     - go build -o $OUTPUT_NAME ./...
   artifacts:
+    expire_in: 1 day
     paths:
       - $OUTPUT_NAME
 
@@ -38,11 +36,11 @@ test_reports:
   stage: test
   script:
     - go test ./... -short -coverprofile=coverage.out -covermode count
-    - go get github.com/boumenot/gocover-cobertura
+    - go get github.com/boumenot/gocover-cobertura@v1.2.0
     - go run github.com/boumenot/gocover-cobertura < coverage.out > coverage.xml 
     
-    - go install gotest.tools/gotestsum@v1.12.0
-    - gotestsum --junitfile junit.xml --format testname -- -short
+    - go get gotest.tools/gotestsum@v1.12.0
+    - go run gotest.tools/gotestsum --junitfile junit.xml --format testname -- -short
     
   artifacts:
     name: "$CI_JOB_NAME"

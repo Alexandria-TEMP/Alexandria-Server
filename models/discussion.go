@@ -6,43 +6,28 @@ import (
 	"gorm.io/gorm"
 )
 
-type DiscussionContainer struct {
-	gorm.Model
-
-	// DiscussionContainer has many Discussion
-	Discussions []*Discussion `gorm:"foreignKey:ContainerID"`
-}
-
-func (model *DiscussionContainer) GetID() uint {
-	return model.Model.ID
-}
-
 type Discussion struct {
 	gorm.Model
 
 	// Discussion belongs to DiscussionContainer
 	ContainerID uint
 
-	// Discussion belongs to Member
-	Member   Member `gorm:"foreignKey:MemberID"`
-	MemberID uint
+	// Discussion optionally belongs to Member (anonymity is possible)
+	Member   *Member `gorm:"foreignKey:MemberID"`
+	MemberID *uint
 
 	// Discussion optionally has many Discussion
 	Replies  []*Discussion `gorm:"foreignKey:ParentID"`
 	ParentID *uint
 
-	Text      string
-	Deleted   bool
-	Anonymous bool
+	Text string
 }
 
 type DiscussionDTO struct {
-	ID        uint   `json:"id"`
-	MemberID  uint   `json:"memberID"`
-	ReplyIDs  []uint `json:"replyIDs"`
-	Text      string `json:"text"`
-	Deleted   bool   `json:"deleted"`
-	Anonymous bool   `json:"anonymous"`
+	ID       uint   `json:"id"`
+	MemberID *uint  `json:"memberID"`
+	ReplyIDs []uint `json:"replyIDs"`
+	Text     string `json:"text"`
 }
 
 func (model *Discussion) GetID() uint {
@@ -55,8 +40,6 @@ func (model *Discussion) IntoDTO() DiscussionDTO {
 		model.MemberID,
 		discussionsIntoIDs(model.Replies),
 		model.Text,
-		model.Deleted,
-		model.Anonymous,
 	}
 }
 

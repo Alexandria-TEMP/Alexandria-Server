@@ -38,6 +38,9 @@ var (
 
 	memberA, memberB, memberC models.Member
 
+	discussionA          models.Discussion
+	discussionContainerA models.DiscussionContainer
+
 	projectPost *models.ProjectPost
 
 	c   *gin.Context

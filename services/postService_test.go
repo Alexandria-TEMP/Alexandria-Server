@@ -57,6 +57,10 @@ func postServiceSetup(t *testing.T) {
 	mockMemberRepository.EXPECT().GetByID(memberB.ID).Return(&memberB, nil).AnyTimes()
 	mockMemberRepository.EXPECT().GetByID(memberC.ID).Return(&memberC, nil).AnyTimes()
 	mockMemberRepository.EXPECT().GetByID(uint(0)).Return(nil, fmt.Errorf("member does not exist")).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(memberA.ID).Return(&memberA, nil).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(memberB.ID).Return(&memberB, nil).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(memberC.ID).Return(&memberC, nil).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(uint(0)).Return(nil, fmt.Errorf("member does not exist")).AnyTimes()
 }
 
 func postServiceTeardown() {
@@ -142,6 +146,7 @@ func TestCreatePostNonExistingMembers(t *testing.T) {
 	}
 
 	// Setup mock function return values
+	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, false, models.Author).Return(nil, fmt.Errorf("oh no")).Times(1)
 	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, false, models.Author).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
@@ -257,6 +262,7 @@ func TestCreatePostWithBadPostType(t *testing.T) {
 		ScientificFields: []models.ScientificField{models.Mathematics},
 	}
 
+	mockPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
 	mockPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
 
 	// Function under test
@@ -568,6 +574,7 @@ func TestGetPost(t *testing.T) {
 	}
 
 	mockPostRepository.EXPECT().GetByID(uint(10)).Return(databasePost, nil).Times(1)
+	mockPostRepository.EXPECT().GetByID(uint(10)).Return(databasePost, nil).Times(1)
 
 	// Function under test
 	fetchedPost, err := postService.GetPost(10)
@@ -615,6 +622,7 @@ func TestFilterFailed(t *testing.T) {
 	postServiceSetup(t)
 	t.Cleanup(postServiceTeardown)
 
+	mockPostRepository.EXPECT().QueryPaginated(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
 	mockPostRepository.EXPECT().QueryPaginated(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test

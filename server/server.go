@@ -26,23 +26,26 @@ type RepositoryEnv struct {
 }
 
 type ServiceEnv struct {
-	postService               interfaces.PostService
-	memberService             interfaces.MemberService
-	branchService             interfaces.BranchService
-	renderService             interfaces.RenderService
-	projectPostService        interfaces.ProjectPostService
-	postCollaboratorService   interfaces.PostCollaboratorService
-	branchCollaboratorService interfaces.BranchCollaboratorService
+	postService                interfaces.PostService
+	memberService              interfaces.MemberService
+	branchService              interfaces.BranchService
+	renderService              interfaces.RenderService
+	projectPostService         interfaces.ProjectPostService
+	postCollaboratorService    interfaces.PostCollaboratorService
+	branchCollaboratorService  interfaces.BranchCollaboratorService
+	discussionService          interfaces.DiscussionService
+	discussionContainerService interfaces.DiscussionContainerService
 }
 
 type ControllerEnv struct {
-	postController        *controllers.PostController
-	memberController      *controllers.MemberController
-	projectPostController *controllers.ProjectPostController
-	discussionController  *controllers.DiscussionController
-	filterController      *controllers.FilterController
-	branchController      *controllers.BranchController
-	tagController         *controllers.TagController
+	postController                *controllers.PostController
+	memberController              *controllers.MemberController
+	projectPostController         *controllers.ProjectPostController
+	discussionController          *controllers.DiscussionController
+	discussionContainerController *controllers.DiscussionContainerController
+	filterController              *controllers.FilterController
+	branchController              *controllers.BranchController
+	tagController                 *controllers.TagController
 }
 
 func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
@@ -105,16 +108,27 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		BranchCollaboratorService: branchCollaboratorService,
 		BranchService:             branchService,
 	}
+	discussionService := &services.DiscussionService{
+		DiscussionRepository:          repositoryEnv.discussionRepository,
+		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
+		MemberRepository:              repositoryEnv.memberRepository,
+	}
+
+	discussionContainerService := &services.DiscussionContainerService{
+		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
+	}
 	renderService.BranchService = branchService // added afterwards since both require eachother
 
 	return ServiceEnv{
-		postService:               postService,
-		projectPostService:        projectPostService,
-		memberService:             memberService,
-		renderService:             renderService,
-		branchService:             branchService,
-		postCollaboratorService:   postCollaboratorService,
-		branchCollaboratorService: branchCollaboratorService,
+		postService:                postService,
+		projectPostService:         projectPostService,
+		memberService:              memberService,
+		renderService:              renderService,
+		branchService:              branchService,
+		postCollaboratorService:    postCollaboratorService,
+		branchCollaboratorService:  branchCollaboratorService,
+		discussionService:          discussionService,
+		discussionContainerService: discussionContainerService,
 	}
 }
 
@@ -131,8 +145,16 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 			ProjectPostService: serviceEnv.projectPostService,
 			RenderService:      serviceEnv.renderService,
 		},
-		discussionController: &controllers.DiscussionController{},
-		filterController:     &controllers.FilterController{},
+		discussionController: &controllers.DiscussionController{
+			DiscussionService: serviceEnv.discussionService,
+		},
+		discussionContainerController: &controllers.DiscussionContainerController{
+			DiscussionContainerService: serviceEnv.discussionContainerService,
+		},
+		filterController: &controllers.FilterController{
+			PostService:        serviceEnv.postService,
+			ProjectPostService: serviceEnv.projectPostService,
+		},
 		branchController: &controllers.BranchController{
 			BranchService:             serviceEnv.branchService,
 			RenderService:             serviceEnv.renderService,
