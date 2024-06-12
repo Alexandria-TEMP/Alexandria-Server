@@ -38,7 +38,7 @@ func (branchService *BranchService) GetBranch(branchID uint) (models.Branch, err
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 
 	if err != nil {
-		return *branch, fmt.Errorf("failed to find branch with id %v", branchID)
+		return *branch, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
 	}
 
 	return *branch, nil
@@ -51,20 +51,20 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 	projectPost, err := branchService.ProjectPostRepository.GetByID(branchCreationForm.ProjectPostID)
 
 	if err != nil {
-		return branch, fmt.Errorf("no such project post exists"), nil
+		return branch, fmt.Errorf("failed to find project post with id %v: %w", branchCreationForm.ProjectPostID, err), nil
 	}
 
 	// create and save discussion new container
 	// we shouldn't have to do this extra, it should be implicit but it isnt...
 	discussionContainer := models.DiscussionContainer{}
 	if err := branchService.DiscussionContainerRepository.Create(&discussionContainer); err != nil {
-		return branch, fmt.Errorf("failed to add discussion container to db"), nil
+		return branch, fmt.Errorf("failed to add discussion container to db: %w", err), nil
 	}
 
 	// get all collaborators from ids
 	collaborators, err := branchService.BranchCollaboratorService.MembersToBranchCollaborators(branchCreationForm.CollaboratingMemberIDs, branchCreationForm.Anonymous)
 	if err != nil {
-		return branch, err, nil
+		return branch, fmt.Errorf("failed to convert member ids to branch collaborators: %w", err), nil
 	}
 
 	// make new branch
@@ -84,7 +84,7 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 	projectPost.OpenBranches = append(projectPost.OpenBranches, &branch)
 
 	if _, err := branchService.ProjectPostRepository.Update(projectPost); err != nil {
-		return branch, nil, fmt.Errorf("failed to update project post with new branch")
+		return branch, nil, fmt.Errorf("failed to update project post with new branch: %w", err)
 	}
 
 	// set vfs to repository according to the Post of the ProjectPost of the Branch entity
@@ -92,7 +92,7 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 
 	// create new branch in git repo with branch ID as its name
 	if err := branchService.Filesystem.CreateBranch(fmt.Sprintf("%v", branch.ID)); err != nil {
-		return branch, nil, err
+		return branch, nil, fmt.Errorf("failed create branch: %w", err)
 	}
 
 	return branch, nil, nil
@@ -103,14 +103,14 @@ func (branchService *BranchService) DeleteBranch(branchID uint) error {
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 
 	if err != nil {
-		return fmt.Errorf("failed to find branch with id %v", branchID)
+		return fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
 	}
 
 	// get project post
 	projectPost, err := branchService.GetBranchProjectPost(branch)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get the project post of branch %v: %w", branch.ID, err)
 	}
 
 	// checkout repository
@@ -118,12 +118,12 @@ func (branchService *BranchService) DeleteBranch(branchID uint) error {
 
 	// delete branch
 	if err := branchService.Filesystem.DeleteBranch(fmt.Sprintf("%v", branchID)); err != nil {
-		return fmt.Errorf("failed to delete branch from vfs with id %v", branchID)
+		return fmt.Errorf("failed to delete branch from vfs with id %v: %w", branchID, err)
 	}
 
 	// delete entity
 	if err := branchService.BranchRepository.Delete(branchID); err != nil {
-		return fmt.Errorf("failed to find branch with id %v", branchID)
+		return fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
 	}
 
 	return nil
@@ -134,7 +134,7 @@ func (branchService *BranchService) GetReviewStatus(branchID uint) ([]models.Bra
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to find branch with id %v", branchID)
+		return nil, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
 	}
 
 	// get all decisions
@@ -151,7 +151,7 @@ func (branchService *BranchService) GetReview(reviewID uint) (models.BranchRevie
 	branchreview, err := branchService.ReviewRepository.GetByID(reviewID)
 
 	if err != nil {
-		return *branchreview, fmt.Errorf("failed to find branch with id %v", reviewID)
+		return *branchreview, fmt.Errorf("failed to find branch with id %v: %w", reviewID, err)
 	}
 
 	return *branchreview, nil
@@ -164,14 +164,14 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 	branch, err := branchService.BranchRepository.GetByID(form.BranchID)
 
 	if err != nil {
-		return branchreview, fmt.Errorf("failed to find branch with id %v", form.BranchID)
+		return branchreview, fmt.Errorf("failed to find branch with id %v: %w", form.BranchID, err)
 	}
 
 	// get member
 	member, err := branchService.MemberRepository.GetByID(form.ReviewingMemberID)
 
 	if err != nil {
-		return branchreview, fmt.Errorf("failed to find member with id %v", form.ReviewingMemberID)
+		return branchreview, fmt.Errorf("failed to find member with id %v: %w", form.ReviewingMemberID, err)
 	}
 
 	// make new branchreview
@@ -183,7 +183,7 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 	}
 
 	if err := branchService.ReviewRepository.Create(&branchreview); err != nil {
-		return branchreview, fmt.Errorf("failed to add branch review to db")
+		return branchreview, fmt.Errorf("failed to add branch review to db: %w", err)
 	}
 
 	// update branch with new branchreview and update branchreview status accordingly
@@ -193,7 +193,7 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 	// if approved or rejected we close the branch
 	if branch.BranchOverallReviewStatus == models.BranchPeerReviewed || branch.BranchOverallReviewStatus == models.BranchRejected {
 		if err := branchService.closeBranch(branch); err != nil {
-			return branchreview, err
+			return branchreview, fmt.Errorf("failed to close branch: %w", err)
 		}
 
 		return branchreview, nil
@@ -201,7 +201,7 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 
 	// save changes to branch
 	if _, err := branchService.BranchRepository.Update(branch); err != nil {
-		return branchreview, fmt.Errorf("failed to save branch branchreview")
+		return branchreview, fmt.Errorf("failed to save branch branchreview: %w", err)
 	}
 
 	return branchreview, nil
@@ -212,7 +212,7 @@ func (branchService *BranchService) closeBranch(branch *models.Branch) error {
 	projectPost, err := branchService.GetBranchProjectPost(branch)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get the project post of branch %v: %w", branch.ID, err)
 	}
 
 	// close branch
@@ -340,7 +340,7 @@ func (branchService *BranchService) MemberCanReview(branchID, memberID uint) (bo
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 
 	if err != nil {
-		return false, fmt.Errorf("failed to find branch with id %v", branchID)
+		return false, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
 	}
 
 	// get project post
@@ -374,7 +374,7 @@ func (branchService *BranchService) GetProject(branchID uint) (string, error) {
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 
 	if err != nil {
-		return filePath, fmt.Errorf("failed to find branch with id %v", branchID)
+		return filePath, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
 	}
 
 	// get project post
@@ -400,7 +400,7 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 
 	if err != nil {
-		return fmt.Errorf("failed to find branch with id %v", branchID)
+		return fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
 	}
 
 	// get project post
@@ -454,7 +454,7 @@ func (branchService *BranchService) GetFiletree(branchID uint) (map[string]int64
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to find branch with id %v", branchID), nil
+		return nil, fmt.Errorf("failed to find branch with id %v: %w", branchID, err), nil
 	}
 
 	// get project post. if branch is clsoed we need to get the project post id via the closed branch
@@ -529,7 +529,7 @@ func (branchService *BranchService) GetFileFromProject(branchID uint, relFilepat
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 
 	if err != nil {
-		return absFilepath, fmt.Errorf("failed to find branch with id %v", branchID)
+		return absFilepath, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
 	}
 
 	// get project post

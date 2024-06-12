@@ -101,7 +101,7 @@ func TestCreatePostGoodWeather(t *testing.T) {
 	createdPost, err := postService.CreatePost(&postCreationForm)
 
 	if err != nil {
-		t.Fatalf("creating a post failed: %s", err)
+		t.Fatalf("creating a post failed: %w", err)
 	}
 
 	expectedPost := &models.Post{
@@ -188,7 +188,7 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 	createdPost, err := postService.CreatePost(&postCreationForm)
 
 	if err != nil {
-		t.Fatalf("creating a post failed: %s", err)
+		t.Fatalf("creating a post failed: %w", err)
 	}
 
 	expectedPost := models.Post{

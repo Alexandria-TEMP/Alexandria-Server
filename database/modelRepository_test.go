@@ -18,7 +18,7 @@ var member models.Member
 func beforeEach() {
 	database, err := InitializeTestDatabase()
 	if err != nil {
-		log.Fatalf("Could not initialize test database: %s", err)
+		log.Fatalf("Could not initialize test database: %w", err)
 	}
 
 	testDB = database
@@ -100,7 +100,7 @@ func TestCreateFails(t *testing.T) {
 	err := memberRepository.Create(&memberA)
 
 	if err != nil {
-		t.Fatalf("could not create first member: %s", err)
+		t.Fatalf("could not create first member: %w", err)
 	}
 
 	err = memberRepository.Create(&memberA)

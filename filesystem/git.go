@@ -23,21 +23,21 @@ func (filesystem *Filesystem) CreateRepository() error {
 	_, err := git.PlainInit(directory, false)
 
 	if err != nil {
-		return fmt.Errorf("failed git init")
+		return fmt.Errorf("failed git init: %w", err)
 	}
 
 	// set CurrentRepository to new repo
 	filesystem.CurrentRepository, err = filesystem.CheckoutRepository()
 
 	if err != nil {
-		return fmt.Errorf("failed to open new repo")
+		return fmt.Errorf("failed to open new repo: %w", err)
 	}
 
 	// create initial files
 	err = cp.Copy("/app/utils/template_repo", filesystem.CurrentDirPath)
 
 	if err != nil {
-		return fmt.Errorf("failed to copy over default repository")
+		return fmt.Errorf("failed to copy over default repository: %w", err)
 	}
 
 	// make initial commit
@@ -55,7 +55,7 @@ func (filesystem *Filesystem) CheckoutRepository() (*git.Repository, error) {
 	r, err := git.PlainOpen(filesystem.CurrentDirPath)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to open repository")
+		return nil, fmt.Errorf("failed to open repository: %w", err)
 	}
 
 	return r, nil
@@ -72,7 +72,7 @@ func (filesystem *Filesystem) CreateBranch(branchName string) error {
 	fromCommit, err := filesystem.GetLastCommit("master")
 
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get last commit on master: %w", err)
 	}
 
 	// git checkout master
@@ -81,7 +81,7 @@ func (filesystem *Filesystem) CreateBranch(branchName string) error {
 
 	// save branch to .git
 	if err = filesystem.CurrentRepository.Storer.SetReference(ref); err != nil {
-		return fmt.Errorf("failed to create new branch")
+		return fmt.Errorf("failed to save branch reference: %w", err)
 	}
 
 	return nil
@@ -90,7 +90,7 @@ func (filesystem *Filesystem) CreateBranch(branchName string) error {
 func (filesystem *Filesystem) DeleteBranch(branchName string) error {
 	// checkout master
 	if err := filesystem.CheckoutBranch("master"); err != nil {
-		return fmt.Errorf("failed to checkout branch master")
+		return fmt.Errorf("failed to checkout branch master: %w", err)
 	}
 
 	// git branch -d <branchName>
@@ -98,7 +98,7 @@ func (filesystem *Filesystem) DeleteBranch(branchName string) error {
 	cmd.Dir = filesystem.CurrentDirPath
 
 	if out, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("failed to delete branch %v with message:\n %v", branchName, out)
+		return fmt.Errorf("failed to delete branch %s:\n%s", branchName, string(out))
 	}
 
 	return nil
@@ -114,19 +114,19 @@ func (filesystem *Filesystem) Merge(toMerge, mergeInto string) error {
 	w, err := filesystem.CurrentRepository.Worktree()
 
 	if err != nil {
-		return fmt.Errorf("failed to open worktree")
+		return fmt.Errorf("failed to open worktree: %w", err)
 	}
 
 	// checkout master to merge into it
 	if err := filesystem.CheckoutBranch(mergeInto); err != nil {
-		return err
+		return fmt.Errorf("failed to checkout branch %s: %w", mergeInto, err)
 	}
 
 	// get last commit on <branchName>
 	lastCommit, err := filesystem.GetLastCommit(toMerge)
 
 	if err != nil {
-		return fmt.Errorf("failed to fetch last commit on %s", toMerge)
+		return fmt.Errorf("failed to get last commit on %s: %w", toMerge, err)
 	}
 
 	// git reset --hard <branchName>
@@ -136,12 +136,12 @@ func (filesystem *Filesystem) Merge(toMerge, mergeInto string) error {
 	})
 
 	if err != nil {
-		return fmt.Errorf("failed to reset master to %s", toMerge)
+		return fmt.Errorf("failed to reset master to %s: %w", toMerge, err)
 	}
 
 	// git clean --ffxd
 	if err := w.Clean(&git.CleanOptions{Dir: true}); err != nil {
-		return fmt.Errorf("failed to clean master")
+		return fmt.Errorf("failed to clean master: %w", err)
 	}
 
 	return nil
@@ -157,11 +157,11 @@ func (filesystem *Filesystem) Reset() error {
 	w, err := filesystem.CurrentRepository.Worktree()
 
 	if err != nil {
-		return fmt.Errorf("failed to open worktree")
+		return fmt.Errorf("failed to open worktree: %w", err)
 	}
 
 	if err := w.Reset(&git.ResetOptions{Mode: git.HardReset}); err != nil {
-		return fmt.Errorf("failed to reset current branch")
+		return fmt.Errorf("failed to reset current branch: %w", err)
 	}
 
 	return nil
@@ -178,17 +178,17 @@ func (filesystem *Filesystem) CreateCommit() error {
 	w, err := filesystem.CurrentRepository.Worktree()
 
 	if err != nil {
-		return fmt.Errorf("failed to open worktree")
+		return fmt.Errorf("failed to open worktree: %w", err)
 	}
 
 	// git add .
 	if err = w.AddWithOptions(&git.AddOptions{All: true}); err != nil {
-		return fmt.Errorf("failed to stage all changes")
+		return fmt.Errorf("failed to stage all changes: %w", err)
 	}
 
 	// git commit -m "-"
 	if _, err = w.Commit("-", &git.CommitOptions{AllowEmptyCommits: true}); err != nil {
-		return fmt.Errorf("failed to commit stages changes: %w", err)
+		return fmt.Errorf("failed to commit staged changes: %w", err)
 	}
 
 	return nil
@@ -205,12 +205,12 @@ func (filesystem *Filesystem) CheckoutBranch(branchName string) error {
 	w, err := filesystem.CurrentRepository.Worktree()
 
 	if err != nil {
-		return fmt.Errorf("failed to open worktree")
+		return fmt.Errorf("failed to open worktree: %w", err)
 	}
 
 	// git reset --hard
 	if err := w.Reset(&git.ResetOptions{Mode: git.HardReset}); err != nil {
-		return fmt.Errorf("failed to reset branch %s", branchName)
+		return fmt.Errorf("failed to reset branch %s: %w", branchName, err)
 	}
 
 	// git checkout <branchName>
@@ -220,17 +220,17 @@ func (filesystem *Filesystem) CheckoutBranch(branchName string) error {
 	}
 
 	if err := w.Checkout(&branchCoOpts); err != nil {
-		return fmt.Errorf("failed to checkout branch %s", branchName)
+		return fmt.Errorf("failed to checkout branch %s: %w", branchName, err)
 	}
 
 	// git reset --hard
 	if err := w.Reset(&git.ResetOptions{Mode: git.HardReset}); err != nil {
-		return fmt.Errorf("failed to reset branch %s", branchName)
+		return fmt.Errorf("failed to reset branch %s: %w", branchName, err)
 	}
 
 	// git clean --ffxd
 	if err := w.Clean(&git.CleanOptions{Dir: true}); err != nil {
-		return fmt.Errorf("failed to clean branch %s", branchName)
+		return fmt.Errorf("failed to clean branch %s: %w", branchName, err)
 	}
 
 	return nil
@@ -246,7 +246,7 @@ func (filesystem *Filesystem) GetLastCommit(branchName string) (*plumbing.Refere
 	ref, err := filesystem.CurrentRepository.Reference(plumbing.NewBranchReferenceName(branchName), true)
 
 	if err != nil || ref.Type() == plumbing.InvalidReference {
-		return nil, fmt.Errorf("failed to get master ref")
+		return nil, fmt.Errorf("failed to get master ref: %w", err)
 	}
 
 	return ref, nil
@@ -262,12 +262,12 @@ func (filesystem *Filesystem) CleanDir() error {
 	w, err := filesystem.CurrentRepository.Worktree()
 
 	if err != nil {
-		return fmt.Errorf("failed to open worktree")
+		return fmt.Errorf("failed to open worktree: %w", err)
 	}
 
 	// git add . (add all files, in order to track them)
 	if err = w.AddWithOptions(&git.AddOptions{All: true}); err != nil {
-		return fmt.Errorf("failed to stage all changes")
+		return fmt.Errorf("failed to stage all changes: %w", err)
 	}
 
 	// git rm -rf . (then remove all tracked files)
@@ -275,7 +275,7 @@ func (filesystem *Filesystem) CleanDir() error {
 	cmd.Dir = filesystem.CurrentDirPath
 
 	if out, err := cmd.CombinedOutput(); err != nil && string(out) != "fatal: pathspec '.' did not match any files\n" {
-		return fmt.Errorf("failed to remove all files from index:\n%s", out)
+		return fmt.Errorf("failed to remove currently staged files:\n%s", string(out))
 	}
 
 	return nil

@@ -2,6 +2,7 @@ package filesystem
 
 import (
 	"archive/zip"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
@@ -78,7 +79,7 @@ func (filesystem *Filesystem) SaveZipFile(c *gin.Context, file *multipart.FileHe
 	err := c.SaveUploadedFile(file, filesystem.CurrentZipFilePath)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to save uploaded file: %w", err)
 	}
 
 	return nil
@@ -100,28 +101,28 @@ func (filesystem *Filesystem) Unzip() error {
 			err = os.MkdirAll(filePath, os.ModePerm)
 
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to make directory: %w", err)
 			}
 
 			continue
 		}
 
 		if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
-			return err
+			return fmt.Errorf("failed to make file: %w", err)
 		}
 
 		dstFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to open file to copy: %w", err)
 		}
 
 		fileInArchive, err := f.Open()
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to open file in zip: %w", err)
 		}
 
 		if _, err := io.Copy(dstFile, fileInArchive); err != nil {
-			return err
+			return fmt.Errorf("failed to copy file contents: %w", err)
 		}
 
 		dstFile.Close()
@@ -179,14 +180,14 @@ func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
 
 			relativePath, err := filepath.Rel(filesystem.CurrentQuartoDirPath, path)
 
+			if err != nil {
+				return fmt.Errorf("the rquested file lies outside of the repository: %w", err)
+			}
+
 			// If its a directory add it with size -1
 			if info.IsDir() {
 				fileTree[relativePath] = -1
 				return nil
-			}
-
-			if err != nil {
-				return err
 			}
 
 			fileTree[relativePath] = info.Size()
@@ -195,7 +196,7 @@ func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
 		})
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to recursively walk files: %w", err)
 	}
 
 	return fileTree, nil
