@@ -6,6 +6,11 @@ ARG GOBIN
 # Create directory for alexandria app
 WORKDIR /app
 
+# Set git config
+RUN git config --global user.name "Alexandria Bot"
+# TODO change email
+RUN git config --global user.email "todo@todo.todo" 
+
 # Copy over alexandria files
 COPY . ./
 
