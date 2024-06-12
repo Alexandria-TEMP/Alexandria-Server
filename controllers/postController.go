@@ -253,16 +253,16 @@ func (postController *PostController) GetPostReport(_ *gin.Context) {
 
 // UploadPost
 // @Summary 	Upload a new project version to a branch
-// @Description Upload a new project version to a specific, preexisting, branch as a zipped quarto project
+// @Description Upload a zipped quarto project to a post. This is the main version of the post, as there are no other versions.
 // @Tags 		posts
 // @Accept  	multipart/form-data
-// @Param		postID		path		string			true	"Post ID"
+// @Param		postID			path		string			true	"Post ID"
 // @Param		file			formData	file			true	"Repository to create"
 // @Produce		application/json
 // @Success 	200
 // @Failure		400
 // @Failure		500
-// @Router 		/posts/{postID}		[post]
+// @Router 		/posts/{postID}/upload		[post]
 func (postController *PostController) UploadPost(c *gin.Context) {
 	// extract file
 	file, err := c.FormFile("file")
