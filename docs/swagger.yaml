@@ -75,6 +75,14 @@ definitions:
       postCreationForm:
         $ref: '#/definitions/forms.PostCreationForm'
     type: object
+  forms.ReplyDiscussionCreationForm:
+    properties:
+      discussion:
+        $ref: '#/definitions/forms.DiscussionCreationForm'
+      parentID:
+        description: The Discussion this Discussion will be added to
+        type: integer
+    type: object
   forms.ReportCreationForm:
     type: object
   forms.ReviewCreationForm:
@@ -85,6 +93,14 @@ definitions:
         type: string
       reviewingMemberID:
         type: integer
+    type: object
+  forms.RootDiscussionCreationForm:
+    properties:
+      containerID:
+        description: The DiscussionContainer this Discussion will be added to
+        type: integer
+      discussion:
+        $ref: '#/definitions/forms.DiscussionCreationForm'
     type: object
   models.BranchCollaboratorDTO:
     properties:
@@ -173,12 +189,17 @@ definitions:
     - Author
     - Contributor
     - Reviewer
+  models.DiscussionContainerDTO:
+    properties:
+      discussionIDs:
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
+    type: object
   models.DiscussionDTO:
     properties:
-      anonymous:
-        type: boolean
-      deleted:
-        type: boolean
       id:
         type: integer
       memberID:
@@ -665,27 +686,16 @@ paths:
       summary: Returns a branch review by ID
       tags:
       - branches
-  /discussions:
-    post:
+  /discussion-containers/{discussionContainerID}:
+    get:
       consumes:
       - application/json
-      description: |-
-        Create a new discussion
-        Either parent ID or version ID must be specified. This determines whether it's a reply or not, respectively.
+      description: Get a discussion container by its ID, to access its discussions
       parameters:
-      - description: Discussion Creation Form
-        in: body
-        name: form
+      - description: Discussion Container ID
+        in: path
+        name: discussionContainerID
         required: true
-        schema:
-          $ref: '#/definitions/forms.DiscussionCreationForm'
-      - description: Parent ID
-        in: query
-        name: parentID
-        type: string
-      - description: Version ID
-        in: query
-        name: versionID
         type: string
       produces:
       - application/json
@@ -693,18 +703,22 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.DiscussionDTO'
+            $ref: '#/definitions/models.DiscussionContainerDTO'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not Found
           schema:
             $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Create new discussion
+      summary: Get discussion container
       tags:
-      - discussions
+      - discussion-containers
   /discussions/{discussionID}:
     delete:
       consumes:
@@ -841,6 +855,37 @@ paths:
       summary: Add a new report to a discussion
       tags:
       - discussions
+  /discussions/replies:
+    post:
+      consumes:
+      - application/json
+      description: Create a new reply-type discussion, so a discussion that is a child
+        of another discussion.
+      parameters:
+      - description: Reply Discussion Creation Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.ReplyDiscussionCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DiscussionDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Create new reply discussion
+      tags:
+      - discussions
   /discussions/reports/{reportID}:
     get:
       description: Gets a discussion report by its ID
@@ -870,6 +915,37 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Gets a discussion report by ID
+      tags:
+      - discussions
+  /discussions/roots:
+    post:
+      consumes:
+      - application/json
+      description: Create a new root-level discussion, meaning a discussion that is
+        not a reply.
+      parameters:
+      - description: Root Discussion Creation Form
+        in: body
+        name: form
+        required: true
+        schema:
+          $ref: '#/definitions/forms.RootDiscussionCreationForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DiscussionDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      summary: Create new root discussion
       tags:
       - discussions
   /filter/posts:

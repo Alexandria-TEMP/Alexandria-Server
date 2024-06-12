@@ -29,6 +29,8 @@ func branchCollaboratorServiceSetup(t *testing.T) {
 
 	// Setup mocks
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	mockBranchCollaboratorRepository = mocks.NewMockModelRepositoryInterface[*models.BranchCollaborator](mockCtrl)
+	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 	branchCollaboratorRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.BranchCollaborator](mockCtrl)
 
 	// Setup mock function return values
@@ -38,7 +40,7 @@ func branchCollaboratorServiceSetup(t *testing.T) {
 	// Setup SUT
 	branchCollaboratorService = BranchCollaboratorService{
 		MemberRepository:             mockMemberRepository,
-		BranchCollaboratorRepository: branchCollaboratorRepositoryMock,
+		BranchCollaboratorRepository: mockBranchCollaboratorRepository,
 	}
 }
 
@@ -111,7 +113,7 @@ func TestGetBranchCollaborator(t *testing.T) {
 	t.Cleanup(branchCollaboratorServiceTeardown)
 
 	// Setup mock function return values
-	branchCollaboratorRepositoryMock.EXPECT().GetByID(uint(10)).Return(&models.BranchCollaborator{
+	mockBranchCollaboratorRepository.EXPECT().GetByID(uint(10)).Return(&models.BranchCollaborator{
 		Model:  gorm.Model{ID: 5},
 		Member: models.Member{Model: gorm.Model{ID: 10}},
 	}, nil).Times(1)

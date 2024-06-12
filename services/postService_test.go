@@ -24,15 +24,15 @@ func postServiceSetup(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	// Setup mocks
-	postRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
+	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
-	postCollaboratorServiceMock = mocks.NewMockPostCollaboratorService(mockCtrl)
+	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
 
 	// Setup SUT
 	postService = PostService{
-		PostRepository:          postRepositoryMock,
+		PostRepository:          mockPostRepository,
 		MemberRepository:        mockMemberRepository,
-		PostCollaboratorService: postCollaboratorServiceMock,
+		PostCollaboratorService: mockPostCollaboratorService,
 	}
 
 	// Setup members in the repository
@@ -48,6 +48,10 @@ func postServiceSetup(t *testing.T) {
 		Model: gorm.Model{ID: 12},
 	}
 
+	mockMemberRepository.EXPECT().GetByID(memberA.ID).Return(&memberA, nil).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(memberB.ID).Return(&memberB, nil).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(memberC.ID).Return(&memberC, nil).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(uint(0)).Return(nil, fmt.Errorf("member does not exist")).AnyTimes()
 	mockMemberRepository.EXPECT().GetByID(memberA.ID).Return(&memberA, nil).AnyTimes()
 	mockMemberRepository.EXPECT().GetByID(memberB.ID).Return(&memberB, nil).AnyTimes()
 	mockMemberRepository.EXPECT().GetByID(memberC.ID).Return(&memberC, nil).AnyTimes()
@@ -72,9 +76,9 @@ func TestCreatePostGoodWeather(t *testing.T) {
 	}
 
 	// Setup mock function return values
-	postRepositoryMock.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
+	mockPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
 
-	postCollaboratorServiceMock.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, false, models.Author).Return([]*models.PostCollaborator{
+	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, false, models.Author).Return([]*models.PostCollaborator{
 		{
 			Member:            memberA,
 			CollaborationType: models.Author,
@@ -130,7 +134,7 @@ func TestCreatePostNonExistingMembers(t *testing.T) {
 	}
 
 	// Setup mock function return values
-	postCollaboratorServiceMock.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, false, models.Author).Return(nil, fmt.Errorf("oh no")).Times(1)
+	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, false, models.Author).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)
@@ -160,8 +164,8 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 	}
 
 	// Setup mock function return values
-	postRepositoryMock.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
-	postCollaboratorServiceMock.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, true, models.Author).Return([]*models.PostCollaborator{}, nil)
+	mockPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
+	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, true, models.Author).Return([]*models.PostCollaborator{}, nil)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)
@@ -198,8 +202,8 @@ func TestCreatePostDatabaseFailure(t *testing.T) {
 		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
-	postRepositoryMock.EXPECT().Create(gomock.Any()).Return(fmt.Errorf("oh no")).Times(1)
-	postCollaboratorServiceMock.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberC.ID}, false, models.Author).Return([]*models.PostCollaborator{
+	mockPostRepository.EXPECT().Create(gomock.Any()).Return(fmt.Errorf("oh no")).Times(1)
+	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberC.ID}, false, models.Author).Return([]*models.PostCollaborator{
 		{
 			Member:            memberA,
 			CollaborationType: models.Author,
@@ -237,7 +241,7 @@ func TestCreatePostWithBadPostType(t *testing.T) {
 		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
-	postRepositoryMock.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
+	mockPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)
@@ -270,7 +274,7 @@ func TestGetPost(t *testing.T) {
 		DiscussionContainerID: 6,
 	}
 
-	postRepositoryMock.EXPECT().GetByID(uint(10)).Return(databasePost, nil).Times(1)
+	mockPostRepository.EXPECT().GetByID(uint(10)).Return(databasePost, nil).Times(1)
 
 	// Function under test
 	fetchedPost, err := postService.GetPost(10)
@@ -294,7 +298,7 @@ func TestFilterAllPosts(t *testing.T) {
 	form := forms.FilterForm{}
 
 	// Setup mock function return values
-	postRepositoryMock.EXPECT().QueryPaginated(page, size, gomock.Any()).Return([]*models.Post{
+	mockPostRepository.EXPECT().QueryPaginated(page, size, gomock.Any()).Return([]*models.Post{
 		{Model: gorm.Model{ID: 2}},
 		{Model: gorm.Model{ID: 3}},
 		{Model: gorm.Model{ID: 6}},
@@ -318,7 +322,7 @@ func TestFilterFailed(t *testing.T) {
 	postServiceSetup(t)
 	t.Cleanup(postServiceTeardown)
 
-	postRepositoryMock.EXPECT().QueryPaginated(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
+	mockPostRepository.EXPECT().QueryPaginated(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
 	_, err := postService.Filter(1, 10, forms.FilterForm{})

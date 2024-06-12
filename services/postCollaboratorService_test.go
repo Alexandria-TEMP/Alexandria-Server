@@ -29,12 +29,12 @@ func postCollaboratorServiceSetup(t *testing.T) {
 
 	// Setup mocks
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
-	postCollaboratorRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.PostCollaborator](mockCtrl)
+	mockPostCollaboratorRepository = mocks.NewMockModelRepositoryInterface[*models.PostCollaborator](mockCtrl)
 
 	// Setup SUT
 	postCollaboratorService = PostCollaboratorService{
 		MemberRepository:           mockMemberRepository,
-		PostCollaboratorRepository: postCollaboratorRepositoryMock,
+		PostCollaboratorRepository: mockPostCollaboratorRepository,
 	}
 }
 
@@ -117,7 +117,7 @@ func TestGetPostCollaborator(t *testing.T) {
 	t.Cleanup(postCollaboratorServiceTeardown)
 
 	// Setup mock function return values
-	postCollaboratorRepositoryMock.EXPECT().GetByID(uint(10)).Return(&models.PostCollaborator{
+	mockPostCollaboratorRepository.EXPECT().GetByID(uint(10)).Return(&models.PostCollaborator{
 		Model:             gorm.Model{ID: 5},
 		Member:            models.Member{Model: gorm.Model{ID: 10}},
 		CollaborationType: models.Author,

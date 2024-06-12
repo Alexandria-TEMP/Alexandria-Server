@@ -11,26 +11,38 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 )
 
+// Variables that are used by all service tests
+// IMPORTANT: tests are responsible for initializing their values!
+
+// Mocked repositories
 var (
-	c   *gin.Context
-	cwd string
+	c                                 *gin.Context
+	cwd                               string
+	mockPostRepository                *mocks.MockModelRepositoryInterface[*models.Post]
+	mockProjectPostRepository         *mocks.MockModelRepositoryInterface[*models.ProjectPost]
+	mockMemberRepository              *mocks.MockModelRepositoryInterface[*models.Member]
+	mockPostCollaboratorRepository    *mocks.MockModelRepositoryInterface[*models.PostCollaborator]
+	mockBranchCollaboratorRepository  *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
+	mockDiscussionRepository          *mocks.MockModelRepositoryInterface[*models.Discussion]
+	mockDiscussionContainerRepository *mocks.MockModelRepositoryInterface[*models.DiscussionContainer]
+)
 
-	postRepositoryMock               *mocks.MockModelRepositoryInterface[*models.Post]
-	projectPostRepositoryMock        *mocks.MockModelRepositoryInterface[*models.ProjectPost]
-	postCollaboratorRepositoryMock   *mocks.MockModelRepositoryInterface[*models.PostCollaborator]
-	branchCollaboratorRepositoryMock *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
-	mockMemberRepository             *mocks.MockModelRepositoryInterface[*models.Member]
+// Mocked services
+var (
+	mockPostCollaboratorService   *mocks.MockPostCollaboratorService
+	mockBranchCollaboratorService *mocks.MockBranchCollaboratorService
+)
 
-	postCollaboratorServiceMock   *mocks.MockPostCollaboratorService
-	branchCollaboratorServiceMock *mocks.MockBranchCollaboratorService
-
-	memberService    MemberService
-	exampleMember    models.Member
-	exampleMemberDTO models.MemberDTO
-	exampleSTag1     *tags.ScientificFieldTag
-	exampleSTag2     *tags.ScientificFieldTag
-
+// Data that can be used by tests
+var (
 	memberA, memberB, memberC models.Member
+	discussionA               models.Discussion
+	discussionContainerA      models.DiscussionContainer
+	memberService             MemberService
+	exampleMember             models.Member
+	exampleMemberDTO          models.MemberDTO
+	exampleSTag1              *tags.ScientificFieldTag
+	exampleSTag2              *tags.ScientificFieldTag
 )
 
 func setupTestSuite() {
