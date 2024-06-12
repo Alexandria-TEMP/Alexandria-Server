@@ -862,16 +862,10 @@ paths:
             $ref: '#/definitions/models.DiscussionContainerDTO'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Get discussion container
       tags:
       - discussion-containers
@@ -1009,12 +1003,8 @@ paths:
             $ref: '#/definitions/models.DiscussionDTO'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Create new reply discussion
       tags:
       - discussions
@@ -1065,12 +1055,8 @@ paths:
             $ref: '#/definitions/models.DiscussionDTO'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Create new root discussion
       tags:
       - discussions

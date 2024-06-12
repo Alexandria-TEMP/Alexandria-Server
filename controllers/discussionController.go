@@ -96,8 +96,8 @@ func (discussionController *DiscussionController) CreateRootDiscussion(c *gin.Co
 // @Param		form	body	forms.ReplyDiscussionCreationForm	true	"Reply Discussion Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.DiscussionDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500 	{object} 	utils.HTTPError
+// @Failure		400
+// @Failure		500
 // @Router 		/discussions/replies 		[post]
 func (discussionController *DiscussionController) CreateReplyDiscussion(c *gin.Context) {
 	// Bind discussion creation form from request
