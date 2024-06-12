@@ -1,29 +1,6 @@
 basePath: /api/v2
 definitions:
   forms.BranchCreationForm:
-    properties:
-      anonymous:
-        type: boolean
-      branchTitle:
-        type: string
-      collaboratingMemberIDs:
-        description: The branch's metadata
-        items:
-          type: integer
-        type: array
-      projectPostID:
-        type: integer
-      updatedCompletionStatus:
-        $ref: '#/definitions/models.ProjectCompletionStatus'
-      updatedFeedbackPreferences:
-        $ref: '#/definitions/models.ProjectFeedbackPreference'
-      updatedPostTitle:
-        description: Changes made by the branch
-        type: string
-      updatedScientificFields:
-        items:
-          $ref: '#/definitions/models.ScientificField'
-        type: array
     type: object
   forms.DiscussionCreationForm:
     properties:
@@ -56,10 +33,6 @@ definitions:
     properties:
       email:
         type: string
-      fields:
-        items:
-          $ref: '#/definitions/models.ScientificField'
-        type: array
       firstName:
         type: string
       institution:
@@ -71,13 +44,13 @@ definitions:
           making the password just a string for now
           TODO: some hashing or semblance of security
         type: string
+      scientificFieldTagIDs:
+        items:
+          type: integer
+        type: array
     type: object
   forms.PostCreationForm:
     properties:
-      ScientificFields:
-        items:
-          $ref: '#/definitions/models.ScientificField'
-        type: array
       anonymous:
         type: boolean
       authorMemberIDs:
@@ -86,6 +59,10 @@ definitions:
         type: array
       postType:
         $ref: '#/definitions/models.PostType'
+      scientificFieldTags:
+        items:
+          $ref: '#/definitions/models.ScientificFieldTag'
+        type: array
       title:
         type: string
     type: object
@@ -166,9 +143,9 @@ definitions:
         type: array
       updatedCompletionStatus:
         $ref: '#/definitions/models.ProjectCompletionStatus'
-      updatedScientificFields:
+      updatedScientificFieldTagIDs:
         items:
-          $ref: '#/definitions/models.ScientificField'
+          type: integer
         type: array
     type: object
   models.BranchOverallReviewStatus:
@@ -251,10 +228,6 @@ definitions:
     type: object
   models.MemberDTO:
     properties:
-      ScientificFields:
-        items:
-          $ref: '#/definitions/models.ScientificField'
-        type: array
       email:
         type: string
       firstName:
@@ -266,6 +239,19 @@ definitions:
       lastName:
         type: string
       password:
+        type: string
+      scientificFieldTagIDs:
+        items:
+          type: integer
+        type: array
+    type: object
+  models.MemberShortFormDTO:
+    properties:
+      firstName:
+        type: string
+      id:
+        type: integer
+      lastName:
         type: string
     type: object
   models.PostCollaboratorDTO:
@@ -295,9 +281,9 @@ definitions:
         $ref: '#/definitions/models.PostType'
       renderStatus:
         $ref: '#/definitions/models.RenderStatus'
-      scientificFields:
+      scientificFieldTagIDs:
         items:
-          $ref: '#/definitions/models.ScientificField'
+          type: integer
         type: array
       title:
         type: string
@@ -373,14 +359,21 @@ definitions:
     - Failure
   models.ReportDTO:
     type: object
-  models.ScientificField:
-    enum:
-    - mathematics
-    - computer science
-    type: string
-    x-enum-varnames:
-    - Mathematics
-    - ComputerScience
+  models.ScientificFieldTag:
+    type: object
+  models.ScientificFieldTagDTO:
+    properties:
+      id:
+        type: integer
+      parentID:
+        type: integer
+      scientificField:
+        type: string
+      subtagIDs:
+        items:
+          type: integer
+        type: array
+    type: object
   reports.DiscussionReportDTO:
     properties:
       discussionID:
@@ -1150,10 +1143,8 @@ paths:
           description: OK
           schema:
             items:
-              type: integer
+              $ref: '#/definitions/models.MemberShortFormDTO'
             type: array
-        "400":
-          description: Bad Request
         "404":
           description: Not Found
         "500":
@@ -1215,7 +1206,7 @@ paths:
       - application/json
       description: Delete a member with given ID from database
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
         name: memberID
         required: true
@@ -1237,9 +1228,9 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get a member by user ID
+      description: Get a member by member ID
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
         name: memberID
         required: true
@@ -1251,6 +1242,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.MemberDTO'
+        "400":
+          description: Bad Request
         "404":
           description: Not Found
         "500":
@@ -1264,7 +1257,7 @@ paths:
       - application/json
       description: Get all branches that this member is a collaborator of
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
         name: memberID
         required: true
@@ -1293,7 +1286,7 @@ paths:
       - application/json
       description: Get all discussions that this member has participated in
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
         name: memberID
         required: true
@@ -1322,7 +1315,7 @@ paths:
       - application/json
       description: Get all posts that this member is a collaborator of
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
         name: memberID
         required: true
@@ -1351,7 +1344,7 @@ paths:
       - application/json
       description: Get all project posts that this member is a collaborator of
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
         name: memberID
         required: true
@@ -1380,7 +1373,7 @@ paths:
       - application/json
       description: Get all posts that this member has saved
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
         name: memberID
         required: true
@@ -1409,7 +1402,7 @@ paths:
       - application/json
       description: Adds a post to the saved posts of a member
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
         name: memberID
         required: true
@@ -1437,7 +1430,7 @@ paths:
       - application/json
       description: Get all project posts that this member has saved
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
         name: memberID
         required: true
@@ -1466,7 +1459,7 @@ paths:
       - application/json
       description: Adds a project post to the saved project posts of a member
       parameters:
-      - description: user ID
+      - description: member ID
         in: path
         name: memberID
         required: true
@@ -2250,7 +2243,7 @@ paths:
       - tags
   /tags/scientific:
     get:
-      description: Returns all scientific tags (an array of strings) in the database
+      description: Returns all scientific tags in the database
       produces:
       - application/json
       responses:
@@ -2258,13 +2251,40 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.ScientificField'
+              $ref: '#/definitions/models.ScientificFieldTagDTO'
             type: array
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
         "500":
           description: Internal Server Error
       summary: Returns all scientific tags
+      tags:
+      - tags
+  /tags/scientific/:tagID:
+    get:
+      consumes:
+      - application/json
+      description: Get a scientific field tag by tag ID
+      parameters:
+      - description: tag ID
+        in: path
+        name: tagID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ScientificFieldTagDTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get scientific field tag from database
       tags:
       - tags
 swagger: "2.0"

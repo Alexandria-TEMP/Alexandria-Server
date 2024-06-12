@@ -41,59 +41,74 @@ func (m *MockMemberService) EXPECT() *MockMemberServiceMockRecorder {
 }
 
 // CreateMember mocks base method.
-func (m *MockMemberService) CreateMember(memberForm *forms.MemberCreationForm) *models.Member {
+func (m *MockMemberService) CreateMember(memberForm *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (*models.Member, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateMember", memberForm)
+	ret := m.ctrl.Call(m, "CreateMember", memberForm, userFields)
 	ret0, _ := ret[0].(*models.Member)
-	return ret0
-}
-
-// CreateMember indicates an expected call of CreateMember.
-func (mr *MockMemberServiceMockRecorder) CreateMember(memberForm any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMember", reflect.TypeOf((*MockMemberService)(nil).CreateMember), memberForm)
-}
-
-// GetCollaborator mocks base method.
-func (m *MockMemberService) GetCollaborator(collaboratorID uint) (*models.PostCollaborator, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCollaborator", collaboratorID)
-	ret0, _ := ret[0].(*models.PostCollaborator)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetCollaborator indicates an expected call of GetCollaborator.
-func (mr *MockMemberServiceMockRecorder) GetCollaborator(collaboratorID any) *gomock.Call {
+// CreateMember indicates an expected call of CreateMember.
+func (mr *MockMemberServiceMockRecorder) CreateMember(memberForm, userFields any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCollaborator", reflect.TypeOf((*MockMemberService)(nil).GetCollaborator), collaboratorID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMember", reflect.TypeOf((*MockMemberService)(nil).CreateMember), memberForm, userFields)
+}
+
+// DeleteMember mocks base method.
+func (m *MockMemberService) DeleteMember(memberID uint) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteMember", memberID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteMember indicates an expected call of DeleteMember.
+func (mr *MockMemberServiceMockRecorder) DeleteMember(memberID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMember", reflect.TypeOf((*MockMemberService)(nil).DeleteMember), memberID)
+}
+
+// GetAllMembers mocks base method.
+func (m *MockMemberService) GetAllMembers() ([]*models.MemberShortFormDTO, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllMembers")
+	ret0, _ := ret[0].([]*models.MemberShortFormDTO)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllMembers indicates an expected call of GetAllMembers.
+func (mr *MockMemberServiceMockRecorder) GetAllMembers() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllMembers", reflect.TypeOf((*MockMemberService)(nil).GetAllMembers))
 }
 
 // GetMember mocks base method.
-func (m *MockMemberService) GetMember(userID uint) (*models.Member, error) {
+func (m *MockMemberService) GetMember(memberID uint) (*models.Member, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMember", userID)
+	ret := m.ctrl.Call(m, "GetMember", memberID)
 	ret0, _ := ret[0].(*models.Member)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetMember indicates an expected call of GetMember.
-func (mr *MockMemberServiceMockRecorder) GetMember(userID any) *gomock.Call {
+func (mr *MockMemberServiceMockRecorder) GetMember(memberID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMember", reflect.TypeOf((*MockMemberService)(nil).GetMember), userID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMember", reflect.TypeOf((*MockMemberService)(nil).GetMember), memberID)
 }
 
 // UpdateMember mocks base method.
-func (m *MockMemberService) UpdateMember(updatedMember *models.Member) error {
+func (m *MockMemberService) UpdateMember(updatedMember *models.MemberDTO, userFields *models.ScientificFieldTagContainer) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateMember", updatedMember)
+	ret := m.ctrl.Call(m, "UpdateMember", updatedMember, userFields)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UpdateMember indicates an expected call of UpdateMember.
-func (mr *MockMemberServiceMockRecorder) UpdateMember(updatedMember any) *gomock.Call {
+func (mr *MockMemberServiceMockRecorder) UpdateMember(updatedMember, userFields any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMember", reflect.TypeOf((*MockMemberService)(nil).UpdateMember), updatedMember)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMember", reflect.TypeOf((*MockMemberService)(nil).UpdateMember), updatedMember, userFields)
 }

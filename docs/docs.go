@@ -1134,12 +1134,9 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "integer"
+                                "$ref": "#/definitions/models.MemberShortFormDTO"
                             }
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request"
                     },
                     "404": {
                         "description": "Not Found"
@@ -1225,7 +1222,7 @@ const docTemplate = `{
         },
         "/members/{memberID}": {
             "get": {
-                "description": "Get a member by user ID",
+                "description": "Get a member by member ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1239,7 +1236,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
+                        "description": "member ID",
                         "name": "memberID",
                         "in": "path",
                         "required": true
@@ -1251,6 +1248,9 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.MemberDTO"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "404": {
                         "description": "Not Found"
@@ -1275,7 +1275,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
+                        "description": "member ID",
                         "name": "memberID",
                         "in": "path",
                         "required": true
@@ -1313,7 +1313,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
+                        "description": "member ID",
                         "name": "memberID",
                         "in": "path",
                         "required": true
@@ -1357,7 +1357,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
+                        "description": "member ID",
                         "name": "memberID",
                         "in": "path",
                         "required": true
@@ -1401,7 +1401,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
+                        "description": "member ID",
                         "name": "memberID",
                         "in": "path",
                         "required": true
@@ -1445,7 +1445,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
+                        "description": "member ID",
                         "name": "memberID",
                         "in": "path",
                         "required": true
@@ -1489,7 +1489,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
+                        "description": "member ID",
                         "name": "memberID",
                         "in": "path",
                         "required": true
@@ -1533,7 +1533,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
+                        "description": "member ID",
                         "name": "memberID",
                         "in": "path",
                         "required": true
@@ -1575,7 +1575,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
+                        "description": "member ID",
                         "name": "memberID",
                         "in": "path",
                         "required": true
@@ -1619,7 +1619,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
+                        "description": "member ID",
                         "name": "memberID",
                         "in": "path",
                         "required": true
@@ -2776,7 +2776,7 @@ const docTemplate = `{
         },
         "/tags/scientific": {
             "get": {
-                "description": "Returns all scientific tags (an array of strings) in the database",
+                "description": "Returns all scientific tags in the database",
                 "produces": [
                     "application/json"
                 ],
@@ -2790,12 +2790,53 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ScientificField"
+                                "$ref": "#/definitions/models.ScientificFieldTagDTO"
                             }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/tags/scientific/:tagID": {
+            "get": {
+                "description": "Get a scientific field tag by tag ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Get scientific field tag from database",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tag ID",
+                        "name": "tagID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ScientificFieldTagDTO"
                         }
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -2806,41 +2847,7 @@ const docTemplate = `{
     },
     "definitions": {
         "forms.BranchCreationForm": {
-            "type": "object",
-            "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "branchTitle": {
-                    "type": "string"
-                },
-                "collaboratingMemberIDs": {
-                    "description": "The branch's metadata",
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "projectPostID": {
-                    "type": "integer"
-                },
-                "updatedCompletionStatus": {
-                    "$ref": "#/definitions/models.ProjectCompletionStatus"
-                },
-                "updatedFeedbackPreferences": {
-                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
-                },
-                "updatedPostTitle": {
-                    "description": "Changes made by the branch",
-                    "type": "string"
-                },
-                "updatedScientificFields": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ScientificField"
-                    }
-                }
-            }
+            "type": "object"
         },
         "forms.DiscussionCreationForm": {
             "type": "object",
@@ -2889,12 +2896,6 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "fields": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ScientificField"
-                    }
-                },
                 "firstName": {
                     "type": "string"
                 },
@@ -2907,18 +2908,18 @@ const docTemplate = `{
                 "password": {
                     "description": "making the password just a string for now\nTODO: some hashing or semblance of security",
                     "type": "string"
+                },
+                "scientificFieldTagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
         "forms.PostCreationForm": {
             "type": "object",
             "properties": {
-                "ScientificFields": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ScientificField"
-                    }
-                },
                 "anonymous": {
                     "type": "boolean"
                 },
@@ -2930,6 +2931,12 @@ const docTemplate = `{
                 },
                 "postType": {
                     "$ref": "#/definitions/models.PostType"
+                },
+                "scientificFieldTags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ScientificFieldTag"
+                    }
                 },
                 "title": {
                     "type": "string"
@@ -3052,10 +3059,10 @@ const docTemplate = `{
                 "updatedCompletionStatus": {
                     "$ref": "#/definitions/models.ProjectCompletionStatus"
                 },
-                "updatedScientificFields": {
+                "updatedScientificFieldTagIDs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.ScientificField"
+                        "type": "integer"
                     }
                 }
             }
@@ -3177,12 +3184,6 @@ const docTemplate = `{
         "models.MemberDTO": {
             "type": "object",
             "properties": {
-                "ScientificFields": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ScientificField"
-                    }
-                },
                 "email": {
                     "type": "string"
                 },
@@ -3199,6 +3200,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                },
+                "scientificFieldTagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "models.MemberShortFormDTO": {
+            "type": "object",
+            "properties": {
+                "firstName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastName": {
                     "type": "string"
                 }
             }
@@ -3244,10 +3265,10 @@ const docTemplate = `{
                 "renderStatus": {
                     "$ref": "#/definitions/models.RenderStatus"
                 },
-                "scientificFields": {
+                "scientificFieldTagIDs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.ScientificField"
+                        "type": "integer"
                     }
                 },
                 "title": {
@@ -3353,16 +3374,28 @@ const docTemplate = `{
         "models.ReportDTO": {
             "type": "object"
         },
-        "models.ScientificField": {
-            "type": "string",
-            "enum": [
-                "mathematics",
-                "computer science"
-            ],
-            "x-enum-varnames": [
-                "Mathematics",
-                "ComputerScience"
-            ]
+        "models.ScientificFieldTag": {
+            "type": "object"
+        },
+        "models.ScientificFieldTagDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "parentID": {
+                    "type": "integer"
+                },
+                "scientificField": {
+                    "type": "string"
+                },
+                "subtagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "reports.DiscussionReportDTO": {
             "type": "object",

@@ -1,9 +1,9 @@
 package services
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"go.uber.org/mock/gomock"
@@ -59,11 +59,6 @@ func TestGetDiscussionContainer(t *testing.T) {
 
 	// Function under test
 	fetchedDiscussionContainer, err := discussionContainerService.GetDiscussionContainer(discussionContainerA.ID)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if !reflect.DeepEqual(fetchedDiscussionContainer, &discussionContainerA) {
-		t.Fatalf("fetched discussion container\n%+v\nshould have equaled\n%+v", fetchedDiscussionContainer, &discussionContainerA)
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, fetchedDiscussionContainer, &discussionContainerA)
 }

@@ -60,11 +60,11 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 	// Input to function under test
 	projectPostCreationForm := forms.ProjectPostCreationForm{
 		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:  []uint{memberA.ID, memberB.ID},
-			Title:            "My Awesome Project Post",
-			Anonymous:        false,
-			PostType:         models.Project,
-			ScientificFields: []models.ScientificField{models.Mathematics},
+			AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
+			Title:               "My Awesome Project Post",
+			Anonymous:           false,
+			PostType:            models.Project,
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 		ProjectCompletionStatus:   models.Ongoing,
 		ProjectFeedbackPreference: models.FormalFeedback,
@@ -98,9 +98,11 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 				{Member: memberA, CollaborationType: models.Author},
 				{Member: memberB, CollaborationType: models.Author},
 			},
-			Title:            "My Awesome Project Post",
-			PostType:         models.Project,
-			ScientificFields: []models.ScientificField{models.Mathematics},
+			Title:    "My Awesome Project Post",
+			PostType: models.Project,
+			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+				ScientificFieldTags: []*models.ScientificFieldTag{},
+			},
 			DiscussionContainer: models.DiscussionContainer{
 				Discussions: []*models.Discussion{},
 			},
@@ -110,7 +112,9 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 			{
 				UpdatedPostTitle:        &updatedPostTitle,
 				UpdatedCompletionStatus: &updatedCompletionStatus,
-				UpdatedScientificFields: []models.ScientificField{models.Mathematics},
+				UpdatedScientificFieldTagContainer: models.ScientificFieldTagContainer{
+					ScientificFieldTags: []*models.ScientificFieldTag{},
+				},
 				Collaborators: []*models.BranchCollaborator{
 					{Member: memberA}, {Member: memberB},
 				},
@@ -142,11 +146,11 @@ func TestCreateProjectPostDatabaseFailure(t *testing.T) {
 
 	projectPostCreationForm := forms.ProjectPostCreationForm{
 		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:  []uint{},
-			Title:            "My Broken Project Post",
-			Anonymous:        true,
-			PostType:         models.Project,
-			ScientificFields: []models.ScientificField{},
+			AuthorMemberIDs:     []uint{},
+			Title:               "My Broken Project Post",
+			Anonymous:           true,
+			PostType:            models.Project,
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 		ProjectCompletionStatus:   models.Completed,
 		ProjectFeedbackPreference: models.FormalFeedback,
@@ -175,11 +179,11 @@ func TestCreateProjectPostWrongPostType(t *testing.T) {
 
 	projectPostCreationForm := forms.ProjectPostCreationForm{
 		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:  []uint{},
-			Title:            "",
-			Anonymous:        true,
-			PostType:         models.Question,
-			ScientificFields: []models.ScientificField{},
+			AuthorMemberIDs:     []uint{},
+			Title:               "",
+			Anonymous:           true,
+			PostType:            models.Question,
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 		ProjectCompletionStatus:   models.Idea,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
@@ -203,11 +207,11 @@ func TestCreateProjectPostCollaboratorsFail(t *testing.T) {
 
 	projectPostCreationForm := forms.ProjectPostCreationForm{
 		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:  []uint{10, 15},
-			Title:            "",
-			Anonymous:        false,
-			PostType:         models.Project,
-			ScientificFields: []models.ScientificField{},
+			AuthorMemberIDs:     []uint{10, 15},
+			Title:               "",
+			Anonymous:           false,
+			PostType:            models.Project,
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 		ProjectCompletionStatus:   models.Idea,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
@@ -234,11 +238,11 @@ func TestCreateProjectBranchCollaboratorsFail(t *testing.T) {
 
 	projectPostCreationForm := forms.ProjectPostCreationForm{
 		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:  []uint{memberA.ID, memberB.ID},
-			Title:            "",
-			Anonymous:        false,
-			PostType:         models.Project,
-			ScientificFields: []models.ScientificField{},
+			AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
+			Title:               "",
+			Anonymous:           false,
+			PostType:            models.Project,
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 		ProjectCompletionStatus:   models.Idea,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
@@ -273,6 +277,9 @@ func TestGetProjectPost(t *testing.T) {
 			Collaborators: []*models.PostCollaborator{},
 			Title:         "My Awesome Project Post",
 			PostType:      models.Project,
+			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+				ScientificFieldTags: []*models.ScientificFieldTag{},
+			},
 			DiscussionContainer: models.DiscussionContainer{
 				Model:       gorm.Model{ID: 1},
 				Discussions: []*models.Discussion{},

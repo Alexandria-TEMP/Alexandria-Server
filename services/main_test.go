@@ -13,6 +13,7 @@ import (
 var (
 	renderService RenderService
 	branchService BranchService
+	memberService MemberService
 
 	mockRenderService             *mocks.MockRenderService
 	mockPostCollaboratorService   *mocks.MockPostCollaboratorService
@@ -41,6 +42,11 @@ var (
 	discussionA          models.Discussion
 	discussionContainerA models.DiscussionContainer
 
+	exampleMember    models.Member
+	exampleMemberDTO models.MemberDTO
+	exampleSTag1     *models.ScientificFieldTag
+	exampleSTag2     *models.ScientificFieldTag
+
 	projectPost *models.ProjectPost
 
 	c   *gin.Context
@@ -54,6 +60,42 @@ func teardownTestSuite() {
 }
 
 func TestMain(m *testing.M) {
+	tag1 := models.ScientificFieldTag{
+		ScientificField: "Mathematics",
+		Subtags:         []*models.ScientificFieldTag{},
+		ParentID:        nil,
+	}
+	exampleSTag1 = &tag1
+	tag2 := models.ScientificFieldTag{
+		ScientificField: "",
+		Subtags:         []*models.ScientificFieldTag{},
+		ParentID:        nil,
+	}
+	exampleSTag2 = &tag2
+	scientificFieldTagArray := []*models.ScientificFieldTag{exampleSTag1, exampleSTag2}
+	exampleMember = models.Member{
+		FirstName:   "John",
+		LastName:    "Smith",
+		Email:       "john.smith@gmail.com",
+		Password:    "password",
+		Institution: "TU Delft",
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: scientificFieldTagArray,
+		},
+	}
+	exampleMemberDTO = models.MemberDTO{
+		FirstName:             "John",
+		LastName:              "Smith",
+		Email:                 "john.smith@gmail.com",
+		Password:              "password",
+		Institution:           "TU Delft",
+		ScientificFieldTagIDs: []uint{},
+	}
+
+	cwd, _ = os.Getwd()
+
+	c, _ = gin.CreateTestContext(httptest.NewRecorder())
+
 	setupTestSuite()
 
 	cwd, _ = os.Getwd()

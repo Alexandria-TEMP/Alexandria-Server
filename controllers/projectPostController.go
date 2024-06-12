@@ -46,7 +46,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 	projectPost, err := projectPostController.ProjectPostService.GetProjectPost(uint(projectPostID))
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get project post, reason: %w", err)})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get project post, reason: %v", err.Error())})
 
 		return
 	}
@@ -72,7 +72,7 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 	err := c.BindJSON(&form)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid project post creation form: %w", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid project post creation form: %v", err.Error())})
 
 		return
 	}
@@ -86,13 +86,13 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 	projectPost, err404, err500 := projectPostController.ProjectPostService.CreateProjectPost(&form)
 
 	if err404 != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("not found: %w", err)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("not found: %v", err.Error())})
 
 		return
 	}
 
 	if err500 != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("internal server error: %w", err)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("internal server error: %v", err.Error())})
 
 		return
 	}

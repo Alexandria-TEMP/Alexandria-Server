@@ -28,5 +28,7 @@ func autoMigrateAllModels(db *gorm.DB) error {
 		&models.BranchReview{},        // FK to Branch, Member
 		&reports.DiscussionReport{},   // FK to Discussion
 		&reports.PostReport{},         // FK to Post
+		&models.ScientificFieldTag{},
+		&models.ScientificFieldTagContainer{},
 	)
 }

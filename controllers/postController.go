@@ -86,7 +86,7 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 
 	post, err := postController.PostService.CreatePost(&form)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post, reason: %w", err)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post, reason: %v", err.Error())})
 
 		return
 	}
@@ -228,7 +228,7 @@ func (postController *PostController) GetPostCollaborator(c *gin.Context) {
 	// Fetch the post collaborator by ID
 	postCollaborator, err := postController.PostCollaboratorService.GetPostCollaborator(uint(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get post collaborator: %w", err)})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get post collaborator: %v", err.Error())})
 
 		return
 	}

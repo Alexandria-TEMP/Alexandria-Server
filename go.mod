@@ -3,10 +3,9 @@ module gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/al
 go 1.22.2
 
 require (
-	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/gin-contrib/cors v1.7.2
+	github.com/webstradev/gin-pagination v1.0.1
 	go.uber.org/mock v0.4.0
-	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.5.6
 	gorm.io/gorm v1.25.10
 )
@@ -33,6 +32,7 @@ require (
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.4 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.5.0 // indirect
@@ -80,4 +80,5 @@ require (
 	golang.org/x/tools v0.21.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

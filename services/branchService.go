@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"mime/multipart"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -67,11 +66,21 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 		return branch, fmt.Errorf("failed to convert member ids to branch collaborators: %w", err), nil
 	}
 
+	// convert []models.ScientificFieldTag to []*models.ScientificFieldTag
+	updatedScientificFields := []*models.ScientificFieldTag{}
+
+	for _, tag := range branchCreationForm.UpdatedScientificFields {
+		tagAddress := &tag
+		updatedScientificFields = append(updatedScientificFields, tagAddress)
+	}
+
 	// make new branch
 	branch = models.Branch{
-		UpdatedPostTitle:          branchCreationForm.UpdatedPostTitle,
-		UpdatedCompletionStatus:   branchCreationForm.UpdatedCompletionStatus,
-		UpdatedScientificFields:   branchCreationForm.UpdatedScientificFields,
+		UpdatedPostTitle:        branchCreationForm.UpdatedPostTitle,
+		UpdatedCompletionStatus: branchCreationForm.UpdatedCompletionStatus,
+		UpdatedScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: updatedScientificFields,
+		},
 		Collaborators:             collaborators,
 		DiscussionContainer:       discussionContainer,
 		ProjectPostID:             &branchCreationForm.ProjectPostID,
@@ -291,8 +300,8 @@ func (branchService *BranchService) merge(branch *models.Branch, closedBranch *m
 		projectPost.ProjectCompletionStatus = *branch.UpdatedCompletionStatus
 	}
 
-	if branch.UpdatedScientificFields != nil {
-		projectPost.Post.ScientificFields = branch.UpdatedScientificFields
+	if len(branch.UpdatedScientificFieldTagContainer.ScientificFieldTags) == 0 {
+		projectPost.Post.ScientificFieldTagContainer = branch.UpdatedScientificFieldTagContainer
 	}
 
 	if branch.UpdatedFeedbackPreferences != nil {
@@ -335,35 +344,7 @@ func (branchService *BranchService) updateReviewStatus(reviews []*models.BranchR
 	return models.BranchOpenForReview
 }
 
-func (branchService *BranchService) MemberCanReview(branchID, memberID uint) (bool, error) {
-	// get branch
-	branch, err := branchService.BranchRepository.GetByID(branchID)
-
-	if err != nil {
-		return false, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
-	}
-
-	// get project post
-	projectPost, err := branchService.GetBranchProjectPost(branch)
-
-	if err != nil {
-		return false, err
-	}
-
-	// get member
-	member, err := branchService.MemberRepository.GetByID(memberID)
-
-	if err != nil {
-		return false, fmt.Errorf("failed to find member with id %v", memberID)
-	}
-
-	// create sets of all tags
-	for _, tag := range member.ScientificFields {
-		if slices.Contains(branch.UpdatedScientificFields, tag) || slices.Contains(projectPost.Post.ScientificFields, tag) {
-			return true, nil
-		}
-	}
-
+func (branchService *BranchService) MemberCanReview(_, _ uint) (bool, error) {
 	return false, nil
 }
 

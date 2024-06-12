@@ -43,12 +43,12 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 	// This Post instance will be embedded into the Project Post
 	post := models.Post{
 		Collaborators: postCollaborators,
-
-		Title:            form.PostCreationForm.Title,
-		PostType:         form.PostCreationForm.PostType,
-		ScientificFields: form.PostCreationForm.ScientificFields,
-		RenderStatus:     models.Success,
-
+		Title:         form.PostCreationForm.Title,
+		PostType:      form.PostCreationForm.PostType,
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: form.PostCreationForm.ScientificFieldTags,
+		},
+		RenderStatus: models.Success,
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
 		},
@@ -72,9 +72,11 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 				// TODO make these fields optional maybe? so they dont have to be filled in
 				UpdatedPostTitle:        &form.PostCreationForm.Title,
 				UpdatedCompletionStatus: &form.ProjectCompletionStatus,
-				UpdatedScientificFields: form.PostCreationForm.ScientificFields,
-				Collaborators:           branchCollaborators,
-				Reviews:                 []*models.BranchReview{},
+				UpdatedScientificFieldTagContainer: models.ScientificFieldTagContainer{
+					ScientificFieldTags: form.PostCreationForm.ScientificFieldTags,
+				},
+				Collaborators: branchCollaborators,
+				Reviews:       []*models.BranchReview{},
 				DiscussionContainer: models.DiscussionContainer{
 					Discussions: []*models.Discussion{},
 				},

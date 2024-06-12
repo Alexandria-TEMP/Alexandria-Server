@@ -73,13 +73,11 @@ func TestCreatePostGoodWeather(t *testing.T) {
 
 	// The input we will be sending to the function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs: []uint{memberA.ID, memberB.ID},
-		Title:           "My Awesome Question",
-		Anonymous:       false,
-		PostType:        models.Question,
-		ScientificFields: []models.ScientificField{
-			models.Mathematics, models.ComputerScience,
-		},
+		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
+		Title:               "My Awesome Question",
+		Anonymous:           false,
+		PostType:            models.Question,
+		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 
 	// Setup mock function return values
@@ -100,9 +98,7 @@ func TestCreatePostGoodWeather(t *testing.T) {
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)
 
-	if err != nil {
-		t.Fatalf("creating a post failed: %w", err)
-	}
+	assert.Nil(t, err)
 
 	expectedPost := &models.Post{
 		Collaborators: []*models.PostCollaborator{
@@ -117,18 +113,15 @@ func TestCreatePostGoodWeather(t *testing.T) {
 		},
 		Title:    "My Awesome Question",
 		PostType: models.Question,
-		ScientificFields: []models.ScientificField{
-			models.Mathematics, models.ComputerScience,
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
 		},
 		RenderStatus: models.Success,
 	}
-
-	if !reflect.DeepEqual(createdPost, expectedPost) {
-		t.Fatalf("created post:\n%+v\n did not equal expected post:\n%+v\n", createdPost, expectedPost)
-	}
+	assert.Equal(t, createdPost, expectedPost)
 }
 
 // Try to create a Post where the PostCollaboratorService returns an error. Should fail.
@@ -138,11 +131,11 @@ func TestCreatePostNonExistingMembers(t *testing.T) {
 
 	// Input to function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs:  []uint{memberA.ID, memberB.ID},
-		Title:            "My Broken Post",
-		Anonymous:        false,
-		PostType:         models.Reflection,
-		ScientificFields: []models.ScientificField{models.Mathematics},
+		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
+		Title:               "My Broken Post",
+		Anonymous:           false,
+		PostType:            models.Reflection,
+		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 
 	// Setup mock function return values
@@ -169,13 +162,11 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 
 	// The input we will be sending to the function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs: []uint{memberA.ID, memberB.ID},
-		Title:           "My Awesome Question",
-		Anonymous:       true,
-		PostType:        models.Question,
-		ScientificFields: []models.ScientificField{
-			models.Mathematics, models.ComputerScience,
-		},
+		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
+		Title:               "My Awesome Question",
+		Anonymous:           true,
+		PostType:            models.Question,
+		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 
 	// Setup mock function return values
@@ -187,26 +178,21 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)
 
-	if err != nil {
-		t.Fatalf("creating a post failed: %w", err)
-	}
+	assert.Nil(t, err)
 
 	expectedPost := models.Post{
 		Collaborators: []*models.PostCollaborator{},
 		Title:         "My Awesome Question",
 		PostType:      models.Question,
-		ScientificFields: []models.ScientificField{
-			models.Mathematics, models.ComputerScience,
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
 		},
 		RenderStatus: models.Success,
 	}
-
-	if !reflect.DeepEqual(*createdPost, expectedPost) {
-		t.Fatalf("created post:\n%+v\n did not equal expected post:\n%+v\n", *createdPost, expectedPost)
-	}
+	assert.Equal(t, *createdPost, expectedPost)
 }
 
 // If the database creation fails, creating a post should fail
@@ -216,11 +202,11 @@ func TestCreatePostDatabaseFailure(t *testing.T) {
 
 	// Input to function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs:  []uint{memberA.ID, memberC.ID},
-		Title:            "My Post That Shall Fail",
-		Anonymous:        false,
-		PostType:         models.Reflection,
-		ScientificFields: []models.ScientificField{models.Mathematics},
+		AuthorMemberIDs:     []uint{memberA.ID, memberC.ID},
+		Title:               "My Post That Shall Fail",
+		Anonymous:           false,
+		PostType:            models.Reflection,
+		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 
 	mockPostRepository.EXPECT().Create(gomock.Any()).Return(fmt.Errorf("oh no")).Times(1)
@@ -255,11 +241,11 @@ func TestCreatePostWithBadPostType(t *testing.T) {
 
 	// Input to function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs:  []uint{memberA.ID, memberB.ID, memberC.ID},
-		Title:            "My Faulty Project Post",
-		Anonymous:        false,
-		PostType:         models.Project,
-		ScientificFields: []models.ScientificField{models.Mathematics},
+		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID, memberC.ID},
+		Title:               "My Faulty Project Post",
+		Anonymous:           false,
+		PostType:            models.Project,
+		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 
 	mockPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
@@ -561,11 +547,13 @@ func TestGetPost(t *testing.T) {
 	t.Cleanup(postServiceTeardown)
 
 	databasePost := &models.Post{
-		Model:            gorm.Model{ID: 5},
-		Collaborators:    []*models.PostCollaborator{},
-		Title:            "Hello, world!",
-		PostType:         models.Project,
-		ScientificFields: []models.ScientificField{},
+		Model:         gorm.Model{ID: 5},
+		Collaborators: []*models.PostCollaborator{},
+		Title:         "Hello, world!",
+		PostType:      models.Project,
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
+		},
 		DiscussionContainer: models.DiscussionContainer{
 			Model:       gorm.Model{ID: 6},
 			Discussions: []*models.Discussion{},

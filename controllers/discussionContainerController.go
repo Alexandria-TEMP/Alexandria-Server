@@ -41,7 +41,7 @@ func (discussionContainerController *DiscussionContainerController) GetDiscussio
 	// Fetch the discussion container from the database
 	discussionContainer, err := discussionContainerController.DiscussionContainerService.GetDiscussionContainer(uint(discussionContainerID))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get discussion container: %w", err)})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get discussion container: %v", err.Error())})
 
 		return
 	}

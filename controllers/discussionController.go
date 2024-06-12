@@ -66,7 +66,7 @@ func (discussionController *DiscussionController) CreateRootDiscussion(c *gin.Co
 	var discussionCreationForm forms.RootDiscussionCreationForm
 
 	if err := c.BindJSON(&discussionCreationForm); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not bind form from JSON: %w", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not bind form from JSON: %v", err.Error())})
 
 		return
 	}
@@ -80,7 +80,7 @@ func (discussionController *DiscussionController) CreateRootDiscussion(c *gin.Co
 	// Create discussion in the database
 	createdDiscussion, err := discussionController.DiscussionService.CreateRootDiscussion(&discussionCreationForm)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create root discussion: %w", err)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create root discussion: %v", err.Error())})
 
 		return
 	}
@@ -104,7 +104,7 @@ func (discussionController *DiscussionController) CreateReplyDiscussion(c *gin.C
 	var discussionCreationForm forms.ReplyDiscussionCreationForm
 
 	if err := c.BindJSON(&discussionCreationForm); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not bind form from JSON: %w", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not bind form from JSON: %v", err.Error())})
 
 		return
 	}
@@ -118,7 +118,7 @@ func (discussionController *DiscussionController) CreateReplyDiscussion(c *gin.C
 	// Create discussion in the database
 	createdDiscussion, err := discussionController.DiscussionService.CreateReply(&discussionCreationForm)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create reply discussion: %w", err)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create reply discussion: %v", err.Error())})
 
 		return
 	}

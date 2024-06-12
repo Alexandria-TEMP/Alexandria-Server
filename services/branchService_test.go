@@ -137,13 +137,13 @@ func TestCreateBranchFailedUpdateProjectPost(t *testing.T) {
 	projectPost.ID = 10
 	projectPost.PostID = 12
 	expectedBranch := &models.Branch{
-		Collaborators:             []*models.BranchCollaborator{{MemberID: 12, BranchID: 11}},
-		ProjectPostID:             &projectPost.ID,
-		RenderStatus:              models.Success,
-		BranchOverallReviewStatus: models.BranchOpenForReview,
-		DiscussionContainer:       models.DiscussionContainer{},
-		UpdatedScientificFields:   []models.ScientificField{},
-		Reviews:                   []*models.BranchReview{},
+		Collaborators:                      []*models.BranchCollaborator{{MemberID: 12, BranchID: 11}},
+		ProjectPostID:                      &projectPost.ID,
+		RenderStatus:                       models.Success,
+		BranchOverallReviewStatus:          models.BranchOpenForReview,
+		DiscussionContainer:                models.DiscussionContainer{},
+		UpdatedScientificFieldTagContainer: models.ScientificFieldTagContainer{},
+		Reviews:                            []*models.BranchReview{},
 	}
 	newProjectPost := &models.ProjectPost{
 		Model:        gorm.Model{ID: 10},
@@ -611,122 +611,6 @@ func TestCreateReviewFailedUpdateBranch(t *testing.T) {
 	mockBranchRepository.EXPECT().Update(newBranch).Return(newBranch, errors.New("failed"))
 
 	_, err := branchService.CreateReview(form)
-	assert.NotNil(t, err)
-}
-
-func TestMemberCanReviewSuccessTrue(t *testing.T) {
-	beforeEachBranch(t)
-
-	projectPostID := uint(20)
-	member := &models.Member{
-		Model:            gorm.Model{ID: 11},
-		ScientificFields: []models.ScientificField{models.Mathematics},
-	}
-	branch := &models.Branch{
-		Model:                     gorm.Model{ID: 10},
-		ProjectPostID:             &projectPostID,
-		BranchOverallReviewStatus: models.BranchOpenForReview,
-	}
-	projectPost := &models.ProjectPost{
-		Model: gorm.Model{ID: 20},
-		Post:  models.Post{ScientificFields: []models.ScientificField{models.Mathematics, models.ComputerScience}},
-	}
-
-	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockProjectPostRepository.EXPECT().GetByID(uint(20)).Return(projectPost, nil)
-	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, nil)
-	mockDiscussionContainerRepository.EXPECT().GetByID(uint(0)).Return(&models.DiscussionContainer{}, nil)
-	mockClosedBranchRepository.EXPECT().Query(&models.ClosedBranch{ProjectPostID: 20})
-
-	canReview, err := branchService.MemberCanReview(10, 11)
-	assert.Nil(t, err)
-	assert.True(t, canReview)
-}
-
-func TestMemberCanReviewSuccessFalse(t *testing.T) {
-	beforeEachBranch(t)
-
-	projectPostID := uint(20)
-	member := &models.Member{
-		Model:            gorm.Model{ID: 11},
-		ScientificFields: []models.ScientificField{models.Mathematics},
-	}
-	branch := &models.Branch{
-		Model:         gorm.Model{ID: 10},
-		ProjectPostID: &projectPostID,
-	}
-	projectPost := &models.ProjectPost{
-		Model: gorm.Model{ID: 20},
-		Post:  models.Post{ScientificFields: []models.ScientificField{models.ComputerScience}},
-	}
-
-	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockProjectPostRepository.EXPECT().GetByID(uint(20)).Return(projectPost, nil)
-	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, nil)
-	mockDiscussionContainerRepository.EXPECT().GetByID(uint(0)).Return(&models.DiscussionContainer{}, nil)
-	mockClosedBranchRepository.EXPECT().Query(&models.ClosedBranch{ProjectPostID: 20})
-
-	canReview, err := branchService.MemberCanReview(10, 11)
-	assert.Nil(t, err)
-	assert.False(t, canReview)
-}
-
-func TestMemberCanReviewFailedGetBranch(t *testing.T) {
-	beforeEachBranch(t)
-
-	branch := &models.Branch{
-		Model: gorm.Model{ID: 10},
-	}
-
-	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, errors.New("failed"))
-
-	_, err := branchService.MemberCanReview(10, 11)
-	assert.NotNil(t, err)
-}
-
-func TestMemberCanReviewFailedGetProjectPost(t *testing.T) {
-	beforeEachBranch(t)
-
-	projectPostID := uint(20)
-	branch := &models.Branch{
-		Model:         gorm.Model{ID: 10},
-		ProjectPostID: &projectPostID,
-	}
-	projectPost := &models.ProjectPost{
-		Model: gorm.Model{ID: 20},
-		Post:  models.Post{ScientificFields: []models.ScientificField{models.Mathematics, models.ComputerScience}},
-	}
-
-	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockProjectPostRepository.EXPECT().GetByID(uint(20)).Return(projectPost, errors.New("failed"))
-
-	_, err := branchService.MemberCanReview(10, 11)
-	assert.NotNil(t, err)
-}
-
-func TestMemberCanReviewFailedGetMember(t *testing.T) {
-	beforeEachBranch(t)
-
-	projectPostID := uint(20)
-	member := &models.Member{
-		Model: gorm.Model{ID: 11},
-	}
-	branch := &models.Branch{
-		Model:         gorm.Model{ID: 10},
-		ProjectPostID: &projectPostID,
-	}
-	projectPost := &models.ProjectPost{
-		Model: gorm.Model{ID: 20},
-		Post:  models.Post{ScientificFields: []models.ScientificField{models.Mathematics, models.ComputerScience}},
-	}
-
-	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockProjectPostRepository.EXPECT().GetByID(uint(20)).Return(projectPost, nil)
-	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, errors.New("failed"))
-	mockDiscussionContainerRepository.EXPECT().GetByID(uint(0)).Return(&models.DiscussionContainer{}, nil)
-	mockClosedBranchRepository.EXPECT().Query(&models.ClosedBranch{ProjectPostID: 20})
-
-	_, err := branchService.MemberCanReview(10, 11)
 	assert.NotNil(t, err)
 }
 

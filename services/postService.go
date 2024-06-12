@@ -40,11 +40,16 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 		return nil, fmt.Errorf("could not create post: %w", err)
 	}
 
+	postFields := form.ScientificFieldTags
+	postTagContainer := models.ScientificFieldTagContainer{
+		ScientificFieldTags: postFields,
+	}
+
 	post := models.Post{
-		Collaborators:    postCollaborators,
-		Title:            form.Title,
-		PostType:         form.PostType,
-		ScientificFields: form.ScientificFields,
+		Collaborators:               postCollaborators,
+		Title:                       form.Title,
+		PostType:                    form.PostType,
+		ScientificFieldTagContainer: postTagContainer,
 		DiscussionContainer: models.DiscussionContainer{
 			// The discussion list is initially empty
 			Discussions: []*models.Discussion{},
