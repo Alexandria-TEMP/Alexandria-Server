@@ -101,7 +101,7 @@ func (projectPostService *ProjectPostService) UpdateProjectPost(_ *models.Projec
 	return fmt.Errorf("TODO")
 }
 
-func (projectPostService *ProjectPostService) Filter(page, size int, _ forms.FilterForm) ([]uint, error) {
+func (projectPostService *ProjectPostService) Filter(page, size int, _ forms.ProjectPostFilterForm) ([]uint, error) {
 	// TODO construct query based off filter form
 	posts, err := projectPostService.ProjectPostRepository.QueryPaginated(page, size)
 	if err != nil {

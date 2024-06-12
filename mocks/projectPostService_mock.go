@@ -56,7 +56,7 @@ func (mr *MockProjectPostServiceMockRecorder) CreateProjectPost(form any) *gomoc
 }
 
 // Filter mocks base method.
-func (m *MockProjectPostService) Filter(page, size int, form forms.FilterForm) ([]uint, error) {
+func (m *MockProjectPostService) Filter(page, size int, form forms.ProjectPostFilterForm) ([]uint, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Filter", page, size, form)
 	ret0, _ := ret[0].([]uint)
