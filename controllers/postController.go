@@ -383,7 +383,8 @@ func (postController *PostController) GetMainProject(c *gin.Context) {
 
 // GetMainFiletree godoc specs are subject to change
 // @Summary 	Get the filetree of a post
-// @Description Get the filetree of a the main version of a post
+// @Description Get the filetree of a the main version of a post, together with the size of the file in bytes.
+// @Description Directories have a size of -1.
 // @Tags 		posts
 // @Param		postID	path		string				true	"Post ID"
 // @Produce		application/json
