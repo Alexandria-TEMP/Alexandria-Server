@@ -40,12 +40,12 @@ type Post struct {
 }
 
 type PostDTO struct {
-	ID                    uint
-	CollaboratorIDs       []uint
-	Title                 string
-	PostType              PostType
-	ScientificFieldTagIDs []uint
-	DiscussionIDs         []uint
+	ID                    uint     `json:"id"`
+	CollaboratorIDs       []uint   `json:"collaboratorIDs"`
+	Title                 string   `json:"title"`
+	PostType              PostType `json:"postType"`
+	ScientificFieldTagIDs []uint   `json:"scientificFieldTagIDs"`
+	DiscussionIDs         []uint   `json:"discussionIDs"`
 }
 
 func (model *Post) GetID() uint {
