@@ -42,7 +42,7 @@ func (filesystem *Filesystem) CreateRepository() error {
 
 	// make initial commit
 	if err := filesystem.CreateCommit(); err != nil {
-		return fmt.Errorf("failed to make initial commit")
+		return fmt.Errorf("failed to make initial commit: %w", err)
 	}
 
 	return nil
@@ -188,7 +188,7 @@ func (filesystem *Filesystem) CreateCommit() error {
 
 	// git commit -m "-"
 	if _, err = w.Commit("-", &git.CommitOptions{AllowEmptyCommits: true}); err != nil {
-		return fmt.Errorf("failed to commit stages changes")
+		return fmt.Errorf("failed to commit stages changes: %w", err)
 	}
 
 	return nil
