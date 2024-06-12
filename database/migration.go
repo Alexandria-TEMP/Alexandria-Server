@@ -3,6 +3,7 @@ package database
 import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/reports"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -28,5 +29,7 @@ func autoMigrateAllModels(db *gorm.DB) error {
 		&models.BranchReview{},        // FK to Branch, Member
 		&reports.DiscussionReport{},   // FK to Discussion
 		&reports.PostReport{},         // FK to Post
+		&tags.ScientificFieldTag{},
+		&tags.ScientificFieldTagContainer{},
 	)
 }

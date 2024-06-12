@@ -11,7 +11,7 @@ type BranchCreationForm struct {
 	// Changes made by the branch
 	UpdatedPostTitle           string                           `json:"updatedPostTitle"`
 	UpdatedCompletionStatus    models.ProjectCompletionStatus   `json:"updatedCompletionStatus"`
-	UpdatedScientificFields    []tags.ScientificField           `json:"updatedScientificFields"`
+	UpdatedScientificFields    []tags.ScientificFieldTag        `json:"updatedScientificFields"`
 	UpdatedFeedbackPreferences models.ProjectFeedbackPreference `json:"updatedFeedbackPreferences"`
 
 	// The branch's metadata

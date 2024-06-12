@@ -6,6 +6,7 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -41,9 +42,11 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 	post := models.Post{
 		Collaborators: postCollaborators,
 
-		Title:               form.PostCreationForm.Title,
-		PostType:            form.PostCreationForm.PostType,
-		ScientificFieldTags: form.PostCreationForm.ScientificFieldTags,
+		Title:    form.PostCreationForm.Title,
+		PostType: form.PostCreationForm.PostType,
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: form.PostCreationForm.ScientificFieldTags,
+		},
 
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
@@ -68,9 +71,11 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 				// TODO make these fields optional maybe? so they dont have to be filled in
 				NewPostTitle:            form.PostCreationForm.Title,
 				UpdatedCompletionStatus: form.CompletionStatus,
-				UpdatedScientificFields: form.PostCreationForm.ScientificFieldTags,
-				Collaborators:           branchCollaborators,
-				Reviews:                 []*models.BranchReview{},
+				UpdatedScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+					ScientificFieldTags: form.PostCreationForm.ScientificFieldTags,
+				},
+				Collaborators: branchCollaborators,
+				Reviews:       []*models.BranchReview{},
 				DiscussionContainer: models.DiscussionContainer{
 					Discussions: []*models.Discussion{},
 				},

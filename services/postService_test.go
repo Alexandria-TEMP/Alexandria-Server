@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
@@ -51,6 +52,10 @@ func postServiceSetup(t *testing.T) {
 	mockMemberRepository.EXPECT().GetByID(memberB.ID).Return(&memberB, nil).AnyTimes()
 	mockMemberRepository.EXPECT().GetByID(memberC.ID).Return(&memberC, nil).AnyTimes()
 	mockMemberRepository.EXPECT().GetByID(uint(0)).Return(nil, fmt.Errorf("member does not exist")).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(memberA.ID).Return(&memberA, nil).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(memberB.ID).Return(&memberB, nil).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(memberC.ID).Return(&memberC, nil).AnyTimes()
+	mockMemberRepository.EXPECT().GetByID(uint(0)).Return(nil, fmt.Errorf("member does not exist")).AnyTimes()
 }
 
 func postServiceTeardown() {
@@ -63,13 +68,11 @@ func TestCreatePostGoodWeather(t *testing.T) {
 
 	// The input we will be sending to the function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs: []uint{memberA.ID, memberB.ID},
-		Title:           "My Awesome Question",
-		Anonymous:       false,
-		PostType:        models.Question,
-		ScientificFieldTags: []tags.ScientificField{
-			tags.Mathematics, tags.ComputerScience,
-		},
+		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
+		Title:               "My Awesome Question",
+		Anonymous:           false,
+		PostType:            models.Question,
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	// Setup mock function return values
@@ -106,17 +109,14 @@ func TestCreatePostGoodWeather(t *testing.T) {
 		},
 		Title:    "My Awesome Question",
 		PostType: models.Question,
-		ScientificFieldTags: []tags.ScientificField{
-			tags.Mathematics, tags.ComputerScience,
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
 		},
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
 		},
 	}
-
-	if !reflect.DeepEqual(createdPost, expectedPost) {
-		t.Fatalf("created post:\n%+v\n did not equal expected post:\n%+v\n", createdPost, expectedPost)
-	}
+	assert.Equal(t, createdPost, expectedPost)
 }
 
 // Try to create a Post where the PostCollaboratorService returns an error. Should fail.
@@ -130,7 +130,7 @@ func TestCreatePostNonExistingMembers(t *testing.T) {
 		Title:               "My Broken Post",
 		Anonymous:           false,
 		PostType:            models.Reflection,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	// Setup mock function return values
@@ -156,13 +156,11 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 
 	// The input we will be sending to the function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs: []uint{memberA.ID, memberB.ID},
-		Title:           "My Awesome Question",
-		Anonymous:       true,
-		PostType:        models.Question,
-		ScientificFieldTags: []tags.ScientificField{
-			tags.Mathematics, tags.ComputerScience,
-		},
+		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
+		Title:               "My Awesome Question",
+		Anonymous:           true,
+		PostType:            models.Question,
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	// Setup mock function return values
@@ -180,17 +178,14 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 		Collaborators: []*models.PostCollaborator{},
 		Title:         "My Awesome Question",
 		PostType:      models.Question,
-		ScientificFieldTags: []tags.ScientificField{
-			tags.Mathematics, tags.ComputerScience,
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
 		},
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
 		},
 	}
-
-	if !reflect.DeepEqual(*createdPost, expectedPost) {
-		t.Fatalf("created post:\n%+v\n did not equal expected post:\n%+v\n", *createdPost, expectedPost)
-	}
+	assert.Equal(t, *createdPost, expectedPost)
 }
 
 // If the database creation fails, creating a post should fail
@@ -204,7 +199,7 @@ func TestCreatePostDatabaseFailure(t *testing.T) {
 		Title:               "My Post That Shall Fail",
 		Anonymous:           false,
 		PostType:            models.Reflection,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	mockPostRepository.EXPECT().Create(gomock.Any()).Return(fmt.Errorf("oh no")).Times(1)
@@ -243,7 +238,7 @@ func TestCreatePostWithBadPostType(t *testing.T) {
 		Title:               "My Faulty Project Post",
 		Anonymous:           false,
 		PostType:            models.Project,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+		ScientificFieldTags: []*tags.ScientificFieldTag{},
 	}
 
 	mockPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
@@ -265,11 +260,13 @@ func TestGetPost(t *testing.T) {
 	t.Cleanup(postServiceTeardown)
 
 	databasePost := &models.Post{
-		Model:               gorm.Model{ID: 5},
-		Collaborators:       []*models.PostCollaborator{},
-		Title:               "Hello, world!",
-		PostType:            models.Project,
-		ScientificFieldTags: []tags.ScientificField{},
+		Model:         gorm.Model{ID: 5},
+		Collaborators: []*models.PostCollaborator{},
+		Title:         "Hello, world!",
+		PostType:      models.Project,
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		},
 		DiscussionContainer: models.DiscussionContainer{
 			Model:       gorm.Model{ID: 6},
 			Discussions: []*models.Discussion{},

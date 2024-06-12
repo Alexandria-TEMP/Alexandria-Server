@@ -6,6 +6,7 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -34,11 +35,16 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 		return nil, fmt.Errorf("could not create post: %w", err)
 	}
 
+	postFields := form.ScientificFieldTags
+	postTagContainer := tags.ScientificFieldTagContainer{
+		ScientificFieldTags: postFields,
+	}
+
 	post := models.Post{
-		Collaborators:       postCollaborators,
-		Title:               form.Title,
-		PostType:            form.PostType,
-		ScientificFieldTags: form.ScientificFieldTags,
+		Collaborators:               postCollaborators,
+		Title:                       form.Title,
+		PostType:                    form.PostType,
+		ScientificFieldTagContainer: postTagContainer,
 		DiscussionContainer: models.DiscussionContainer{
 			// The discussion list is initially empty
 			Discussions: []*models.Discussion{},

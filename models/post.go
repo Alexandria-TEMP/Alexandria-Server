@@ -29,22 +29,23 @@ type Post struct {
 
 	// Post files and render can be implicitly accessed in the vfs with the postID
 
-	Title               string
-	PostType            PostType
-	ScientificFieldTags []tags.ScientificField `gorm:"serializer:json"`
-
+	Title    string
+	PostType PostType
+	// Post has a ScientificFieldTagContainer
+	ScientificFieldTagContainer   tags.ScientificFieldTagContainer `gorm:"foreignKey:ScientificFieldTagContainerID"`
+	ScientificFieldTagContainerID uint
 	// Post has a DiscussionContainer
 	DiscussionContainer   DiscussionContainer `gorm:"foreignKey:DiscussionContainerID"`
 	DiscussionContainerID uint
 }
 
 type PostDTO struct {
-	ID                  uint                   `json:"id"`
-	CollaboratorIDs     []uint                 `json:"collaboratorIDs"`
-	Title               string                 `json:"title"`
-	PostType            PostType               `json:"postType"`
-	ScientificFieldTags []tags.ScientificField `json:"scientificFieldTags"`
-	DiscussionIDs       []uint                 `json:"discussionIDs"`
+	ID                    uint     `json:"id"`
+	CollaboratorIDs       []uint   `json:"collaboratorIDs"`
+	Title                 string   `json:"title"`
+	PostType              PostType `json:"postType"`
+	ScientificFieldTagIDs []uint   `json:"scientificFieldTagIDs"`
+	DiscussionIDs         []uint   `json:"discussionIDs"`
 }
 
 func (model *Post) GetID() uint {
@@ -57,7 +58,7 @@ func (model *Post) IntoDTO() PostDTO {
 		postCollaboratorsToIDs(model.Collaborators),
 		model.Title,
 		model.PostType,
-		model.ScientificFieldTags,
+		tags.ScientificFieldTagContainerIntoIDs(&model.ScientificFieldTagContainer),
 		discussionContainerIntoIDs(&model.DiscussionContainer),
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gorm.io/gorm"
@@ -20,6 +21,7 @@ type RepositoryEnv struct {
 	branchCollaboratorRepository  database.ModelRepositoryInterface[*models.BranchCollaborator]
 	discussionRepository          database.ModelRepositoryInterface[*models.Discussion]
 	discussionContainerRepository database.ModelRepositoryInterface[*models.DiscussionContainer]
+	tagRepository                 database.ModelRepositoryInterface[*tags.ScientificFieldTag]
 }
 
 type ServiceEnv struct {
@@ -30,6 +32,7 @@ type ServiceEnv struct {
 	branchCollaboratorService  interfaces.BranchCollaboratorService
 	discussionService          interfaces.DiscussionService
 	discussionContainerService interfaces.DiscussionContainerService
+	tagService                 interfaces.TagService
 }
 
 type ControllerEnv struct {
@@ -52,6 +55,9 @@ func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
 			Database: db,
 		},
 		memberRepository: &database.ModelRepository[*models.Member]{
+			Database: db,
+		},
+		tagRepository: &database.ModelRepository[*tags.ScientificFieldTag]{
 			Database: db,
 		},
 		postCollaboratorRepository: &database.ModelRepository[*models.PostCollaborator]{
@@ -104,9 +110,14 @@ func initServiceEnv(repositories *RepositoryEnv, _ *filesystem.Filesystem) *Serv
 	}
 
 	return &ServiceEnv{
-		postService:                postService,
-		projectPostService:         projectPostService,
-		memberService:              &services.MemberService{},
+		postService:        postService,
+		projectPostService: projectPostService,
+		memberService: &services.MemberService{
+			MemberRepository: repositories.memberRepository,
+		},
+		tagService: &services.TagService{
+			TagRepository: repositories.tagRepository,
+		},
 		postCollaboratorService:    postCollaboratorService,
 		branchCollaboratorService:  branchCollaboratorService,
 		discussionService:          discussionService,
@@ -122,6 +133,7 @@ func initControllerEnv(serviceEnv *ServiceEnv) *ControllerEnv {
 		},
 		memberController: &controllers.MemberController{
 			MemberService: serviceEnv.memberService,
+			TagService:    serviceEnv.tagService,
 		},
 		projectPostController: &controllers.ProjectPostController{
 			ProjectPostService: serviceEnv.projectPostService,
@@ -137,7 +149,9 @@ func initControllerEnv(serviceEnv *ServiceEnv) *ControllerEnv {
 			ProjectPostService: serviceEnv.projectPostService,
 		},
 		branchController: &controllers.BranchController{},
-		tagController:    &controllers.TagController{},
+		tagController: &controllers.TagController{
+			TagService: serviceEnv.tagService,
+		},
 	}
 }
 

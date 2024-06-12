@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
@@ -17,38 +18,43 @@ import (
 
 type MemberController struct {
 	MemberService interfaces.MemberService
+	TagService    interfaces.TagService
 }
 
 // GetMember godoc
 // @Summary 	Get member from database
-// @Description Get a member by user ID
+// @Description Get a member by member ID
 // @Tags 		members
 // @Accept  	json
-// @Param		userID		path		string			true	"user ID"
+// @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200 		{object}	models.MemberDTO
 // @Failure		400 		{object} 	utils.HTTPError
 // @Failure		404 		{object} 	utils.HTTPError
 // @Failure		500			{object}	utils.HTTPError
-// @Router 		/members/{userID}	[get]
+// @Router 		/members/{memberID}	[get]
 func (memberController *MemberController) GetMember(c *gin.Context) {
 	// extract the id of the member
-	userIDStr := c.Param("userID")
-	userID, err := strconv.ParseUint(userIDStr, 10, 64)
-	// if this caused an error, print it
+	memberIDStr := c.Param("memberID")
+	initmemberID, err := strconv.ParseUint(memberIDStr, 10, 64)
+	// if this caused an error, print it and return status 400: bad input
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid user ID, cannot interpret as integer, id=%s ", userIDStr))
+		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid member ID, cannot interpret as integer, id=%s ", memberIDStr))
 
 		return
 	}
-	// get the user through the service
-	member, err := memberController.MemberService.GetMember(userID)
 
-	// if there was an error, print it and return
+	// cast member ID as uint instead of uint64, because database only accepts those
+	memberID := uint(initmemberID)
+
+	// get the member through the service
+	member, err := memberController.MemberService.GetMember(memberID)
+
+	// if there was an error, print it and return status 404: not found
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusNotFound, errors.New("cannot get member because no user with this ID exists"))
+		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("cannot get member because no member with this ID exists, id=%d", memberID))
 
 		return
 	}
@@ -70,25 +76,55 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/members 		[post]
 func (memberController *MemberController) CreateMember(c *gin.Context) {
-	// get the member
 	form := forms.MemberCreationForm{}
 	// bind the fields of the param to the JSON of the model
 	err := c.BindJSON(&form)
 
-	// check for errors
+	if !form.IsValid() {
+		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("form fails validation"))
+		return
+	}
+
+	// if there is an error, return a 400 bad request status
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind userCreationForm from request body"))
+		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind memberCreationForm from request body"))
 
 		return
 	}
 
-	// create and add to database(not done yet) through the memberService
-	member := memberController.MemberService.CreateMember(&form)
+	// get array of strings, create array of tags
+	tagIDs := form.ScientificFieldTagIDs
 
-	// send back a positive response with the created member
+	// getting the tags from tag service
+	tagArray, err := memberController.TagService.GetTagsFromIDs(tagIDs)
+
+	tagContainer := tags.ScientificFieldTagContainer{
+		ScientificFieldTags: tagArray,
+	}
+
+	// if there is an error, return a 404 not found status
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusNotFound, errors.New("cannot bind tag ids from request body"))
+
+		return
+	}
+
+	// create and add to database through the memberService
+	member, err := memberController.MemberService.CreateMember(&form, &tagContainer)
+
+	// if the member service throws an error, return a 400 Bad request status
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("a member with this id already exists"))
+
+		return
+	}
+
+	// send back a positive response 200 status with the created member
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, &member)
+	c.JSON(http.StatusOK, member)
 }
 
 // UpdateMember godoc
@@ -111,20 +147,35 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	// check for errors
 	if err != nil {
 		fmt.Println(err)
-		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind updated user from request body"))
+		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind updated member from request body"))
 
 		return
 	}
 
-	// TODO update and add the member to the database
-	// err = memberController.MemberService.UpdateMember(&updatedMember)
-	// check for errors again
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	utils.ThrowHTTPError(c, http.StatusGone, errors.New("cannot update user because no user with this ID exists"))
+	// get array of strings, create array of tags
+	tagIDs := updatedMember.ScientificFieldTagIDs
+	// call the method from the tag service
+	tagArray, err := memberController.TagService.GetTagsFromIDs(tagIDs)
+	tagContainer := tags.ScientificFieldTagContainer{
+		ScientificFieldTags: tagArray,
+	}
 
-	// 	return
-	// }
+	// if there is an error, return a 400 bad request status
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusBadRequest, errors.New("cannot bind tag ids from request body"))
+
+		return
+	}
+
+	err = memberController.MemberService.UpdateMember(&updatedMember, &tagContainer)
+	// check for errors again
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusNotFound, errors.New("cannot update member because no member with this ID exists"))
+
+		return
+	}
 
 	// send back a positive response if member updated successfully
 	c.Header("Content-Type", "application/json")
@@ -136,15 +187,44 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 // @Description Delete a member with given ID from database
 // @Tags 		members
 // @Accept  	json
-// @Param		userID		path		string			true	"user ID"
+// @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID} 		[delete]
-func (memberController *MemberController) DeleteMember(_ *gin.Context) {
-	// delete method goes here
+// @Router 		/members/{memberID} 		[delete]
+func (memberController *MemberController) DeleteMember(c *gin.Context) {
+	// extract the id of the member
+	memberIDStr := c.Param("memberID")
+	initmemberID, err := strconv.ParseUint(memberIDStr, 10, 64)
+
+	// if this caused an error, print it and return status 400: bad input
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusBadRequest, fmt.Errorf("invalid member ID, cannot interpret as integer, id=%s ", memberIDStr))
+
+		return
+	}
+
+	// cast member ID as uint instead of uint64, because database only accepts those
+	memberID := uint(initmemberID)
+
+	// get the member through the service
+	err = memberController.MemberService.DeleteMember(memberID)
+
+	// if there was an error, print it and return status 404: not found
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("cannot delete member because no member with this ID exists, id=%d", memberID))
+
+		return
+	}
+
+	// if correct response send the member back
+	c.Header("Content-Type", "application/json")
+	// TODO: should this return the deleted member?
+	c.JSON(http.StatusOK, nil)
 }
 
 // GetAllMembers godoc
@@ -153,13 +233,24 @@ func (memberController *MemberController) DeleteMember(_ *gin.Context) {
 // TODO this should eventually be paginated?
 // @Tags		members
 // @Produce		json
-// @Success		200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
+// @Success		200		{array}		models.MemberShortFormDTO
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router		/members	[get]
-func (memberController *MemberController) GetAllMembers(_ *gin.Context) {
-	// TODO implement
+func (memberController *MemberController) GetAllMembers(c *gin.Context) {
+	members, err := memberController.MemberService.GetAllMembers()
+
+	// if there was an error, print it and return status 404: not found
+	if err != nil {
+		fmt.Println(err)
+		utils.ThrowHTTPError(c, http.StatusNotFound, fmt.Errorf("could not retrieve all members: %w", err))
+
+		return
+	}
+
+	// if correct response send the member ids and names back
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, &members)
 }
 
 // GetMemberPosts godoc
@@ -167,13 +258,13 @@ func (memberController *MemberController) GetAllMembers(_ *gin.Context) {
 // @Description	Get all posts that this member is a collaborator of
 // @Tags 		members
 // @Accept 		json
-// @Param		userID		path		string			true	"user ID"
+// @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID}/posts 		[get]
+// @Router 		/members/{memberID}/posts 		[get]
 func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 	// return all the posts
 	// that this member is a collaborator/author of
@@ -185,13 +276,13 @@ func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 // @Description	Get all project posts that this member is a collaborator of
 // @Tags 		members
 // @Accept 		json
-// @Param		userID		path		string			true	"user ID"
+// @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID}/project-posts 		[get]
+// @Router 		/members/{memberID}/project-posts 		[get]
 func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) {
 	// return all the project posts
 	// that this member is a collaborator/author of
@@ -203,13 +294,13 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 // @Description	Get all branches that this member is a collaborator of
 // @Tags 		members
 // @Accept 		json
-// @Param		userID		path		string			true	"user ID"
+// @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID}/branches 		[get]
+// @Router 		/members/{memberID}/branches 		[get]
 func (memberController *MemberController) GetMemberBranches(_ *gin.Context) {
 	// return all the branches
 	// that this member is a collaborator/author of
@@ -221,13 +312,13 @@ func (memberController *MemberController) GetMemberBranches(_ *gin.Context) {
 // @Description	Get all discussions that this member has participated in
 // @Tags 		members
 // @Accept 		json
-// @Param		userID		path		string			true	"user ID"
+// @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID}/discussions		[get]
+// @Router 		/members/{memberID}/discussions		[get]
 func (memberController *MemberController) GetMemberDiscussions(_ *gin.Context) {
 	// returns all the discussions this member is a part of
 	// TODO implement
@@ -238,13 +329,13 @@ func (memberController *MemberController) GetMemberDiscussions(_ *gin.Context) {
 // @Description Adds a post to the saved posts of a member
 // @Tags 		members
 // @Accept  	json
-// @Param		userID		path		string			true	"user ID"
+// @Param		memberID		path		string			true	"member ID"
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID}/saved-posts/{postID} 		[post]
+// @Router 		/members/{memberID}/saved-posts/{postID} 		[post]
 func (memberController *MemberController) AddMemberSavedPost(_ *gin.Context) {
 
 }
@@ -254,13 +345,13 @@ func (memberController *MemberController) AddMemberSavedPost(_ *gin.Context) {
 // @Description Adds a project post to the saved project posts of a member
 // @Tags 		members
 // @Accept  	json
-// @Param		userID		path		string			true	"user ID"
+// @Param		memberID		path		string			true	"member ID"
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID}/saved-project-posts/{postID} 		[post]
+// @Router 		/members/{memberID}/saved-project-posts/{postID} 		[post]
 func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Context) {
 
 }
@@ -270,13 +361,13 @@ func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Conte
 // @Description	Get all posts that this member has saved
 // @Tags 		members
 // @Accept 		json
-// @Param		userID		path		string			true	"user ID"
+// @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID}/saved-posts 		[get]
+// @Router 		/members/{memberID}/saved-posts 		[get]
 func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
 	// return all saved posts of this member
 	// TODO implement
@@ -287,13 +378,13 @@ func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
 // @Description	Get all project posts that this member has saved
 // @Tags 		members
 // @Accept 		json
-// @Param		userID		path		string			true	"user ID"
+// @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{array}		uint
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		404 	{object} 	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
-// @Router 		/members/{userID}/saved-project-posts 		[get]
+// @Router 		/members/{memberID}/saved-project-posts 		[get]
 func (memberController *MemberController) GetMemberSavedProjectPosts(_ *gin.Context) {
 	// return all the project posts that this member has saved
 	// TODO implement
