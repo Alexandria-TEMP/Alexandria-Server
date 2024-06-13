@@ -5,11 +5,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
 func TestBranchJSONMarshaling(t *testing.T) {
+	projectPostID := uint(45)
+	updatedPostTitle := "Updated Post Title"
+	updatedCompletionStatus := Idea
 	// This model...
 	model := Branch{
 		Model: gorm.Model{ID: 44},
@@ -27,13 +29,13 @@ func TestBranchJSONMarshaling(t *testing.T) {
 				Feedback:             "LGTM",
 			},
 		},
-		ProjectPostID:                      45,
+		ProjectPostID:                      &projectPostID,
 		BranchTitle:                        "My Cool MR",
-		NewPostTitle:                       "Updated Post Title",
-		UpdatedCompletionStatus:            Idea,
-		UpdatedScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
+		UpdatedPostTitle:                   &updatedPostTitle,
+		UpdatedCompletionStatus:            &updatedCompletionStatus,
+		UpdatedScientificFieldTagContainer: &ScientificFieldTagContainer{},
 		RenderStatus:                       Pending,
-		BranchReviewStatus:                 BranchOpenForReview,
+		BranchOverallReviewStatus:          BranchOpenForReview,
 	}
 
 	// should equal this DTO!
@@ -41,10 +43,10 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		ID:                           44,
 		CollaboratorIDs:              []uint{100, 50},
 		ReviewIDs:                    []uint{2},
-		ProjectPostID:                45,
+		ProjectPostID:                &projectPostID,
 		BranchTitle:                  "My Cool MR",
-		NewPostTitle:                 "Updated Post Title",
-		UpdatedCompletionStatus:      Idea,
+		UpdatedPostTitle:             &updatedPostTitle,
+		UpdatedCompletionStatus:      &updatedCompletionStatus,
 		UpdatedScientificFieldTagIDs: []uint{},
 		DiscussionIDs:                []uint{},
 		RenderStatus:                 Pending,

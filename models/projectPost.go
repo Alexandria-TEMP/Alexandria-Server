@@ -10,7 +10,7 @@ import (
 // The name of the branch that will be created, automatically, when a new project post is created.
 // This branch is created for purpose of peer reviewing the project post itself, before it can
 // receive any other proposed changes.
-const InitialPeerReviewBranchName = "Initial peer review changes"
+const InitialPeerReviewBranchName = "Initial Peer Review"
 
 type ProjectCompletionStatus string
 
@@ -37,7 +37,7 @@ func (enum *ProjectFeedbackPreference) IsValid() bool {
 	return slices.Contains(valid, *enum)
 }
 
-// The review status of an entire Project Post
+// The branchreview status of an entire Project Post
 // If a Project Post is not (yet) peer reviewed, new changes cannot be requested
 type ProjectReviewStatus string
 
@@ -65,19 +65,19 @@ type ProjectPost struct {
 	// ProjectPost has many ClosedBranch
 	ClosedBranches []*ClosedBranch `gorm:"foreignKey:ProjectPostID"`
 
-	CompletionStatus   ProjectCompletionStatus
-	FeedbackPreference ProjectFeedbackPreference
-	PostReviewStatus   ProjectReviewStatus
+	ProjectCompletionStatus   ProjectCompletionStatus
+	ProjectFeedbackPreference ProjectFeedbackPreference
+	PostReviewStatus          ProjectReviewStatus
 }
 
 type ProjectPostDTO struct {
-	ID                 uint                      `json:"id"`
-	PostDTO            PostDTO                   `json:"post"`
-	OpenBranchIDs      []uint                    `json:"openBranchIDs"`
-	ClosedBranchIDs    []uint                    `json:"closedBranchIDs"`
-	CompletionStatus   ProjectCompletionStatus   `json:"completionStatus"`
-	FeedbackPreference ProjectFeedbackPreference `json:"feedbackPreference"`
-	PostReviewStatus   ProjectReviewStatus       `json:"postReviewStatus"`
+	ID                        uint                      `json:"id"`
+	PostID                    uint                      `json:"postID"`
+	OpenBranchIDs             []uint                    `json:"openBranchIDs"`
+	ClosedBranchIDs           []uint                    `json:"closedBranchIDs"`
+	ProjectCompletionStatus   ProjectCompletionStatus   `json:"projectCompletionStatus"`
+	ProjectFeedbackPreference ProjectFeedbackPreference `json:"projectFeedbackPreference"`
+	PostReviewStatus          ProjectReviewStatus       `json:"postReviewStatus"`
 }
 
 func (model *ProjectPost) GetID() uint {
@@ -87,11 +87,11 @@ func (model *ProjectPost) GetID() uint {
 func (model *ProjectPost) IntoDTO() ProjectPostDTO {
 	return ProjectPostDTO{
 		model.ID,
-		model.Post.IntoDTO(),
+		model.PostID,
 		branchesToIDs(model.OpenBranches),
 		closedBranchesToIDs(model.ClosedBranches),
-		model.CompletionStatus,
-		model.FeedbackPreference,
+		model.ProjectCompletionStatus,
+		model.ProjectFeedbackPreference,
 		model.PostReviewStatus,
 	}
 }

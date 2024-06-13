@@ -3,7 +3,6 @@ package models
 import (
 	"encoding/json"
 
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +16,7 @@ type Member struct {
 	Password    string // TODO hmmmmmm maybe not
 	Institution string
 	// Member has a ScientificFieldTagContainer
-	ScientificFieldTagContainer   tags.ScientificFieldTagContainer `gorm:"foreignKey:ScientificFieldTagContainerID"`
+	ScientificFieldTagContainer   ScientificFieldTagContainer `gorm:"foreignKey:ScientificFieldTagContainerID"`
 	ScientificFieldTagContainerID uint
 }
 
@@ -49,7 +48,7 @@ func (model *Member) IntoDTO() MemberDTO {
 		model.Email,
 		model.Password,
 		model.Institution,
-		tags.ScientificFieldTagContainerIntoIDs(&model.ScientificFieldTagContainer),
+		ScientificFieldTagContainerIntoIDs(&model.ScientificFieldTagContainer),
 	}
 }
 

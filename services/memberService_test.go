@@ -8,7 +8,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	tags "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -73,8 +72,8 @@ func TestCreateMemberSuccessful(t *testing.T) {
 	}
 
 	// manually set up the member tags
-	userTags := tags.ScientificFieldTagContainer{
-		ScientificFieldTags: []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2},
+	userTags := models.ScientificFieldTagContainer{
+		ScientificFieldTags: []*models.ScientificFieldTag{exampleSTag1, exampleSTag2},
 	}
 	// call service method under test
 	member, err := memberService.CreateMember(&memberForm, &userTags)
@@ -103,8 +102,8 @@ func TestCreateMemberUnsuccessful(t *testing.T) {
 	}
 
 	// manually set up the member tags
-	userTags := tags.ScientificFieldTagContainer{
-		ScientificFieldTags: []*tags.ScientificFieldTag{exampleSTag1, exampleSTag2},
+	userTags := models.ScientificFieldTagContainer{
+		ScientificFieldTags: []*models.ScientificFieldTag{exampleSTag1, exampleSTag2},
 	}
 
 	// call service method under test
