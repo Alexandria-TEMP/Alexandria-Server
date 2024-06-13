@@ -54,6 +54,11 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 		return branch, fmt.Errorf("failed to find project post with id %v: %w", branchCreationForm.ProjectPostID, err), nil
 	}
 
+	// check whether project post is still open. if so reject this branch creation
+	if projectPost.PostReviewStatus == models.Open {
+		return branch, fmt.Errorf("this project post is still open for review"), nil
+	}
+
 	// create and save discussion new container
 	// we shouldn't have to do this extra, it should be implicit but it isnt...
 	discussionContainer := models.DiscussionContainer{}
@@ -224,15 +229,19 @@ func (branchService *BranchService) closeBranch(branch *models.Branch) error {
 
 	// close branch
 	closedBranch := &models.ClosedBranch{
-		ProjectPostID:        projectPost.ID,
-		BranchReviewDecision: models.Rejected,
+		ProjectPostID: projectPost.ID,
 	}
 
 	// merge into master if approved
 	if branch.BranchOverallReviewStatus == models.BranchPeerReviewed {
+		closedBranch.BranchReviewDecision = models.Approved
+		projectPost.PostReviewStatus = models.Reviewed
 		if err := branchService.merge(branch, closedBranch, projectPost); err != nil {
 			return err
 		}
+	} else {
+		closedBranch.BranchReviewDecision = models.Rejected
+		projectPost.PostReviewStatus = models.RevisionNeeded
 	}
 
 	// remove project post id so that it is no longer in open branches
