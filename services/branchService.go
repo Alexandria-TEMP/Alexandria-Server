@@ -353,7 +353,7 @@ func (branchService *BranchService) updateReviewStatus(reviews []*models.BranchR
 }
 
 func (branchService *BranchService) MemberCanReview(_, _ uint) (bool, error) {
-	return false, nil
+	return true, nil
 }
 
 func (branchService *BranchService) GetProject(branchID uint) (string, error) {
