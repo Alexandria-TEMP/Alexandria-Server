@@ -254,6 +254,7 @@ func (postController *PostController) GetPostReport(_ *gin.Context) {
 // UploadPost
 // @Summary 	Upload a new project version to a branch
 // @Description Upload a zipped quarto project to a post. This is the main version of the post, as there are no other versions.
+// @Description Specifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.
 // @Tags 		posts
 // @Accept  	multipart/form-data
 // @Param		postID			path		string			true	"Post ID"

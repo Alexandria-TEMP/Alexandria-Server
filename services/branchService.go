@@ -236,6 +236,7 @@ func (branchService *BranchService) closeBranch(branch *models.Branch) error {
 	if branch.BranchOverallReviewStatus == models.BranchPeerReviewed {
 		closedBranch.BranchReviewDecision = models.Approved
 		projectPost.PostReviewStatus = models.Reviewed
+
 		if err := branchService.merge(branch, closedBranch, projectPost); err != nil {
 			return err
 		}
