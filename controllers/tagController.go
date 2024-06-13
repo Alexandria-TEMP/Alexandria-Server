@@ -98,8 +98,10 @@ func (tagController *TagController) GetScientificTags(c *gin.Context) {
 // @Failure		400
 // @Failure		500
 // @Router		/tags/completion-status	[get]
-func (tagController *TagController) GetCompletionStatusTags(_ *gin.Context) {
-	// TODO implement
+func (tagController *TagController) GetCompletionStatusTags(c *gin.Context) {
+	completionStatusTags := []models.PostType{models.Project, models.Question, models.Reflection}
+
+	c.JSON(http.StatusOK, completionStatusTags)
 }
 
 // GetPostTypeTags godoc
@@ -111,8 +113,10 @@ func (tagController *TagController) GetCompletionStatusTags(_ *gin.Context) {
 // @Failure		400
 // @Failure		500
 // @Router		/tags/post-type	[get]
-func (tagController *TagController) GetPostTypeTags(_ *gin.Context) {
-	// TODO implement
+func (tagController *TagController) GetPostTypeTags(c *gin.Context) {
+	postTypeTags := []models.PostType{models.Project, models.Question, models.Reflection}
+
+	c.JSON(http.StatusOK, postTypeTags)
 }
 
 // GetFeedbackPreferenceTags godoc
@@ -124,6 +128,8 @@ func (tagController *TagController) GetPostTypeTags(_ *gin.Context) {
 // @Failure		400
 // @Failure		500
 // @Router		/tags/feedback-preference	[get]
-func (tagController *TagController) GetFeedbackPreferenceTags(_ *gin.Context) {
-	// TODO implement
+func (tagController *TagController) GetFeedbackPreferenceTags(c *gin.Context) {
+	feedbackPreferenceTags := []models.ProjectFeedbackPreference{models.DiscussionFeedback, models.FormalFeedback}
+
+	c.JSON(http.StatusOK, feedbackPreferenceTags)
 }
