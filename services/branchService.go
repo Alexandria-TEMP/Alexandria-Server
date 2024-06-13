@@ -38,7 +38,7 @@ func (branchService *BranchService) GetBranch(branchID uint) (models.Branch, err
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 
 	if err != nil {
-		return *branch, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
+		return models.Branch{}, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
 	}
 
 	return *branch, nil
