@@ -636,7 +636,7 @@ const docTemplate = `{
         },
         "/branches/{branchID}/upload": {
             "post": {
-                "description": "Upload a new project version to a specific, preexisting, branch as a zipped quarto project\nCall this after you create a post, and supply it with the actual post contents.",
+                "description": "Upload a new project version to a specific, preexisting, branch as a zipped quarto project.\nSpecifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.\nCall this after you create a post, and supply it with the actual post contents.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -1019,12 +1019,12 @@ const docTemplate = `{
                 "summary": "Filters all posts",
                 "parameters": [
                     {
-                        "description": "Filter form",
+                        "description": "Post filter form",
                         "name": "form",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.FilterForm"
+                            "$ref": "#/definitions/forms.PostFilterForm"
                         }
                     },
                     {
@@ -1077,12 +1077,12 @@ const docTemplate = `{
                 "summary": "Filters all project posts",
                 "parameters": [
                     {
-                        "description": "Filter form",
+                        "description": "Project post filter form",
                         "name": "form",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.FilterForm"
+                            "$ref": "#/definitions/forms.ProjectPostFilterForm"
                         }
                     },
                     {
@@ -2196,7 +2196,7 @@ const docTemplate = `{
         },
         "/posts/{postID}/upload": {
             "post": {
-                "description": "Upload a zipped quarto project to a post. This is the main version of the post, as there are no other versions.",
+                "description": "Upload a zipped quarto project to a post. This is the main version of the post, as there are no other versions.\nSpecifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -2731,9 +2731,6 @@ const docTemplate = `{
                 }
             }
         },
-        "forms.FilterForm": {
-            "type": "object"
-        },
         "forms.GroupedBranchForm": {
             "type": "object",
             "properties": {
@@ -2810,6 +2807,14 @@ const docTemplate = `{
                 }
             }
         },
+        "forms.PostFilterForm": {
+            "type": "object",
+            "properties": {
+                "includeProjectPosts": {
+                    "type": "boolean"
+                }
+            }
+        },
         "forms.ProjectPostCreationForm": {
             "type": "object",
             "properties": {
@@ -2823,6 +2828,9 @@ const docTemplate = `{
                     "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 }
             }
+        },
+        "forms.ProjectPostFilterForm": {
+            "type": "object"
         },
         "forms.ReplyDiscussionCreationForm": {
             "type": "object",
