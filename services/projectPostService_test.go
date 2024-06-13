@@ -32,20 +32,26 @@ func projectPostServiceSetup(t *testing.T) {
 	// Create mocks
 	mockProjectPostRepository = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	mockScientificFieldTagContainerReposiotry = mocks.NewMockModelRepositoryInterface[*models.ScientificFieldTagContainer](mockCtrl)
+	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
 
 	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
 	mockBranchCollaboratorService = mocks.NewMockBranchCollaboratorService(mockCtrl)
 	mockBranchService = mocks.NewMockBranchService(mockCtrl)
+	mockTagService = mocks.NewMockTagService(mockCtrl)
 
 	// Setup SUT
 	projectPostService = ProjectPostService{
-		ProjectPostRepository:     mockProjectPostRepository,
-		MemberRepository:          mockMemberRepository,
-		Filesystem:                mockFilesystem,
-		PostCollaboratorService:   mockPostCollaboratorService,
-		BranchCollaboratorService: mockBranchCollaboratorService,
-		BranchService:             mockBranchService,
+		PostRepository:                        mockPostRepository,
+		ProjectPostRepository:                 mockProjectPostRepository,
+		MemberRepository:                      mockMemberRepository,
+		ScientificFieldTagContainerRepository: mockScientificFieldTagContainerReposiotry,
+		Filesystem:                            mockFilesystem,
+		PostCollaboratorService:               mockPostCollaboratorService,
+		BranchCollaboratorService:             mockBranchCollaboratorService,
+		BranchService:                         mockBranchService,
+		TagService:                            mockTagService,
 	}
 }
 
@@ -58,16 +64,33 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 	t.Cleanup(projectPostServiceTeardown)
 
 	// Input to function under test
+
+	emptyTagContainer := &models.ScientificFieldTagContainer{
+		ScientificFieldTags: []*models.ScientificFieldTag{},
+	}
 	projectPostCreationForm := forms.ProjectPostCreationForm{
 		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
-			Title:               "My Awesome Project Post",
-			Anonymous:           false,
-			PostType:            models.Project,
-			ScientificFieldTags: []*models.ScientificFieldTag{},
+			AuthorMemberIDs:       []uint{memberA.ID, memberB.ID},
+			Title:                 "My Awesome Project Post",
+			Anonymous:             false,
+			PostType:              models.Project,
+			ScientificFieldTagIDs: []uint{},
 		},
 		ProjectCompletionStatus:   models.Ongoing,
 		ProjectFeedbackPreference: models.FormalFeedback,
+	}
+	expectedPost := &models.Post{
+		Collaborators: []*models.PostCollaborator{
+			{Member: memberA, CollaborationType: models.Author},
+			{Member: memberB, CollaborationType: models.Author},
+		},
+		Title:                       "My Awesome Project Post",
+		PostType:                    models.Project,
+		ScientificFieldTagContainer: *emptyTagContainer,
+		DiscussionContainer: models.DiscussionContainer{
+			Discussions: []*models.Discussion{},
+		},
+		RenderStatus: models.Success,
 	}
 
 	// Setup mock function return values
@@ -84,37 +107,19 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
 	mockFilesystem.EXPECT().CreateRepository().Return(nil)
 	mockFilesystem.EXPECT().CreateBranch("0").Return(nil)
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
+	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
+	mockPostRepository.EXPECT().Create(expectedPost).Return(nil)
 
 	// Function under test
 	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
 	assert.Nil(t, err404)
 	assert.Nil(t, err500)
 
-	updatedPostTitle := "My Awesome Project Post"
-	updatedCompletionStatus := models.Ongoing
 	expectedProjectPost := &models.ProjectPost{
-		Post: models.Post{
-			Collaborators: []*models.PostCollaborator{
-				{Member: memberA, CollaborationType: models.Author},
-				{Member: memberB, CollaborationType: models.Author},
-			},
-			Title:    "My Awesome Project Post",
-			PostType: models.Project,
-			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
-				ScientificFieldTags: []*models.ScientificFieldTag{},
-			},
-			DiscussionContainer: models.DiscussionContainer{
-				Discussions: []*models.Discussion{},
-			},
-			RenderStatus: models.Success,
-		},
+		Post: *expectedPost,
 		OpenBranches: []*models.Branch{
 			{
-				UpdatedPostTitle:        &updatedPostTitle,
-				UpdatedCompletionStatus: &updatedCompletionStatus,
-				UpdatedScientificFieldTagContainer: models.ScientificFieldTagContainer{
-					ScientificFieldTags: []*models.ScientificFieldTag{},
-				},
 				Collaborators: []*models.BranchCollaborator{
 					{Member: memberA}, {Member: memberB},
 				},
@@ -133,10 +138,7 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 		PostReviewStatus:          models.Open,
 	}
 
-	if !reflect.DeepEqual(createdProjectPost, expectedProjectPost) {
-		t.Fatalf("created project post:\n%+v\ndid not equal expected project post:\n%+v\n",
-			createdProjectPost, expectedProjectPost)
-	}
+	assert.Equal(t, expectedProjectPost, createdProjectPost)
 }
 
 // When database creation fails, project post creation should fail.
@@ -144,22 +146,38 @@ func TestCreateProjectPostDatabaseFailure(t *testing.T) {
 	projectPostServiceSetup(t)
 	t.Cleanup(projectPostServiceTeardown)
 
+	emptyTagContainer := &models.ScientificFieldTagContainer{
+		ScientificFieldTags: []*models.ScientificFieldTag{},
+	}
 	projectPostCreationForm := forms.ProjectPostCreationForm{
 		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:     []uint{},
-			Title:               "My Broken Project Post",
-			Anonymous:           true,
-			PostType:            models.Project,
-			ScientificFieldTags: []*models.ScientificFieldTag{},
+			AuthorMemberIDs:       []uint{},
+			Title:                 "My Broken Project Post",
+			Anonymous:             true,
+			PostType:              models.Project,
+			ScientificFieldTagIDs: []uint{},
 		},
 		ProjectCompletionStatus:   models.Completed,
 		ProjectFeedbackPreference: models.FormalFeedback,
+	}
+	expectedPost := &models.Post{
+		Collaborators:               []*models.PostCollaborator{},
+		Title:                       "My Broken Project Post",
+		PostType:                    models.Project,
+		ScientificFieldTagContainer: *emptyTagContainer,
+		DiscussionContainer: models.DiscussionContainer{
+			Discussions: []*models.Discussion{},
+		},
+		RenderStatus: models.Success,
 	}
 
 	// Setup mock function return values
 	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{}, true, models.Author).Return([]*models.PostCollaborator{}, nil).Times(1)
 	mockBranchCollaboratorService.EXPECT().MembersToBranchCollaborators([]uint{}, true).Return([]*models.BranchCollaborator{}, nil).Times(1)
 	mockProjectPostRepository.EXPECT().Create(gomock.Any()).Return(fmt.Errorf("oh no")).Times(1)
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
+	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
+	mockPostRepository.EXPECT().Create(expectedPost).Return(nil)
 
 	// Function under test
 	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
@@ -179,11 +197,11 @@ func TestCreateProjectPostWrongPostType(t *testing.T) {
 
 	projectPostCreationForm := forms.ProjectPostCreationForm{
 		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:     []uint{},
-			Title:               "",
-			Anonymous:           true,
-			PostType:            models.Question,
-			ScientificFieldTags: []*models.ScientificFieldTag{},
+			AuthorMemberIDs:       []uint{},
+			Title:                 "",
+			Anonymous:             true,
+			PostType:              models.Question,
+			ScientificFieldTagIDs: []uint{},
 		},
 		ProjectCompletionStatus:   models.Idea,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
@@ -207,11 +225,11 @@ func TestCreateProjectPostCollaboratorsFail(t *testing.T) {
 
 	projectPostCreationForm := forms.ProjectPostCreationForm{
 		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:     []uint{10, 15},
-			Title:               "",
-			Anonymous:           false,
-			PostType:            models.Project,
-			ScientificFieldTags: []*models.ScientificFieldTag{},
+			AuthorMemberIDs:       []uint{10, 15},
+			Title:                 "",
+			Anonymous:             false,
+			PostType:              models.Project,
+			ScientificFieldTagIDs: []uint{},
 		},
 		ProjectCompletionStatus:   models.Idea,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
@@ -236,16 +254,32 @@ func TestCreateProjectBranchCollaboratorsFail(t *testing.T) {
 	projectPostServiceSetup(t)
 	t.Cleanup(projectPostServiceTeardown)
 
+	emptyTagContainer := &models.ScientificFieldTagContainer{
+		ScientificFieldTags: []*models.ScientificFieldTag{},
+	}
 	projectPostCreationForm := forms.ProjectPostCreationForm{
 		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
-			Title:               "",
-			Anonymous:           false,
-			PostType:            models.Project,
-			ScientificFieldTags: []*models.ScientificFieldTag{},
+			AuthorMemberIDs:       []uint{memberA.ID, memberB.ID},
+			Title:                 "",
+			Anonymous:             false,
+			PostType:              models.Project,
+			ScientificFieldTagIDs: []uint{},
 		},
 		ProjectCompletionStatus:   models.Idea,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
+	}
+	expectedPost := &models.Post{
+		Collaborators: []*models.PostCollaborator{
+			{Member: memberA, CollaborationType: models.Author},
+			{Member: memberB, CollaborationType: models.Author},
+		},
+		Title:                       "",
+		PostType:                    models.Project,
+		ScientificFieldTagContainer: *emptyTagContainer,
+		DiscussionContainer: models.DiscussionContainer{
+			Discussions: []*models.Discussion{},
+		},
+		RenderStatus: models.Success,
 	}
 
 	// Setup mock function return values
@@ -254,6 +288,9 @@ func TestCreateProjectBranchCollaboratorsFail(t *testing.T) {
 		{Member: memberB, CollaborationType: models.Author},
 	}, nil).Times(1)
 	mockBranchCollaboratorService.EXPECT().MembersToBranchCollaborators([]uint{memberA.ID, memberB.ID}, false).Return(nil, fmt.Errorf("oh no")).Times(1)
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
+	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
+	mockPostRepository.EXPECT().Create(expectedPost).Return(nil)
 
 	// Function under test
 	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)

@@ -43,8 +43,8 @@ type Branch struct {
 	UpdatedPostTitle                     *string
 	UpdatedCompletionStatus              *ProjectCompletionStatus
 	UpdatedFeedbackPreferences           *ProjectFeedbackPreference
-	UpdatedScientificFieldTagContainer   ScientificFieldTagContainer `gorm:"foreignKey:UpdatedScientificFieldTagContainerID"`
-	UpdatedScientificFieldTagContainerID uint
+	UpdatedScientificFieldTagContainer   *ScientificFieldTagContainer `gorm:"foreignKey:UpdatedScientificFieldTagContainerID"`
+	UpdatedScientificFieldTagContainerID *uint
 
 	/////////////////////////////////////////////
 	// The branch's metadata:
@@ -93,7 +93,7 @@ func (model *Branch) IntoDTO() BranchDTO {
 		model.ID,
 		model.UpdatedPostTitle,
 		model.UpdatedCompletionStatus,
-		ScientificFieldTagContainerIntoIDs(&model.UpdatedScientificFieldTagContainer),
+		ScientificFieldTagContainerIntoIDs(model.UpdatedScientificFieldTagContainer),
 		branchCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
 		model.ProjectPostID,

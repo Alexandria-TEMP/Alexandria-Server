@@ -23,6 +23,7 @@ type PostService struct {
 
 	PostCollaboratorService interfaces.PostCollaboratorService
 	RenderService           interfaces.RenderService
+	TagService              interfaces.TagService
 }
 
 func (postService *PostService) GetPost(id uint) (*models.Post, error) {
@@ -41,10 +42,16 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 		return nil, fmt.Errorf("could not create post: %w", err)
 	}
 
+	// convert []uint to []*models.ScientificFieldTag
+	tags, err := postService.TagService.GetTagsFromIDs(form.ScientificFieldTagIDs)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get tags from ids: %w", err)
+	}
+
 	// create and save the tag container to avoid issues with saving later (preloading stuff?)
-	postFields := form.ScientificFieldTags
 	postTagContainer := &models.ScientificFieldTagContainer{
-		ScientificFieldTags: postFields,
+		ScientificFieldTags: tags,
 	}
 
 	if err := postService.ScientificFieldTagContainerRepository.Create(postTagContainer); err != nil {
@@ -61,7 +68,7 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 			// The discussion list is initially empty
 			Discussions: []*models.Discussion{},
 		},
-		RenderStatus: models.Success,
+		RenderStatus: models.Success, // Render status is success because the default project is prerendered
 	}
 
 	if err := postService.PostRepository.Create(&post); err != nil {

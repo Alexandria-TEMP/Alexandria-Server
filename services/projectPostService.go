@@ -20,6 +20,7 @@ type ProjectPostService struct {
 	PostCollaboratorService   interfaces.PostCollaboratorService
 	BranchCollaboratorService interfaces.BranchCollaboratorService
 	BranchService             interfaces.BranchService
+	TagService                interfaces.TagService
 }
 
 func (projectPostService *ProjectPostService) GetProjectPost(id uint) (*models.ProjectPost, error) {
@@ -52,15 +53,6 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 		return nil, fmt.Errorf("could not create project post: %w", err), nil
 	}
 
-	// Create new ScientificFieldTagContainer for branch
-	newBranchTagContainer := &models.ScientificFieldTagContainer{
-		ScientificFieldTags: form.PostCreationForm.ScientificFieldTags,
-	}
-
-	if err := projectPostService.ScientificFieldTagContainerRepository.Create(newBranchTagContainer); err != nil {
-		return nil, nil, fmt.Errorf("failed to add tag container to db: %w", err)
-	}
-
 	// Construct project post
 	projectPost := models.ProjectPost{
 		Post:                      *post,
@@ -70,11 +62,8 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 		OpenBranches: []*models.Branch{
 			{
 				// TODO make these fields optional maybe? so they dont have to be filled in
-				UpdatedPostTitle:                   &form.PostCreationForm.Title,
-				UpdatedCompletionStatus:            &form.ProjectCompletionStatus,
-				UpdatedScientificFieldTagContainer: *newBranchTagContainer,
-				Collaborators:                      branchCollaborators,
-				Reviews:                            []*models.BranchReview{},
+				Collaborators: branchCollaborators,
+				Reviews:       []*models.BranchReview{},
 				DiscussionContainer: models.DiscussionContainer{
 					Discussions: []*models.Discussion{},
 				},
@@ -121,12 +110,19 @@ func (projectPostService *ProjectPostService) creatPostForProjectPost(form *form
 		return nil, fmt.Errorf("failed to get post collaborators: %w", err)
 	}
 
-	// Create and save new ScientificFieldTagContainer for post
-	newPostTagContainer := &models.ScientificFieldTagContainer{
-		ScientificFieldTags: form.PostCreationForm.ScientificFieldTags,
+	// convert []uint to []*models.ScientificFieldTag
+	tags, err := projectPostService.TagService.GetTagsFromIDs(form.PostCreationForm.ScientificFieldTagIDs)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get tags from ids: %w", err)
 	}
 
-	if err := projectPostService.ScientificFieldTagContainerRepository.Create(newPostTagContainer); err != nil {
+	// create and save the tag container to avoid issues with saving later (preloading stuff?)
+	postTagContainer := &models.ScientificFieldTagContainer{
+		ScientificFieldTags: tags,
+	}
+
+	if err := projectPostService.ScientificFieldTagContainerRepository.Create(postTagContainer); err != nil {
 		return nil, fmt.Errorf("failed to add tag container to db: %w", err)
 	}
 
@@ -135,7 +131,7 @@ func (projectPostService *ProjectPostService) creatPostForProjectPost(form *form
 		Collaborators:               postCollaborators,
 		Title:                       form.PostCreationForm.Title,
 		PostType:                    form.PostCreationForm.PostType,
-		ScientificFieldTagContainer: *newPostTagContainer,
+		ScientificFieldTagContainer: *postTagContainer,
 		RenderStatus:                models.Success,
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},

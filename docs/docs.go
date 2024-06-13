@@ -284,46 +284,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "post": {
-                "description": "Upload a new project version to a specific, preexisting, branch as a zipped quarto project",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Upload a new project version to a branch",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Branch ID",
-                        "name": "branchID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "Repository to create",
-                        "name": "file",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
             "delete": {
                 "description": "Delete a branch with given ID from database",
                 "consumes": [
@@ -667,6 +627,48 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/branches/{branchID}/upload": {
+            "post": {
+                "description": "Upload a new project version to a specific, preexisting, branch as a zipped quarto project\nCall this after you create a post, and supply it with the actual post contents.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Upload a new project version to a branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Repository to create",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -1892,46 +1894,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "post": {
-                "description": "Upload a new project version to a specific, preexisting, branch as a zipped quarto project",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "posts"
-                ],
-                "summary": "Upload a new project version to a branch",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Post ID",
-                        "name": "postID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "Repository to create",
-                        "name": "file",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
             "delete": {
                 "description": "Delete a post with given ID from database",
                 "consumes": [
@@ -2193,7 +2155,7 @@ const docTemplate = `{
         },
         "/posts/{postID}/tree": {
             "get": {
-                "description": "Get the filetree of a the main version of a post",
+                "description": "Get the filetree of a the main version of a post, together with the size of the file in bytes.\nDirectories have a size of -1.",
                 "produces": [
                     "application/json"
                 ],
@@ -2225,6 +2187,48 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}/upload": {
+            "post": {
+                "description": "Upload a zipped quarto project to a post. This is the main version of the post, as there are no other versions.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Upload a new project version to a branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Repository to create",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -2847,7 +2851,41 @@ const docTemplate = `{
     },
     "definitions": {
         "forms.BranchCreationForm": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "anonymous": {
+                    "type": "boolean"
+                },
+                "branchTitle": {
+                    "type": "string"
+                },
+                "collaboratingMemberIDs": {
+                    "description": "The branch's metadata",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "projectPostID": {
+                    "type": "integer"
+                },
+                "updatedCompletionStatus": {
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                },
+                "updatedFeedbackPreferences": {
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                },
+                "updatedPostTitle": {
+                    "description": "Changes made by the branch",
+                    "type": "string"
+                },
+                "updatedScientificFieldIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "forms.DiscussionCreationForm": {
             "type": "object",
@@ -2918,30 +2956,7 @@ const docTemplate = `{
             }
         },
         "forms.PostCreationForm": {
-            "type": "object",
-            "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "authorMemberIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "postType": {
-                    "$ref": "#/definitions/models.PostType"
-                },
-                "scientificFieldTags": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ScientificFieldTag"
-                    }
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
+            "type": "object"
         },
         "forms.ProjectPostCreationForm": {
             "type": "object",
@@ -3372,9 +3387,6 @@ const docTemplate = `{
             ]
         },
         "models.ReportDTO": {
-            "type": "object"
-        },
-        "models.ScientificFieldTag": {
             "type": "object"
         },
         "models.ScientificFieldTagDTO": {

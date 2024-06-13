@@ -27,17 +27,21 @@ func postServiceSetup(t *testing.T) {
 	// Setup mocks
 	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	mockScientificFieldTagContainerReposiotry = mocks.NewMockModelRepositoryInterface[*models.ScientificFieldTagContainer](mockCtrl)
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
 	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
 	mockRenderService = mocks.NewMockRenderService(mockCtrl)
+	mockTagService = mocks.NewMockTagService(mockCtrl)
 
 	// Setup SUT
 	postService = PostService{
-		PostRepository:          mockPostRepository,
-		MemberRepository:        mockMemberRepository,
-		Filesystem:              mockFilesystem,
-		PostCollaboratorService: mockPostCollaboratorService,
-		RenderService:           mockRenderService,
+		PostRepository:                        mockPostRepository,
+		MemberRepository:                      mockMemberRepository,
+		ScientificFieldTagContainerRepository: mockScientificFieldTagContainerReposiotry,
+		Filesystem:                            mockFilesystem,
+		PostCollaboratorService:               mockPostCollaboratorService,
+		RenderService:                         mockRenderService,
+		TagService:                            mockTagService,
 	}
 
 	// Setup members in the repository
@@ -73,10 +77,13 @@ func TestCreatePostGoodWeather(t *testing.T) {
 
 	// The input we will be sending to the function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
-		Title:               "My Awesome Question",
-		Anonymous:           false,
-		PostType:            models.Question,
+		AuthorMemberIDs:       []uint{memberA.ID, memberB.ID},
+		Title:                 "My Awesome Question",
+		Anonymous:             false,
+		PostType:              models.Question,
+		ScientificFieldTagIDs: []uint{},
+	}
+	emptyTagContainer := &models.ScientificFieldTagContainer{
 		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 
@@ -94,6 +101,8 @@ func TestCreatePostGoodWeather(t *testing.T) {
 	}, nil).Times(1)
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
 	mockFilesystem.EXPECT().CreateRepository().Return(nil)
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
+	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)
@@ -111,11 +120,9 @@ func TestCreatePostGoodWeather(t *testing.T) {
 				CollaborationType: models.Author,
 			},
 		},
-		Title:    "My Awesome Question",
-		PostType: models.Question,
-		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
-			ScientificFieldTags: []*models.ScientificFieldTag{},
-		},
+		Title:                       "My Awesome Question",
+		PostType:                    models.Question,
+		ScientificFieldTagContainer: *emptyTagContainer,
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
 		},
@@ -131,11 +138,11 @@ func TestCreatePostNonExistingMembers(t *testing.T) {
 
 	// Input to function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
-		Title:               "My Broken Post",
-		Anonymous:           false,
-		PostType:            models.Reflection,
-		ScientificFieldTags: []*models.ScientificFieldTag{},
+		AuthorMemberIDs:       []uint{memberA.ID, memberB.ID},
+		Title:                 "My Broken Post",
+		Anonymous:             false,
+		PostType:              models.Reflection,
+		ScientificFieldTagIDs: []uint{},
 	}
 
 	// Setup mock function return values
@@ -162,18 +169,22 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 
 	// The input we will be sending to the function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID},
-		Title:               "My Awesome Question",
-		Anonymous:           true,
-		PostType:            models.Question,
+		AuthorMemberIDs:       []uint{memberA.ID, memberB.ID},
+		Title:                 "My Awesome Question",
+		Anonymous:             true,
+		PostType:              models.Question,
+		ScientificFieldTagIDs: []uint{},
+	}
+	emptyTagContainer := &models.ScientificFieldTagContainer{
 		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
-
 	// Setup mock function return values
 	mockPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
 	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, true, models.Author).Return([]*models.PostCollaborator{}, nil)
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
 	mockFilesystem.EXPECT().CreateRepository().Return(nil)
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
+	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)
@@ -181,12 +192,10 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 	assert.Nil(t, err)
 
 	expectedPost := models.Post{
-		Collaborators: []*models.PostCollaborator{},
-		Title:         "My Awesome Question",
-		PostType:      models.Question,
-		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
-			ScientificFieldTags: []*models.ScientificFieldTag{},
-		},
+		Collaborators:               []*models.PostCollaborator{},
+		Title:                       "My Awesome Question",
+		PostType:                    models.Question,
+		ScientificFieldTagContainer: *emptyTagContainer,
 		DiscussionContainer: models.DiscussionContainer{
 			Discussions: []*models.Discussion{},
 		},
@@ -202,13 +211,15 @@ func TestCreatePostDatabaseFailure(t *testing.T) {
 
 	// Input to function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs:     []uint{memberA.ID, memberC.ID},
-		Title:               "My Post That Shall Fail",
-		Anonymous:           false,
-		PostType:            models.Reflection,
+		AuthorMemberIDs:       []uint{memberA.ID, memberC.ID},
+		Title:                 "My Post That Shall Fail",
+		Anonymous:             false,
+		PostType:              models.Reflection,
+		ScientificFieldTagIDs: []uint{},
+	}
+	emptyTagContainer := &models.ScientificFieldTagContainer{
 		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
-
 	mockPostRepository.EXPECT().Create(gomock.Any()).Return(fmt.Errorf("oh no")).Times(1)
 	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberC.ID}, false, models.Author).Return([]*models.PostCollaborator{
 		{
@@ -220,6 +231,8 @@ func TestCreatePostDatabaseFailure(t *testing.T) {
 			CollaborationType: models.Author,
 		},
 	}, nil)
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
+	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)
@@ -241,11 +254,11 @@ func TestCreatePostWithBadPostType(t *testing.T) {
 
 	// Input to function under test
 	postCreationForm := forms.PostCreationForm{
-		AuthorMemberIDs:     []uint{memberA.ID, memberB.ID, memberC.ID},
-		Title:               "My Faulty Project Post",
-		Anonymous:           false,
-		PostType:            models.Project,
-		ScientificFieldTags: []*models.ScientificFieldTag{},
+		AuthorMemberIDs:       []uint{memberA.ID, memberB.ID, memberC.ID},
+		Title:                 "My Faulty Project Post",
+		Anonymous:             false,
+		PostType:              models.Project,
+		ScientificFieldTagIDs: []uint{},
 	}
 
 	mockPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)

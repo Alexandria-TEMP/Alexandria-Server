@@ -33,7 +33,7 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		BranchTitle:                        "My Cool MR",
 		UpdatedPostTitle:                   &updatedPostTitle,
 		UpdatedCompletionStatus:            &updatedCompletionStatus,
-		UpdatedScientificFieldTagContainer: ScientificFieldTagContainer{},
+		UpdatedScientificFieldTagContainer: &ScientificFieldTagContainer{},
 		RenderStatus:                       Pending,
 		BranchOverallReviewStatus:          BranchOpenForReview,
 	}

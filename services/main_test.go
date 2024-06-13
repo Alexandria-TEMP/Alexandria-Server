@@ -19,17 +19,19 @@ var (
 	mockPostCollaboratorService   *mocks.MockPostCollaboratorService
 	mockBranchCollaboratorService *mocks.MockBranchCollaboratorService
 	mockBranchService             *mocks.MockBranchService
+	mockTagService                *mocks.MockTagService
 
-	mockBranchRepository              *mocks.MockModelRepositoryInterface[*models.Branch]
-	mockClosedBranchRepository        *mocks.MockModelRepositoryInterface[*models.ClosedBranch]
-	mockPostRepository                *mocks.MockModelRepositoryInterface[*models.Post]
-	mockProjectPostRepository         *mocks.MockModelRepositoryInterface[*models.ProjectPost]
-	mockReviewRepository              *mocks.MockModelRepositoryInterface[*models.BranchReview]
-	mockBranchCollaboratorRepository  *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
-	mockPostCollaboratorRepository    *mocks.MockModelRepositoryInterface[*models.PostCollaborator]
-	mockDiscussionContainerRepository *mocks.MockModelRepositoryInterface[*models.DiscussionContainer]
-	mockDiscussionRepository          *mocks.MockModelRepositoryInterface[*models.Discussion]
-	mockMemberRepository              *mocks.MockModelRepositoryInterface[*models.Member]
+	mockBranchRepository                      *mocks.MockModelRepositoryInterface[*models.Branch]
+	mockClosedBranchRepository                *mocks.MockModelRepositoryInterface[*models.ClosedBranch]
+	mockPostRepository                        *mocks.MockModelRepositoryInterface[*models.Post]
+	mockProjectPostRepository                 *mocks.MockModelRepositoryInterface[*models.ProjectPost]
+	mockReviewRepository                      *mocks.MockModelRepositoryInterface[*models.BranchReview]
+	mockBranchCollaboratorRepository          *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
+	mockPostCollaboratorRepository            *mocks.MockModelRepositoryInterface[*models.PostCollaborator]
+	mockDiscussionContainerRepository         *mocks.MockModelRepositoryInterface[*models.DiscussionContainer]
+	mockDiscussionRepository                  *mocks.MockModelRepositoryInterface[*models.Discussion]
+	mockMemberRepository                      *mocks.MockModelRepositoryInterface[*models.Member]
+	mockScientificFieldTagContainerReposiotry *mocks.MockModelRepositoryInterface[*models.ScientificFieldTagContainer]
 
 	mockFilesystem *mocks.MockFilesystem
 

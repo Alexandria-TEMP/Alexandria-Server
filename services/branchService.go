@@ -31,6 +31,7 @@ type BranchService struct {
 	RenderService             interfaces.RenderService
 	BranchCollaboratorService interfaces.BranchCollaboratorService
 	PostCollaboratorService   interfaces.PostCollaboratorService
+	TagService                interfaces.TagService
 }
 
 func (branchService *BranchService) GetBranch(branchID uint) (models.Branch, error) {
@@ -66,27 +67,24 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 		return branch, fmt.Errorf("failed to convert member ids to branch collaborators: %w", err), nil
 	}
 
-	// convert []models.ScientificFieldTag to []*models.ScientificFieldTag
-	updatedScientificFields := []*models.ScientificFieldTag{}
+	// convert []uint to []*models.ScientificFieldTag
+	tags, err := branchService.TagService.GetTagsFromIDs(branchCreationForm.UpdatedScientificFieldIDs)
 
-	for _, tag := range branchCreationForm.UpdatedScientificFields {
-		tagAddress := &tag
-		updatedScientificFields = append(updatedScientificFields, tagAddress)
+	if err != nil {
+		return branch, fmt.Errorf("failed to get tags from ids: %w", err), nil
 	}
 
 	// make new branch
 	branch = models.Branch{
-		UpdatedPostTitle:        branchCreationForm.UpdatedPostTitle,
-		UpdatedCompletionStatus: branchCreationForm.UpdatedCompletionStatus,
-		UpdatedScientificFieldTagContainer: models.ScientificFieldTagContainer{
-			ScientificFieldTags: updatedScientificFields,
-		},
-		Collaborators:             collaborators,
-		DiscussionContainer:       discussionContainer,
-		ProjectPostID:             &branchCreationForm.ProjectPostID,
-		BranchTitle:               branchCreationForm.BranchTitle,
-		RenderStatus:              models.Success,
-		BranchOverallReviewStatus: models.BranchOpenForReview,
+		UpdatedPostTitle:                   branchCreationForm.UpdatedPostTitle,
+		UpdatedCompletionStatus:            branchCreationForm.UpdatedCompletionStatus,
+		UpdatedScientificFieldTagContainer: &models.ScientificFieldTagContainer{ScientificFieldTags: tags},
+		Collaborators:                      collaborators,
+		DiscussionContainer:                discussionContainer,
+		ProjectPostID:                      &branchCreationForm.ProjectPostID,
+		BranchTitle:                        branchCreationForm.BranchTitle,
+		RenderStatus:                       models.Success,
+		BranchOverallReviewStatus:          models.BranchOpenForReview,
 	}
 
 	// save branch entity to open branches
@@ -300,8 +298,8 @@ func (branchService *BranchService) merge(branch *models.Branch, closedBranch *m
 		projectPost.ProjectCompletionStatus = *branch.UpdatedCompletionStatus
 	}
 
-	if len(branch.UpdatedScientificFieldTagContainer.ScientificFieldTags) == 0 {
-		projectPost.Post.ScientificFieldTagContainer = branch.UpdatedScientificFieldTagContainer
+	if branch.UpdatedScientificFieldTagContainer != nil {
+		projectPost.Post.ScientificFieldTagContainer = *branch.UpdatedScientificFieldTagContainer
 	}
 
 	if branch.UpdatedFeedbackPreferences != nil {

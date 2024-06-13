@@ -10,7 +10,7 @@ import (
 // The name of the branch that will be created, automatically, when a new project post is created.
 // This branch is created for purpose of peer reviewing the project post itself, before it can
 // receive any other proposed changes.
-const InitialPeerReviewBranchName = "Initial peer branchreview changes"
+const InitialPeerReviewBranchName = "Initial Peer Review"
 
 type ProjectCompletionStatus string
 

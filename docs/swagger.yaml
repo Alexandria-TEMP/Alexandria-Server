@@ -1,6 +1,29 @@
 basePath: /api/v2
 definitions:
   forms.BranchCreationForm:
+    properties:
+      anonymous:
+        type: boolean
+      branchTitle:
+        type: string
+      collaboratingMemberIDs:
+        description: The branch's metadata
+        items:
+          type: integer
+        type: array
+      projectPostID:
+        type: integer
+      updatedCompletionStatus:
+        $ref: '#/definitions/models.ProjectCompletionStatus'
+      updatedFeedbackPreferences:
+        $ref: '#/definitions/models.ProjectFeedbackPreference'
+      updatedPostTitle:
+        description: Changes made by the branch
+        type: string
+      updatedScientificFieldIDs:
+        items:
+          type: integer
+        type: array
     type: object
   forms.DiscussionCreationForm:
     properties:
@@ -50,21 +73,6 @@ definitions:
         type: array
     type: object
   forms.PostCreationForm:
-    properties:
-      anonymous:
-        type: boolean
-      authorMemberIDs:
-        items:
-          type: integer
-        type: array
-      postType:
-        $ref: '#/definitions/models.PostType'
-      scientificFieldTags:
-        items:
-          $ref: '#/definitions/models.ScientificFieldTag'
-        type: array
-      title:
-        type: string
     type: object
   forms.ProjectPostCreationForm:
     properties:
@@ -359,8 +367,6 @@ definitions:
     - Failure
   models.ReportDTO:
     type: object
-  models.ScientificFieldTag:
-    type: object
   models.ScientificFieldTagDTO:
     properties:
       id:
@@ -489,34 +495,6 @@ paths:
         "404":
           description: Not Found
       summary: Get branch
-      tags:
-      - branches
-    post:
-      consumes:
-      - multipart/form-data
-      description: Upload a new project version to a specific, preexisting, branch
-        as a zipped quarto project
-      parameters:
-      - description: Branch ID
-        in: path
-        name: branchID
-        required: true
-        type: string
-      - description: Repository to create
-        in: formData
-        name: file
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-        "500":
-          description: Internal Server Error
-      summary: Upload a new project version to a branch
       tags:
       - branches
   /branches/{branchID}/can-review/{memberID}:
@@ -729,6 +707,36 @@ paths:
         "500":
           description: Internal Server Error
       summary: Get the filetree of a project
+      tags:
+      - branches
+  /branches/{branchID}/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: |-
+        Upload a new project version to a specific, preexisting, branch as a zipped quarto project
+        Call this after you create a post, and supply it with the actual post contents.
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branchID
+        required: true
+        type: string
+      - description: Repository to create
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Upload a new project version to a branch
       tags:
       - branches
   /branches/closed/{closedBranchID}:
@@ -1583,34 +1591,6 @@ paths:
       summary: Get post by ID
       tags:
       - posts
-    post:
-      consumes:
-      - multipart/form-data
-      description: Upload a new project version to a specific, preexisting, branch
-        as a zipped quarto project
-      parameters:
-      - description: Post ID
-        in: path
-        name: postID
-        required: true
-        type: string
-      - description: Repository to create
-        in: formData
-        name: file
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-        "500":
-          description: Internal Server Error
-      summary: Upload a new project version to a branch
-      tags:
-      - posts
   /posts/{postID}/file/{filepath}:
     get:
       description: Get the contents of a single file from the main version of a post
@@ -1761,7 +1741,9 @@ paths:
       - posts
   /posts/{postID}/tree:
     get:
-      description: Get the filetree of a the main version of a post
+      description: |-
+        Get the filetree of a the main version of a post, together with the size of the file in bytes.
+        Directories have a size of -1.
       parameters:
       - description: Post ID
         in: path
@@ -1784,6 +1766,35 @@ paths:
         "500":
           description: Internal Server Error
       summary: Get the filetree of a post
+      tags:
+      - posts
+  /posts/{postID}/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload a zipped quarto project to a post. This is the main version
+        of the post, as there are no other versions.
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      - description: Repository to create
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Upload a new project version to a branch
       tags:
       - posts
   /posts/collaborators/{collaboratorID}:

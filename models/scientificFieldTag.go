@@ -66,6 +66,11 @@ func ScientificFieldTagIntoIDs(subtags []*ScientificFieldTag) []uint {
 
 // Helper function for JSON marshaling
 func ScientificFieldTagContainerIntoIDs(scientificFieldTags *ScientificFieldTagContainer) []uint {
+	if scientificFieldTags == nil {
+		ints := []uint{}
+		return ints
+	}
+
 	if len(scientificFieldTags.ScientificFieldTags) == 0 {
 		ints := []uint{}
 		return ints

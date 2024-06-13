@@ -37,6 +37,7 @@ func beforeEachBranch(t *testing.T) {
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
 	mockBranchCollaboratorService = mocks.NewMockBranchCollaboratorService(mockCtrl)
+	mockTagService = mocks.NewMockTagService(mockCtrl)
 	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
 
 	// Create branch service
@@ -53,6 +54,7 @@ func beforeEachBranch(t *testing.T) {
 		BranchCollaboratorService:     mockBranchCollaboratorService,
 		PostCollaboratorService:       mockPostCollaboratorService,
 		RenderService:                 mockRenderService,
+		TagService:                    mockTagService,
 	}
 }
 
@@ -81,22 +83,17 @@ func TestCreateBranchSuccess(t *testing.T) {
 	projectPost.ID = 10
 	projectPost.PostID = 12
 	collaborator := &models.BranchCollaborator{MemberID: 12}
-	expectedBranch := &models.Branch{
-		Collaborators:             []*models.BranchCollaborator{collaborator},
-		ProjectPostID:             &projectPost.ID,
-		RenderStatus:              models.Success,
-		BranchOverallReviewStatus: models.BranchOpenForReview,
-	}
 	outputBranch := &models.Branch{
-		Collaborators:             []*models.BranchCollaborator{collaborator},
-		ProjectPostID:             &projectPost.ID,
-		RenderStatus:              models.Success,
-		BranchOverallReviewStatus: models.BranchOpenForReview,
+		Collaborators:                      []*models.BranchCollaborator{collaborator},
+		ProjectPostID:                      &projectPost.ID,
+		RenderStatus:                       models.Success,
+		BranchOverallReviewStatus:          models.BranchOpenForReview,
+		UpdatedScientificFieldTagContainer: &models.ScientificFieldTagContainer{ScientificFieldTags: []*models.ScientificFieldTag{}},
 	}
 	newProjectPost := &models.ProjectPost{
 		Model:        gorm.Model{ID: 10},
 		PostID:       12,
-		OpenBranches: []*models.Branch{expectedBranch},
+		OpenBranches: []*models.Branch{outputBranch},
 	}
 
 	mockProjectPostRepository.EXPECT().GetByID(uint(10)).Return(projectPost, nil)
@@ -106,10 +103,12 @@ func TestCreateBranchSuccess(t *testing.T) {
 	mockFilesystem.EXPECT().CreateBranch("0")
 	mockBranchCollaboratorService.EXPECT().GetBranchCollaborator(uint(12)).Return(collaborator, nil)
 	mockBranchCollaboratorService.EXPECT().MembersToBranchCollaborators([]uint{12}, false).Return([]*models.BranchCollaborator{collaborator}, nil)
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
 
 	branch, err404, err500 := branchService.CreateBranch(&forms.BranchCreationForm{
-		CollaboratingMemberIDs: []uint{12},
-		ProjectPostID:          10,
+		CollaboratingMemberIDs:    []uint{12},
+		ProjectPostID:             10,
+		UpdatedScientificFieldIDs: []uint{},
 	})
 
 	assert.Nil(t, err404)
@@ -142,7 +141,7 @@ func TestCreateBranchFailedUpdateProjectPost(t *testing.T) {
 		RenderStatus:                       models.Success,
 		BranchOverallReviewStatus:          models.BranchOpenForReview,
 		DiscussionContainer:                models.DiscussionContainer{},
-		UpdatedScientificFieldTagContainer: models.ScientificFieldTagContainer{},
+		UpdatedScientificFieldTagContainer: &models.ScientificFieldTagContainer{},
 		Reviews:                            []*models.BranchReview{},
 	}
 	newProjectPost := &models.ProjectPost{
@@ -157,10 +156,12 @@ func TestCreateBranchFailedUpdateProjectPost(t *testing.T) {
 	mockBranchCollaboratorService.EXPECT().GetBranchCollaborator(uint(12)).Return(&models.BranchCollaborator{MemberID: 12}, nil)
 	mockBranchCollaboratorService.EXPECT().GetBranchCollaborator(uint(11)).Return(&models.BranchCollaborator{MemberID: 11}, nil)
 	mockBranchCollaboratorService.EXPECT().MembersToBranchCollaborators([]uint{12, 11}, false).Return([]*models.BranchCollaborator{{MemberID: 12, BranchID: 11}}, nil)
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
 
 	_, err404, err500 := branchService.CreateBranch(&forms.BranchCreationForm{
-		CollaboratingMemberIDs: []uint{12, 11},
-		ProjectPostID:          10,
+		CollaboratingMemberIDs:    []uint{12, 11},
+		ProjectPostID:             10,
+		UpdatedScientificFieldIDs: []uint{},
 	})
 
 	assert.Nil(t, err404)
@@ -173,10 +174,11 @@ func TestCreateBranchFailedGit(t *testing.T) {
 	projectPost.ID = 10
 	projectPost.PostID = 12
 	expectedBranch := &models.Branch{
-		Collaborators:             []*models.BranchCollaborator{{MemberID: 12, BranchID: 11}},
-		ProjectPostID:             &projectPost.ID,
-		RenderStatus:              models.Success,
-		BranchOverallReviewStatus: models.BranchOpenForReview,
+		Collaborators:                      []*models.BranchCollaborator{{MemberID: 12, BranchID: 11}},
+		ProjectPostID:                      &projectPost.ID,
+		RenderStatus:                       models.Success,
+		BranchOverallReviewStatus:          models.BranchOpenForReview,
+		UpdatedScientificFieldTagContainer: &models.ScientificFieldTagContainer{ScientificFieldTags: []*models.ScientificFieldTag{}},
 	}
 	newProjectPost := &models.ProjectPost{
 		Model:        gorm.Model{ID: 10},
@@ -197,10 +199,12 @@ func TestCreateBranchFailedGit(t *testing.T) {
 	mockBranchCollaboratorService.EXPECT().GetBranchCollaborator(uint(12)).Return(&models.BranchCollaborator{MemberID: 12}, nil)
 	mockBranchCollaboratorService.EXPECT().GetBranchCollaborator(uint(11)).Return(&models.BranchCollaborator{MemberID: 12}, nil)
 	mockBranchCollaboratorService.EXPECT().MembersToBranchCollaborators([]uint{12, 11}, false).Return([]*models.BranchCollaborator{{MemberID: 12, BranchID: 11}}, nil)
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
 
 	_, err404, err500 := branchService.CreateBranch(&forms.BranchCreationForm{
-		CollaboratingMemberIDs: []uint{12, 11},
-		ProjectPostID:          10,
+		CollaboratingMemberIDs:    []uint{12, 11},
+		ProjectPostID:             10,
+		UpdatedScientificFieldIDs: []uint{},
 	})
 
 	assert.Nil(t, err404)

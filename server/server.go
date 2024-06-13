@@ -23,7 +23,7 @@ type RepositoryEnv struct {
 	discussionRepository                  database.ModelRepositoryInterface[*models.Discussion]
 	discussionContainerRepository         database.ModelRepositoryInterface[*models.DiscussionContainer]
 	memberRepository                      database.ModelRepositoryInterface[*models.Member]
-	tagRepository                         database.ModelRepositoryInterface[*models.ScientificFieldTag]
+	scientificFieldTagRepository          database.ModelRepositoryInterface[*models.ScientificFieldTag]
 	scientificFieldTagContainerRepository database.ModelRepositoryInterface[*models.ScientificFieldTagContainer]
 }
 
@@ -63,12 +63,15 @@ func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
 		discussionRepository:                  &database.ModelRepository[*models.Discussion]{Database: db},
 		discussionContainerRepository:         &database.ModelRepository[*models.DiscussionContainer]{Database: db},
 		memberRepository:                      &database.ModelRepository[*models.Member]{Database: db},
-		tagRepository:                         &database.ModelRepository[*models.ScientificFieldTag]{Database: db},
+		scientificFieldTagRepository:          &database.ModelRepository[*models.ScientificFieldTag]{Database: db},
 		scientificFieldTagContainerRepository: &database.ModelRepository[*models.ScientificFieldTagContainer]{Database: db},
 	}
 }
 
 func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
+	tagService := &services.TagService{
+		TagRepository: repositoryEnv.scientificFieldTagRepository,
+	}
 	renderService := &services.RenderService{
 		BranchRepository:      repositoryEnv.branchRepository,
 		PostRepository:        repositoryEnv.postRepository,
@@ -90,6 +93,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		Filesystem:                            fs,
 		RenderService:                         renderService,
 		PostCollaboratorService:               postCollaboratorService,
+		TagService:                            tagService,
 	}
 	memberService := &services.MemberService{
 		MemberRepository: repositoryEnv.memberRepository,
@@ -107,6 +111,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		RenderService:                 renderService,
 		BranchCollaboratorService:     branchCollaboratorService,
 		PostCollaboratorService:       postCollaboratorService,
+		TagService:                    tagService,
 	}
 	projectPostService := &services.ProjectPostService{
 		PostRepository:                        repositoryEnv.postRepository,
@@ -117,6 +122,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		PostCollaboratorService:               postCollaboratorService,
 		BranchCollaboratorService:             branchCollaboratorService,
 		BranchService:                         branchService,
+		TagService:                            tagService,
 	}
 	discussionService := &services.DiscussionService{
 		DiscussionRepository:          repositoryEnv.discussionRepository,
@@ -125,9 +131,6 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 	}
 	discussionContainerService := &services.DiscussionContainerService{
 		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
-	}
-	tagService := &services.TagService{
-		TagRepository: repositoryEnv.tagRepository,
 	}
 	renderService.BranchService = branchService // added afterwards since both require eachother
 
@@ -171,7 +174,11 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 			PostService:        serviceEnv.postService,
 			ProjectPostService: serviceEnv.projectPostService,
 		},
-		branchController: &controllers.BranchController{},
+		branchController: &controllers.BranchController{
+			BranchService:             serviceEnv.branchService,
+			RenderService:             serviceEnv.renderService,
+			BranchCollaboratorService: serviceEnv.branchCollaboratorService,
+		},
 		tagController: &controllers.TagController{
 			TagService: serviceEnv.tagService,
 		},
