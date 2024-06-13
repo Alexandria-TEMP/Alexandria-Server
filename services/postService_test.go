@@ -220,6 +220,7 @@ func TestCreatePostDatabaseFailure(t *testing.T) {
 	emptyTagContainer := &models.ScientificFieldTagContainer{
 		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
+
 	mockPostRepository.EXPECT().Create(gomock.Any()).Return(fmt.Errorf("oh no")).Times(1)
 	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberC.ID}, false, models.Author).Return([]*models.PostCollaborator{
 		{
