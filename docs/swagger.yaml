@@ -73,6 +73,21 @@ definitions:
         type: array
     type: object
   forms.PostCreationForm:
+    properties:
+      anonymous:
+        type: boolean
+      authorMemberIDs:
+        items:
+          type: integer
+        type: array
+      postType:
+        $ref: '#/definitions/models.PostType'
+      scientificFieldTagIDs:
+        items:
+          type: integer
+        type: array
+      title:
+        type: string
     type: object
   forms.ProjectPostCreationForm:
     properties:
@@ -2041,121 +2056,6 @@ paths:
         "500":
           description: Internal Server Error
       summary: Returns branch IDs grouped by each branch status
-      tags:
-      - project-posts
-  /project-posts/{projectPostID}/file/{filepath}:
-    get:
-      description: Get the contents of a single file from the main version of a project
-        post
-      parameters:
-      - description: Project Post ID
-        in: path
-        name: projectPostID
-        required: true
-        type: string
-      - description: Filepath
-        in: path
-        name: filepath
-        required: true
-        type: string
-      produces:
-      - application/octet-stream
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "404":
-          description: Not Found
-        "500":
-          description: Internal Server Error
-      summary: Get a file from a project post
-      tags:
-      - project-posts
-  /project-posts/{projectPostID}/render:
-    get:
-      description: Get the main render of the repository underlying a project post
-        if it exists and has been rendered successfully
-      parameters:
-      - description: Project Post ID
-        in: path
-        name: projectPostID
-        required: true
-        type: string
-      produces:
-      - text/html
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "202":
-          description: Accepted
-          schema:
-            items:
-              type: integer
-            type: array
-        "400":
-          description: Bad Request
-        "404":
-          description: Not Found
-      summary: Get the main render of a project post
-      tags:
-      - project-posts
-  /project-posts/{projectPostID}/repository:
-    get:
-      description: Get the entire zipped main repository of a project post
-      parameters:
-      - description: Project Post ID
-        in: path
-        name: projectPostID
-        required: true
-        type: string
-      produces:
-      - application/zip
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              type: integer
-            type: array
-        "400":
-          description: Bad Request
-        "404":
-          description: Not Found
-      summary: Get the main repository of a project post
-      tags:
-      - project-posts
-  /project-posts/{projectPostID}/tree:
-    get:
-      description: Get the filetree of a the main version of a project post
-      parameters:
-      - description: Project Post ID
-        in: path
-        name: projectPostID
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: integer
-            type: object
-        "400":
-          description: Bad Request
-        "404":
-          description: Not Found
-        "500":
-          description: Internal Server Error
-      summary: Get the filetree of a project post
       tags:
       - project-posts
   /project-posts/from-github:
