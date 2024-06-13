@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -18,7 +17,7 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			{Model: gorm.Model{ID: 60}},
 		},
 		PostType:                    Project,
-		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
+		ScientificFieldTagContainer: ScientificFieldTagContainer{},
 		DiscussionContainer:         DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
 	}
 
@@ -31,26 +30,20 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			{Model: gorm.Model{ID: 59}},
 			{Model: gorm.Model{ID: 20}},
 		},
-		CompletionStatus:   Completed,
-		FeedbackPreference: FormalFeedback,
-		PostReviewStatus:   RevisionNeeded,
+		ProjectCompletionStatus:   Completed,
+		ProjectFeedbackPreference: FormalFeedback,
+		PostReviewStatus:          RevisionNeeded,
 	}
 
 	// should equal this DTO!
 	targetDTO := ProjectPostDTO{
-		ID: 42,
-		PostDTO: PostDTO{
-			ID:                    88,
-			CollaboratorIDs:       []uint{1, 60},
-			PostType:              Project,
-			ScientificFieldTagIDs: []uint{},
-			DiscussionIDs:         []uint{95},
-		},
-		OpenBranchIDs:      []uint{44},
-		ClosedBranchIDs:    []uint{59, 20},
-		CompletionStatus:   Completed,
-		FeedbackPreference: FormalFeedback,
-		PostReviewStatus:   RevisionNeeded,
+		ID:                        42,
+		PostID:                    88,
+		OpenBranchIDs:             []uint{44},
+		ClosedBranchIDs:           []uint{59, 20},
+		ProjectCompletionStatus:   Completed,
+		ProjectFeedbackPreference: FormalFeedback,
+		PostReviewStatus:          RevisionNeeded,
 	}
 
 	dto := ProjectPostDTO{}

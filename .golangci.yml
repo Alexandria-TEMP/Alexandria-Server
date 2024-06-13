@@ -17,6 +17,8 @@ linters-settings:
       - opinionated
       - performance
       - style
+    disabled-checks:
+    - rangeValCopy
   gofmt:
     simplify: true
   govet:

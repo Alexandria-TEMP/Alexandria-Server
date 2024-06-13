@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"slices"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
@@ -45,4 +46,76 @@ func (postCollaboratorService *PostCollaboratorService) MembersToPostCollaborato
 	}
 
 	return postCollaborators, nil
+}
+
+// We add all branch collaborators to the project post as post collaborators with the "reviewer" type, unless they have already been added as such
+func (postCollaboratorService *PostCollaboratorService) MergeReviewers(projectPost *models.ProjectPost, reviews []*models.BranchReview) error {
+	// get all member ids which are reviewers present in post collaborators initially
+	collaboratorMemberIDs := []uint{}
+
+	for _, c := range projectPost.Post.Collaborators {
+		if c.CollaborationType == models.Reviewer {
+			collaboratorMemberIDs = append(collaboratorMemberIDs, c.MemberID)
+		}
+	}
+
+	// add all new post collaborators
+	for _, review := range reviews {
+		// if the member is already present as a post collaborator, we do not add it again
+		if slices.Contains(collaboratorMemberIDs, review.MemberID) {
+			continue
+		}
+
+		// otherwise we add this post collaborator
+		reviewMember, err := postCollaboratorService.MemberRepository.GetByID(review.MemberID)
+		if err != nil {
+			return fmt.Errorf("failed to get reviewing member from db")
+		}
+
+		asPostCollaborator := &models.PostCollaborator{
+			Member:            *reviewMember,
+			PostID:            projectPost.PostID,
+			CollaborationType: models.Reviewer,
+		}
+
+		projectPost.Post.Collaborators = append(projectPost.Post.Collaborators, asPostCollaborator)
+	}
+
+	return nil
+}
+
+// We add all branch collaborators to the project post as post collaborators with the "contributor" type, unless they have already been added as such
+func (postCollaboratorService *PostCollaboratorService) MergeContributors(projectPost *models.ProjectPost, branchCollaborators []*models.BranchCollaborator) error {
+	// get all member ids which are collaborators present in post collaborators initially
+	collaboratorMemberIDs := []uint{}
+
+	for _, c := range projectPost.Post.Collaborators {
+		if c.CollaborationType == models.Contributor {
+			collaboratorMemberIDs = append(collaboratorMemberIDs, c.MemberID)
+		}
+	}
+
+	// add all new post collaborators
+	for _, branchCollaborator := range branchCollaborators {
+		// if the member is already present as a post collaborator, we do not add it again
+		if slices.Contains(collaboratorMemberIDs, branchCollaborator.MemberID) {
+			continue
+		}
+
+		// otherwise we add this post collaborator
+		branchCollaboratorMember, err := postCollaboratorService.MemberRepository.GetByID(branchCollaborator.MemberID)
+		if err != nil {
+			return fmt.Errorf("failed to get contributing member from db")
+		}
+
+		asPostCollaborator := &models.PostCollaborator{
+			Member:            *branchCollaboratorMember,
+			PostID:            projectPost.PostID,
+			CollaborationType: models.Contributor,
+		}
+
+		projectPost.Post.Collaborators = append(projectPost.Post.Collaborators, asPostCollaborator)
+	}
+
+	return nil
 }

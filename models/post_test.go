@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -31,7 +30,7 @@ func TestPostJSONMarshaling(t *testing.T) {
 		},
 		Title:                       "Nice Post",
 		PostType:                    Question,
-		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
+		ScientificFieldTagContainer: ScientificFieldTagContainer{},
 		DiscussionContainer:         DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
 	}
 

@@ -4,7 +4,6 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 )
 
 type MemberService struct {
@@ -17,7 +16,7 @@ func (memberService *MemberService) GetMember(memberID uint) (*models.Member, er
 	return member, err
 }
 
-func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm, userFields *tags.ScientificFieldTagContainer) (*models.Member, error) {
+func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (*models.Member, error) {
 	// for now no input sanitization for the strings - so first name, last name, email, institution, etc.
 	// however have to get tags somehow
 	member := &models.Member{
@@ -37,7 +36,7 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 	return member, err
 }
 
-func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, userFields *tags.ScientificFieldTagContainer) error {
+func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, userFields *models.ScientificFieldTagContainer) error {
 	oldMember, err := memberService.MemberRepository.GetByID(memberDTO.ID)
 	if err != nil {
 		return err

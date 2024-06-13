@@ -68,3 +68,31 @@ func (mr *MockPostCollaboratorServiceMockRecorder) MembersToPostCollaborators(ID
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MembersToPostCollaborators", reflect.TypeOf((*MockPostCollaboratorService)(nil).MembersToPostCollaborators), IDs, anonymous, collaborationType)
 }
+
+// MergeContributors mocks base method.
+func (m *MockPostCollaboratorService) MergeContributors(projectPost *models.ProjectPost, branchCollaborators []*models.BranchCollaborator) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MergeContributors", projectPost, branchCollaborators)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// MergeContributors indicates an expected call of MergeContributors.
+func (mr *MockPostCollaboratorServiceMockRecorder) MergeContributors(projectPost, branchCollaborators any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MergeContributors", reflect.TypeOf((*MockPostCollaboratorService)(nil).MergeContributors), projectPost, branchCollaborators)
+}
+
+// MergeReviewers mocks base method.
+func (m *MockPostCollaboratorService) MergeReviewers(projectPost *models.ProjectPost, reviews []*models.BranchReview) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MergeReviewers", projectPost, reviews)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// MergeReviewers indicates an expected call of MergeReviewers.
+func (mr *MockPostCollaboratorServiceMockRecorder) MergeReviewers(projectPost, reviews any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MergeReviewers", reflect.TypeOf((*MockPostCollaboratorService)(nil).MergeReviewers), projectPost, reviews)
+}

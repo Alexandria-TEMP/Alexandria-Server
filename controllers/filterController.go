@@ -27,16 +27,16 @@ type FilterController struct {
 // @Param		size	query		uint				false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/filter/posts		[get]
 func (filterController *FilterController) FilterPosts(c *gin.Context) {
 	var filterForm forms.FilterForm
 
 	err := c.BindJSON(&filterForm)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to bind form JSON: %s", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to bind form JSON: %v", err.Error())})
 
 		return
 	}
@@ -52,7 +52,7 @@ func (filterController *FilterController) FilterPosts(c *gin.Context) {
 
 	postIDs, err := filterController.PostService.Filter(page, size, filterForm)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering posts failed: %s", err)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering posts failed: %v", err.Error())})
 
 		return
 	}
@@ -71,16 +71,16 @@ func (filterController *FilterController) FilterPosts(c *gin.Context) {
 // @Param		size		query		uint				false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/filter/project-posts		[get]
 func (filterController *FilterController) FilterProjectPosts(c *gin.Context) {
 	var filterForm forms.FilterForm
 
 	err := c.BindJSON(&filterForm)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to bind form JSON: %s", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to bind form JSON: %v", err.Error())})
 
 		return
 	}
@@ -96,7 +96,7 @@ func (filterController *FilterController) FilterProjectPosts(c *gin.Context) {
 
 	projectPostIDs, err := filterController.ProjectPostService.Filter(page, size, filterForm)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering project posts failed: %s", err)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering project posts failed: %v", err.Error())})
 	}
 
 	c.JSON(http.StatusOK, projectPostIDs)

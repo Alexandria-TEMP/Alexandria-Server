@@ -13,8 +13,8 @@ func SetUpRouter(controllers *ControllerEnv) *gin.Engine {
 	// Get router
 	router := gin.Default()
 	router.Use(cors.Default())
-	router.RedirectTrailingSlash = true
-	router.RedirectFixedPath = true
+	router.RedirectTrailingSlash = false
+	router.RedirectFixedPath = false
 	err := router.SetTrustedProxies(nil)
 
 	if err != nil {
@@ -82,9 +82,16 @@ func branchRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	branchRouter.DELETE("/:branchID", controllers.branchController.DeleteBranch)
 	branchRouter.GET("/:branchID/review-statuses", controllers.branchController.GetReviewStatus)
 	branchRouter.GET("/reviews/:reviewID", controllers.branchController.GetReview)
-	branchRouter.POST("/:branchID/reviews", controllers.branchController.CreateReview)
-	branchRouter.GET("/:branchID/can-review/:memberID", controllers.branchController.UserCanReview)
+	branchRouter.POST("/reviews", controllers.branchController.CreateReview)
+	branchRouter.GET("/:branchID/can-review/:memberID", controllers.branchController.MemberCanReview)
 	branchRouter.GET("/collaborators/:collaboratorID", controllers.branchController.GetBranchCollaborator)
+	branchRouter.GET("/:branchID/render", controllers.branchController.GetRender)
+	branchRouter.GET("/:branchID/repository", controllers.branchController.GetProject)
+	branchRouter.POST("/:branchID/upload", controllers.branchController.UploadProject)
+	branchRouter.GET("/:branchID/tree", controllers.branchController.GetFiletree)
+	branchRouter.GET("/:branchID/file/*filepath", controllers.branchController.GetFileFromProject)
+	branchRouter.GET("/:branchID/discussions", controllers.branchController.GetDiscussions)
+	branchRouter.GET("/closed/:closedBranchID", controllers.branchController.GetClosedBranch)
 }
 
 func memberRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
@@ -106,13 +113,13 @@ func memberRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 
 func projectPostRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	projectPostRouter := v2.Group("/project-posts")
-	projectPostRouter.GET("/:postID", controllers.projectPostController.GetProjectPost)
+	projectPostRouter.GET("/:projectPostID", controllers.projectPostController.GetProjectPost)
 	projectPostRouter.POST("", controllers.projectPostController.CreateProjectPost)
 	projectPostRouter.PUT("", controllers.projectPostController.UpdateProjectPost)
-	projectPostRouter.DELETE("/:postID", controllers.projectPostController.DeleteProjectPost)
+	projectPostRouter.DELETE("/:projectPostID", controllers.projectPostController.DeleteProjectPost)
 	projectPostRouter.POST("/from-github", controllers.projectPostController.CreateProjectPostFromGithub)
-	projectPostRouter.GET("/:postID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
-	projectPostRouter.GET("/:postID/branches-by-status", controllers.projectPostController.GetProjectPostMRsByStatus)
+	projectPostRouter.GET("/:projectPostID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
+	projectPostRouter.GET("/:projectPostID/branches-by-status", controllers.projectPostController.GetProjectPostBranchesByStatus)
 }
 
 func postRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
@@ -126,6 +133,11 @@ func postRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	postRouter.GET("/:postID/reports", controllers.postController.GetPostReports)
 	postRouter.GET("/reports/:reportID", controllers.postController.GetPostReport)
 	postRouter.GET("/collaborators/:collaboratorID", controllers.postController.GetPostCollaborator)
+	postRouter.POST("/:postID/upload", controllers.postController.UploadPost)
+	postRouter.GET("/:postID/render", controllers.postController.GetMainRender)
+	postRouter.GET("/:postID/repository", controllers.postController.GetMainProject)
+	postRouter.GET("/:postID/tree", controllers.postController.GetMainFiletree)
+	postRouter.GET("/:postID/file/*filepath", controllers.postController.GetMainFileFromProject)
 }
 
 func discussionContainerRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
