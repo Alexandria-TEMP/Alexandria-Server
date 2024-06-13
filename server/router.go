@@ -138,6 +138,7 @@ func postRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	postRouter.GET("/:postID/repository", controllers.postController.GetMainProject)
 	postRouter.GET("/:postID/tree", controllers.postController.GetMainFiletree)
 	postRouter.GET("/:postID/file/*filepath", controllers.postController.GetMainFileFromProject)
+	postRouter.GET("/:postID/project-post", controllers.postController.GetProjectPostIfExists)
 }
 
 func discussionContainerRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
