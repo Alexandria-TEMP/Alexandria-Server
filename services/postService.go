@@ -242,7 +242,7 @@ func (postService *PostService) GetProjectPost(postID uint) (*models.ProjectPost
 	// TODO this is not super efficient... improve somehow?
 	foundProjectPosts, err := postService.ProjectPostRepository.Query(fmt.Sprintf("post_id = %d", postID))
 	if err != nil {
-		return nil, fmt.Errorf("failed to get project post that has post ID %d: %s", postID, err)
+		return nil, fmt.Errorf("failed to get project post that has post ID %d: %w", postID, err)
 	}
 
 	// Ensure that only ONE project post has this post.
