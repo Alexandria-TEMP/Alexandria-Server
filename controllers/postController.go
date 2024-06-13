@@ -507,7 +507,7 @@ func (postController *PostController) GetProjectPostIfExists(c *gin.Context) {
 	}
 
 	// Return the project post's ID
-	c.JSON(http.StatusOK, gin.H{"projectPostID": projectPost.ID})
+	c.JSON(http.StatusOK, projectPost.ID)
 
 	// Note: this endpoint kind of goes against the data model's design philosophy, and is quite a hacky fix.
 	// TODO reconsider how composition of posts and project posts is implemented & integrated.
