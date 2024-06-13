@@ -430,7 +430,8 @@ func (branchController *BranchController) GetProject(c *gin.Context) {
 
 // UploadProject
 // @Summary 	Upload a new project version to a branch
-// @Description Upload a new project version to a specific, preexisting, branch as a zipped quarto project
+// @Description Upload a new project version to a specific, preexisting, branch as a zipped quarto project.
+// @Description Specifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.
 // @Description Call this after you create a post, and supply it with the actual post contents.
 // @Tags 		branches
 // @Accept  	multipart/form-data
