@@ -17,9 +17,9 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 			{Model: gorm.Model{ID: 1}},
 			{Model: gorm.Model{ID: 60}},
 		},
-		PostType:            Project,
-		ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
-		DiscussionContainer: DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
+		PostType:                    Project,
+		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
+		DiscussionContainer:         DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
 	}
 
 	model := ProjectPost{
@@ -40,11 +40,11 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 	targetDTO := ProjectPostDTO{
 		ID: 42,
 		PostDTO: PostDTO{
-			ID:                  88,
-			CollaboratorIDs:     []uint{1, 60},
-			PostType:            Project,
-			ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
-			DiscussionIDs:       []uint{95},
+			ID:                    88,
+			CollaboratorIDs:       []uint{1, 60},
+			PostType:              Project,
+			ScientificFieldTagIDs: []uint{},
+			DiscussionIDs:         []uint{95},
 		},
 		OpenBranchIDs:      []uint{44},
 		ClosedBranchIDs:    []uint{59, 20},

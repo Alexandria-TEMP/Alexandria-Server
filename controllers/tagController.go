@@ -1,23 +1,92 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+	tags "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
+)
 
 // @BasePath /api/v2
 
 type TagController struct {
+	TagService interfaces.TagService
+}
+
+// GetScientificFieldTag godoc
+// @Summary 	Get scientific field tag from database
+// @Description Get a scientific field tag by tag ID
+// @Tags 		tags
+// @Accept  	json
+// @Param		tagID		path		string			true	"tag ID"
+// @Produce		json
+// @Success 	200 		{object}	tags.ScientificFieldTagDTO
+// @Failure		400 		{object} 	utils.HTTPError
+// @Failure		404 		{object} 	utils.HTTPError
+// @Failure		500			{object}	utils.HTTPError
+// @Router 		/tags/scientific/:tagID	[get]
+func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
+	// extract the id of the scientific field tag
+	tagIDStr := c.Param("tagID")
+	initTagID, err := strconv.ParseUint(tagIDStr, 10, 64)
+
+	// if this caused an error, print it and return status 400: bad input
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid tag ID, cannot interpret '%s' as integer: %s ", tagIDStr, err)})
+
+		return
+	}
+
+	// cast tag ID as uint instead of uint64, because database only accepts those
+	tagID := uint(initTagID)
+
+	// get the tag through the service
+	tag, err := tagController.TagService.GetTagByID(tagID)
+
+	// if there was an error, print it and return status 404: not found
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot get member because no tag with ID '%d' exists: %s", tagID, err)})
+
+		return
+	}
+
+	// if correct response send the tag back
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, tag)
 }
 
 // GetScientificTags godoc
 // @Summary 	Returns all scientific tags
-// @Description Returns all scientific tags (an array of strings) in the database
+// @Description Returns all scientific tags in the database
 // @Tags 		tags
 // @Produce		json
-// @Success 	200		{array}		tags.ScientificFieldTag
-// @Failure		400 	{object}	utils.HTTPError
+// @Success 	200		{array}		tags.ScientificFieldTagDTO
+// @Failure		404 	{object}	utils.HTTPError
 // @Failure		500		{object}	utils.HTTPError
 // @Router 		/tags/scientific	[get]
-func (tagController *TagController) GetScientificTags(_ *gin.Context) {
-	// TODO implement
+func (tagController *TagController) GetScientificTags(c *gin.Context) {
+	tagObjects, err := tagController.TagService.GetAllScientificFieldTags()
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot get tags: %s", err)})
+
+		return
+	}
+
+	tagDTOs := []tags.ScientificFieldTagDTO{}
+
+	for _, tag := range tagObjects {
+		dto := tag.IntoDTO()
+
+		tagDTOs = append(tagDTOs, dto)
+	}
+
+	// if correct response send the tags back
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, tagDTOs)
 }
 
 // GetCompletionStatusTags godoc

@@ -36,7 +36,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret '%s' as integer: %s", postIDStr, err)})
 
 		return
 	}
@@ -45,7 +45,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 	post, err := postController.PostService.GetPost(uint(postID))
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "cannot get post because no post with this ID exists"})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get post: %s", err)})
 
 		return
 	}
@@ -71,7 +71,7 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 	err := c.BindJSON(&form)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind PostCreationForm from request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind PostCreationForm from request body: %s", err)})
 
 		return
 	}
@@ -84,7 +84,7 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 
 	post, err := postController.PostService.CreatePost(&form)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post, reason: %s", err)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post: %s", err)})
 
 		return
 	}
@@ -114,7 +114,7 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 	// TODO convert from Post DTO to updated Post data
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated Post from request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind updated Post from request body: %s", err)})
 
 		return
 	}
@@ -123,7 +123,7 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 	err = postController.PostService.UpdatePost(&updatedPost)
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "cannot update post because no post with this ID exists"})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot update post because no post with this ID exists: %s", err)})
 
 		return
 	}

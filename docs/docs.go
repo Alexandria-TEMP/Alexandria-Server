@@ -303,7 +303,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/branches/{branchID}/can-review/{userID}": {
+        "/branches/{branchID}/can-review/{memberID}": {
             "get": {
                 "description": "Returns true if the user fulfills the requirements to review the branch\nReturns false if user is unauthorized to review the branch",
                 "consumes": [
@@ -326,8 +326,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
+                        "description": "member ID",
+                        "name": "memberID",
                         "in": "path",
                         "required": true
                     }
@@ -469,9 +469,59 @@ const docTemplate = `{
                 }
             }
         },
-        "/discussions": {
+        "/discussion-containers/{discussionContainerID}": {
+            "get": {
+                "description": "Get a discussion container by its ID, to access its discussions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "discussion-containers"
+                ],
+                "summary": "Get discussion container",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Discussion Container ID",
+                        "name": "discussionContainerID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.DiscussionContainerDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/discussions/replies": {
             "post": {
-                "description": "Create a new discussion\nEither parent ID or version ID must be specified. This determines whether it's a reply or not, respectively.",
+                "description": "Create a new reply-type discussion, so a discussion that is a child of another discussion.",
                 "consumes": [
                     "application/json"
                 ],
@@ -481,28 +531,16 @@ const docTemplate = `{
                 "tags": [
                     "discussions"
                 ],
-                "summary": "Create new discussion",
+                "summary": "Create new reply discussion",
                 "parameters": [
                     {
-                        "description": "Discussion Creation Form",
+                        "description": "Reply Discussion Creation Form",
                         "name": "form",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.DiscussionCreationForm"
+                            "$ref": "#/definitions/forms.ReplyDiscussionCreationForm"
                         }
-                    },
-                    {
-                        "type": "string",
-                        "description": "Parent ID",
-                        "name": "parentID",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Version ID",
-                        "name": "versionID",
-                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -561,6 +599,52 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/discussions/roots": {
+            "post": {
+                "description": "Create a new root-level discussion, meaning a discussion that is not a reply.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "discussions"
+                ],
+                "summary": "Create new root discussion",
+                "parameters": [
+                    {
+                        "description": "Root Discussion Creation Form",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.RootDiscussionCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.DiscussionDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
@@ -929,14 +1013,8 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "integer"
+                                "$ref": "#/definitions/models.MemberShortFormDTO"
                             }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
                         }
                     },
                     "404": {
@@ -1045,9 +1123,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}": {
+        "/members/{memberID}": {
             "get": {
-                "description": "Get a member by user ID",
+                "description": "Get a member by member ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -1061,8 +1139,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
+                        "description": "member ID",
+                        "name": "memberID",
                         "in": "path",
                         "required": true
                     }
@@ -1109,8 +1187,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
+                        "description": "member ID",
+                        "name": "memberID",
                         "in": "path",
                         "required": true
                     }
@@ -1140,7 +1218,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}/branches": {
+        "/members/{memberID}/branches": {
             "get": {
                 "description": "Get all branches that this member is a collaborator of",
                 "consumes": [
@@ -1156,8 +1234,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
+                        "description": "member ID",
+                        "name": "memberID",
                         "in": "path",
                         "required": true
                     }
@@ -1193,7 +1271,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}/discussions": {
+        "/members/{memberID}/discussions": {
             "get": {
                 "description": "Get all discussions that this member has participated in",
                 "consumes": [
@@ -1209,8 +1287,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
+                        "description": "member ID",
+                        "name": "memberID",
                         "in": "path",
                         "required": true
                     }
@@ -1246,7 +1324,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}/posts": {
+        "/members/{memberID}/posts": {
             "get": {
                 "description": "Get all posts that this member is a collaborator of",
                 "consumes": [
@@ -1262,8 +1340,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
+                        "description": "member ID",
+                        "name": "memberID",
                         "in": "path",
                         "required": true
                     }
@@ -1299,7 +1377,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}/project-posts": {
+        "/members/{memberID}/project-posts": {
             "get": {
                 "description": "Get all project posts that this member is a collaborator of",
                 "consumes": [
@@ -1315,8 +1393,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
+                        "description": "member ID",
+                        "name": "memberID",
                         "in": "path",
                         "required": true
                     }
@@ -1352,7 +1430,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}/saved-posts": {
+        "/members/{memberID}/saved-posts": {
             "get": {
                 "description": "Get all posts that this member has saved",
                 "consumes": [
@@ -1368,8 +1446,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
+                        "description": "member ID",
+                        "name": "memberID",
                         "in": "path",
                         "required": true
                     }
@@ -1405,7 +1483,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}/saved-posts/{postID}": {
+        "/members/{memberID}/saved-posts/{postID}": {
             "post": {
                 "description": "Adds a post to the saved posts of a member",
                 "consumes": [
@@ -1421,8 +1499,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
+                        "description": "member ID",
+                        "name": "memberID",
                         "in": "path",
                         "required": true
                     },
@@ -1453,7 +1531,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}/saved-project-posts": {
+        "/members/{memberID}/saved-project-posts": {
             "get": {
                 "description": "Get all project posts that this member has saved",
                 "consumes": [
@@ -1469,8 +1547,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
+                        "description": "member ID",
+                        "name": "memberID",
                         "in": "path",
                         "required": true
                     }
@@ -1506,7 +1584,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/members/{userID}/saved-project-posts/{postID}": {
+        "/members/{memberID}/saved-project-posts/{postID}": {
             "post": {
                 "description": "Adds a project post to the saved project posts of a member",
                 "consumes": [
@@ -1522,8 +1600,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user ID",
-                        "name": "userID",
+                        "description": "member ID",
+                        "name": "memberID",
                         "in": "path",
                         "required": true
                     },
@@ -2465,7 +2543,7 @@ const docTemplate = `{
         },
         "/tags/scientific": {
             "get": {
-                "description": "Returns all scientific tags (an array of strings) in the database",
+                "description": "Returns all scientific tags in the database",
                 "produces": [
                     "application/json"
                 ],
@@ -2479,12 +2557,62 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.ScientificFieldTag"
+                                "$ref": "#/definitions/tags.ScientificFieldTagDTO"
                             }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/tags/scientific/:tagID": {
+            "get": {
+                "description": "Get a scientific field tag by tag ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "members"
+                ],
+                "summary": "Get scientific field tag from database",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tag ID",
+                        "name": "tagID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/tags.ScientificFieldTagDTO"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
@@ -2501,41 +2629,7 @@ const docTemplate = `{
     },
     "definitions": {
         "forms.BranchCreationForm": {
-            "type": "object",
-            "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "branchTitle": {
-                    "type": "string"
-                },
-                "collaboratingMemberIDs": {
-                    "description": "The branch's metadata",
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "projectPostID": {
-                    "type": "integer"
-                },
-                "updatedCompletionStatus": {
-                    "$ref": "#/definitions/models.ProjectCompletionStatus"
-                },
-                "updatedFeedbackPreferences": {
-                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
-                },
-                "updatedPostTitle": {
-                    "description": "Changes made by the branch",
-                    "type": "string"
-                },
-                "updatedScientificFields": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/tags.ScientificField"
-                    }
-                }
-            }
+            "type": "object"
         },
         "forms.DiscussionCreationForm": {
             "type": "object",
@@ -2584,12 +2678,6 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "fields": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/tags.ScientificFieldTag"
-                    }
-                },
                 "firstName": {
                     "type": "string"
                 },
@@ -2602,6 +2690,12 @@ const docTemplate = `{
                 "password": {
                     "description": "making the password just a string for now\nTODO: some hashing or semblance of security",
                     "type": "string"
+                },
+                "scientificFieldTagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -2623,7 +2717,7 @@ const docTemplate = `{
                 "scientificFieldTags": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/tags.ScientificField"
+                        "$ref": "#/definitions/tags.ScientificFieldTag"
                     }
                 },
                 "title": {
@@ -2645,6 +2739,18 @@ const docTemplate = `{
                 }
             }
         },
+        "forms.ReplyDiscussionCreationForm": {
+            "type": "object",
+            "properties": {
+                "discussion": {
+                    "$ref": "#/definitions/forms.DiscussionCreationForm"
+                },
+                "parentID": {
+                    "description": "The Discussion this Discussion will be added to",
+                    "type": "integer"
+                }
+            }
+        },
         "forms.ReportCreationForm": {
             "type": "object"
         },
@@ -2659,6 +2765,18 @@ const docTemplate = `{
                 },
                 "reviewingMemberID": {
                     "type": "integer"
+                }
+            }
+        },
+        "forms.RootDiscussionCreationForm": {
+            "type": "object",
+            "properties": {
+                "containerID": {
+                    "description": "The DiscussionContainer this Discussion will be added to",
+                    "type": "integer"
+                },
+                "discussion": {
+                    "$ref": "#/definitions/forms.DiscussionCreationForm"
                 }
             }
         },
@@ -2720,10 +2838,10 @@ const docTemplate = `{
                 "updatedCompletionStatus": {
                     "$ref": "#/definitions/models.ProjectCompletionStatus"
                 },
-                "updatedScientificFields": {
+                "updatedScientificFieldTagIDs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/tags.ScientificField"
+                        "type": "integer"
                     }
                 }
             }
@@ -2788,15 +2906,23 @@ const docTemplate = `{
                 "Reviewer"
             ]
         },
+        "models.DiscussionContainerDTO": {
+            "type": "object",
+            "properties": {
+                "discussionIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.DiscussionDTO": {
             "type": "object",
             "properties": {
-                "anonymous": {
-                    "type": "boolean"
-                },
-                "deleted": {
-                    "type": "boolean"
-                },
                 "id": {
                     "type": "integer"
                 },
@@ -2835,11 +2961,25 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
-                "scientificFieldTags": {
+                "scientificFieldTagIDs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/tags.ScientificField"
+                        "type": "integer"
                     }
+                }
+            }
+        },
+        "models.MemberShortFormDTO": {
+            "type": "object",
+            "properties": {
+                "firstName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastName": {
+                    "type": "string"
                 }
             }
         },
@@ -2881,10 +3021,10 @@ const docTemplate = `{
                 "postType": {
                     "$ref": "#/definitions/models.PostType"
                 },
-                "scientificFieldTags": {
+                "scientificFieldTagIDs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/tags.ScientificField"
+                        "type": "integer"
                     }
                 },
                 "title": {
@@ -3006,19 +3146,28 @@ const docTemplate = `{
                 }
             }
         },
-        "tags.ScientificField": {
-            "type": "string",
-            "enum": [
-                "mathematics",
-                "computer science"
-            ],
-            "x-enum-varnames": [
-                "Mathematics",
-                "ComputerScience"
-            ]
-        },
         "tags.ScientificFieldTag": {
             "type": "object"
+        },
+        "tags.ScientificFieldTagDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "parentID": {
+                    "type": "integer"
+                },
+                "scientificField": {
+                    "type": "string"
+                },
+                "subtagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "utils.HTTPError": {
             "type": "object",

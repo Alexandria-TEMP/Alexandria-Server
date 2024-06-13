@@ -1,10 +1,19 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
+)
 
 // @BasePath /api/v2
 
 type DiscussionController struct {
+	DiscussionService interfaces.DiscussionService
 }
 
 // GetDiscussion godoc
@@ -19,26 +28,102 @@ type DiscussionController struct {
 // @Failure		404 		{object} 	utils.HTTPError
 // @Failure		500 		{object} 	utils.HTTPError
 // @Router 		/discussions/{discussionID}	[get]
-func (discussionController *DiscussionController) GetDiscussion(_ *gin.Context) {
+func (discussionController *DiscussionController) GetDiscussion(c *gin.Context) {
+	// Parse discussion ID path parameter
+	discussionIDString := c.Param("discussionID")
 
+	discussionID, err := strconv.ParseUint(discussionIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not parse discussion ID '%s' as unsigned integer: %s", discussionIDString, err)})
+
+		return
+	}
+
+	// Get from database
+	discussion, err := discussionController.DiscussionService.GetDiscussion(uint(discussionID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get discussion with ID %d: %s", discussionID, err)})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, discussion)
 }
 
-// CreateDiscussion godoc
-// @Summary 	Create new discussion
-// @Description Create a new discussion
-// @Description Either parent ID or version ID must be specified. This determines whether it's a reply or not, respectively.
+// CreateRootDiscussion godoc
+// @Summary 	Create new root discussion
+// @Description Create a new root-level discussion, meaning a discussion that is not a reply.
 // @Tags 		discussions
 // @Accept  	json
-// @Param		form	body	forms.DiscussionCreationForm	true	"Discussion Creation Form"
-// @Param 		parentID			query		string			false	"Parent ID"
-// @Param 		versionID			query		string			false	"Version ID"
+// @Param		form	body	forms.RootDiscussionCreationForm	true	"Root Discussion Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.DiscussionDTO
 // @Failure		400 	{object} 	utils.HTTPError
 // @Failure		500 	{object} 	utils.HTTPError
-// @Router 		/discussions 		[post]
-func (discussionController *DiscussionController) CreateDiscussion(_ *gin.Context) {
+// @Router 		/discussions/roots 		[post]
+func (discussionController *DiscussionController) CreateRootDiscussion(c *gin.Context) {
+	// Bind discussion creation form from request
+	var discussionCreationForm forms.RootDiscussionCreationForm
 
+	if err := c.BindJSON(&discussionCreationForm); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not bind form from JSON: %s", err)})
+
+		return
+	}
+
+	if !discussionCreationForm.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
+
+		return
+	}
+
+	// Create discussion in the database
+	createdDiscussion, err := discussionController.DiscussionService.CreateRootDiscussion(&discussionCreationForm)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create root discussion: %s", err)})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, createdDiscussion)
+}
+
+// CreateReplyDiscussion godoc
+// @Summary 	Create new reply discussion
+// @Description Create a new reply-type discussion, so a discussion that is a child of another discussion.
+// @Tags 		discussions
+// @Accept  	json
+// @Param		form	body	forms.ReplyDiscussionCreationForm	true	"Reply Discussion Creation Form"
+// @Produce		json
+// @Success 	200 	{object} 	models.DiscussionDTO
+// @Failure		400 	{object} 	utils.HTTPError
+// @Failure		500 	{object} 	utils.HTTPError
+// @Router 		/discussions/replies 		[post]
+func (discussionController *DiscussionController) CreateReplyDiscussion(c *gin.Context) {
+	// Bind discussion creation form from request
+	var discussionCreationForm forms.ReplyDiscussionCreationForm
+
+	if err := c.BindJSON(&discussionCreationForm); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not bind form from JSON: %s", err)})
+
+		return
+	}
+
+	if !discussionCreationForm.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
+
+		return
+	}
+
+	// Create discussion in the database
+	createdDiscussion, err := discussionController.DiscussionService.CreateReply(&discussionCreationForm)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create reply discussion: %s", err)})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, createdDiscussion)
 }
 
 // DeleteDiscussion godoc

@@ -30,18 +30,18 @@ func projectPostServiceSetup(t *testing.T) {
 	}
 
 	// Create mocks
-	projectPostRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
-	memberRepositoryMock = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	mockProjectPostRepository = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
+	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 
-	postCollaboratorServiceMock = mocks.NewMockPostCollaboratorService(mockCtrl)
-	branchCollaboratorServiceMock = mocks.NewMockBranchCollaboratorService(mockCtrl)
+	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
+	mockBranchCollaboratorService = mocks.NewMockBranchCollaboratorService(mockCtrl)
 
 	// Setup SUT
 	projectPostService = ProjectPostService{
-		ProjectPostRepository:     projectPostRepositoryMock,
-		MemberRepository:          memberRepositoryMock,
-		PostCollaboratorService:   postCollaboratorServiceMock,
-		BranchCollaboratorService: branchCollaboratorServiceMock,
+		ProjectPostRepository:     mockProjectPostRepository,
+		MemberRepository:          mockMemberRepository,
+		PostCollaboratorService:   mockPostCollaboratorService,
+		BranchCollaboratorService: mockBranchCollaboratorService,
 	}
 }
 
@@ -60,23 +60,23 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 			Title:               "My Awesome Project Post",
 			Anonymous:           false,
 			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
 		},
 		CompletionStatus:   models.Ongoing,
 		FeedbackPreference: models.FormalFeedback,
 	}
 
 	// Setup mock function return values
-	postCollaboratorServiceMock.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, false, models.Author).Return([]*models.PostCollaborator{
+	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, false, models.Author).Return([]*models.PostCollaborator{
 		{Member: memberA, CollaborationType: models.Author},
 		{Member: memberB, CollaborationType: models.Author},
 	}, nil).Times(1)
 
-	branchCollaboratorServiceMock.EXPECT().MembersToBranchCollaborators([]uint{memberA.ID, memberB.ID}, false).Return([]*models.BranchCollaborator{
+	mockBranchCollaboratorService.EXPECT().MembersToBranchCollaborators([]uint{memberA.ID, memberB.ID}, false).Return([]*models.BranchCollaborator{
 		{Member: memberA}, {Member: memberB},
 	}, nil).Times(1)
 
-	projectPostRepositoryMock.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
+	mockProjectPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
 
 	// Function under test
 	createdProjectPost, err := projectPostService.CreateProjectPost(&projectPostCreationForm)
@@ -91,9 +91,11 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 				{Member: memberA, CollaborationType: models.Author},
 				{Member: memberB, CollaborationType: models.Author},
 			},
-			Title:               "My Awesome Project Post",
-			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{tags.Mathematics},
+			Title:    "My Awesome Project Post",
+			PostType: models.Project,
+			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+				ScientificFieldTags: []*tags.ScientificFieldTag{},
+			},
 			DiscussionContainer: models.DiscussionContainer{
 				Discussions: []*models.Discussion{},
 			},
@@ -102,7 +104,9 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 			{
 				NewPostTitle:            "My Awesome Project Post",
 				UpdatedCompletionStatus: models.Ongoing,
-				UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
+				UpdatedScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+					ScientificFieldTags: []*tags.ScientificFieldTag{},
+				},
 				Collaborators: []*models.BranchCollaborator{
 					{Member: memberA}, {Member: memberB},
 				},
@@ -138,16 +142,16 @@ func TestCreateProjectPostDatabaseFailure(t *testing.T) {
 			Title:               "My Broken Project Post",
 			Anonymous:           true,
 			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{},
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
 		},
 		CompletionStatus:   models.Completed,
 		FeedbackPreference: models.FormalFeedback,
 	}
 
 	// Setup mock function return values
-	postCollaboratorServiceMock.EXPECT().MembersToPostCollaborators([]uint{}, true, models.Author).Return([]*models.PostCollaborator{}, nil).Times(1)
-	branchCollaboratorServiceMock.EXPECT().MembersToBranchCollaborators([]uint{}, true).Return([]*models.BranchCollaborator{}, nil).Times(1)
-	projectPostRepositoryMock.EXPECT().Create(gomock.Any()).Return(fmt.Errorf("oh no")).Times(1)
+	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{}, true, models.Author).Return([]*models.PostCollaborator{}, nil).Times(1)
+	mockBranchCollaboratorService.EXPECT().MembersToBranchCollaborators([]uint{}, true).Return([]*models.BranchCollaborator{}, nil).Times(1)
+	mockProjectPostRepository.EXPECT().Create(gomock.Any()).Return(fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
 	createdProjectPost, err := projectPostService.CreateProjectPost(&projectPostCreationForm)
@@ -172,7 +176,7 @@ func TestCreateProjectPostWrongPostType(t *testing.T) {
 			Title:               "",
 			Anonymous:           true,
 			PostType:            models.Question,
-			ScientificFieldTags: []tags.ScientificField{},
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
 		},
 		CompletionStatus:   models.Idea,
 		FeedbackPreference: models.DiscussionFeedback,
@@ -201,14 +205,14 @@ func TestCreateProjectPostCollaboratorsFail(t *testing.T) {
 			Title:               "",
 			Anonymous:           false,
 			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{},
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
 		},
 		CompletionStatus:   models.Idea,
 		FeedbackPreference: models.DiscussionFeedback,
 	}
 
 	// Setup mock function return values
-	postCollaboratorServiceMock.EXPECT().MembersToPostCollaborators([]uint{10, 15}, false, models.Author).Return(nil, fmt.Errorf("oh no")).Times(1)
+	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{10, 15}, false, models.Author).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
 	createdProjectPost, err := projectPostService.CreateProjectPost(&projectPostCreationForm)
@@ -233,18 +237,18 @@ func TestCreateProjectBranchCollaboratorsFail(t *testing.T) {
 			Title:               "",
 			Anonymous:           false,
 			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{},
+			ScientificFieldTags: []*tags.ScientificFieldTag{},
 		},
 		CompletionStatus:   models.Idea,
 		FeedbackPreference: models.DiscussionFeedback,
 	}
 
 	// Setup mock function return values
-	postCollaboratorServiceMock.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, false, models.Author).Return([]*models.PostCollaborator{
+	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, false, models.Author).Return([]*models.PostCollaborator{
 		{Member: memberA, CollaborationType: models.Author},
 		{Member: memberB, CollaborationType: models.Author},
 	}, nil).Times(1)
-	branchCollaboratorServiceMock.EXPECT().MembersToBranchCollaborators([]uint{memberA.ID, memberB.ID}, false).Return(nil, fmt.Errorf("oh no")).Times(1)
+	mockBranchCollaboratorService.EXPECT().MembersToBranchCollaborators([]uint{memberA.ID, memberB.ID}, false).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
 	createdProjectPost, err := projectPostService.CreateProjectPost(&projectPostCreationForm)
@@ -265,11 +269,13 @@ func TestGetProjectPost(t *testing.T) {
 	databasePost := &models.ProjectPost{
 		Model: gorm.Model{ID: 10},
 		Post: models.Post{
-			Model:               gorm.Model{ID: 20},
-			Collaborators:       []*models.PostCollaborator{},
-			Title:               "My Awesome Project Post",
-			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{},
+			Model:         gorm.Model{ID: 20},
+			Collaborators: []*models.PostCollaborator{},
+			Title:         "My Awesome Project Post",
+			PostType:      models.Project,
+			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
+				ScientificFieldTags: []*tags.ScientificFieldTag{},
+			},
 			DiscussionContainer: models.DiscussionContainer{
 				Model:       gorm.Model{ID: 1},
 				Discussions: []*models.Discussion{},
@@ -284,7 +290,7 @@ func TestGetProjectPost(t *testing.T) {
 		PostReviewStatus:   models.Open,
 	}
 
-	projectPostRepositoryMock.EXPECT().GetByID(uint(10)).Return(databasePost, nil).Times(1)
+	mockProjectPostRepository.EXPECT().GetByID(uint(10)).Return(databasePost, nil).Times(1)
 
 	// Function under test
 	fetchedPost, err := projectPostService.GetProjectPost(10)
@@ -308,7 +314,7 @@ func TestFilterAllProjectPosts(t *testing.T) {
 	form := forms.FilterForm{}
 
 	// Setup mock function return values
-	projectPostRepositoryMock.EXPECT().QueryPaginated(page, size, gomock.Any()).Return([]*models.ProjectPost{
+	mockProjectPostRepository.EXPECT().QueryPaginated(page, size, gomock.Any()).Return([]*models.ProjectPost{
 		{Model: gorm.Model{ID: 2}},
 		{Model: gorm.Model{ID: 3}},
 		{Model: gorm.Model{ID: 6}},
@@ -332,7 +338,7 @@ func TestFilterProjectPostsFailed(t *testing.T) {
 	projectPostServiceSetup(t)
 	t.Cleanup(projectPostServiceTeardown)
 
-	projectPostRepositoryMock.EXPECT().QueryPaginated(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
+	mockProjectPostRepository.EXPECT().QueryPaginated(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
 	_, err := projectPostService.Filter(1, 10, forms.FilterForm{})

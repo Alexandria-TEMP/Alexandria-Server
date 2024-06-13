@@ -7,35 +7,43 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gorm.io/gorm"
 )
 
 type RepositoryEnv struct {
-	postRepository               database.ModelRepositoryInterface[*models.Post]
-	projectPostRepository        database.ModelRepositoryInterface[*models.ProjectPost]
-	memberRepository             database.ModelRepositoryInterface[*models.Member]
-	postCollaboratorRepository   database.ModelRepositoryInterface[*models.PostCollaborator]
-	branchCollaboratorRepository database.ModelRepositoryInterface[*models.BranchCollaborator]
+	postRepository                database.ModelRepositoryInterface[*models.Post]
+	projectPostRepository         database.ModelRepositoryInterface[*models.ProjectPost]
+	memberRepository              database.ModelRepositoryInterface[*models.Member]
+	postCollaboratorRepository    database.ModelRepositoryInterface[*models.PostCollaborator]
+	branchCollaboratorRepository  database.ModelRepositoryInterface[*models.BranchCollaborator]
+	discussionRepository          database.ModelRepositoryInterface[*models.Discussion]
+	discussionContainerRepository database.ModelRepositoryInterface[*models.DiscussionContainer]
+	tagRepository                 database.ModelRepositoryInterface[*tags.ScientificFieldTag]
 }
 
 type ServiceEnv struct {
-	postService               interfaces.PostService
-	projectPostService        interfaces.ProjectPostService
-	memberService             interfaces.MemberService
-	postCollaboratorService   interfaces.PostCollaboratorService
-	branchCollaboratorService interfaces.BranchCollaboratorService
+	postService                interfaces.PostService
+	projectPostService         interfaces.ProjectPostService
+	memberService              interfaces.MemberService
+	postCollaboratorService    interfaces.PostCollaboratorService
+	branchCollaboratorService  interfaces.BranchCollaboratorService
+	discussionService          interfaces.DiscussionService
+	discussionContainerService interfaces.DiscussionContainerService
+	tagService                 interfaces.TagService
 }
 
 type ControllerEnv struct {
-	postController        *controllers.PostController
-	memberController      *controllers.MemberController
-	projectPostController *controllers.ProjectPostController
-	discussionController  *controllers.DiscussionController
-	filterController      *controllers.FilterController
-	branchController      *controllers.BranchController
-	tagController         *controllers.TagController
+	postController                *controllers.PostController
+	memberController              *controllers.MemberController
+	projectPostController         *controllers.ProjectPostController
+	discussionController          *controllers.DiscussionController
+	discussionContainerController *controllers.DiscussionContainerController
+	filterController              *controllers.FilterController
+	branchController              *controllers.BranchController
+	tagController                 *controllers.TagController
 }
 
 func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
@@ -49,10 +57,19 @@ func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
 		memberRepository: &database.ModelRepository[*models.Member]{
 			Database: db,
 		},
+		tagRepository: &database.ModelRepository[*tags.ScientificFieldTag]{
+			Database: db,
+		},
 		postCollaboratorRepository: &database.ModelRepository[*models.PostCollaborator]{
 			Database: db,
 		},
 		branchCollaboratorRepository: &database.ModelRepository[*models.BranchCollaborator]{
+			Database: db,
+		},
+		discussionRepository: &database.ModelRepository[*models.Discussion]{
+			Database: db,
+		},
+		discussionContainerRepository: &database.ModelRepository[*models.DiscussionContainer]{
 			Database: db,
 		},
 	}
@@ -82,12 +99,29 @@ func initServiceEnv(repositories *RepositoryEnv, _ *filesystem.Filesystem) *Serv
 		BranchCollaboratorService: branchCollaboratorService,
 	}
 
+	discussionService := &services.DiscussionService{
+		DiscussionRepository:          repositories.discussionRepository,
+		DiscussionContainerRepository: repositories.discussionContainerRepository,
+		MemberRepository:              repositories.memberRepository,
+	}
+
+	discussionContainerService := &services.DiscussionContainerService{
+		DiscussionContainerRepository: repositories.discussionContainerRepository,
+	}
+
 	return &ServiceEnv{
-		postService:               postService,
-		projectPostService:        projectPostService,
-		memberService:             &services.MemberService{},
-		postCollaboratorService:   postCollaboratorService,
-		branchCollaboratorService: branchCollaboratorService,
+		postService:        postService,
+		projectPostService: projectPostService,
+		memberService: &services.MemberService{
+			MemberRepository: repositories.memberRepository,
+		},
+		tagService: &services.TagService{
+			TagRepository: repositories.tagRepository,
+		},
+		postCollaboratorService:    postCollaboratorService,
+		branchCollaboratorService:  branchCollaboratorService,
+		discussionService:          discussionService,
+		discussionContainerService: discussionContainerService,
 	}
 }
 
@@ -99,17 +133,25 @@ func initControllerEnv(serviceEnv *ServiceEnv) *ControllerEnv {
 		},
 		memberController: &controllers.MemberController{
 			MemberService: serviceEnv.memberService,
+			TagService:    serviceEnv.tagService,
 		},
 		projectPostController: &controllers.ProjectPostController{
 			ProjectPostService: serviceEnv.projectPostService,
 		},
-		discussionController: &controllers.DiscussionController{},
+		discussionController: &controllers.DiscussionController{
+			DiscussionService: serviceEnv.discussionService,
+		},
+		discussionContainerController: &controllers.DiscussionContainerController{
+			DiscussionContainerService: serviceEnv.discussionContainerService,
+		},
 		filterController: &controllers.FilterController{
 			PostService:        serviceEnv.postService,
 			ProjectPostService: serviceEnv.projectPostService,
 		},
 		branchController: &controllers.BranchController{},
-		tagController:    &controllers.TagController{},
+		tagController: &controllers.TagController{
+			TagService: serviceEnv.tagService,
+		},
 	}
 }
 
