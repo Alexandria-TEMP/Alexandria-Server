@@ -729,7 +729,8 @@ paths:
       consumes:
       - multipart/form-data
       description: |-
-        Upload a new project version to a specific, preexisting, branch as a zipped quarto project
+        Upload a new project version to a specific, preexisting, branch as a zipped quarto project.
+        Specifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.
         Call this after you create a post, and supply it with the actual post contents.
       parameters:
       - description: Branch ID
@@ -1636,6 +1637,30 @@ paths:
       summary: Get a file from a post
       tags:
       - posts
+  /posts/{postID}/project-post:
+    get:
+      description: Get the Project Post ID that encapsulates a Post, if this Project
+        Post exists
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get Project Post of Post
+      tags:
+      - posts
   /posts/{postID}/render:
     get:
       description: Get the main render of the repository underlying a post if it exists
@@ -1787,8 +1812,9 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: Upload a zipped quarto project to a post. This is the main version
-        of the post, as there are no other versions.
+      description: |-
+        Upload a zipped quarto project to a post. This is the main version of the post, as there are no other versions.
+        Specifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.
       parameters:
       - description: Post ID
         in: path

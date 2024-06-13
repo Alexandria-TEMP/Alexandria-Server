@@ -636,7 +636,7 @@ const docTemplate = `{
         },
         "/branches/{branchID}/upload": {
             "post": {
-                "description": "Upload a new project version to a specific, preexisting, branch as a zipped quarto project\nCall this after you create a post, and supply it with the actual post contents.",
+                "description": "Upload a new project version to a specific, preexisting, branch as a zipped quarto project.\nSpecifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.\nCall this after you create a post, and supply it with the actual post contents.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -1976,6 +1976,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/posts/{postID}/project-post": {
+            "get": {
+                "description": "Get the Project Post ID that encapsulates a Post, if this Project Post exists",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get Project Post of Post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/posts/{postID}/render": {
             "get": {
                 "description": "Get the main render of the repository underlying a post if it exists and has been rendered successfully",
@@ -2196,7 +2231,7 @@ const docTemplate = `{
         },
         "/posts/{postID}/upload": {
             "post": {
-                "description": "Upload a zipped quarto project to a post. This is the main version of the post, as there are no other versions.",
+                "description": "Upload a zipped quarto project to a post. This is the main version of the post, as there are no other versions.\nSpecifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.",
                 "consumes": [
                     "multipart/form-data"
                 ],
