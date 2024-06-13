@@ -4,17 +4,19 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
 
 func TestClosedBranchJSONMarshaling(t *testing.T) {
+	supercededBranchID := uint(12)
 	// This model...
 	model := ClosedBranch{
 		Model:                gorm.Model{ID: 55},
 		Branch:               Branch{},
 		BranchID:             33,
-		SupercededBranch:     Branch{},
-		SupercededBranchID:   12,
+		SupercededBranch:     &Branch{},
+		SupercededBranchID:   &supercededBranchID,
 		ProjectPostID:        40,
 		BranchReviewDecision: Rejected,
 	}
@@ -23,7 +25,7 @@ func TestClosedBranchJSONMarshaling(t *testing.T) {
 	targetDTO := ClosedBranchDTO{
 		ID:                   55,
 		BranchID:             33,
-		SupercededBranchID:   12,
+		SupercededBranchID:   &supercededBranchID,
 		ProjectPostID:        40,
 		BranchReviewDecision: Rejected,
 	}
@@ -40,7 +42,5 @@ func TestClosedBranchJSONMarshaling(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if dto != targetDTO {
-		t.Fatal("parsed DTO did not equal target DTO")
-	}
+	assert.Equal(t, targetDTO, dto)
 }

@@ -7,4 +7,6 @@ import "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/a
 type PostCollaboratorService interface {
 	GetPostCollaborator(id uint) (*models.PostCollaborator, error)
 	MembersToPostCollaborators(IDs []uint, anonymous bool, collaborationType models.CollaborationType) ([]*models.PostCollaborator, error)
+	MergeReviewers(projectPost *models.ProjectPost, reviews []*models.BranchReview) error
+	MergeContributors(projectPost *models.ProjectPost, branchCollaborators []*models.BranchCollaborator) error
 }

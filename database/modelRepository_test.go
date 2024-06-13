@@ -5,8 +5,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
+
 	"gorm.io/gorm"
 )
 
@@ -15,11 +16,11 @@ var memberRepository ModelRepository[*models.Member]
 var projectPostRepository ModelRepository[*models.ProjectPost]
 var member models.Member
 
-func beforeEach() {
+func beforeEach(t *testing.T) {
+	t.Helper()
+
 	database, err := InitializeTestDatabase()
-	if err != nil {
-		log.Fatalf("Could not initialize test database: %s", err)
-	}
+	assert.Nil(t, err)
 
 	testDB = database
 
@@ -29,8 +30,8 @@ func beforeEach() {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
-		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 	}
 
@@ -50,7 +51,7 @@ func TestCreateWithoutSpecifyingID(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	err := memberRepository.Create(&member)
@@ -64,7 +65,7 @@ func TestCreateWithID(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	var id uint = 5
@@ -76,8 +77,8 @@ func TestCreateWithID(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
-		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 	}
 
@@ -96,21 +97,18 @@ func TestCreateFails(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	memberA := models.Member{
 		Model: gorm.Model{ID: 5},
-		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 	}
 
 	err := memberRepository.Create(&memberA)
-
-	if err != nil {
-		t.Fatalf("could not create first member: %s", err)
-	}
+	assert.Nil(t, err)
 
 	err = memberRepository.Create(&memberA)
 
@@ -124,7 +122,7 @@ func TestGetById(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Create a member
@@ -135,8 +133,8 @@ func TestGetById(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
-		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 	}
 
@@ -163,7 +161,7 @@ func TestGetByIDReturnsError(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Insert a model with a different ID from the one we're getting
@@ -188,7 +186,7 @@ func TestUpdateWithNewModelWithSameID(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Insert an initial model
@@ -208,8 +206,8 @@ func TestUpdateWithNewModelWithSameID(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
-		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 	}
 
@@ -233,7 +231,7 @@ func TestUpdateWithModelFetchedFromDB(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Insert an initial model
@@ -268,7 +266,7 @@ func TestUpdateWithNonExistingID(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Insert an initial model with a different ID
@@ -288,8 +286,8 @@ func TestUpdateWithNonExistingID(t *testing.T) {
 		Email:       "C",
 		Password:    "D",
 		Institution: "E",
-		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-			ScientificFieldTags: []*tags.ScientificFieldTag{},
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
 		},
 	}
 
@@ -304,7 +302,7 @@ func TestDeleteExistingModel(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Insert an initial model
@@ -328,7 +326,7 @@ func TestDeleteNonExistingModel(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Insert an initial model with a different ID
@@ -354,7 +352,7 @@ func TestGetPreloadedAssociations(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	createdProjectPost := models.ProjectPost{
@@ -362,18 +360,18 @@ func TestGetPreloadedAssociations(t *testing.T) {
 			Collaborators: []*models.PostCollaborator{},
 			Title:         "TEST POST",
 			PostType:      models.Project,
-			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-				ScientificFieldTags: []*tags.ScientificFieldTag{},
+			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+				ScientificFieldTags: []*models.ScientificFieldTag{},
 			},
 			DiscussionContainer: models.DiscussionContainer{
 				Discussions: []*models.Discussion{},
 			},
 		},
-		OpenBranches:       []*models.Branch{},
-		ClosedBranches:     []*models.ClosedBranch{},
-		CompletionStatus:   models.Ongoing,
-		FeedbackPreference: models.FormalFeedback,
-		PostReviewStatus:   models.Open,
+		OpenBranches:              []*models.Branch{},
+		ClosedBranches:            []*models.ClosedBranch{},
+		ProjectCompletionStatus:   models.Ongoing,
+		ProjectFeedbackPreference: models.FormalFeedback,
+		PostReviewStatus:          models.Open,
 	}
 
 	if err := projectPostRepository.Create(&createdProjectPost); err != nil {
@@ -396,7 +394,7 @@ func TestGetPreloadedAssociations(t *testing.T) {
 // 		t.SkipNow()
 // 	}
 
-// 	beforeEach()
+// 	beforeEach(t)
 // 	t.Cleanup(afterEach)
 // 	fmt.Println("All is well up to point 1")
 // 	// Create dummy members in the database, with specific IDs
@@ -405,22 +403,22 @@ func TestGetPreloadedAssociations(t *testing.T) {
 // 			FirstName:   "one",
 // 			LastName:    "One",
 // 			Institution: "TU Delft",
-// 			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-// 				ScientificFieldTags: []*tags.ScientificFieldTag{},
+// 			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+// 				ScientificFieldTags: []*models.ScientificFieldTag{},
 // 			}},
 // 		{Model: gorm.Model{ID: 10},
 // 			FirstName:   "two",
 // 			LastName:    "Two",
 // 			Institution: "Vrije Universiteit Berlin",
-// 			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-// 				ScientificFieldTags: []*tags.ScientificFieldTag{},
+// 			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+// 				ScientificFieldTags: []*models.ScientificFieldTag{},
 // 			}},
 // 		{Model: gorm.Model{ID: 12},
 // 			FirstName:   "three",
 // 			LastName:    "Three",
 // 			Institution: "Politechnika Poznanska",
-// 			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-// 				ScientificFieldTags: []*tags.ScientificFieldTag{},
+// 			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+// 				ScientificFieldTags: []*models.ScientificFieldTag{},
 // 			}},
 // 	}
 
@@ -487,22 +485,22 @@ func TestQuerySimple(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Create dummy members in the database, with specific IDs
 	membersToCreate := []models.Member{
 		{Model: gorm.Model{ID: 5},
-			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-				ScientificFieldTags: []*tags.ScientificFieldTag{},
+			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+				ScientificFieldTags: []*models.ScientificFieldTag{},
 			}},
 		{Model: gorm.Model{ID: 10},
-			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-				ScientificFieldTags: []*tags.ScientificFieldTag{},
+			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+				ScientificFieldTags: []*models.ScientificFieldTag{},
 			}},
 		{Model: gorm.Model{ID: 12},
-			ScientificFieldTagContainer: tags.ScientificFieldTagContainer{
-				ScientificFieldTags: []*tags.ScientificFieldTag{},
+			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+				ScientificFieldTags: []*models.ScientificFieldTag{},
 			}},
 	}
 
@@ -518,7 +516,7 @@ func TestQuerySimple(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedIDs := []uint{10, 12}
+	expectedIDs := []uint{12, 10}
 
 	if len(fetchedMembers) != len(expectedIDs) {
 		t.Fatalf("expected %d records, got %d", len(expectedIDs), len(fetchedMembers))
@@ -537,7 +535,7 @@ func TestQueryNonExistingField(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Function under test
@@ -560,15 +558,15 @@ func TestQueryPaginated(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	memberIDs := []uint{
 		10, 11, 12, 13, 15, 20, 21, 41,
 		42, 43, 60, 61, 62, 78, 88,
 	}
-	container := tags.ScientificFieldTagContainer{
-		ScientificFieldTags: []*tags.ScientificFieldTag{},
+	container := models.ScientificFieldTagContainer{
+		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 	// Add members with the above IDs to the database
 	for _, memberID := range memberIDs {
@@ -582,9 +580,9 @@ func TestQueryPaginated(t *testing.T) {
 	condition := "id >= 20"
 
 	expectedPages := [][]uint{
-		{20, 21, 41, 42},
-		{43, 60, 61, 62},
-		{78, 88},
+		{88, 78, 62, 61},
+		{60, 43, 42, 41},
+		{21, 20},
 	}
 
 	// For each page in the expected pages, perform a paginated query,

@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -18,7 +17,7 @@ func TestMemberJSONMarshaling(t *testing.T) {
 		Email:                       "email",
 		Password:                    "password",
 		Institution:                 "institution",
-		ScientificFieldTagContainer: tags.ScientificFieldTagContainer{},
+		ScientificFieldTagContainer: ScientificFieldTagContainer{},
 	}
 
 	// should equal this DTO!

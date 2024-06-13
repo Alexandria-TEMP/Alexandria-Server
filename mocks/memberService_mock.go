@@ -14,7 +14,6 @@ import (
 
 	forms "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	models "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	tags "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,7 +41,7 @@ func (m *MockMemberService) EXPECT() *MockMemberServiceMockRecorder {
 }
 
 // CreateMember mocks base method.
-func (m *MockMemberService) CreateMember(memberForm *forms.MemberCreationForm, userFields *tags.ScientificFieldTagContainer) (*models.Member, error) {
+func (m *MockMemberService) CreateMember(memberForm *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (*models.Member, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateMember", memberForm, userFields)
 	ret0, _ := ret[0].(*models.Member)
@@ -101,7 +100,7 @@ func (mr *MockMemberServiceMockRecorder) GetMember(memberID any) *gomock.Call {
 }
 
 // UpdateMember mocks base method.
-func (m *MockMemberService) UpdateMember(updatedMember *models.MemberDTO, userFields *tags.ScientificFieldTagContainer) error {
+func (m *MockMemberService) UpdateMember(updatedMember *models.MemberDTO, userFields *models.ScientificFieldTagContainer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateMember", updatedMember, userFields)
 	ret0, _ := ret[0].(error)

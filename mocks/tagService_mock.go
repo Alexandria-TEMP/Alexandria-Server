@@ -12,7 +12,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	tags "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
+	models "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -40,10 +40,10 @@ func (m *MockTagService) EXPECT() *MockTagServiceMockRecorder {
 }
 
 // GetAllScientificFieldTags mocks base method.
-func (m *MockTagService) GetAllScientificFieldTags() ([]*tags.ScientificFieldTag, error) {
+func (m *MockTagService) GetAllScientificFieldTags() ([]*models.ScientificFieldTag, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllScientificFieldTags")
-	ret0, _ := ret[0].([]*tags.ScientificFieldTag)
+	ret0, _ := ret[0].([]*models.ScientificFieldTag)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -55,10 +55,10 @@ func (mr *MockTagServiceMockRecorder) GetAllScientificFieldTags() *gomock.Call {
 }
 
 // GetTagByID mocks base method.
-func (m *MockTagService) GetTagByID(id uint) (*tags.ScientificFieldTag, error) {
+func (m *MockTagService) GetTagByID(id uint) (*models.ScientificFieldTag, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTagByID", id)
-	ret0, _ := ret[0].(*tags.ScientificFieldTag)
+	ret0, _ := ret[0].(*models.ScientificFieldTag)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -70,10 +70,10 @@ func (mr *MockTagServiceMockRecorder) GetTagByID(id any) *gomock.Call {
 }
 
 // GetTagsFromIDs mocks base method.
-func (m *MockTagService) GetTagsFromIDs(arg0 []uint) ([]*tags.ScientificFieldTag, error) {
+func (m *MockTagService) GetTagsFromIDs(arg0 []uint) ([]*models.ScientificFieldTag, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTagsFromIDs", arg0)
-	ret0, _ := ret[0].([]*tags.ScientificFieldTag)
+	ret0, _ := ret[0].([]*models.ScientificFieldTag)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
