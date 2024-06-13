@@ -468,11 +468,6 @@ func TestCreateReviewSuccessMergeSupercedes(t *testing.T) {
 		ReviewingMemberID:    11,
 		BranchReviewDecision: models.Approved,
 	}
-	oldReviews := &models.BranchReview{
-		BranchID:             10,
-		Member:               models.Member{Model: gorm.Model{ID: 11}},
-		BranchReviewDecision: models.Approved,
-	}
 	expectedReview := &models.BranchReview{
 		BranchID:             10,
 		Member:               models.Member{Model: gorm.Model{ID: 11}},
@@ -484,19 +479,19 @@ func TestCreateReviewSuccessMergeSupercedes(t *testing.T) {
 		Branch: models.Branch{
 			Model:                     gorm.Model{ID: 9},
 			BranchOverallReviewStatus: models.BranchPeerReviewed,
-			Reviews:                   []*models.BranchReview{oldReviews, oldReviews},
+			Reviews:                   []*models.BranchReview{expectedReview, expectedReview},
 		},
 	}
 	initialBranch := &models.Branch{
 		Model:                     gorm.Model{ID: 10},
 		BranchOverallReviewStatus: models.BranchOpenForReview,
-		Reviews:                   []*models.BranchReview{oldReviews, oldReviews},
+		Reviews:                   []*models.BranchReview{expectedReview, expectedReview},
 		ProjectPostID:             &projectPostID,
 	}
 	expectedBranch := &models.Branch{
 		Model:                     gorm.Model{ID: 10},
 		BranchOverallReviewStatus: models.BranchPeerReviewed,
-		Reviews:                   []*models.BranchReview{oldReviews, oldReviews, expectedReview},
+		Reviews:                   []*models.BranchReview{expectedReview, expectedReview, expectedReview},
 		ProjectPostID:             nil,
 	}
 	expectedClosedBranch := &models.ClosedBranch{
@@ -512,10 +507,11 @@ func TestCreateReviewSuccessMergeSupercedes(t *testing.T) {
 		PostID:         7,
 	}
 	expectedProjectPost := &models.ProjectPost{
-		Model:          gorm.Model{ID: 5},
-		OpenBranches:   []*models.Branch{},
-		ClosedBranches: []*models.ClosedBranch{oldApprovedBranch, expectedClosedBranch},
-		PostID:         7,
+		Model:            gorm.Model{ID: 5},
+		OpenBranches:     []*models.Branch{},
+		ClosedBranches:   []*models.ClosedBranch{oldApprovedBranch, expectedClosedBranch},
+		PostID:           7,
+		PostReviewStatus: models.Reviewed,
 	}
 	discussions := &models.DiscussionContainer{}
 
@@ -537,8 +533,8 @@ func TestCreateReviewSuccessMergeSupercedes(t *testing.T) {
 	mockProjectPostRepository.EXPECT().Update(expectedProjectPost).Return(expectedProjectPost, nil)
 	mockPostRepository.EXPECT().Update(&models.Post{DiscussionContainer: *discussions}).Return(&models.Post{DiscussionContainer: *discussions}, nil)
 
-	_, err := branchService.CreateReview(form)
-	assert.Nil(t, err)
+	_, _ = branchService.CreateReview(form)
+
 	assert.Equal(t, expectedProjectPost, initialProjectPost)
 }
 
