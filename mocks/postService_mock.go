@@ -133,6 +133,21 @@ func (mr *MockPostServiceMockRecorder) GetPost(postID any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPost", reflect.TypeOf((*MockPostService)(nil).GetPost), postID)
 }
 
+// GetProjectPost mocks base method.
+func (m *MockPostService) GetProjectPost(postID uint) (*models.ProjectPost, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProjectPost", postID)
+	ret0, _ := ret[0].(*models.ProjectPost)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProjectPost indicates an expected call of GetProjectPost.
+func (mr *MockPostServiceMockRecorder) GetProjectPost(postID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectPost", reflect.TypeOf((*MockPostService)(nil).GetProjectPost), postID)
+}
+
 // UpdatePost mocks base method.
 func (m *MockPostService) UpdatePost(updatedPost *models.Post) error {
 	m.ctrl.T.Helper()

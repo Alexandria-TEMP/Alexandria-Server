@@ -88,11 +88,12 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 	}
 	postService := &services.PostService{
 		PostRepository:                        repositoryEnv.postRepository,
+		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
 		MemberRepository:                      repositoryEnv.memberRepository,
 		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
 		Filesystem:                            fs,
-		RenderService:                         renderService,
 		PostCollaboratorService:               postCollaboratorService,
+		RenderService:                         renderService,
 		TagService:                            tagService,
 	}
 	memberService := &services.MemberService{

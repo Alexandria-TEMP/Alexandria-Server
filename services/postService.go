@@ -17,6 +17,7 @@ import (
 
 type PostService struct {
 	PostRepository                        database.ModelRepositoryInterface[*models.Post]
+	ProjectPostRepository                 database.ModelRepositoryInterface[*models.ProjectPost]
 	MemberRepository                      database.ModelRepositoryInterface[*models.Member]
 	ScientificFieldTagContainerRepository database.ModelRepositoryInterface[*models.ScientificFieldTagContainer]
 	Filesystem                            filesystemInterfaces.Filesystem
@@ -229,4 +230,29 @@ func (postService *PostService) Filter(page, size int, _ forms.FilterForm) ([]ui
 	}
 
 	return ids, nil
+}
+
+func (postService *PostService) GetProjectPost(postID uint) (*models.ProjectPost, error) {
+	// Ensure the post itself exists
+	if _, err := postService.PostRepository.GetByID(postID); err != nil {
+		return nil, fmt.Errorf("failed to get post with ID %d", postID)
+	}
+
+	// Query for a project post that has this post
+	// TODO this is not super efficient... improve somehow?
+	foundProjectPosts, err := postService.ProjectPostRepository.Query(fmt.Sprintf("post_id = %d", postID))
+	if err != nil {
+		return nil, fmt.Errorf("failed to get project post that has post ID %d: %s", postID, err)
+	}
+
+	// Ensure that only ONE project post has this post.
+	// TODO this is a pretty hacky way to represent the post/project-post relation.
+	numberOfFoundProjectPosts := len(foundProjectPosts)
+
+	if numberOfFoundProjectPosts != 1 {
+		return nil, fmt.Errorf("failed to get exactly 1 project post for post ID %d: found %d", postID, numberOfFoundProjectPosts)
+	}
+
+	// Guaranteed to be safe due to the above condition
+	return foundProjectPosts[0], nil
 }

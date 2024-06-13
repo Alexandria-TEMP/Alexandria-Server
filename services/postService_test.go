@@ -26,6 +26,7 @@ func postServiceSetup(t *testing.T) {
 
 	// Setup mocks
 	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
+	mockProjectPostRepository = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 	mockScientificFieldTagContainerReposiotry = mocks.NewMockModelRepositoryInterface[*models.ScientificFieldTagContainer](mockCtrl)
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
@@ -36,6 +37,7 @@ func postServiceSetup(t *testing.T) {
 	// Setup SUT
 	postService = PostService{
 		PostRepository:                        mockPostRepository,
+		ProjectPostRepository:                 mockProjectPostRepository,
 		MemberRepository:                      mockMemberRepository,
 		ScientificFieldTagContainerRepository: mockScientificFieldTagContainerReposiotry,
 		Filesystem:                            mockFilesystem,
@@ -633,4 +635,124 @@ func TestFilterFailed(t *testing.T) {
 	if err == nil {
 		t.Fatal("post filtering should have failed")
 	}
+}
+
+func TestGetProjectPostGoodWeather(t *testing.T) {
+	postServiceSetup(t)
+	t.Cleanup(postServiceTeardown)
+
+	postID := uint(10)
+
+	post := &models.Post{
+		Model: gorm.Model{ID: postID},
+	}
+
+	projectPost := &models.ProjectPost{
+		Post:   *post,
+		PostID: postID,
+	}
+
+	// Set up mock function return values
+	mockPostRepository.EXPECT().GetByID(postID).Return(post, nil).Times(1)
+	mockProjectPostRepository.EXPECT().Query(gomock.Any()).Return([]*models.ProjectPost{projectPost}, nil).Times(1)
+
+	// Function under test
+	fetchedProjectPost, err := postService.GetProjectPost(postID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedProjectPost := &models.ProjectPost{
+		Post: models.Post{
+			Model: gorm.Model{ID: postID},
+		},
+		PostID: postID,
+	}
+
+	assert.Equal(t, expectedProjectPost, fetchedProjectPost)
+}
+
+func TestGetProjectPostPostNotFound(t *testing.T) {
+	postServiceSetup(t)
+	t.Cleanup(postServiceTeardown)
+
+	postID := uint(10)
+
+	mockPostRepository.EXPECT().GetByID(postID).Return(nil, fmt.Errorf("oh no")).Times(1)
+
+	// Function under test
+	_, err := postService.GetProjectPost(postID)
+
+	assert.NotNil(t, err)
+}
+
+func TestGetProjectPostProjectPostNotFound(t *testing.T) {
+	postServiceSetup(t)
+	t.Cleanup(postServiceTeardown)
+
+	postID := uint(10)
+
+	post := &models.Post{
+		Model: gorm.Model{ID: postID},
+	}
+
+	mockPostRepository.EXPECT().GetByID(postID).Return(post, nil).Times(1)
+	mockProjectPostRepository.EXPECT().Query(gomock.Any()).Return([]*models.ProjectPost{}, nil).Times(1)
+
+	// Function under test
+	_, err := postService.GetProjectPost(postID)
+
+	assert.NotNil(t, err)
+}
+
+func TestGetProjectPostMultipleProjectPostsFound(t *testing.T) {
+	postServiceSetup(t)
+	t.Cleanup(postServiceTeardown)
+
+	postID := uint(10)
+
+	post := &models.Post{
+		Model: gorm.Model{ID: postID},
+	}
+
+	mockPostRepository.EXPECT().GetByID(postID).Return(post, nil).Times(1)
+
+	projectPostA := &models.ProjectPost{
+		Post:   models.Post{},
+		PostID: postID,
+	}
+
+	projectPostB := &models.ProjectPost{
+		Post:   models.Post{},
+		PostID: postID,
+	}
+
+	mockProjectPostRepository.EXPECT().Query(gomock.Any()).Return([]*models.ProjectPost{
+		projectPostA,
+		projectPostB,
+	}, nil).Times(1)
+
+	// Function under test
+	_, err := postService.GetProjectPost(postID)
+
+	assert.NotNil(t, err)
+}
+
+func TestGetProjectPostProjectPostQueryFailed(t *testing.T) {
+	postServiceSetup(t)
+	t.Cleanup(postServiceTeardown)
+
+	postID := uint(10)
+
+	post := &models.Post{
+		Model: gorm.Model{ID: postID},
+	}
+
+	mockPostRepository.EXPECT().GetByID(postID).Return(post, nil).Times(1)
+	mockProjectPostRepository.EXPECT().Query(gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
+
+	// Function under test
+	_, err := postService.GetProjectPost(postID)
+
+	assert.NotNil(t, err)
 }

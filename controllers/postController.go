@@ -476,3 +476,39 @@ func (postController *PostController) GetMainFileFromProject(c *gin.Context) {
 	c.Header("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
 	c.File(absFilepath)
 }
+
+// GetProjectPostIfExists godoc
+// @Summary 	Get Project Post of Post
+// @Description Get the Project Post ID that encapsulates a Post, if this Project Post exists
+// @Tags 		posts
+// @Param		postID		path		string				true	"Post ID"
+// @Produce		application/json
+// @Success 	200		{object}	uint
+// @Failure		404
+// @Failure		500
+// @Router 		/posts/{postID}/project-post	[get]
+func (postController *PostController) GetProjectPostIfExists(c *gin.Context) {
+	// Get post ID from path
+	postIDString := c.Param("postID")
+
+	postID, err := strconv.ParseUint(postIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to parse post ID '%s' as unsigned integer: %s", postIDString, err)})
+
+		return
+	}
+
+	// Get the post's project post
+	projectPost, err := postController.PostService.GetProjectPost(uint(postID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get project post of post with ID %d: %s", postID, err)})
+
+		return
+	}
+
+	// Return the project post's ID
+	c.JSON(http.StatusOK, projectPost.ID)
+
+	// Note: this endpoint kind of goes against the data model's design philosophy, and is quite a hacky fix.
+	// TODO reconsider how composition of posts and project posts is implemented & integrated.
+}
