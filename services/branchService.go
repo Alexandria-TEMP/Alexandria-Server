@@ -158,7 +158,7 @@ func (branchService *BranchService) GetReview(reviewID uint) (models.BranchRevie
 	branchreview, err := branchService.ReviewRepository.GetByID(reviewID)
 
 	if err != nil {
-		return *branchreview, fmt.Errorf("failed to find branch with id %v: %w", reviewID, err)
+		return models.BranchReview{}, fmt.Errorf("failed to find branch with id %v: %w", reviewID, err)
 	}
 
 	return *branchreview, nil
