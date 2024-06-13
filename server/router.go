@@ -120,10 +120,6 @@ func projectPostRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	projectPostRouter.POST("/from-github", controllers.projectPostController.CreateProjectPostFromGithub)
 	projectPostRouter.GET("/:projectPostID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
 	projectPostRouter.GET("/:projectPostID/branches-by-status", controllers.projectPostController.GetProjectPostBranchesByStatus)
-	projectPostRouter.GET("/:projectPostID/render", controllers.projectPostController.GetMainRender)
-	projectPostRouter.GET("/:projectPostID/repository", controllers.projectPostController.GetMainProject)
-	projectPostRouter.GET("/:projectPostID/tree", controllers.projectPostController.GetMainFiletree)
-	projectPostRouter.GET("/:projectPostID/file/*filepath", controllers.projectPostController.GetMainFileFromProject)
 }
 
 func postRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {

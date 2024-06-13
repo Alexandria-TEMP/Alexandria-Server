@@ -610,7 +610,7 @@ func (branchController *BranchController) GetClosedBranch(c *gin.Context) {
 	closedBranch, err := branchController.BranchService.GetClosedBranch(uint(closedBranchID))
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 
 		return
 	}
