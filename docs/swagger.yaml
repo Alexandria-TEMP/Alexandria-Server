@@ -2050,7 +2050,7 @@ paths:
       description: Returns all discussion container IDs on this project post over
         all its previous merged versions, instead of only the current version
       parameters:
-      - description: post ID
+      - description: project post ID
         in: path
         name: projectPostID
         required: true

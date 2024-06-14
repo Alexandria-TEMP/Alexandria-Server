@@ -179,7 +179,7 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Description Returns all discussion container IDs on this project post over all its previous merged versions, instead of only the current version
 // @Tags 		project-posts
 // @Accept  	json
-// @Param		projectPostID		path		string			true	"post ID"
+// @Param		projectPostID		path		string			true	"project post ID"
 // @Produce		json
 // @Success 	200		{object}	models.DiscussionContainerProjectHistoryDTO
 // @Failure		400
@@ -188,7 +188,7 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Router		/project-posts/{projectPostID}/all-discussion-containers 	[get]
 func (projectPostController *ProjectPostController) GetProjectPostDiscussionContainers(c *gin.Context) {
 	// Get project post ID from path
-	projectPostIDString := c.Param("postID")
+	projectPostIDString := c.Param("projectPostID")
 
 	projectPostID, err := strconv.ParseUint(projectPostIDString, 10, 64)
 	if err != nil {

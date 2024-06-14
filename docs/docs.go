@@ -2486,7 +2486,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "post ID",
+                        "description": "project post ID",
                         "name": "projectPostID",
                         "in": "path",
                         "required": true
