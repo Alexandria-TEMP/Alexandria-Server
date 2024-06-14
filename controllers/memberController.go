@@ -55,17 +55,19 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 	}
 
 	// if correct response send the member back
-	c.JSON(http.StatusOK, member)
+	c.JSON(http.StatusOK, member.IntoDTO())
 }
 
 // CreateMember godoc
 // @Summary 	Create a new member
-// @Description Create a new member from the given fields
+// @Description Create a new member from the given fields.
+// @Description The member must have a unique email address, which isn't associated with any other accounts.
+// @Description They are automatically logged in, and an access + refresh token pair is returned alongside the member
 // @Tags 		members
 // @Accept  	json
 // @Param		form	body	forms.MemberCreationForm	true	"Member Creation Form"
-// @Produce		json
-// @Success 	200 	{object} 	models.MemberDTO
+// @Produce		jsonj
+// @Success 	200 	{object} 	models.LoggedInMemberDTO
 // @Failure		400
 // @Failure		500
 // @Router 		/members 		[post]
@@ -92,30 +94,29 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	// getting the tags from tag service
 	tagArray, err := memberController.TagService.GetTagsFromIDs(tagIDs)
 
-	tagContainer := models.ScientificFieldTagContainer{
-		ScientificFieldTags: tagArray,
-	}
-
 	// if there is an error, return a 404 not found status
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "cannot bind tag ids from request body"})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot get tags from ids: %s", err.Error())})
 
 		return
 	}
 
+	tagContainer := models.ScientificFieldTagContainer{
+		ScientificFieldTags: tagArray,
+	}
+
 	// create and add to database through the memberService
-	member, err := memberController.MemberService.CreateMember(&form, &tagContainer)
+	loggedInMember, err := memberController.MemberService.CreateMember(&form, &tagContainer)
 
 	// if the member service throws an error, return a 400 Bad request status
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "a member with this id already exists"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprint("failed to create member: %s", err.Error())})
 
 		return
 	}
 
 	// send back a positive response 200 status with the created member
-	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, member)
+	c.JSON(http.StatusOK, loggedInMember)
 }
 
 // UpdateMember godoc
@@ -165,7 +166,6 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	}
 
 	// send back a positive response if member updated successfully
-	c.Header("Content-Type", "application/json")
 	c.Status(http.StatusOK)
 }
 
@@ -207,7 +207,6 @@ func (memberController *MemberController) DeleteMember(c *gin.Context) {
 	}
 
 	// if correct response send the member back
-	c.Header("Content-Type", "application/json")
 	// TODO: should this return the deleted member?
 	c.JSON(http.StatusOK, nil)
 }
@@ -223,7 +222,7 @@ func (memberController *MemberController) DeleteMember(c *gin.Context) {
 // @Failure		500
 // @Router		/members	[get]
 func (memberController *MemberController) GetAllMembers(c *gin.Context) {
-	members, err := memberController.MemberService.GetAllMembers()
+	memberShortDTOs, err := memberController.MemberService.GetAllMembers()
 
 	// if there was an error, print it and return status 404: not found
 	if err != nil {
@@ -233,8 +232,85 @@ func (memberController *MemberController) GetAllMembers(c *gin.Context) {
 	}
 
 	// if correct response send the member ids and names back
-	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, &members)
+	c.JSON(http.StatusOK, &memberShortDTOs)
+}
+
+// LoginMember godoc
+// @Summary		Logs a member in
+// @Description	Logs a member in based on email and password and returns an access and refresh token.
+// @Tags 		members
+// @Accept 		json
+// @Param		member	body		models.MemberAuthForm		true	"Member Authentication Form"
+// @Produce		json
+// @Success 	200		{object}	models.LoggedInMemberDTO
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router 		/members/login 		[get]
+func (memberController *MemberController) LoginMember(c *gin.Context) {
+	form := &forms.MemberAuthForm{}
+	// bind the fields of the param to the JSON of the model
+	err := c.BindJSON(form)
+
+	// if there is an error, return a 400 bad request status
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind MemberAuthForm from request body"})
+
+		return
+	}
+
+	if !form.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "form fails validation"})
+		return
+	}
+
+	loggedInMember, err := memberController.MemberService.LogInMember(form)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to log in member: %s", err.Error())})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, loggedInMember)
+}
+
+// RefreshToken godoc
+// @Summary		Refreshes the access token.
+// @Description	Refreshes the access token with a refresh token.
+// @Tags 		members
+// @Accept 		json
+// @Param		member	body		models.TokenRefreshForm		true	"Token Refresh Form"
+// @Produce		json
+// @Success 	200		{object}	models.TokenPairDTO
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router 		/members/token	[get]
+func (memberController *MemberController) RefreshToken(c *gin.Context) {
+	form := &forms.TokenRefreshForm{}
+	// bind the fields of the param to the JSON of the model
+	err := c.BindJSON(form)
+
+	// if there is an error, return a 400 bad request status
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind TokenRefreshForm from request body"})
+
+		return
+	}
+
+	if !form.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "form fails validation"})
+		return
+	}
+
+	tokenPair, err := memberController.MemberService.RefreshToken(form)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to refresh access token: %s", err.Error())})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, tokenPair)
 }
 
 // GetMemberPosts godoc

@@ -187,7 +187,6 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 
 func Init() {
 	db, err := database.InitializeDatabase()
-
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -65,7 +65,6 @@ func TestMain(m *testing.M) {
 		FirstName:             "John",
 		LastName:              "Smith",
 		Email:                 "john.smith@gmail.com",
-		Password:              "password",
 		Institution:           "TU Delft",
 		ScientificFieldTagIDs: []uint{},
 	}
