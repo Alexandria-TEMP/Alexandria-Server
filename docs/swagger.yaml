@@ -2043,11 +2043,7 @@ paths:
       summary: Get project post
       tags:
       - project-posts
-<<<<<<< HEAD
-  /project-posts/{postID}/all-discussion-containers:
-=======
-  /project-posts/{projectPostID}/all-discussions:
->>>>>>> main
+  /project-posts/{projectPostID}/all-discussion-containers:
     get:
       consumes:
       - application/json
@@ -2072,13 +2068,7 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-<<<<<<< HEAD
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
       summary: Returns all discussion container IDs associated with the project post
-=======
-      summary: Returns all discussion IDs associated with the project post
->>>>>>> main
       tags:
       - project-posts
   /project-posts/{projectPostID}/branches-by-status:

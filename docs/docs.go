@@ -2470,11 +2470,7 @@ const docTemplate = `{
                 }
             }
         },
-<<<<<<< HEAD
-        "/project-posts/{postID}/all-discussion-containers": {
-=======
-        "/project-posts/{projectPostID}/all-discussions": {
->>>>>>> main
+        "/project-posts/{projectPostID}/all-discussion-containers": {
             "get": {
                 "description": "Returns all discussion container IDs on this project post over all its previous merged versions, instead of only the current version",
                 "consumes": [
