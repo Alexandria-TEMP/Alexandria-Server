@@ -1642,6 +1642,30 @@ paths:
       summary: Get a file from a post
       tags:
       - posts
+  /posts/{postID}/project-post:
+    get:
+      description: Get the Project Post ID that encapsulates a Post, if this Project
+        Post exists
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get Project Post of Post
+      tags:
+      - posts
   /posts/{postID}/render:
     get:
       description: Get the main render of the repository underlying a post if it exists

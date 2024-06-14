@@ -1970,6 +1970,41 @@
                 }
             }
         },
+        "/posts/{postID}/project-post": {
+            "get": {
+                "description": "Get the Project Post ID that encapsulates a Post, if this Project Post exists",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get Project Post of Post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/posts/{postID}/render": {
             "get": {
                 "description": "Get the main render of the repository underlying a post if it exists and has been rendered successfully",
