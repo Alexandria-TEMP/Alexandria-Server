@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"go.uber.org/mock/gomock"
@@ -138,4 +139,89 @@ func TestGetPostCollaborator(t *testing.T) {
 	if !reflect.DeepEqual(fetchedPostCollaborator, expectedPostCollaborator) {
 		t.Fatalf("fetched post collaborator \n%+v\nshould have equaled expected post collaborator \n%+v", fetchedPostCollaborator, expectedPostCollaborator)
 	}
+}
+
+func TestMergeContributors(t *testing.T) {
+	postCollaboratorServiceSetup(t)
+	t.Cleanup(postCollaboratorServiceTeardown)
+
+	postCollaborator1 := &models.PostCollaborator{
+		MemberID:          1,
+		Member:            models.Member{Model: gorm.Model{ID: 1}},
+		CollaborationType: models.Contributor,
+	}
+	postCollaborator2 := &models.PostCollaborator{
+		MemberID:          2,
+		Member:            models.Member{Model: gorm.Model{ID: 2}},
+		CollaborationType: models.Reviewer,
+	}
+	postCollaborator2again := &models.PostCollaborator{
+		Member:            models.Member{Model: gorm.Model{ID: 2}},
+		CollaborationType: models.Contributor,
+	}
+	branchCollaborator1 := &models.BranchCollaborator{
+		MemberID: 1,
+	}
+	branchCollaborator2 := &models.BranchCollaborator{
+		MemberID: 2,
+	}
+	projectPostBefore := &models.ProjectPost{
+		Post: models.Post{
+			Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2},
+		},
+	}
+	projectPostAfter := &models.ProjectPost{
+		Post: models.Post{
+			Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2, postCollaborator2again},
+		},
+	}
+
+	mockMemberRepository.EXPECT().GetByID(uint(1)).Return(&models.Member{Model: gorm.Model{ID: 1}}, nil)
+	mockMemberRepository.EXPECT().GetByID(uint(2)).Return(&models.Member{Model: gorm.Model{ID: 2}}, nil)
+
+	assert.Nil(t, postCollaboratorService.MergeContributors(projectPostBefore, []*models.BranchCollaborator{branchCollaborator1, branchCollaborator2}))
+	assert.Equal(t, projectPostAfter, projectPostBefore)
+}
+
+func TestMergeReviewers(t *testing.T) {
+	postCollaboratorServiceSetup(t)
+	t.Cleanup(postCollaboratorServiceTeardown)
+
+	postCollaborator1 := &models.PostCollaborator{
+		MemberID:          1,
+		Member:            models.Member{Model: gorm.Model{ID: 1}},
+		CollaborationType: models.Contributor,
+	}
+	postCollaborator1again := &models.PostCollaborator{
+		Member:            models.Member{Model: gorm.Model{ID: 1}},
+		CollaborationType: models.Reviewer,
+	}
+	postCollaborator2 := &models.PostCollaborator{
+		MemberID:          2,
+		Member:            models.Member{Model: gorm.Model{ID: 2}},
+		CollaborationType: models.Reviewer,
+	}
+	review1 := &models.BranchReview{
+		MemberID: 1,
+	}
+	review2 := &models.BranchReview{
+		MemberID: 2,
+	}
+	projectPostBefore := &models.ProjectPost{
+		Post: models.Post{
+			Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2},
+		},
+	}
+	projectPostAfter := &models.ProjectPost{
+		Post: models.Post{
+			Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2, postCollaborator1again},
+		},
+	}
+
+	mockMemberRepository.EXPECT().GetByID(uint(1)).Return(&models.Member{Model: gorm.Model{ID: 1}}, nil)
+	mockMemberRepository.EXPECT().GetByID(uint(2)).Return(&models.Member{Model: gorm.Model{ID: 2}}, nil)
+
+	assert.Nil(t, postCollaboratorService.MergeReviewers(projectPostBefore, []*models.BranchReview{review1, review2}))
+
+	assert.Equal(t, projectPostAfter, projectPostBefore)
 }

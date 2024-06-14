@@ -30,6 +30,8 @@ func branchCollaboratorServiceSetup(t *testing.T) {
 	// Setup mocks
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 	mockBranchCollaboratorRepository = mocks.NewMockModelRepositoryInterface[*models.BranchCollaborator](mockCtrl)
+	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
+	mockBranchCollaboratorRepository = mocks.NewMockModelRepositoryInterface[*models.BranchCollaborator](mockCtrl)
 
 	// Setup mock function return values
 	mockMemberRepository.EXPECT().GetByID(memberA.ID).Return(&memberA, nil).AnyTimes()

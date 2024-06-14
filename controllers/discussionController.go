@@ -24,9 +24,9 @@ type DiscussionController struct {
 // @Param		discussionID		path		string			true	"Discussion ID"
 // @Produce		json
 // @Success 	200 		{object}	models.DiscussionDTO
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		404 		{object} 	utils.HTTPError
-// @Failure		500 		{object} 	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/discussions/{discussionID}	[get]
 func (discussionController *DiscussionController) GetDiscussion(c *gin.Context) {
 	// Parse discussion ID path parameter
@@ -58,15 +58,15 @@ func (discussionController *DiscussionController) GetDiscussion(c *gin.Context) 
 // @Param		form	body	forms.RootDiscussionCreationForm	true	"Root Discussion Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.DiscussionDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500 	{object} 	utils.HTTPError
+// @Failure		400
+// @Failure		500
 // @Router 		/discussions/roots 		[post]
 func (discussionController *DiscussionController) CreateRootDiscussion(c *gin.Context) {
 	// Bind discussion creation form from request
 	var discussionCreationForm forms.RootDiscussionCreationForm
 
 	if err := c.BindJSON(&discussionCreationForm); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not bind form from JSON: %s", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not bind form from JSON: %v", err.Error())})
 
 		return
 	}
@@ -80,7 +80,7 @@ func (discussionController *DiscussionController) CreateRootDiscussion(c *gin.Co
 	// Create discussion in the database
 	createdDiscussion, err := discussionController.DiscussionService.CreateRootDiscussion(&discussionCreationForm)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create root discussion: %s", err)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create root discussion: %v", err.Error())})
 
 		return
 	}
@@ -96,15 +96,15 @@ func (discussionController *DiscussionController) CreateRootDiscussion(c *gin.Co
 // @Param		form	body	forms.ReplyDiscussionCreationForm	true	"Reply Discussion Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.DiscussionDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500 	{object} 	utils.HTTPError
+// @Failure		400
+// @Failure		500
 // @Router 		/discussions/replies 		[post]
 func (discussionController *DiscussionController) CreateReplyDiscussion(c *gin.Context) {
 	// Bind discussion creation form from request
 	var discussionCreationForm forms.ReplyDiscussionCreationForm
 
 	if err := c.BindJSON(&discussionCreationForm); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not bind form from JSON: %s", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not bind form from JSON: %v", err.Error())})
 
 		return
 	}
@@ -118,7 +118,7 @@ func (discussionController *DiscussionController) CreateReplyDiscussion(c *gin.C
 	// Create discussion in the database
 	createdDiscussion, err := discussionController.DiscussionService.CreateReply(&discussionCreationForm)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create reply discussion: %s", err)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create reply discussion: %v", err.Error())})
 
 		return
 	}
@@ -134,9 +134,9 @@ func (discussionController *DiscussionController) CreateReplyDiscussion(c *gin.C
 // @Param		discussionID		path		string			true	"discussion ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/discussions/{discussionID} 		[delete]
 func (discussionController *DiscussionController) DeleteDiscussion(_ *gin.Context) {
 	// delete method goes here
@@ -151,9 +151,9 @@ func (discussionController *DiscussionController) DeleteDiscussion(_ *gin.Contex
 // @Param		discussionID		path		string			true	"Discussion ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.ReportDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500 	{object} 	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/discussions/{discussionID}/reports 		[post]
 func (discussionController *DiscussionController) AddDiscussionReport(_ *gin.Context) {
 
@@ -167,9 +167,9 @@ func (discussionController *DiscussionController) AddDiscussionReport(_ *gin.Con
 // @Param		discussionID		path		string			true	"Discussion ID"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/discussions/{discussionID}/reports 		[get]
 func (discussionController *DiscussionController) GetDiscussionReports(_ *gin.Context) {
 	// TODO implement
@@ -182,9 +182,9 @@ func (discussionController *DiscussionController) GetDiscussionReports(_ *gin.Co
 // @Param		reportID	path	string	true	"Report ID"
 // @Produce		json
 // @Success		200		{object}	reports.DiscussionReportDTO
-// @Failure		400		{object}	utils.HTTPError
-// @Failure		404		{object}	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router		/discussions/reports/{reportID}				[get]
 func (discussionController *DiscussionController) GetDiscussionReport(_ *gin.Context) {
 	// TODO implement

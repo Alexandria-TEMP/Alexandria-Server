@@ -3,7 +3,6 @@ package models
 import (
 	"encoding/json"
 
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -11,22 +10,30 @@ import (
 type Member struct {
 	gorm.Model
 
-	FirstName           string
-	LastName            string
-	Email               string
-	Password            string // TODO hmmmmmm maybe not
-	Institution         string
-	ScientificFieldTags []tags.ScientificField `gorm:"serializer:json"`
+	FirstName   string
+	LastName    string
+	Email       string
+	Password    string // TODO hmmmmmm maybe not
+	Institution string
+	// Member has a ScientificFieldTagContainer
+	ScientificFieldTagContainer   ScientificFieldTagContainer `gorm:"foreignKey:ScientificFieldTagContainerID"`
+	ScientificFieldTagContainerID uint
 }
 
 type MemberDTO struct {
-	ID                  uint                   `json:"id"`
-	FirstName           string                 `json:"firstName"`
-	LastName            string                 `json:"lastName"`
-	Email               string                 `json:"email"`
-	Password            string                 `json:"password"`
-	Institution         string                 `json:"institution"`
-	ScientificFieldTags []tags.ScientificField `json:"scientificFieldTags"`
+	ID                    uint   `json:"id"`
+	FirstName             string `json:"firstName"`
+	LastName              string `json:"lastName"`
+	Email                 string `json:"email"`
+	Password              string `json:"password"`
+	Institution           string `json:"institution"`
+	ScientificFieldTagIDs []uint `json:"scientificFieldTagIDs"`
+}
+
+type MemberShortFormDTO struct {
+	ID        uint   `json:"id"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
 }
 
 func (model *Member) GetID() uint {
@@ -41,7 +48,7 @@ func (model *Member) IntoDTO() MemberDTO {
 		model.Email,
 		model.Password,
 		model.Institution,
-		model.ScientificFieldTags,
+		ScientificFieldTagContainerIntoIDs(&model.ScientificFieldTagContainer),
 	}
 }
 

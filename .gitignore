@@ -19,3 +19,6 @@ junit.*
 
 # Python
 .venv/
+
+# Filesystem
+vfs/

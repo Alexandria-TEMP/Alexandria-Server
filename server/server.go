@@ -13,24 +13,31 @@ import (
 )
 
 type RepositoryEnv struct {
-	postRepository                database.ModelRepositoryInterface[*models.Post]
-	projectPostRepository         database.ModelRepositoryInterface[*models.ProjectPost]
-	memberRepository              database.ModelRepositoryInterface[*models.Member]
-	postCollaboratorRepository    database.ModelRepositoryInterface[*models.PostCollaborator]
-	branchCollaboratorRepository  database.ModelRepositoryInterface[*models.BranchCollaborator]
-	discussionRepository          database.ModelRepositoryInterface[*models.Discussion]
-	discussionContainerRepository database.ModelRepositoryInterface[*models.DiscussionContainer]
-	closedBranchRepository        database.ModelRepositoryInterface[*models.ClosedBranch]
+	branchRepository                      database.ModelRepositoryInterface[*models.Branch]
+	closedBranchRepository                database.ModelRepositoryInterface[*models.ClosedBranch]
+	branchCollaboratorRepository          database.ModelRepositoryInterface[*models.BranchCollaborator]
+	postCollaboratorRepository            database.ModelRepositoryInterface[*models.PostCollaborator]
+	postRepository                        database.ModelRepositoryInterface[*models.Post]
+	projectPostRepository                 database.ModelRepositoryInterface[*models.ProjectPost]
+	reviewRepository                      database.ModelRepositoryInterface[*models.BranchReview]
+	discussionRepository                  database.ModelRepositoryInterface[*models.Discussion]
+	discussionContainerRepository         database.ModelRepositoryInterface[*models.DiscussionContainer]
+	memberRepository                      database.ModelRepositoryInterface[*models.Member]
+	scientificFieldTagRepository          database.ModelRepositoryInterface[*models.ScientificFieldTag]
+	scientificFieldTagContainerRepository database.ModelRepositoryInterface[*models.ScientificFieldTagContainer]
 }
 
 type ServiceEnv struct {
 	postService                interfaces.PostService
-	projectPostService         interfaces.ProjectPostService
 	memberService              interfaces.MemberService
+	branchService              interfaces.BranchService
+	renderService              interfaces.RenderService
+	projectPostService         interfaces.ProjectPostService
 	postCollaboratorService    interfaces.PostCollaboratorService
 	branchCollaboratorService  interfaces.BranchCollaboratorService
 	discussionService          interfaces.DiscussionService
 	discussionContainerService interfaces.DiscussionContainerService
+	tagService                 interfaces.TagService
 }
 
 type ControllerEnv struct {
@@ -46,90 +53,118 @@ type ControllerEnv struct {
 
 func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
 	return &RepositoryEnv{
-		postRepository: &database.ModelRepository[*models.Post]{
-			Database: db,
-		},
-		projectPostRepository: &database.ModelRepository[*models.ProjectPost]{
-			Database: db,
-		},
-		memberRepository: &database.ModelRepository[*models.Member]{
-			Database: db,
-		},
-		postCollaboratorRepository: &database.ModelRepository[*models.PostCollaborator]{
-			Database: db,
-		},
-		branchCollaboratorRepository: &database.ModelRepository[*models.BranchCollaborator]{
-			Database: db,
-		},
-		discussionRepository: &database.ModelRepository[*models.Discussion]{
-			Database: db,
-		},
-		discussionContainerRepository: &database.ModelRepository[*models.DiscussionContainer]{
-			Database: db,
-		},
-		closedBranchRepository: &database.ModelRepository[*models.ClosedBranch]{
-			Database: db,
-		},
+		branchRepository:                      &database.ModelRepository[*models.Branch]{Database: db},
+		closedBranchRepository:                &database.ModelRepository[*models.ClosedBranch]{Database: db},
+		branchCollaboratorRepository:          &database.ModelRepository[*models.BranchCollaborator]{Database: db},
+		postCollaboratorRepository:            &database.ModelRepository[*models.PostCollaborator]{Database: db},
+		postRepository:                        &database.ModelRepository[*models.Post]{Database: db},
+		projectPostRepository:                 &database.ModelRepository[*models.ProjectPost]{Database: db},
+		reviewRepository:                      &database.ModelRepository[*models.BranchReview]{Database: db},
+		discussionRepository:                  &database.ModelRepository[*models.Discussion]{Database: db},
+		discussionContainerRepository:         &database.ModelRepository[*models.DiscussionContainer]{Database: db},
+		memberRepository:                      &database.ModelRepository[*models.Member]{Database: db},
+		scientificFieldTagRepository:          &database.ModelRepository[*models.ScientificFieldTag]{Database: db},
+		scientificFieldTagContainerRepository: &database.ModelRepository[*models.ScientificFieldTagContainer]{Database: db},
 	}
 }
 
-func initServiceEnv(repositories *RepositoryEnv, _ *filesystem.Filesystem) *ServiceEnv {
+func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
+	tagService := &services.TagService{
+		TagRepository: repositoryEnv.scientificFieldTagRepository,
+	}
+	renderService := &services.RenderService{
+		BranchRepository:      repositoryEnv.branchRepository,
+		PostRepository:        repositoryEnv.postRepository,
+		ProjectPostRepository: repositoryEnv.projectPostRepository,
+		Filesystem:            fs,
+	}
 	postCollaboratorService := &services.PostCollaboratorService{
-		PostCollaboratorRepository: repositories.postCollaboratorRepository,
-		MemberRepository:           repositories.memberRepository,
+		PostCollaboratorRepository: repositoryEnv.postCollaboratorRepository,
+		MemberRepository:           repositoryEnv.memberRepository,
 	}
-
 	branchCollaboratorService := &services.BranchCollaboratorService{
-		BranchCollaboratorRepository: repositories.branchCollaboratorRepository,
-		MemberRepository:             repositories.memberRepository,
+		BranchCollaboratorRepository: repositoryEnv.branchCollaboratorRepository,
+		MemberRepository:             repositoryEnv.memberRepository,
 	}
-
 	postService := &services.PostService{
-		PostRepository:          repositories.postRepository,
-		MemberRepository:        repositories.memberRepository,
-		PostCollaboratorService: postCollaboratorService,
+		PostRepository:                        repositoryEnv.postRepository,
+		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
+		MemberRepository:                      repositoryEnv.memberRepository,
+		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
+		Filesystem:                            fs,
+		PostCollaboratorService:               postCollaboratorService,
+		RenderService:                         renderService,
+		TagService:                            tagService,
 	}
-
+	memberService := &services.MemberService{
+		MemberRepository: repositoryEnv.memberRepository,
+	}
+	branchService := &services.BranchService{
+		BranchRepository:              repositoryEnv.branchRepository,
+		ClosedBranchRepository:        repositoryEnv.closedBranchRepository,
+		PostRepository:                repositoryEnv.postRepository,
+		ProjectPostRepository:         repositoryEnv.projectPostRepository,
+		ReviewRepository:              repositoryEnv.reviewRepository,
+		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
+		DiscussionRepository:          repositoryEnv.discussionRepository,
+		MemberRepository:              repositoryEnv.memberRepository,
+		Filesystem:                    fs,
+		RenderService:                 renderService,
+		BranchCollaboratorService:     branchCollaboratorService,
+		PostCollaboratorService:       postCollaboratorService,
+		TagService:                    tagService,
+	}
 	projectPostService := &services.ProjectPostService{
-		ProjectPostRepository:     repositories.projectPostRepository,
-		MemberRepository:          repositories.memberRepository,
-		ClosedBranchRepository:    repositories.closedBranchRepository,
-		PostCollaboratorService:   postCollaboratorService,
-		BranchCollaboratorService: branchCollaboratorService,
+		ProjectPostRepository:                 repositories.projectPostRepository,
+		MemberRepository:                      repositories.memberRepository,
+		ClosedBranchRepository:                repositories.closedBranchRepository,
+		PostRepository:                        repositoryEnv.postRepository,
+		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
+		Filesystem:                            renderService.Filesystem,
+		PostCollaboratorService:               postCollaboratorService,
+		BranchCollaboratorService:             branchCollaboratorService,
+		BranchService:                         branchService,
+		TagService:                            tagService,
 	}
-
 	discussionService := &services.DiscussionService{
-		DiscussionRepository:          repositories.discussionRepository,
-		DiscussionContainerRepository: repositories.discussionContainerRepository,
-		MemberRepository:              repositories.memberRepository,
+		DiscussionRepository:          repositoryEnv.discussionRepository,
+		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
+		MemberRepository:              repositoryEnv.memberRepository,
 	}
-
 	discussionContainerService := &services.DiscussionContainerService{
-		DiscussionContainerRepository: repositories.discussionContainerRepository,
+		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
 	}
+	renderService.BranchService = branchService // added afterwards since both require eachother
 
-	return &ServiceEnv{
+	return ServiceEnv{
 		postService:                postService,
+		memberService:              memberService,
+		branchService:              branchService,
+		renderService:              renderService,
 		projectPostService:         projectPostService,
-		memberService:              &services.MemberService{},
 		postCollaboratorService:    postCollaboratorService,
 		branchCollaboratorService:  branchCollaboratorService,
 		discussionService:          discussionService,
 		discussionContainerService: discussionContainerService,
+		tagService:                 tagService,
 	}
 }
 
-func initControllerEnv(serviceEnv *ServiceEnv) *ControllerEnv {
-	return &ControllerEnv{
+func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
+	return ControllerEnv{
 		postController: &controllers.PostController{
 			PostService:             serviceEnv.postService,
+			RenderService:           serviceEnv.renderService,
 			PostCollaboratorService: serviceEnv.postCollaboratorService,
 		},
 		memberController: &controllers.MemberController{
 			MemberService: serviceEnv.memberService,
+			TagService:    serviceEnv.tagService,
 		},
 		projectPostController: &controllers.ProjectPostController{
+			PostService:        serviceEnv.postService,
 			ProjectPostService: serviceEnv.projectPostService,
+			RenderService:      serviceEnv.renderService,
 		},
 		discussionController: &controllers.DiscussionController{
 			DiscussionService: serviceEnv.discussionService,
@@ -141,8 +176,14 @@ func initControllerEnv(serviceEnv *ServiceEnv) *ControllerEnv {
 			PostService:        serviceEnv.postService,
 			ProjectPostService: serviceEnv.projectPostService,
 		},
-		branchController: &controllers.BranchController{},
-		tagController:    &controllers.TagController{},
+		branchController: &controllers.BranchController{
+			BranchService:             serviceEnv.branchService,
+			RenderService:             serviceEnv.renderService,
+			BranchCollaboratorService: serviceEnv.branchCollaboratorService,
+		},
+		tagController: &controllers.TagController{
+			TagService: serviceEnv.tagService,
+		},
 	}
 }
 
@@ -153,13 +194,13 @@ func Init() {
 		log.Fatal(err)
 	}
 
-	fs := filesystem.InitFilesystem()
+	fs := filesystem.NewFilesystem()
 
 	repositoryEnv := initRepositoryEnv(db)
 	serviceEnv := initServiceEnv(repositoryEnv, fs)
-	controllerEnv := initControllerEnv(serviceEnv)
+	controllerEnv := initControllerEnv(&serviceEnv)
 
-	router := SetUpRouter(controllerEnv)
+	router := SetUpRouter(&controllerEnv)
 	err = router.Run(":8080")
 
 	if err != nil {

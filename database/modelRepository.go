@@ -55,7 +55,7 @@ func (repo *ModelRepository[T]) Update(object T) (T, error) {
 	}
 
 	// Save the new data
-	result = repo.Database.Save(object)
+	result = repo.Database.Preload(clause.Associations).Save(object)
 	if result.Error != nil {
 		var zero T
 		return zero, fmt.Errorf("could not update model with ID %d: %w", id, result.Error)
@@ -76,10 +76,17 @@ func (repo *ModelRepository[T]) Delete(id uint) error {
 	return result.Error
 }
 
+// attempt to create a generic get fields method to extract fields from a model
+// currently not working so commented out
+// func (repo *ModelRepository[T]) GetFields(wanted []interface{}) ([]interface{}, error) {
+// 	result := repo.Database.Model(new(T)).Find(&wanted)
+// 	return wanted, result.Error
+// }
+
 func (repo *ModelRepository[T]) Query(conds ...interface{}) ([]T, error) {
 	var models []T
 
-	result := repo.Database.Find(&models, conds[0:]...)
+	result := repo.Database.Preload(clause.Associations).Order("created_at DESC").Find(&models, conds[0:]...)
 
 	if result.Error != nil {
 		return nil, fmt.Errorf("could not query: result.Error")
@@ -95,7 +102,7 @@ func (repo *ModelRepository[T]) QueryPaginated(page, size int, conds ...interfac
 		// Performs pagination
 		offset := (page - 1) * size
 		return db.Offset(offset).Limit(size)
-	}).Find(&models, conds[0:]...)
+	}).Preload(clause.Associations).Order("created_at DESC").Find(&models, conds[0:]...)
 
 	if result.Error != nil {
 		return nil, fmt.Errorf("could not query: result.Error")

@@ -1,7 +1,7 @@
 package forms
 
 // Holds IDs of Branches
-// Categorized by their BranchReviewStatus
+// Categorized by their BranchOverallReviewStatus
 type GroupedBranchForm struct {
 	OpenForReviewIDs []uint `json:"openForReviewIDs"`
 	RejectedIDs      []uint `json:"rejectedIDs"`

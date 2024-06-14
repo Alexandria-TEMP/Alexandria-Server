@@ -5,11 +5,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
 func TestBranchJSONMarshaling(t *testing.T) {
+	projectPostID := uint(45)
+	updatedPostTitle := "Updated Post Title"
+	updatedCompletionStatus := Idea
 	// This model...
 	model := Branch{
 		Model: gorm.Model{ID: 44},
@@ -27,29 +29,29 @@ func TestBranchJSONMarshaling(t *testing.T) {
 				Feedback:             "LGTM",
 			},
 		},
-		DiscussionContainerID:   5,
-		ProjectPostID:           45,
-		BranchTitle:             "My Cool MR",
-		NewPostTitle:            "Updated Post Title",
-		UpdatedCompletionStatus: Idea,
-		UpdatedScientificFields: []tags.ScientificField{tags.Mathematics},
-		RenderStatus:            Pending,
-		BranchReviewStatus:      BranchOpenForReview,
+		DiscussionContainerID:              5,
+		ProjectPostID:                      &projectPostID,
+		BranchTitle:                        "My Cool MR",
+		UpdatedPostTitle:                   &updatedPostTitle,
+		UpdatedCompletionStatus:            &updatedCompletionStatus,
+		UpdatedScientificFieldTagContainer: &ScientificFieldTagContainer{},
+		RenderStatus:                       Pending,
+		BranchOverallReviewStatus:          BranchOpenForReview,
 	}
 
 	// should equal this DTO!
 	targetDTO := BranchDTO{
-		ID:                        44,
-		CollaboratorIDs:           []uint{100, 50},
-		ReviewIDs:                 []uint{2},
-		ProjectPostID:             45,
-		BranchTitle:               "My Cool MR",
-		NewPostTitle:              "Updated Post Title",
-		UpdatedCompletionStatus:   Idea,
-		UpdatedScientificFields:   []tags.ScientificField{tags.Mathematics},
-		DiscussionContainerID:     5,
-		RenderStatus:              Pending,
-		BranchOverallReviewStatus: BranchOpenForReview,
+		ID:                           44,
+		CollaboratorIDs:              []uint{100, 50},
+		ReviewIDs:                    []uint{2},
+		ProjectPostID:                &projectPostID,
+		BranchTitle:                  "My Cool MR",
+		UpdatedPostTitle:             &updatedPostTitle,
+		UpdatedCompletionStatus:      &updatedCompletionStatus,
+		UpdatedScientificFieldTagIDs: []uint{},
+		DiscussionContainerID:        5,
+		RenderStatus:                 Pending,
+		BranchOverallReviewStatus:    BranchOpenForReview,
 	}
 
 	dto := BranchDTO{}

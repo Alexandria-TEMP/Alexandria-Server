@@ -14,9 +14,9 @@ type ClosedBranch struct {
 	Branch   Branch `gorm:"foreignKey:BranchID"`
 	BranchID uint
 
-	// SupercededBranch belongs to ClosedBranch
-	SupercededBranch   Branch `gorm:"foreignKey:SupercededBranchID"`
-	SupercededBranchID uint
+	// SupercededBranch may belong to ClosedBranch
+	SupercededBranch   *Branch `gorm:"foreignKey:SupercededBranchID"`
+	SupercededBranchID *uint
 
 	// ProjectPost has many ClosedBranch
 	ProjectPostID uint
@@ -27,7 +27,7 @@ type ClosedBranch struct {
 type ClosedBranchDTO struct {
 	ID                   uint                 `json:"id"`
 	BranchID             uint                 `json:"branchID"`
-	SupercededBranchID   uint                 `json:"supercededBranchID"`
+	SupercededBranchID   *uint                `json:"supercededBranchID"`
 	ProjectPostID        uint                 `json:"projectPostID"`
 	BranchReviewDecision BranchReviewDecision `json:"branchReviewDecision"`
 }

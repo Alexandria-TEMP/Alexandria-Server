@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"slices"
 
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -29,22 +28,26 @@ type Post struct {
 
 	// Post files and render can be implicitly accessed in the vfs with the postID
 
-	Title               string
-	PostType            PostType
-	ScientificFieldTags []tags.ScientificField `gorm:"serializer:json"`
-
+	Title    string
+	PostType PostType
+	// Post has a ScientificFieldTagContainer
+	ScientificFieldTagContainer   ScientificFieldTagContainer `gorm:"foreignKey:ScientificFieldTagContainerID"`
+	ScientificFieldTagContainerID uint
 	// Post has a DiscussionContainer
 	DiscussionContainer   DiscussionContainer `gorm:"foreignKey:DiscussionContainerID"`
 	DiscussionContainerID uint
+
+	RenderStatus RenderStatus
 }
 
 type PostDTO struct {
-	ID                    uint                   `json:"id"`
-	CollaboratorIDs       []uint                 `json:"collaboratorIDs"`
-	Title                 string                 `json:"title"`
-	PostType              PostType               `json:"postType"`
-	ScientificFieldTags   []tags.ScientificField `json:"scientificFieldTags"`
-	DiscussionContainerID uint                   `json:"discussionContainerID"`
+	ID                    uint         `json:"id"`
+	CollaboratorIDs       []uint       `json:"collaboratorIDs"`
+	Title                 string       `json:"title"`
+	PostType              PostType     `json:"postType"`
+	ScientificFieldTagIDs []uint       `json:"scientificFieldTagIDs"`
+	DiscussionContainerID uint         `json:"discussionContainerID"`
+	RenderStatus          RenderStatus `json:"renderStatus"`
 }
 
 func (model *Post) GetID() uint {
@@ -57,8 +60,9 @@ func (model *Post) IntoDTO() PostDTO {
 		postCollaboratorsToIDs(model.Collaborators),
 		model.Title,
 		model.PostType,
-		model.ScientificFieldTags,
+		ScientificFieldTagContainerIntoIDs(&model.ScientificFieldTagContainer),
 		model.DiscussionContainerID,
+		model.RenderStatus,
 	}
 }
 

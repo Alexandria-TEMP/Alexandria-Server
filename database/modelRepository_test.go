@@ -5,8 +5,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
+
 	"gorm.io/gorm"
 )
 
@@ -15,11 +16,11 @@ var memberRepository ModelRepository[*models.Member]
 var projectPostRepository ModelRepository[*models.ProjectPost]
 var member models.Member
 
-func beforeEach() {
+func beforeEach(t *testing.T) {
+	t.Helper()
+
 	database, err := InitializeTestDatabase()
-	if err != nil {
-		log.Fatalf("Could not initialize test database: %s", err)
-	}
+	assert.Nil(t, err)
 
 	testDB = database
 
@@ -29,6 +30,9 @@ func beforeEach() {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
+		},
 	}
 
 	memberRepository = ModelRepository[*models.Member]{Database: testDB}
@@ -47,7 +51,7 @@ func TestCreateWithoutSpecifyingID(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	err := memberRepository.Create(&member)
@@ -61,7 +65,7 @@ func TestCreateWithID(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	var id uint = 5
@@ -73,6 +77,9 @@ func TestCreateWithID(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
+		},
 	}
 
 	err := memberRepository.Create(&memberWithID)
@@ -90,18 +97,18 @@ func TestCreateFails(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	memberA := models.Member{
 		Model: gorm.Model{ID: 5},
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
+		},
 	}
 
 	err := memberRepository.Create(&memberA)
-
-	if err != nil {
-		t.Fatalf("could not create first member: %s", err)
-	}
+	assert.Nil(t, err)
 
 	err = memberRepository.Create(&memberA)
 
@@ -115,7 +122,7 @@ func TestGetById(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Create a member
@@ -126,6 +133,9 @@ func TestGetById(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
+		},
 	}
 
 	err := memberRepository.Create(&model)
@@ -151,7 +161,7 @@ func TestGetByIDReturnsError(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Insert a model with a different ID from the one we're getting
@@ -176,7 +186,7 @@ func TestUpdateWithNewModelWithSameID(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Insert an initial model
@@ -196,6 +206,9 @@ func TestUpdateWithNewModelWithSameID(t *testing.T) {
 		Email:       "email",
 		Password:    "password",
 		Institution: "institution",
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
+		},
 	}
 
 	updated, err := memberRepository.Update(&newModel)
@@ -218,7 +231,7 @@ func TestUpdateWithModelFetchedFromDB(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Insert an initial model
@@ -253,7 +266,7 @@ func TestUpdateWithNonExistingID(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Insert an initial model with a different ID
@@ -273,6 +286,9 @@ func TestUpdateWithNonExistingID(t *testing.T) {
 		Email:       "C",
 		Password:    "D",
 		Institution: "E",
+		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+			ScientificFieldTags: []*models.ScientificFieldTag{},
+		},
 	}
 
 	_, err = memberRepository.Update(&newModel)
@@ -286,7 +302,7 @@ func TestDeleteExistingModel(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Insert an initial model
@@ -310,7 +326,7 @@ func TestDeleteNonExistingModel(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Insert an initial model with a different ID
@@ -336,24 +352,26 @@ func TestGetPreloadedAssociations(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	createdProjectPost := models.ProjectPost{
 		Post: models.Post{
-			Collaborators:       []*models.PostCollaborator{},
-			Title:               "TEST POST",
-			PostType:            models.Project,
-			ScientificFieldTags: []tags.ScientificField{},
+			Collaborators: []*models.PostCollaborator{},
+			Title:         "TEST POST",
+			PostType:      models.Project,
+			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+				ScientificFieldTags: []*models.ScientificFieldTag{},
+			},
 			DiscussionContainer: models.DiscussionContainer{
 				Discussions: []*models.Discussion{},
 			},
 		},
-		OpenBranches:       []*models.Branch{},
-		ClosedBranches:     []*models.ClosedBranch{},
-		CompletionStatus:   models.Ongoing,
-		FeedbackPreference: models.FormalFeedback,
-		PostReviewStatus:   models.Open,
+		OpenBranches:              []*models.Branch{},
+		ClosedBranches:            []*models.ClosedBranch{},
+		ProjectCompletionStatus:   models.Ongoing,
+		ProjectFeedbackPreference: models.FormalFeedback,
+		PostReviewStatus:          models.Open,
 	}
 
 	if err := projectPostRepository.Create(&createdProjectPost); err != nil {
@@ -371,19 +389,119 @@ func TestGetPreloadedAssociations(t *testing.T) {
 	}
 }
 
+// func TestGetQueryFieldsSimple(t *testing.T) {
+// 	if testing.Short() {
+// 		t.SkipNow()
+// 	}
+
+// 	beforeEach(t)
+// 	t.Cleanup(afterEach)
+// 	fmt.Println("All is well up to point 1")
+// 	// Create dummy members in the database, with specific IDs
+// 	membersToCreate := []models.Member{
+// 		{Model: gorm.Model{ID: 5},
+// 			FirstName:   "one",
+// 			LastName:    "One",
+// 			Institution: "TU Delft",
+// 			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+// 				ScientificFieldTags: []*models.ScientificFieldTag{},
+// 			}},
+// 		{Model: gorm.Model{ID: 10},
+// 			FirstName:   "two",
+// 			LastName:    "Two",
+// 			Institution: "Vrije Universiteit Berlin",
+// 			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+// 				ScientificFieldTags: []*models.ScientificFieldTag{},
+// 			}},
+// 		{Model: gorm.Model{ID: 12},
+// 			FirstName:   "three",
+// 			LastName:    "Three",
+// 			Institution: "Politechnika Poznanska",
+// 			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+// 				ScientificFieldTags: []*models.ScientificFieldTag{},
+// 			}},
+// 	}
+
+// 	for _, member := range membersToCreate {
+// 		if err := memberRepository.Create(&member); err != nil {
+// 			t.Fatal(err)
+// 		}
+// 	}
+
+// 	fmt.Println("All is well up to point 2")
+
+// 	// Try to get all members in the database
+// 	fetchedMembers, err := memberRepository.GetFields([]models.MemberShortFormDTO{})
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	fmt.Println("All is well up to point 3")
+// 	// cast result as the expected data type
+
+// 	memberShortFormDTOs := fetchedMembers.([]models.MemberShortFormDTO)
+// 	fmt.Println("All is well up to point 4")
+// 	// define expected result
+// 	expectedMemberShortFormDTOs := []models.MemberShortFormDTO{
+// 		{
+// 			ID:        5,
+// 			FirstName: "one",
+// 			LastName:  "One",
+// 		},
+// 		{
+// 			ID:        10,
+// 			FirstName: "two",
+// 			LastName:  "Two",
+// 		},
+// 		{
+// 			ID:        12,
+// 			FirstName: "three",
+// 			LastName:  "Three",
+// 		},
+// 	}
+
+// 	// Check that the results have the same length
+// 	if len(memberShortFormDTOs) != len(expectedMemberShortFormDTOs) {
+// 		t.Fatalf("expected %d records, got %d", len(expectedMemberShortFormDTOs), len(memberShortFormDTOs))
+// 	}
+
+// 	fmt.Println("All is well up to point 5")
+
+// 	// Check each fetched member's ID, first and last name
+// 	for i, fetchedMember := range memberShortFormDTOs {
+// 		if fetchedMember.ID != expectedMemberShortFormDTOs[i].ID {
+// 			t.Fatalf("encountered ID %d expecting %d", fetchedMember.ID, expectedMemberShortFormDTOs[i].ID)
+// 		}
+// 		if fetchedMember.FirstName != expectedMemberShortFormDTOs[i].FirstName {
+// 			t.Fatalf("encountered first name %s expecting %s", fetchedMember.FirstName, expectedMemberShortFormDTOs[i].FirstName)
+// 		}
+// 		if fetchedMember.LastName != expectedMemberShortFormDTOs[i].LastName {
+// 			t.Fatalf("encountered last name %s expecting %s", fetchedMember.LastName, expectedMemberShortFormDTOs[i].LastName)
+// 		}
+// 	}
+// }
+
 func TestQuerySimple(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Create dummy members in the database, with specific IDs
 	membersToCreate := []models.Member{
-		{Model: gorm.Model{ID: 5}},
-		{Model: gorm.Model{ID: 10}},
-		{Model: gorm.Model{ID: 12}},
+		{Model: gorm.Model{ID: 5},
+			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+				ScientificFieldTags: []*models.ScientificFieldTag{},
+			}},
+		{Model: gorm.Model{ID: 10},
+			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+				ScientificFieldTags: []*models.ScientificFieldTag{},
+			}},
+		{Model: gorm.Model{ID: 12},
+			ScientificFieldTagContainer: models.ScientificFieldTagContainer{
+				ScientificFieldTags: []*models.ScientificFieldTag{},
+			}},
 	}
 
 	for _, member := range membersToCreate {
@@ -398,7 +516,7 @@ func TestQuerySimple(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedIDs := []uint{10, 12}
+	expectedIDs := []uint{12, 10}
 
 	if len(fetchedMembers) != len(expectedIDs) {
 		t.Fatalf("expected %d records, got %d", len(expectedIDs), len(fetchedMembers))
@@ -417,7 +535,7 @@ func TestQueryNonExistingField(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	// Function under test
@@ -440,17 +558,19 @@ func TestQueryPaginated(t *testing.T) {
 		t.SkipNow()
 	}
 
-	beforeEach()
+	beforeEach(t)
 	t.Cleanup(afterEach)
 
 	memberIDs := []uint{
 		10, 11, 12, 13, 15, 20, 21, 41,
 		42, 43, 60, 61, 62, 78, 88,
 	}
-
+	container := models.ScientificFieldTagContainer{
+		ScientificFieldTags: []*models.ScientificFieldTag{},
+	}
 	// Add members with the above IDs to the database
 	for _, memberID := range memberIDs {
-		if err := memberRepository.Create(&models.Member{Model: gorm.Model{ID: memberID}}); err != nil {
+		if err := memberRepository.Create(&models.Member{Model: gorm.Model{ID: memberID}, ScientificFieldTagContainer: container}); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -460,9 +580,9 @@ func TestQueryPaginated(t *testing.T) {
 	condition := "id >= 20"
 
 	expectedPages := [][]uint{
-		{20, 21, 41, 42},
-		{43, 60, 61, 62},
-		{78, 88},
+		{88, 78, 62, 61},
+		{60, 43, 42, 41},
+		{21, 20},
 	}
 
 	// For each page in the expected pages, perform a paginated query,
