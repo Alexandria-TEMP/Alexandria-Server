@@ -35,8 +35,6 @@ definitions:
       text:
         type: string
     type: object
-  forms.FilterForm:
-    type: object
   forms.GroupedBranchForm:
     properties:
       openForReviewIDs:
@@ -89,6 +87,11 @@ definitions:
       title:
         type: string
     type: object
+  forms.PostFilterForm:
+    properties:
+      includeProjectPosts:
+        type: boolean
+    type: object
   forms.ProjectPostCreationForm:
     properties:
       postCreationForm:
@@ -97,6 +100,8 @@ definitions:
         $ref: '#/definitions/models.ProjectCompletionStatus'
       projectFeedbackPreference:
         $ref: '#/definitions/models.ProjectFeedbackPreference'
+    type: object
+  forms.ProjectPostFilterForm:
     type: object
   forms.ReplyDiscussionCreationForm:
     properties:
@@ -1085,12 +1090,12 @@ paths:
         Returns all post IDs that meet the requirements in the form
         Endpoint is offset-paginated
       parameters:
-      - description: Filter form
+      - description: Post filter form
         in: body
         name: form
         required: true
         schema:
-          $ref: '#/definitions/forms.FilterForm'
+          $ref: '#/definitions/forms.PostFilterForm'
       - description: page query
         in: query
         name: page
@@ -1125,12 +1130,12 @@ paths:
         Returns all project post IDs that meet the requirements in the form
         Endpoint is offset-paginated
       parameters:
-      - description: Filter form
+      - description: Project post filter form
         in: body
         name: form
         required: true
         schema:
-          $ref: '#/definitions/forms.FilterForm'
+          $ref: '#/definitions/forms.ProjectPostFilterForm'
       - description: page query
         in: query
         name: page

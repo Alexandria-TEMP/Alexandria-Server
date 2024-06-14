@@ -1019,12 +1019,12 @@ const docTemplate = `{
                 "summary": "Filters all posts",
                 "parameters": [
                     {
-                        "description": "Filter form",
+                        "description": "Post filter form",
                         "name": "form",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.FilterForm"
+                            "$ref": "#/definitions/forms.PostFilterForm"
                         }
                     },
                     {
@@ -1077,12 +1077,12 @@ const docTemplate = `{
                 "summary": "Filters all project posts",
                 "parameters": [
                     {
-                        "description": "Filter form",
+                        "description": "Project post filter form",
                         "name": "form",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.FilterForm"
+                            "$ref": "#/definitions/forms.ProjectPostFilterForm"
                         }
                     },
                     {
@@ -2766,9 +2766,6 @@ const docTemplate = `{
                 }
             }
         },
-        "forms.FilterForm": {
-            "type": "object"
-        },
         "forms.GroupedBranchForm": {
             "type": "object",
             "properties": {
@@ -2845,6 +2842,14 @@ const docTemplate = `{
                 }
             }
         },
+        "forms.PostFilterForm": {
+            "type": "object",
+            "properties": {
+                "includeProjectPosts": {
+                    "type": "boolean"
+                }
+            }
+        },
         "forms.ProjectPostCreationForm": {
             "type": "object",
             "properties": {
@@ -2858,6 +2863,9 @@ const docTemplate = `{
                     "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 }
             }
+        },
+        "forms.ProjectPostFilterForm": {
+            "type": "object"
         },
         "forms.ReplyDiscussionCreationForm": {
             "type": "object",

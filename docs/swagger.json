@@ -1013,12 +1013,12 @@
                 "summary": "Filters all posts",
                 "parameters": [
                     {
-                        "description": "Filter form",
+                        "description": "Post filter form",
                         "name": "form",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.FilterForm"
+                            "$ref": "#/definitions/forms.PostFilterForm"
                         }
                     },
                     {
@@ -1071,12 +1071,12 @@
                 "summary": "Filters all project posts",
                 "parameters": [
                     {
-                        "description": "Filter form",
+                        "description": "Project post filter form",
                         "name": "form",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.FilterForm"
+                            "$ref": "#/definitions/forms.ProjectPostFilterForm"
                         }
                     },
                     {
@@ -2760,9 +2760,6 @@
                 }
             }
         },
-        "forms.FilterForm": {
-            "type": "object"
-        },
         "forms.GroupedBranchForm": {
             "type": "object",
             "properties": {
@@ -2839,6 +2836,14 @@
                 }
             }
         },
+        "forms.PostFilterForm": {
+            "type": "object",
+            "properties": {
+                "includeProjectPosts": {
+                    "type": "boolean"
+                }
+            }
+        },
         "forms.ProjectPostCreationForm": {
             "type": "object",
             "properties": {
@@ -2852,6 +2857,9 @@
                     "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 }
             }
+        },
+        "forms.ProjectPostFilterForm": {
+            "type": "object"
         },
         "forms.ReplyDiscussionCreationForm": {
             "type": "object",

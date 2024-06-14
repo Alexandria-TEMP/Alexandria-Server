@@ -214,11 +214,17 @@ func (postService *PostService) GetMainFileFromProject(postID uint, relFilepath 
 	return absFilepath, nil
 }
 
-func (postService *PostService) Filter(page, size int, _ forms.FilterForm) ([]uint, error) {
+func (postService *PostService) Filter(page, size int, form forms.PostFilterForm) ([]uint, error) {
 	// TODO construct query based off filter form
-	// Future changes: make sure to exclude any posts of type 'Project' from the result!
-	// Posts are composed into Project Posts, and those composed Posts shouldn't be returned.
-	posts, err := postService.PostRepository.QueryPaginated(page, size, "post_type != 'project'")
+	var query string
+
+	if form.IncludeProjectPosts {
+		query = ""
+	} else {
+		query = "post_type != 'project'"
+	}
+
+	posts, err := postService.PostRepository.QueryPaginated(page, size, query)
 	if err != nil {
 		return nil, err
 	}

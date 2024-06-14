@@ -598,8 +598,10 @@ func TestFilterAllPosts(t *testing.T) {
 	page := 1
 	size := 2
 
-	// For this test, we leave the form empty - we want all posts!
-	form := forms.FilterForm{}
+	// For this test, we want all posts!
+	form := forms.PostFilterForm{
+		IncludeProjectPosts: true,
+	}
 
 	// Setup mock function return values
 	mockPostRepository.EXPECT().QueryPaginated(page, size, gomock.Any()).Return([]*models.Post{
@@ -630,7 +632,7 @@ func TestFilterFailed(t *testing.T) {
 	mockPostRepository.EXPECT().QueryPaginated(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
-	_, err := postService.Filter(1, 10, forms.FilterForm{})
+	_, err := postService.Filter(1, 10, forms.PostFilterForm{})
 
 	if err == nil {
 		t.Fatal("post filtering should have failed")
