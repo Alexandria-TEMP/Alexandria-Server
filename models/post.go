@@ -46,7 +46,7 @@ type PostDTO struct {
 	Title                 string       `json:"title"`
 	PostType              PostType     `json:"postType"`
 	ScientificFieldTagIDs []uint       `json:"scientificFieldTagIDs"`
-	DiscussionIDs         []uint       `json:"discussionIDs"`
+	DiscussionContainerID uint         `json:"discussionContainerID"`
 	RenderStatus          RenderStatus `json:"renderStatus"`
 }
 
@@ -61,7 +61,7 @@ func (model *Post) IntoDTO() PostDTO {
 		model.Title,
 		model.PostType,
 		ScientificFieldTagContainerIntoIDs(&model.ScientificFieldTagContainer),
-		discussionContainerIntoIDs(&model.DiscussionContainer),
+		model.DiscussionContainerID,
 		model.RenderStatus,
 	}
 }

@@ -155,10 +155,8 @@ definitions:
         items:
           type: integer
         type: array
-      discussionIDs:
-        items:
-          type: integer
-        type: array
+      discussionContainerID:
+        type: integer
       id:
         type: integer
       projectPostID:
@@ -241,6 +239,22 @@ definitions:
       id:
         type: integer
     type: object
+  models.DiscussionContainerProjectHistoryDTO:
+    properties:
+      currentDiscussionContainerID:
+        type: integer
+      mergedBranchDiscussionContainers:
+        items:
+          $ref: '#/definitions/models.DiscussionContainerWithBranchDTO'
+        type: array
+    type: object
+  models.DiscussionContainerWithBranchDTO:
+    properties:
+      closedBranchID:
+        type: integer
+      discussionContainerID:
+        type: integer
+    type: object
   models.DiscussionDTO:
     properties:
       id:
@@ -299,10 +313,8 @@ definitions:
         items:
           type: integer
         type: array
-      discussionIDs:
-        items:
-          type: integer
-        type: array
+      discussionContainerID:
+        type: integer
       id:
         type: integer
       postType:
@@ -2031,14 +2043,14 @@ paths:
       summary: Get project post
       tags:
       - project-posts
-  /project-posts/{projectPostID}/all-discussions:
+  /project-posts/{projectPostID}/all-discussion-containers:
     get:
       consumes:
       - application/json
-      description: Returns all discussion IDs on this project post over all its previous
-        versions, instead of only the current version
+      description: Returns all discussion container IDs on this project post over
+        all its previous merged versions, instead of only the current version
       parameters:
-      - description: post ID
+      - description: project post ID
         in: path
         name: projectPostID
         required: true
@@ -2049,16 +2061,14 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              type: integer
-            type: array
+            $ref: '#/definitions/models.DiscussionContainerProjectHistoryDTO'
         "400":
           description: Bad Request
         "404":
           description: Not Found
         "500":
           description: Internal Server Error
-      summary: Returns all discussion IDs associated with the project post
+      summary: Returns all discussion container IDs associated with the project post
       tags:
       - project-posts
   /project-posts/{projectPostID}/branches-by-status:

@@ -14,4 +14,7 @@ type ProjectPostService interface {
 
 	// Return a filtered list of project post IDs
 	Filter(page, size int, form forms.ProjectPostFilterForm) ([]uint, error)
+
+	// Return discussion containers from the current project version + all previous merged versions
+	GetDiscussionContainersFromMergeHistory(postID uint) (*models.DiscussionContainerProjectHistoryDTO, error)
 }

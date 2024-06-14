@@ -2470,9 +2470,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/project-posts/{projectPostID}/all-discussions": {
+        "/project-posts/{projectPostID}/all-discussion-containers": {
             "get": {
-                "description": "Returns all discussion IDs on this project post over all its previous versions, instead of only the current version",
+                "description": "Returns all discussion container IDs on this project post over all its previous merged versions, instead of only the current version",
                 "consumes": [
                     "application/json"
                 ],
@@ -2482,11 +2482,11 @@ const docTemplate = `{
                 "tags": [
                     "project-posts"
                 ],
-                "summary": "Returns all discussion IDs associated with the project post",
+                "summary": "Returns all discussion container IDs associated with the project post",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "post ID",
+                        "description": "project post ID",
                         "name": "projectPostID",
                         "in": "path",
                         "required": true
@@ -2496,10 +2496,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
+                            "$ref": "#/definitions/models.DiscussionContainerProjectHistoryDTO"
                         }
                     },
                     "400": {
@@ -2945,11 +2942,8 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "discussionIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "discussionContainerID": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -3071,6 +3065,31 @@ const docTemplate = `{
                 }
             }
         },
+        "models.DiscussionContainerProjectHistoryDTO": {
+            "type": "object",
+            "properties": {
+                "currentDiscussionContainerID": {
+                    "type": "integer"
+                },
+                "mergedBranchDiscussionContainers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.DiscussionContainerWithBranchDTO"
+                    }
+                }
+            }
+        },
+        "models.DiscussionContainerWithBranchDTO": {
+            "type": "object",
+            "properties": {
+                "closedBranchID": {
+                    "type": "integer"
+                },
+                "discussionContainerID": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.DiscussionDTO": {
             "type": "object",
             "properties": {
@@ -3160,11 +3179,8 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "discussionIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "discussionContainerID": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"

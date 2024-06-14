@@ -28,6 +28,7 @@ func TestPostJSONMarshaling(t *testing.T) {
 				CollaborationType: Contributor,
 			},
 		},
+		DiscussionContainerID:       5,
 		Title:                       "Nice Post",
 		PostType:                    Question,
 		ScientificFieldTagContainer: ScientificFieldTagContainer{},
@@ -36,13 +37,12 @@ func TestPostJSONMarshaling(t *testing.T) {
 
 	// should equal this DTO!
 	targetDTO := PostDTO{
-		ID:              88,
-		CollaboratorIDs: []uint{1, 60},
-		Title:           "Nice Post",
-
+		ID:                    88,
+		CollaboratorIDs:       []uint{1, 60},
+		Title:                 "Nice Post",
 		PostType:              Question,
 		ScientificFieldTagIDs: []uint{},
-		DiscussionIDs:         []uint{95},
+		DiscussionContainerID: 5,
 	}
 
 	dto := PostDTO{}

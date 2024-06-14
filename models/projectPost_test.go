@@ -18,7 +18,8 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 		},
 		PostType:                    Project,
 		ScientificFieldTagContainer: ScientificFieldTagContainer{},
-		DiscussionContainer:         DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
+		DiscussionContainer:         DiscussionContainer{Model: gorm.Model{ID: 50}, Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
+		DiscussionContainerID:       50,
 	}
 
 	model := ProjectPost{
@@ -59,6 +60,6 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(dto, targetDTO) {
-		t.Fatal("parsed DTO did not equal target DTO")
+		t.Fatalf("parsed DTO\n%+v\ndid not equal target DTO\n%+v", dto, targetDTO)
 	}
 }
