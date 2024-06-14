@@ -2516,7 +2516,7 @@ const docTemplate = `{
         },
         "/project-posts/{projectPostID}/branches-by-status": {
             "get": {
-                "description": "Returns all branch IDs of this project post, grouped by each branch's branchreview status",
+                "description": "Returns all branch IDs of this project post, grouped by each branch's review status",
                 "consumes": [
                     "application/json"
                 ],
@@ -2526,11 +2526,11 @@ const docTemplate = `{
                 "tags": [
                     "project-posts"
                 ],
-                "summary": "Returns branch IDs grouped by each branch status",
+                "summary": "Get branch IDs by review status",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "post ID",
+                        "description": "project post ID",
                         "name": "projectPostID",
                         "in": "path",
                         "required": true
@@ -2540,7 +2540,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/forms.GroupedBranchForm"
+                            "$ref": "#/definitions/models.BranchesGroupedByReviewStatusDTO"
                         }
                     },
                     "400": {
@@ -2763,29 +2763,6 @@ const docTemplate = `{
                 },
                 "text": {
                     "type": "string"
-                }
-            }
-        },
-        "forms.GroupedBranchForm": {
-            "type": "object",
-            "properties": {
-                "openForReviewIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "peerReviewedIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "rejectedIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
                 }
             }
         },
@@ -3023,6 +3000,29 @@ const docTemplate = `{
                 "Rejected",
                 "Approved"
             ]
+        },
+        "models.BranchesGroupedByReviewStatusDTO": {
+            "type": "object",
+            "properties": {
+                "approvedClosedBranchIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "openBranchIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "rejectedClosedBranchIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "models.ClosedBranchDTO": {
             "type": "object",
