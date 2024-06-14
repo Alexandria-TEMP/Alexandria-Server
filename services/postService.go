@@ -99,6 +99,11 @@ func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileH
 		return fmt.Errorf("failed to find postID with id %v", postID)
 	}
 
+	// reject project posts
+	if post.PostType == models.Project {
+		return fmt.Errorf("this post is a project post and cannot be directly changed. instead propose a change using a branch")
+	}
+
 	// select repository of the post and checkout master
 	postService.Filesystem.CheckoutDirectory(postID)
 

@@ -288,7 +288,7 @@ func (postController *PostController) UploadPost(c *gin.Context) {
 	err = postController.PostService.UploadPost(c, file, uint(postID))
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 
 		return
 	}
