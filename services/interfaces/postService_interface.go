@@ -23,5 +23,5 @@ type PostService interface {
 	GetMainFileFromProject(postID uint, relFilepath string) (string, error)
 
 	// Return a filtered list of post IDs
-	Filter(page, size int, form forms.FilterForm) ([]uint, error)
+	Filter(page, size int, form forms.PostFilterForm) ([]uint, error)
 }

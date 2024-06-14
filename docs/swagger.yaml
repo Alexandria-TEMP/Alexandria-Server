@@ -35,8 +35,6 @@ definitions:
       text:
         type: string
     type: object
-  forms.FilterForm:
-    type: object
   forms.GroupedBranchForm:
     properties:
       openForReviewIDs:
@@ -89,6 +87,11 @@ definitions:
       title:
         type: string
     type: object
+  forms.PostFilterForm:
+    properties:
+      includeProjectPosts:
+        type: boolean
+    type: object
   forms.ProjectPostCreationForm:
     properties:
       postCreationForm:
@@ -97,6 +100,8 @@ definitions:
         $ref: '#/definitions/models.ProjectCompletionStatus'
       projectFeedbackPreference:
         $ref: '#/definitions/models.ProjectFeedbackPreference'
+    type: object
+  forms.ProjectPostFilterForm:
     type: object
   forms.ReplyDiscussionCreationForm:
     properties:
@@ -729,7 +734,8 @@ paths:
       consumes:
       - multipart/form-data
       description: |-
-        Upload a new project version to a specific, preexisting, branch as a zipped quarto project
+        Upload a new project version to a specific, preexisting, branch as a zipped quarto project.
+        Specifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.
         Call this after you create a post, and supply it with the actual post contents.
       parameters:
       - description: Branch ID
@@ -1084,12 +1090,12 @@ paths:
         Returns all post IDs that meet the requirements in the form
         Endpoint is offset-paginated
       parameters:
-      - description: Filter form
+      - description: Post filter form
         in: body
         name: form
         required: true
         schema:
-          $ref: '#/definitions/forms.FilterForm'
+          $ref: '#/definitions/forms.PostFilterForm'
       - description: page query
         in: query
         name: page
@@ -1124,12 +1130,12 @@ paths:
         Returns all project post IDs that meet the requirements in the form
         Endpoint is offset-paginated
       parameters:
-      - description: Filter form
+      - description: Project post filter form
         in: body
         name: form
         required: true
         schema:
-          $ref: '#/definitions/forms.FilterForm'
+          $ref: '#/definitions/forms.ProjectPostFilterForm'
       - description: page query
         in: query
         name: page
@@ -1787,8 +1793,9 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: Upload a zipped quarto project to a post. This is the main version
-        of the post, as there are no other versions.
+      description: |-
+        Upload a zipped quarto project to a post. This is the main version of the post, as there are no other versions.
+        Specifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.
       parameters:
       - description: Post ID
         in: path
