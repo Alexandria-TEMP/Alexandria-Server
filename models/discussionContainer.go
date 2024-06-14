@@ -25,7 +25,7 @@ func (model *DiscussionContainer) GetID() uint {
 func (model *DiscussionContainer) IntoDTO() DiscussionContainerDTO {
 	return DiscussionContainerDTO{
 		ID:            model.ID,
-		DiscussionIDs: discussionsIntoIDs(model.Discussions),
+		DiscussionIDs: onlyRootDiscussionsIntoIDs(model.Discussions),
 	}
 }
 
@@ -44,4 +44,17 @@ type DiscussionContainerProjectHistoryDTO struct {
 type DiscussionContainerWithBranchDTO struct {
 	DiscussionContainerID uint `json:"discussionContainerID"`
 	ClosedBranchID        uint `json:"closedBranchID"`
+}
+
+// onlyRootDiscussionsIntoIDs takes a list of discussions, and returns the IDs of all root discussions
+func onlyRootDiscussionsIntoIDs(discussions []*Discussion) []uint {
+	rootDiscussionIDs := []uint{}
+
+	for _, discussion := range discussions {
+		if discussion.ParentID == nil {
+			rootDiscussionIDs = append(rootDiscussionIDs, discussion.ID)
+		}
+	}
+
+	return rootDiscussionIDs
 }
