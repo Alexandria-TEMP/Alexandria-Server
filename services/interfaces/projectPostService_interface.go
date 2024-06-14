@@ -14,4 +14,6 @@ type ProjectPostService interface {
 
 	// Return a filtered list of project post IDs
 	Filter(page, size int, form forms.ProjectPostFilterForm) ([]uint, error)
+
+	GetBranchesGroupedByReviewStatus(projectPostID uint) (*models.BranchesGroupedByReviewStatusDTO, error)
 }

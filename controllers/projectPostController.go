@@ -190,17 +190,34 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ 
 }
 
 // GetProjectPostBranchesByStatus godoc
-// @Summary 	Returns branch IDs grouped by each branch status
-// @Description Returns all branch IDs of this project post, grouped by each branch's branchreview status
+// @Summary 	Get branch IDs by review status
+// @Description Returns all branch IDs of this project post, grouped by each branch's review status
 // @Tags		project-posts
 // @Accept		json
-// @Param		projectPostID	path	string	true	"post ID"
+// @Param		projectPostID	path	string	true	"project post ID"
 // @Produce		json
-// @Success		200		{object}	forms.GroupedBranchForm
+// @Success		200		{object}	models.BranchesGroupedByReviewStatusDTO
 // @Failure		400
 // @Failure		404
 // @Failure		500
 // @Router		/project-posts/{projectPostID}/branches-by-status	[get]
-func (projectPostController *ProjectPostController) GetProjectPostBranchesByStatus(_ *gin.Context) {
-	// TODO implement
+func (projectPostController *ProjectPostController) GetProjectPostBranchesByStatus(c *gin.Context) {
+	// Get project post ID from path
+	projectPostIDString := c.Param("projectPostID")
+
+	projectPostID, err := strconv.ParseUint(projectPostIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not parse project post ID '%s' as unsigned integer: %s", projectPostIDString, err)})
+
+		return
+	}
+
+	branchesGroupedByStatus, err := projectPostController.ProjectPostService.GetBranchesGroupedByReviewStatus(uint(projectPostID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get branches by status: %s", err)})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, branchesGroupedByStatus)
 }

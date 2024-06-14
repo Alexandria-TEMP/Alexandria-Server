@@ -388,3 +388,65 @@ func TestFilterProjectPostsFailed(t *testing.T) {
 		t.Fatal("post filtering should have failed")
 	}
 }
+
+func TestGetBranchesByStatus(t *testing.T) {
+	projectPostServiceSetup(t)
+	t.Cleanup(projectPostServiceTeardown)
+
+	projectPostID := uint(10)
+
+	mockProjectPostRepository.EXPECT().GetByID(projectPostID).Return(&models.ProjectPost{
+		OpenBranches: []*models.Branch{
+			{
+				Model: gorm.Model{ID: 2},
+			},
+		},
+		ClosedBranches: []*models.ClosedBranch{
+			{
+				Model:                gorm.Model{ID: 3},
+				BranchReviewDecision: models.Approved,
+			},
+			{
+				Model:                gorm.Model{ID: 4},
+				BranchReviewDecision: models.Rejected,
+			},
+			{
+				Model:                gorm.Model{ID: 10},
+				BranchReviewDecision: models.Approved,
+			},
+		},
+	}, nil).Times(1)
+
+	// Function under test
+	fetchedBranchesGroupedByStatus, err := projectPostService.GetBranchesGroupedByReviewStatus(projectPostID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedBranchesGroupedByStatus := &models.BranchesGroupedByReviewStatusDTO{
+		OpenBranchIDs:           []uint{2},
+		RejectedClosedBranchIDs: []uint{4},
+		ApprovedClosedBranchIDs: []uint{3, 10},
+	}
+
+	if !reflect.DeepEqual(fetchedBranchesGroupedByStatus, expectedBranchesGroupedByStatus) {
+		t.Fatalf("fetched branches grouped by status\n%+vdid not equal expected branches grouped by status\n%+v",
+			fetchedBranchesGroupedByStatus, expectedBranchesGroupedByStatus)
+	}
+}
+
+func TestGetBranchesByStatusProjectPostDNE(t *testing.T) {
+	projectPostServiceSetup(t)
+	t.Cleanup(projectPostServiceTeardown)
+
+	projectPostID := uint(15)
+
+	mockProjectPostRepository.EXPECT().GetByID(projectPostID).Return(nil, fmt.Errorf("oh no")).Times(1)
+
+	// Function under test
+	_, err := projectPostService.GetBranchesGroupedByReviewStatus(projectPostID)
+
+	if err == nil {
+		t.Fatal("branches by status should have failed")
+	}
+}
