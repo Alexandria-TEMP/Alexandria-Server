@@ -26,15 +26,19 @@ var (
 	mockMemberService             *mocks.MockMemberService
 	mockTagService                *mocks.MockTagService
 
-	exampleBranch       models.Branch
-	exampleReview       models.BranchReview
-	exampleCollaborator models.BranchCollaborator
-	exampleMember       models.Member
-	exampleMemberDTO    models.MemberDTO
-	exampleMemberForm   forms.MemberCreationForm
-	exampleSTag1        *models.ScientificFieldTag
-	exampleSTag2        *models.ScientificFieldTag
-	exampleSTag1DTO     models.ScientificFieldTagDTO
+	exampleBranch            models.Branch
+	exampleReview            models.BranchReview
+	exampleCollaborator      models.BranchCollaborator
+	exampleMemberAuthForm    forms.MemberAuthForm
+	exampleMember            models.Member
+	exampleMemberDTO         models.MemberDTO
+	exampleMemberLoggedInDTO models.LoggedInMemberDTO
+	exampleMemberForm        forms.MemberCreationForm
+	exampleTokenRefreshForm  forms.TokenRefreshForm
+	exampleTokenPairDTO      models.TokenPairDTO
+	exampleSTag1             *models.ScientificFieldTag
+	exampleSTag2             *models.ScientificFieldTag
+	exampleSTag1DTO          models.ScientificFieldTagDTO
 )
 
 // TestMain is a keyword function, this is run by the testing package before other tests
@@ -68,7 +72,13 @@ func TestMain(m *testing.M) {
 		Institution:           "TU Delft",
 		ScientificFieldTagIDs: []uint{},
 	}
-
+	exampleMemberLoggedInDTO = models.LoggedInMemberDTO{
+		Member: exampleMemberDTO,
+	}
+	exampleMemberAuthForm = forms.MemberAuthForm{
+		Email:    "john.smith@gmail.com",
+		Password: "password",
+	}
 	exampleMemberForm = forms.MemberCreationForm{
 		FirstName:             "John",
 		LastName:              "Smith",
@@ -76,6 +86,13 @@ func TestMain(m *testing.M) {
 		Password:              "password",
 		Institution:           "TU Delft",
 		ScientificFieldTagIDs: []uint{},
+	}
+	exampleTokenRefreshForm = forms.TokenRefreshForm{
+		RefreshToken: "1234",
+	}
+	exampleTokenPairDTO = models.TokenPairDTO{
+		AccessToken:  "5678",
+		RefreshToken: "9102",
 	}
 
 	// Setup test router, to test controller endpoints through http
@@ -121,6 +138,12 @@ func SetUpRouter() *gin.Engine {
 	})
 	router.GET("/api/v2/members", func(c *gin.Context) {
 		memberController.GetAllMembers(c)
+	})
+	router.GET("/api/v2/members/login", func(c *gin.Context) {
+		memberController.LoginMember(c)
+	})
+	router.GET("/api/v2/members/refresh", func(c *gin.Context) {
+		memberController.RefreshToken(c)
 	})
 	router.GET("/api/v2/tags/scientific", func(c *gin.Context) {
 		tagController.GetScientificTags(c)

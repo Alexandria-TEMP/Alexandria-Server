@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	gomock "go.uber.org/mock/gomock"
@@ -74,25 +75,25 @@ func TestGetMember404(t *testing.T) {
 func TestCreateMember200(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().CreateMember(&exampleMemberForm, gomock.Any()).Return(&exampleMember, nil).Times(1)
+	mockMemberService.EXPECT().CreateMember(&exampleMemberForm, gomock.Any()).Return(&exampleMemberLoggedInDTO, nil).Times(1)
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
 
 	exampleMemberFormJSON, _ := json.Marshal(exampleMemberForm)
 	req, _ := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(exampleMemberFormJSON))
 	router.ServeHTTP(responseRecorder, req)
 
-	var responsemember models.MemberDTO
+	var responsemember models.LoggedInMemberDTO
 
 	responseJSON, _ := io.ReadAll(responseRecorder.Body)
 	_ = json.Unmarshal(responseJSON, &responsemember)
 
-	assert.Equal(t, exampleMemberDTO, responsemember)
+	assert.Equal(t, exampleMemberLoggedInDTO, responsemember)
 }
 
 func TestCreateMember400(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Return(&exampleMember, errors.New("some error")).Times(0)
+	mockMemberService.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Return(nil, errors.New("some error")).Times(0)
 
 	badMemberFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
 	req, _ := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(badMemberFormJSON))
@@ -216,6 +217,136 @@ func TestGetAllMembers404(t *testing.T) {
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}
+
+func TestLoginMember200(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(&exampleMemberLoggedInDTO, nil)
+
+	exampleMemberAuthFormJSON, _ := json.Marshal(exampleMemberAuthForm)
+	req, _ := http.NewRequest("GET", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	var responsemember models.LoggedInMemberDTO
+
+	responseJSON, _ := io.ReadAll(responseRecorder.Body)
+	_ = json.Unmarshal(responseJSON, &responsemember)
+
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+	assert.Equal(t, exampleMemberLoggedInDTO, responsemember)
+}
+
+func TestLoginMember4001(t *testing.T) {
+	beforeEachMember(t)
+
+	exampleMemberAuthFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
+	req, _ := http.NewRequest("GET", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	var responsemember models.LoggedInMemberDTO
+
+	responseJSON, _ := io.ReadAll(responseRecorder.Body)
+	_ = json.Unmarshal(responseJSON, &responsemember)
+
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestLoginMember4002(t *testing.T) {
+	beforeEachMember(t)
+
+	exampleMemberAuthFormJSON, _ := json.Marshal(models.LoggedInMemberDTO{})
+	req, _ := http.NewRequest("GET", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	var responsemember models.LoggedInMemberDTO
+
+	responseJSON, _ := io.ReadAll(responseRecorder.Body)
+	_ = json.Unmarshal(responseJSON, &responsemember)
+
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestLoginMember404(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(nil, errors.New("failed"))
+
+	exampleMemberAuthFormJSON, _ := json.Marshal(exampleMemberAuthForm)
+	req, _ := http.NewRequest("GET", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	var responsemember models.LoggedInMemberDTO
+
+	responseJSON, _ := io.ReadAll(responseRecorder.Body)
+	_ = json.Unmarshal(responseJSON, &responsemember)
+
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}
+
+func TestRefreshToken200(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberService.EXPECT().RefreshToken(&exampleTokenRefreshForm).Return(&exampleTokenPairDTO, nil)
+
+	exampleTokenRefreshFormJSON, _ := json.Marshal(exampleTokenRefreshForm)
+	req, _ := http.NewRequest("GET", "/api/v2/members/refresh", bytes.NewBuffer(exampleTokenRefreshFormJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	var responsemember models.TokenPairDTO
+
+	responseJSON, _ := io.ReadAll(responseRecorder.Body)
+	_ = json.Unmarshal(responseJSON, &responsemember)
+
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+	assert.Equal(t, exampleTokenPairDTO, responsemember)
+}
+
+func TestRefreshToken4001(t *testing.T) {
+	beforeEachMember(t)
+
+	exampleTokenRefreshFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
+	req, _ := http.NewRequest("GET", "/api/v2/members/refresh", bytes.NewBuffer(exampleTokenRefreshFormJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	var responsemember models.TokenPairDTO
+
+	responseJSON, _ := io.ReadAll(responseRecorder.Body)
+	_ = json.Unmarshal(responseJSON, &responsemember)
+
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestRefreshToken4002(t *testing.T) {
+	beforeEachMember(t)
+
+	exampleTokenRefreshFormJSON, _ := json.Marshal(forms.TokenRefreshForm{})
+	req, _ := http.NewRequest("GET", "/api/v2/members/refresh", bytes.NewBuffer(exampleTokenRefreshFormJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	var responsemember models.TokenPairDTO
+
+	responseJSON, _ := io.ReadAll(responseRecorder.Body)
+	_ = json.Unmarshal(responseJSON, &responsemember)
+
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestRefreshToken404(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberService.EXPECT().RefreshToken(&exampleTokenRefreshForm).Return(nil, errors.New("failed"))
+
+	exampleTokenRefreshFormJSON, _ := json.Marshal(exampleTokenRefreshForm)
+	req, _ := http.NewRequest("GET", "/api/v2/members/refresh", bytes.NewBuffer(exampleTokenRefreshFormJSON))
+	router.ServeHTTP(responseRecorder, req)
+
+	var responsemember models.TokenPairDTO
+
+	responseJSON, _ := io.ReadAll(responseRecorder.Body)
+	_ = json.Unmarshal(responseJSON, &responsemember)
 
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }

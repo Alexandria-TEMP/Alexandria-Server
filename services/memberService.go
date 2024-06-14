@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
@@ -13,6 +12,7 @@ import (
 )
 
 type MemberService struct {
+	Secret           string
 	MemberRepository database.ModelRepositoryInterface[*models.Member]
 }
 
@@ -151,23 +151,15 @@ func (memberService *MemberService) LogInMember(form *forms.MemberAuthForm) (*mo
 
 // Credit: https://github.com/war1oc/jwt-auth/blob/master/handler.go
 func (memberService *MemberService) RefreshToken(form *forms.TokenRefreshForm) (*models.TokenPairDTO, error) {
-	// get secret
-	envFile, err := godotenv.Read(".env")
-	if err != nil {
-		return nil, fmt.Errorf("failed to read .env file")
-	}
-
-	secret := envFile["SECRET"]
-
 	// get token
 	token, err := jwt.Parse(form.RefreshToken, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
 		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-		return []byte(secret), nil
+		return []byte(memberService.Secret), nil
 	})
 
 	if err != nil {
@@ -208,25 +200,17 @@ func (memberService *MemberService) RefreshToken(form *forms.TokenRefreshForm) (
 // When the access token expires, the refresh token can be used to generate a new pair of tokens.
 // Credit: https://medium.com/monstar-lab-bangladesh-engineering/jwt-auth-in-go-dde432440924
 func (memberService *MemberService) generateTokenPair(memberID uint) (string, string, error) {
-	// get secret
-	envFile, err := godotenv.Read(".env")
-	if err != nil {
-		return "", "", fmt.Errorf("failed to read .env file")
-	}
-
-	secret := envFile["SECRET"]
-
 	// CREATE ACCESS TOKEN
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Header["typ"] = "access"
 
 	// Set claims
-	claims := token.Claims.(jwt.MapClaims)
+	claims, _ := token.Claims.(jwt.MapClaims)
 	claims["sub"] = memberID
 	claims["exp"] = time.Now().Add(time.Minute * 15).Unix() // 15 min timout
 
 	// Generate encoded token and send it as response.
-	t, err := token.SignedString([]byte(secret))
+	t, err := token.SignedString([]byte(memberService.Secret))
 	if err != nil {
 		return "", "", err
 	}
@@ -241,7 +225,7 @@ func (memberService *MemberService) generateTokenPair(memberID uint) (string, st
 	rtClaims["exp"] = time.Now().Add(time.Hour * 72).Unix() // 3 day timout
 
 	// Generate encoded token and send it as response.
-	rt, err := refreshToken.SignedString([]byte(secret))
+	rt, err := refreshToken.SignedString([]byte(memberService.Secret))
 	if err != nil {
 		return "", "", err
 	}

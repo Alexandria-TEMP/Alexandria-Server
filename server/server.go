@@ -1,8 +1,10 @@
 package server
 
 import (
+	"fmt"
 	"log"
 
+	"github.com/joho/godotenv"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
@@ -68,7 +70,7 @@ func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
 	}
 }
 
-func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) ServiceEnv {
+func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, secret string) ServiceEnv {
 	tagService := &services.TagService{
 		TagRepository: repositoryEnv.scientificFieldTagRepository,
 	}
@@ -96,6 +98,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		TagService:                            tagService,
 	}
 	memberService := &services.MemberService{
+		Secret:           secret,
 		MemberRepository: repositoryEnv.memberRepository,
 	}
 	branchService := &services.BranchService{
@@ -185,6 +188,15 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 	}
 }
 
+func loadSecret() (string, error) {
+	envFile, err := godotenv.Read(".env")
+	if err != nil {
+		return "", fmt.Errorf("failed to read .env file: %w", err)
+	}
+
+	return envFile["SECRET"], nil
+}
+
 func Init() {
 	db, err := database.InitializeDatabase()
 	if err != nil {
@@ -193,11 +205,16 @@ func Init() {
 
 	fs := filesystem.NewFilesystem()
 
+	secret, err := loadSecret()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	repositoryEnv := initRepositoryEnv(db)
-	serviceEnv := initServiceEnv(repositoryEnv, fs)
+	serviceEnv := initServiceEnv(repositoryEnv, fs, secret)
 	controllerEnv := initControllerEnv(&serviceEnv)
 
-	router := SetUpRouter(&controllerEnv)
+	router := SetUpRouter(&controllerEnv, secret)
 	err = router.Run(":8080")
 
 	if err != nil {

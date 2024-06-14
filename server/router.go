@@ -9,7 +9,7 @@ import (
 	docs "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/docs"
 )
 
-func SetUpRouter(controllers *ControllerEnv) *gin.Engine {
+func SetUpRouter(controllers *ControllerEnv, secret string) *gin.Engine {
 	// Get router
 	router := gin.Default()
 	router.Use(cors.Default())
@@ -21,7 +21,7 @@ func SetUpRouter(controllers *ControllerEnv) *gin.Engine {
 	}
 
 	// Init middleware
-	if err := InitializeMiddleware(controllers.memberController.MemberService); err != nil {
+	if err := InitializeMiddleware(controllers.memberController.MemberService, secret); err != nil {
 		return nil
 	}
 

@@ -8,24 +8,19 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
 var secret string
 var memberService interfaces.MemberService
 
-func InitializeMiddleware(memService interfaces.MemberService) error {
+func InitializeMiddleware(m interfaces.MemberService, s string) error {
 	// set member repository
-	memberService = memService
+	memberService = m
 
-	// get secret
-	envFile, err := godotenv.Read(".env")
-	if err != nil {
-		return fmt.Errorf("failed to read .env file")
-	}
+	// set secret
+	secret = s
 
-	secret = envFile["SECRET"]
 	return nil
 }
 
@@ -37,6 +32,7 @@ func CheckAuth(c *gin.Context) {
 	if authHeader == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
 		c.AbortWithStatus(http.StatusUnauthorized)
+
 		return
 	}
 
@@ -44,6 +40,7 @@ func CheckAuth(c *gin.Context) {
 	if len(authToken) != 2 || authToken[0] != "Bearer" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
 		c.AbortWithStatus(http.StatusUnauthorized)
+
 		return
 	}
 
@@ -52,6 +49,7 @@ func CheckAuth(c *gin.Context) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
+
 		return []byte(secret), nil
 	})
 

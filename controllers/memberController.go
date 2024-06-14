@@ -110,7 +110,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 
 	// if the member service throws an error, return a 400 Bad request status
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprint("failed to create member: %s", err.Error())})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 
 		return
 	}

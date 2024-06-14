@@ -41,10 +41,10 @@ func (m *MockMemberService) EXPECT() *MockMemberServiceMockRecorder {
 }
 
 // CreateMember mocks base method.
-func (m *MockMemberService) CreateMember(memberForm *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (*models.Member, error) {
+func (m *MockMemberService) CreateMember(memberForm *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (*models.LoggedInMemberDTO, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateMember", memberForm, userFields)
-	ret0, _ := ret[0].(*models.Member)
+	ret0, _ := ret[0].(*models.LoggedInMemberDTO)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -97,6 +97,36 @@ func (m *MockMemberService) GetMember(memberID uint) (*models.Member, error) {
 func (mr *MockMemberServiceMockRecorder) GetMember(memberID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMember", reflect.TypeOf((*MockMemberService)(nil).GetMember), memberID)
+}
+
+// LogInMember mocks base method.
+func (m *MockMemberService) LogInMember(memberAuthForm *forms.MemberAuthForm) (*models.LoggedInMemberDTO, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LogInMember", memberAuthForm)
+	ret0, _ := ret[0].(*models.LoggedInMemberDTO)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LogInMember indicates an expected call of LogInMember.
+func (mr *MockMemberServiceMockRecorder) LogInMember(memberAuthForm any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LogInMember", reflect.TypeOf((*MockMemberService)(nil).LogInMember), memberAuthForm)
+}
+
+// RefreshToken mocks base method.
+func (m *MockMemberService) RefreshToken(form *forms.TokenRefreshForm) (*models.TokenPairDTO, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RefreshToken", form)
+	ret0, _ := ret[0].(*models.TokenPairDTO)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RefreshToken indicates an expected call of RefreshToken.
+func (mr *MockMemberServiceMockRecorder) RefreshToken(form any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RefreshToken", reflect.TypeOf((*MockMemberService)(nil).RefreshToken), form)
 }
 
 // UpdateMember mocks base method.

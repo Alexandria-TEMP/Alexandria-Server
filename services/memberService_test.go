@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -21,6 +22,7 @@ func beforeEachMember(t *testing.T) {
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 
 	memberService = MemberService{
+		Secret:           "secret",
 		MemberRepository: mockMemberRepository,
 	}
 }
@@ -60,7 +62,8 @@ func TestGetMemberUnsuccessful(t *testing.T) {
 func TestCreateMemberSuccessful(t *testing.T) {
 	beforeEachMember(t)
 	// set up repository mock to create members correctly
-	mockMemberRepository.EXPECT().Create(&exampleMember).Return(nil)
+	mockMemberRepository.EXPECT().Create(gomock.Any()).Return(nil)
+	mockMemberRepository.EXPECT().Query(&models.Member{Email: "john.smith@gmail.com"}).Return(nil, nil)
 
 	// set up a member creation form
 	memberForm := forms.MemberCreationForm{
@@ -79,7 +82,11 @@ func TestCreateMemberSuccessful(t *testing.T) {
 	member, err := memberService.CreateMember(&memberForm, &userTags)
 
 	// verify that the member object was created correctly
-	assert.Equal(t, &exampleMember, member)
+	assert.Equal(t, exampleMember.FirstName, member.Member.FirstName)
+	assert.Equal(t, exampleMember.LastName, member.Member.LastName)
+	assert.Equal(t, exampleMember.Email, member.Member.Email)
+	assert.Equal(t, exampleMember.Institution, member.Member.Institution)
+
 	// verify that there was no error
 	assert.Nil(t, err)
 }
@@ -90,7 +97,8 @@ func TestCreateMemberUnsuccessful(t *testing.T) {
 	expectedErr := fmt.Errorf("error")
 
 	// set up repository mock to return an error
-	mockMemberRepository.EXPECT().Create(&exampleMember).Return(expectedErr)
+	mockMemberRepository.EXPECT().Create(gomock.Any()).Return(expectedErr)
+	mockMemberRepository.EXPECT().Query(&models.Member{Email: "john.smith@gmail.com"}).Return(nil, nil)
 
 	// set up a member creation form
 	memberForm := forms.MemberCreationForm{
@@ -107,10 +115,8 @@ func TestCreateMemberUnsuccessful(t *testing.T) {
 	}
 
 	// call service method under test
-	member, err := memberService.CreateMember(&memberForm, &userTags)
+	_, err := memberService.CreateMember(&memberForm, &userTags)
 
-	// verify that the member object was not created
-	assert.Nil(t, member)
 	// verify the error was returned correctly
 	assert.Equal(t, expectedErr, err)
 }
@@ -177,3 +183,47 @@ func TestDeleteMemberUnsuccessful(t *testing.T) {
 	// assert there expected error was returned
 	assert.Equal(t, expectedErr, err)
 }
+
+func TestLoginMemberValidSuccessful(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberRepository.EXPECT().Query(&models.Member{Email: exampleMemberAuthForm.Email}).Return([]*models.Member{&exampleMemberWithPassword}, nil)
+
+	loggedInMember, err := memberService.LogInMember(&exampleMemberAuthForm)
+	assert.Nil(t, err)
+	assert.Equal(t, exampleMemberDTO, loggedInMember.Member)
+}
+
+func TestLoginMemberInvalidSuccessful(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberRepository.EXPECT().Query(&models.Member{Email: exampleMemberAuthForm.Email}).Return([]*models.Member{&exampleMemberWithPassword}, nil)
+
+	_, err := memberService.LogInMember(&forms.MemberAuthForm{
+		Email:    "john.smith@gmail.com",
+		Password: "wrong",
+	})
+	assert.NotNil(t, err)
+}
+
+func TestLoginMemberFailureQueryFailed(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberRepository.EXPECT().Query(&models.Member{Email: exampleMemberAuthForm.Email}).Return(nil, errors.New("failed"))
+
+	_, err := memberService.LogInMember(&exampleMemberAuthForm)
+	assert.NotNil(t, err)
+}
+
+func TestLoginMemberFailureNoEmailMatches(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberRepository.EXPECT().Query(&models.Member{Email: exampleMemberAuthForm.Email}).Return(nil, nil)
+
+	_, err := memberService.LogInMember(&exampleMemberAuthForm)
+	assert.NotNil(t, err)
+}
+
+// func TestRefreshTokenSuccess(t *testing.T) {
+
+// }
