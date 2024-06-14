@@ -619,3 +619,38 @@ func (branchController *BranchController) GetClosedBranch(c *gin.Context) {
 	// response
 	c.JSON(http.StatusOK, closedBranch.IntoDTO())
 }
+
+// GetAllBranchCollaborators godoc
+// @Summary 	Get all branch collaborators of a branch
+// @Description Returns all branch collaborators of the branch with the given ID
+// @Tags 		branches
+// @Param		branchID	path		string			true	"Branch ID"
+// @Produce		application/json
+// @Success 	200		{array}		// TODO
+// @Failure		400
+// @Failure		404
+// @Router		/branches/collaborators/all/{branchID}		[get]
+func (branchController *BranchController) GetAllBranchCollaborators(c *gin.Context) {
+	// Get branch ID from path param
+	branchIDString := c.Param("branchID")
+
+	branchID, err := strconv.ParseUint(branchIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to parse branch ID '%s' as unsigned integer: %s", branchIDString, err)})
+
+		return
+	}
+
+	// Get the branch itself
+	branch, err := branchController.BranchService.GetBranch(uint(branchID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get branch with ID %d: %s", branchID, err)})
+
+		return
+	}
+
+	branchCollaborators := branch.Collaborators
+
+	// TODO return DTOs instead of an array
+	c.JSON(http.StatusOK, branchCollaborators)
+}
