@@ -86,6 +86,21 @@ func (mr *MockProjectPostServiceMockRecorder) GetBranchesGroupedByReviewStatus(p
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBranchesGroupedByReviewStatus", reflect.TypeOf((*MockProjectPostService)(nil).GetBranchesGroupedByReviewStatus), projectPostID)
 }
 
+// GetDiscussionContainersFromMergeHistory mocks base method.
+func (m *MockProjectPostService) GetDiscussionContainersFromMergeHistory(postID uint) (*models.DiscussionContainerProjectHistoryDTO, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDiscussionContainersFromMergeHistory", postID)
+	ret0, _ := ret[0].(*models.DiscussionContainerProjectHistoryDTO)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDiscussionContainersFromMergeHistory indicates an expected call of GetDiscussionContainersFromMergeHistory.
+func (mr *MockProjectPostServiceMockRecorder) GetDiscussionContainersFromMergeHistory(postID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDiscussionContainersFromMergeHistory", reflect.TypeOf((*MockProjectPostService)(nil).GetDiscussionContainersFromMergeHistory), postID)
+}
+
 // GetProjectPost mocks base method.
 func (m *MockProjectPostService) GetProjectPost(postID uint) (*models.ProjectPost, error) {
 	m.ctrl.T.Helper()
