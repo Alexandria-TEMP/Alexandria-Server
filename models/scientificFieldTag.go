@@ -6,13 +6,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type ScientificFieldTagContainer struct {
-	gorm.Model
-
-	// ScientificFieldTagContainer has many ScientificFieldTag
-	ScientificFieldTags []*ScientificFieldTag `gorm:"many2many:tag_containers;"`
-}
-
 // a scientific field tag is a tag representing a specific scientific field
 type ScientificFieldTag struct {
 	gorm.Model
@@ -33,10 +26,6 @@ type ScientificFieldTagDTO struct {
 }
 
 func (model *ScientificFieldTag) GetID() uint {
-	return model.Model.ID
-}
-
-func (model *ScientificFieldTagContainer) GetID() uint {
 	return model.Model.ID
 }
 

@@ -28,16 +28,17 @@ type RepositoryEnv struct {
 }
 
 type ServiceEnv struct {
-	postService                interfaces.PostService
-	memberService              interfaces.MemberService
-	branchService              interfaces.BranchService
-	renderService              interfaces.RenderService
-	projectPostService         interfaces.ProjectPostService
-	postCollaboratorService    interfaces.PostCollaboratorService
-	branchCollaboratorService  interfaces.BranchCollaboratorService
-	discussionService          interfaces.DiscussionService
-	discussionContainerService interfaces.DiscussionContainerService
-	tagService                 interfaces.TagService
+	postService                        interfaces.PostService
+	memberService                      interfaces.MemberService
+	branchService                      interfaces.BranchService
+	renderService                      interfaces.RenderService
+	projectPostService                 interfaces.ProjectPostService
+	postCollaboratorService            interfaces.PostCollaboratorService
+	branchCollaboratorService          interfaces.BranchCollaboratorService
+	discussionService                  interfaces.DiscussionService
+	discussionContainerService         interfaces.DiscussionContainerService
+	tagService                         interfaces.TagService
+	scientificFieldTagContainerService interfaces.ScientificFieldTagContainerService
 }
 
 type ControllerEnv struct {
@@ -135,19 +136,23 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 	discussionContainerService := &services.DiscussionContainerService{
 		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
 	}
+	scientificFieldTagContainerService := &services.ScientificFieldTagContainerService{
+		ContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
+	}
 	renderService.BranchService = branchService // added afterwards since both require eachother
 
 	return ServiceEnv{
-		postService:                postService,
-		memberService:              memberService,
-		branchService:              branchService,
-		renderService:              renderService,
-		projectPostService:         projectPostService,
-		postCollaboratorService:    postCollaboratorService,
-		branchCollaboratorService:  branchCollaboratorService,
-		discussionService:          discussionService,
-		discussionContainerService: discussionContainerService,
-		tagService:                 tagService,
+		postService:                        postService,
+		memberService:                      memberService,
+		branchService:                      branchService,
+		renderService:                      renderService,
+		projectPostService:                 projectPostService,
+		postCollaboratorService:            postCollaboratorService,
+		branchCollaboratorService:          branchCollaboratorService,
+		discussionService:                  discussionService,
+		discussionContainerService:         discussionContainerService,
+		tagService:                         tagService,
+		scientificFieldTagContainerService: scientificFieldTagContainerService,
 	}
 }
 
@@ -184,7 +189,8 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 			BranchCollaboratorService: serviceEnv.branchCollaboratorService,
 		},
 		tagController: &controllers.TagController{
-			TagService: serviceEnv.tagService,
+			TagService:                         serviceEnv.tagService,
+			ScientificFieldTagContainerService: serviceEnv.scientificFieldTagContainerService,
 		},
 	}
 }

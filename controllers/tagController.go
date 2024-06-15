@@ -13,7 +13,8 @@ import (
 // @BasePath /api/v2
 
 type TagController struct {
-	TagService interfaces.TagService
+	TagService                         interfaces.TagService
+	ScientificFieldTagContainerService interfaces.ScientificFieldTagContainerService
 }
 
 // GetScientificFieldTag godoc
@@ -87,6 +88,22 @@ func (tagController *TagController) GetScientificTags(c *gin.Context) {
 	// if correct response send the tags back
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, tagDTOs)
+}
+
+// GetScientificFieldTagContainer godoc
+// @Summary 	Get scientific tag container
+// @Description Get a scientific tag container by its ID, to access its scientific tags
+// @Tags 		tags
+// @Accept  	json
+// @Param		containerID		path		string			true	"scientific tag container ID"
+// @Produce		json
+// @Success 	200 		{object}	models.ScientificFieldTagContainerDTO
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router 		/tags/scientific/containers/{containerID}	[get]
+func (tagController *TagController) GetScientificFieldTagContainer(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, nil)
 }
 
 // GetCompletionStatusTags godoc
