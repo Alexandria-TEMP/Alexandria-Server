@@ -98,9 +98,6 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		RenderService:                         renderService,
 		TagService:                            tagService,
 	}
-	memberService := &services.MemberService{
-		MemberRepository: repositoryEnv.memberRepository,
-	}
 	branchService := &services.BranchService{
 		BranchRepository:              repositoryEnv.branchRepository,
 		ClosedBranchRepository:        repositoryEnv.closedBranchRepository,
@@ -133,26 +130,27 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
 		MemberRepository:              repositoryEnv.memberRepository,
 	}
-	discussionContainerService := &services.DiscussionContainerService{
-		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
-	}
-	scientificFieldTagContainerService := &services.ScientificFieldTagContainerService{
-		ContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
-	}
 	renderService.BranchService = branchService // added afterwards since both require eachother
 
+	// TODO we really need an automated DI solution..
 	return ServiceEnv{
-		postService:                        postService,
-		memberService:                      memberService,
-		branchService:                      branchService,
-		renderService:                      renderService,
-		projectPostService:                 projectPostService,
-		postCollaboratorService:            postCollaboratorService,
-		branchCollaboratorService:          branchCollaboratorService,
-		discussionService:                  discussionService,
-		discussionContainerService:         discussionContainerService,
-		tagService:                         tagService,
-		scientificFieldTagContainerService: scientificFieldTagContainerService,
+		postService: postService,
+		memberService: &services.MemberService{
+			MemberRepository: repositoryEnv.memberRepository,
+		},
+		branchService:             branchService,
+		renderService:             renderService,
+		projectPostService:        projectPostService,
+		postCollaboratorService:   postCollaboratorService,
+		branchCollaboratorService: branchCollaboratorService,
+		discussionService:         discussionService,
+		discussionContainerService: &services.DiscussionContainerService{
+			DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
+		},
+		tagService: tagService,
+		scientificFieldTagContainerService: &services.ScientificFieldTagContainerService{
+			ContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
+		},
 	}
 }
 
