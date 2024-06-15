@@ -63,24 +63,3 @@ func ScientificFieldTagIntoIDs(subtags []*ScientificFieldTag) []uint {
 
 	return ids
 }
-
-// Helper function for JSON marshaling
-func ScientificFieldTagContainerIntoIDs(scientificFieldTags *ScientificFieldTagContainer) []uint {
-	if scientificFieldTags == nil {
-		ints := []uint{}
-		return ints
-	}
-
-	if len(scientificFieldTags.ScientificFieldTags) == 0 {
-		ints := []uint{}
-		return ints
-	}
-
-	ids := make([]uint, len(scientificFieldTags.ScientificFieldTags))
-
-	for i, tag := range scientificFieldTags.ScientificFieldTags {
-		ids[i] = tag.ID
-	}
-
-	return ids
-}
