@@ -11,6 +11,7 @@ import (
 )
 
 type ProjectPostService struct {
+	ClosedBranchRepository                database.ModelRepositoryInterface[*models.ClosedBranch]
 	PostRepository                        database.ModelRepositoryInterface[*models.Post]
 	ProjectPostRepository                 database.ModelRepositoryInterface[*models.ProjectPost]
 	MemberRepository                      database.ModelRepositoryInterface[*models.Member]
@@ -208,4 +209,42 @@ func (projectPostService *ProjectPostService) GetBranchesGroupedByReviewStatus(p
 	}
 
 	return groupedBranchesByStatus, nil
+}
+
+func (projectPostService *ProjectPostService) GetDiscussionContainersFromMergeHistory(projectPostID uint) (*models.DiscussionContainerProjectHistoryDTO, error) {
+	// Get each discussion container, from every closed & merged branch. Sources of containers:
+	// 1) On the underlying post
+	// 2) On each closed + merged branch
+	// Get the post's discussion container
+	projectPost, err := projectPostService.ProjectPostRepository.GetByID(projectPostID)
+	if err != nil {
+		return nil, fmt.Errorf("could not get project post: %w", err)
+	}
+
+	postDiscussionContainerID := projectPost.Post.DiscussionContainerID
+
+	// Get each closed + merged branch's discussion container
+	closedApprovedBranches, err := projectPostService.ClosedBranchRepository.Query("branch_review_decision = 'approved'")
+	if err != nil {
+		return nil, fmt.Errorf("could not get closed approved branches of project post: %w", err)
+	}
+
+	// Transform each branch into a 'branch + discussion container DTO', which holds
+	// the 'closed branch' ID, and the discussion container ID from the branch itself
+	discussionContainersWithBranches := make([]models.DiscussionContainerWithBranchDTO, len(closedApprovedBranches))
+
+	for i, closedApprovedBranch := range closedApprovedBranches {
+		discussionContainersWithBranches[i] = models.DiscussionContainerWithBranchDTO{
+			DiscussionContainerID: closedApprovedBranch.Branch.DiscussionContainerID,
+			ClosedBranchID:        closedApprovedBranch.ID,
+		}
+	}
+
+	// Create the final history DTO, holding all the discussion containers
+	discussionContainerHistory := models.DiscussionContainerProjectHistoryDTO{
+		CurrentDiscussionContainerID:     postDiscussionContainerID,
+		MergedBranchDiscussionContainers: discussionContainersWithBranches,
+	}
+
+	return &discussionContainerHistory, nil
 }
