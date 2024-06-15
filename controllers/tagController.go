@@ -103,7 +103,25 @@ func (tagController *TagController) GetScientificTags(c *gin.Context) {
 // @Failure		500
 // @Router 		/tags/scientific/containers/{containerID}	[get]
 func (tagController *TagController) GetScientificFieldTagContainer(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, nil)
+	// Get tag container ID from path
+	containerIDString := c.Param("containerID")
+
+	containerID, err := strconv.ParseUint(containerIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to parse container ID '%s' as unsigned integer: %s", containerIDString, err)})
+
+		return
+	}
+
+	// Fetch the container from the database
+	container, err := tagController.ScientificFieldTagContainerService.GetScientificFieldTagContainer(uint(containerID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to fetch scientific field tag container with ID %d: %s", containerID, err)})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, container)
 }
 
 // GetCompletionStatusTags godoc

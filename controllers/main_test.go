@@ -18,13 +18,14 @@ var (
 
 	branchController BranchController
 	memberController *MemberController
-	tagController    *TagController
+	tagController    TagController
 
-	mockBranchService             *mocks.MockBranchService
-	mockRenderService             *mocks.MockRenderService
-	mockBranchCollaboratorService *mocks.MockBranchCollaboratorService
-	mockMemberService             *mocks.MockMemberService
-	mockTagService                *mocks.MockTagService
+	mockBranchService                      *mocks.MockBranchService
+	mockRenderService                      *mocks.MockRenderService
+	mockBranchCollaboratorService          *mocks.MockBranchCollaboratorService
+	mockMemberService                      *mocks.MockMemberService
+	mockTagService                         *mocks.MockTagService
+	mockScientificFieldTagContainerService *mocks.MockScientificFieldTagContainerService
 
 	exampleBranch       models.Branch
 	exampleReview       models.BranchReview
@@ -129,6 +130,7 @@ func SetUpRouter() *gin.Engine {
 	router.GET("/api/v2/tags/scientific/:tagID", func(c *gin.Context) {
 		tagController.GetScientificFieldTag(c)
 	})
+	router.GET("/api/v2/tags/scientific/containers/:containerID", tagController.GetScientificFieldTagContainer)
 
 	return router
 }
