@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -671,4 +673,113 @@ func TestGetFiletree500(t *testing.T) {
 	defer responseRecorder.Result().Body.Close()
 
 	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Result().StatusCode)
+}
+
+func TestGetAllBranchCollaboratorsGoodWeather(t *testing.T) {
+	beforeEachBranch(t)
+
+	branchID := uint(15)
+
+	branch := &models.Branch{
+		Model: gorm.Model{ID: branchID},
+		Collaborators: []*models.BranchCollaborator{
+			{
+				Model:    gorm.Model{ID: 10},
+				Member:   models.Member{Model: gorm.Model{ID: 56}},
+				MemberID: 56,
+				BranchID: branchID,
+			},
+			{
+				Model:    gorm.Model{ID: 20},
+				Member:   models.Member{Model: gorm.Model{ID: 60}},
+				MemberID: 60,
+				BranchID: branchID,
+			},
+		},
+	}
+
+	// Setup mocks
+	// TODO this function should return *Branch, not Branch
+	mockBranchService.EXPECT().GetBranch(branchID).Return(*branch, nil).Times(1)
+
+	// Construct request
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/branches/collaborators/all/%d", branchID), http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+
+	// Read body
+	bytesJSON, err := io.ReadAll(responseRecorder.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Parse body
+	responseBranchCollaboratorDTOs := []*models.BranchCollaboratorDTO{}
+	if err := json.Unmarshal(bytesJSON, &responseBranchCollaboratorDTOs); err != nil {
+		t.Fatal(err)
+	}
+
+	// Check body
+	expectedBranchCollaboratorDTOs := []*models.BranchCollaboratorDTO{
+		{
+			ID:       10,
+			MemberID: 56,
+			BranchID: branchID,
+		},
+		{
+			ID:       20,
+			MemberID: 60,
+			BranchID: branchID,
+		},
+	}
+
+	assert.Equal(t, expectedBranchCollaboratorDTOs, responseBranchCollaboratorDTOs)
+}
+
+func TestGetAllBranchCollaboratorsBranchDNE(t *testing.T) {
+	beforeEachBranch(t)
+
+	branchID := uint(20)
+
+	// Setup mocks
+	// TODO use nil here instead of models.Branch{}, once the function returns *Branch instead of Branch
+	mockBranchService.EXPECT().GetBranch(branchID).Return(models.Branch{}, fmt.Errorf("oh no")).Times(1)
+
+	// Construct request
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/branches/collaborators/all/%d", branchID), http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}
+
+func TestGetAllBranchCollaboratorsBadBranchID(t *testing.T) {
+	beforeEachBranch(t)
+
+	// Construct request
+	req, err := http.NewRequest("GET", "/api/v2/branches/collaborators/all/badbranchID", http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }

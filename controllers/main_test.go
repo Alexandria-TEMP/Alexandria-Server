@@ -106,6 +106,7 @@ func SetUpRouter() *gin.Engine {
 	branchRouter.POST("/reviews", branchController.CreateReview)
 	branchRouter.GET("/:branchID/can-branchreview/:memberID", branchController.MemberCanReview)
 	branchRouter.GET("/collaborators/:collaboratorID", branchController.GetBranchCollaborator)
+	branchRouter.GET("/collaborators/all/:branchID", branchController.GetAllBranchCollaborators)
 	branchRouter.GET("/:branchID/render", branchController.GetRender)
 	branchRouter.GET("/:branchID/repository", branchController.GetProject)
 	branchRouter.POST("/:branchID", branchController.UploadProject)
