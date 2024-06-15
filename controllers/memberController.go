@@ -130,44 +130,45 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 // @Failure		500
 // @Router 		/members 		[put]
 func (memberController *MemberController) UpdateMember(c *gin.Context) {
-	// get the new member object
-	updatedMember := models.MemberDTO{}
-	err := c.BindJSON(&updatedMember)
+	// // get the new member object
+	// updatedMember := models.MemberDTO{}
+	// err := c.BindJSON(&updatedMember)
 
-	// check for errors
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated member from request body"})
+	// // check for errors
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated member from request body"})
 
-		return
-	}
+	// 	return
+	// }
 
-	// get array of strings, create array of tags
-	// TODO use a form for updating members instead
-	tagIDs := []uint{}
+	// // get array of strings, create array of tags
+	// // TODO use a form for updating members instead
+	// tagIDs := []uint{}
 
-	tagArray, err := memberController.TagService.GetTagsFromIDs(tagIDs)
-	tagContainer := models.ScientificFieldTagContainer{
-		ScientificFieldTags: tagArray,
-	}
+	// tagArray, err := memberController.TagService.GetTagsFromIDs(tagIDs)
+	// tagContainer := models.ScientificFieldTagContainer{
+	// 	ScientificFieldTags: tagArray,
+	// }
 
-	// if there is an error, return a 400 bad request status
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind tag ids from request body"})
+	// // if there is an error, return a 400 bad request status
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind tag ids from request body"})
 
-		return
-	}
+	// 	return
+	// }
 
-	err = memberController.MemberService.UpdateMember(&updatedMember, &tagContainer)
-	// check for errors again
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "cannot update member because no member with this ID exists"})
+	// err = memberController.MemberService.UpdateMember(&updatedMember, &tagContainer)
+	// // check for errors again
+	// if err != nil {
+	// 	c.JSON(http.StatusNotFound, gin.H{"error": "cannot update member because no member with this ID exists"})
 
-		return
-	}
+	// 	return
+	// }
 
-	// send back a positive response if member updated successfully
-	c.Header("Content-Type", "application/json")
-	c.Status(http.StatusOK)
+	// // send back a positive response if member updated successfully
+	// c.Header("Content-Type", "application/json")
+	// c.Status(http.StatusOK)
+	c.Status(http.StatusNotImplemented)
 }
 
 // DeleteMember godoc
