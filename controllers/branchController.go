@@ -9,6 +9,7 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -626,7 +627,7 @@ func (branchController *BranchController) GetClosedBranch(c *gin.Context) {
 // @Tags 		branches
 // @Param		branchID	path		string			true	"Branch ID"
 // @Produce		application/json
-// @Success 	200		{array}		// TODO
+// @Success 	200		{array}		models.BranchCollaboratorDTO
 // @Failure		400
 // @Failure		404
 // @Router		/branches/collaborators/all/{branchID}		[get]
@@ -651,6 +652,13 @@ func (branchController *BranchController) GetAllBranchCollaborators(c *gin.Conte
 
 	branchCollaborators := branch.Collaborators
 
-	// TODO return DTOs instead of an array
-	c.JSON(http.StatusOK, branchCollaborators)
+	// Turn each branch collaborator into a DTO
+	branchCollaboratorDTOs := make([]*models.BranchCollaboratorDTO, len(branchCollaborators))
+
+	for i, branchCollaborator := range branchCollaborators {
+		branchCollaboratorDTO := branchCollaborator.IntoDTO()
+		branchCollaboratorDTOs[i] = &branchCollaboratorDTO
+	}
+
+	c.JSON(http.StatusOK, branchCollaboratorDTOs)
 }
