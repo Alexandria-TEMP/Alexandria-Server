@@ -2215,7 +2215,7 @@ paths:
       summary: Returns all scientific tags
       tags:
       - tags
-  /tags/scientific/:tagID:
+  /tags/scientific/{tagID}:
     get:
       consumes:
       - application/json

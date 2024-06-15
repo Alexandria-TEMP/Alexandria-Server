@@ -2668,47 +2668,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/tags/scientific/:tagID": {
-            "get": {
-                "description": "Get a scientific field tag by tag ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tags"
-                ],
-                "summary": "Get scientific field tag from database",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "tag ID",
-                        "name": "tagID",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ScientificFieldTagDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
         "/tags/scientific/containers/{containerID}": {
             "get": {
                 "description": "Get a scientific tag container by its ID, to access its scientific tags",
@@ -2736,6 +2695,47 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.ScientificFieldTagContainerDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/tags/scientific/{tagID}": {
+            "get": {
+                "description": "Get a scientific field tag by tag ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Get scientific field tag from database",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "tag ID",
+                        "name": "tagID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ScientificFieldTagDTO"
                         }
                     },
                     "400": {
