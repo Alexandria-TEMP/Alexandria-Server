@@ -2708,6 +2708,47 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/tags/scientific/containers/{containerID}": {
+            "get": {
+                "description": "Get a scientific tag container by its ID, to access its scientific tags",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Get scientific tag container",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "scientific tag container ID",
+                        "name": "containerID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ScientificFieldTagContainerDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -2963,11 +3004,8 @@ const docTemplate = `{
                 "updatedCompletionStatus": {
                     "$ref": "#/definitions/models.ProjectCompletionStatus"
                 },
-                "updatedScientificFieldTagIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "updatedScientificFieldTagContainerID": {
+                    "type": "integer"
                 }
             }
         },
@@ -3131,11 +3169,8 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
-                "scientificFieldTagIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "scientificFieldTagContainerID": {
+                    "type": "integer"
                 }
             }
         },
@@ -3191,11 +3226,8 @@ const docTemplate = `{
                 "renderStatus": {
                     "$ref": "#/definitions/models.RenderStatus"
                 },
-                "scientificFieldTagIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "scientificFieldTagContainerID": {
+                    "type": "integer"
                 },
                 "title": {
                     "type": "string"
@@ -3299,6 +3331,20 @@ const docTemplate = `{
         },
         "models.ReportDTO": {
             "type": "object"
+        },
+        "models.ScientificFieldTagContainerDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "scientificFieldTagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "models.ScientificFieldTagDTO": {
             "type": "object",
