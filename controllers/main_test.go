@@ -17,14 +17,17 @@ var (
 	responseRecorder *httptest.ResponseRecorder
 
 	branchController BranchController
+	postController   PostController
 	memberController *MemberController
 	tagController    *TagController
 
 	mockBranchService             *mocks.MockBranchService
 	mockRenderService             *mocks.MockRenderService
 	mockBranchCollaboratorService *mocks.MockBranchCollaboratorService
+	mockPostCollaboratorService   *mocks.MockPostCollaboratorService
 	mockMemberService             *mocks.MockMemberService
 	mockTagService                *mocks.MockTagService
+	mockPostService               *mocks.MockPostService
 
 	exampleBranch       models.Branch
 	exampleReview       models.BranchReview
@@ -87,6 +90,8 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+// TODO this duplicates a LOT of server logic and so is a pain to maintain...
+// TODO could we call the actual server routing function (in router.go) instead?
 func SetUpRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router = gin.Default()
@@ -129,6 +134,9 @@ func SetUpRouter() *gin.Engine {
 	router.GET("/api/v2/tags/scientific/:tagID", func(c *gin.Context) {
 		tagController.GetScientificFieldTag(c)
 	})
+
+	postRouter := router.Group("/api/v2/posts")
+	postRouter.GET("/collaborators/all/:postID", postController.GetAllPostCollaborators)
 
 	return router
 }
