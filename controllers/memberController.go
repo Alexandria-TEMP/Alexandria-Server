@@ -142,8 +142,9 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	}
 
 	// get array of strings, create array of tags
-	tagIDs := updatedMember.ScientificFieldTagIDs
-	// call the method from the tag service
+	// TODO use a form for updating members instead
+	tagIDs := []uint{}
+
 	tagArray, err := memberController.TagService.GetTagsFromIDs(tagIDs)
 	tagContainer := models.ScientificFieldTagContainer{
 		ScientificFieldTags: tagArray,
