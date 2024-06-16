@@ -236,7 +236,7 @@ func (memberController *MemberController) LoginMember(c *gin.Context) {
 
 	loggedInMember, err := memberController.MemberService.LogInMember(form)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to log in member: %s", err.Error())})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("failed to log in: %s", err.Error())})
 
 		return
 	}
@@ -276,7 +276,7 @@ func (memberController *MemberController) RefreshToken(c *gin.Context) {
 
 	tokenPair, err := memberController.MemberService.RefreshToken(form)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to refresh access token: %s", err.Error())})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("failed to refresh access token: %s", err.Error())})
 
 		return
 	}
