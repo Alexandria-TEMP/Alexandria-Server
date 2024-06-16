@@ -23,10 +23,10 @@ type TagController struct {
 // @Accept  	json
 // @Param		tagID		path		string			true	"tag ID"
 // @Produce		json
-// @Success 	200 		{object}	models.ScientificFieldTagDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Success 	200 	{object}	models.ScientificFieldTagDTO
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/tags/scientific/:tagID	[get]
 func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 	// extract the id of the scientific field tag
@@ -64,8 +64,8 @@ func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 // @Tags 		tags
 // @Produce		json
 // @Success 	200		{array}		models.ScientificFieldTagDTO
-// @Failure		404
-// @Failure		500
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/tags/scientific	[get]
 func (tagController *TagController) GetScientificTags(c *gin.Context) {
 	tagObjects, err := tagController.TagService.GetAllScientificFieldTags()
@@ -95,8 +95,8 @@ func (tagController *TagController) GetScientificTags(c *gin.Context) {
 // @Tags		tags
 // @Produce		json
 // @Success		200		{array}		models.ProjectCompletionStatus
-// @Failure		400
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/tags/completion-status	[get]
 func (tagController *TagController) GetCompletionStatusTags(c *gin.Context) {
 	completionStatusTags := []models.PostType{models.Project, models.Question, models.Reflection}
@@ -110,8 +110,8 @@ func (tagController *TagController) GetCompletionStatusTags(c *gin.Context) {
 // @Tags		tags
 // @Produce		json
 // @Success		200		{array}		models.PostType
-// @Failure		400
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/tags/post-type	[get]
 func (tagController *TagController) GetPostTypeTags(c *gin.Context) {
 	postTypeTags := []models.PostType{models.Project, models.Question, models.Reflection}
@@ -125,8 +125,8 @@ func (tagController *TagController) GetPostTypeTags(c *gin.Context) {
 // @Tags		tags
 // @Produce		json
 // @Success		200		{array}		models.ProjectFeedbackPreference
-// @Failure		400
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/tags/feedback-preference	[get]
 func (tagController *TagController) GetFeedbackPreferenceTags(c *gin.Context) {
 	feedbackPreferenceTags := []models.ProjectFeedbackPreference{models.DiscussionFeedback, models.FormalFeedback}

@@ -27,9 +27,9 @@ type ProjectPostController struct {
 // @Accept  	json
 // @Param		projectPostID		path		string			true	"Post ID"
 // @Produce		json
-// @Success 	200 		{object}	models.ProjectPostDTO
-// @Failure		400
-// @Failure		404
+// @Success 	200 	{object}	models.ProjectPostDTO
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/project-posts/{projectPostID}	[get]
 func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Context) {
 	// extract projectPostID
@@ -63,8 +63,8 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 // @Param		form	body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/project-posts		[post]
 func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Context) {
 	form := forms.ProjectPostCreationForm{}
@@ -109,8 +109,8 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 // @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
 // @Produce		json
 // @Success 	200
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/project-posts 		[put]
 func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Context) {
 	// extract post
@@ -147,9 +147,9 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 // @Param		projectPostID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/project-posts/{projectPostID} 		[delete]
 func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Context) {
 	// delete method goes here
@@ -166,9 +166,9 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Con
 // @Param		url		query	string							true	"Github repository url"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400
-// @Failure		500
-// @Failure 	502
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
+// @Failure 	502		{object} 	utils.HTTPError
 // @Router 		/project-posts/from-github 		[post]
 func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(_ *gin.Context) {
 
@@ -182,9 +182,9 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Param		projectPostID		path		string			true	"project post ID"
 // @Produce		json
 // @Success 	200		{object}	models.DiscussionContainerProjectHistoryDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/project-posts/{projectPostID}/all-discussion-containers 	[get]
 func (projectPostController *ProjectPostController) GetProjectPostDiscussionContainers(c *gin.Context) {
 	// Get project post ID from path
@@ -216,9 +216,9 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussionCont
 // @Param		projectPostID	path	string	true	"project post ID"
 // @Produce		json
 // @Success		200		{object}	models.BranchesGroupedByReviewStatusDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/project-posts/{projectPostID}/branches-by-status	[get]
 func (projectPostController *ProjectPostController) GetProjectPostBranchesByStatus(c *gin.Context) {
 	// Get project post ID from path

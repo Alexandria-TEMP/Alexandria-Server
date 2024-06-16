@@ -29,8 +29,8 @@ type BranchController struct {
 // @Param		branchID		path		string			true	"Branch ID"
 // @Produce		application/json
 // @Success 	200 		{object}	models.BranchDTO
-// @Failure		400
-// @Failure		404
+// @Failure		400			{object} 	utils.HTTPError
+// @Failure		404			{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}	[get]
 func (branchController *BranchController) GetBranch(c *gin.Context) {
 	// extract branchID
@@ -65,8 +65,8 @@ func (branchController *BranchController) GetBranch(c *gin.Context) {
 // @Param		form	body	forms.BranchCreationForm	true	"Branch Creation Form"
 // @Produce		application/json
 // @Success 	200 	{object} 	models.BranchDTO
-// @Failure		404
-// @Failure		500
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches 		[post]
 func (branchController *BranchController) CreateBranch(c *gin.Context) {
 	// extract branchCreationForm
@@ -111,8 +111,8 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 // @Param		branch	body		models.BranchDTO		true	"Updated Branch"
 // @Produce		json
 // @Success 	200
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches 		[put]
 func (branchController *BranchController) UpdateBranch(_ *gin.Context) {
 }
@@ -125,9 +125,9 @@ func (branchController *BranchController) UpdateBranch(_ *gin.Context) {
 // @Param		branchID		path		string			true	"branch ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID} 		[delete]
 func (branchController *BranchController) DeleteBranch(c *gin.Context) {
 	// extract branchID
@@ -158,8 +158,8 @@ func (branchController *BranchController) DeleteBranch(c *gin.Context) {
 // @Param		branchID		path		string			true	"branch ID"
 // @Produce		json
 // @Success 	200		{array}		models.BranchOverallReviewStatus
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/review-statuses	[get]
 func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 	// extract branchID
@@ -193,8 +193,8 @@ func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 // @Param		reviewID			path		string			true	"branchreview ID"
 // @Produce		json
 // @Success 	200		{object}	models.BranchReviewDTO
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches/reviews/{reviewID}		[get]
 func (branchController *BranchController) GetReview(c *gin.Context) {
 	// extract reviewID
@@ -228,9 +228,9 @@ func (branchController *BranchController) GetReview(c *gin.Context) {
 // @Param		form	body	forms.ReviewCreationForm	true	"branchreview creation form"
 // @Produce		json
 // @Success 	200		{object}	models.BranchReviewDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches/reviews		[post]
 func (branchController *BranchController) CreateReview(c *gin.Context) {
 	// extract ReviewCreationForm
@@ -272,9 +272,9 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{object}		boolean
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/can-review/{memberID}		[get]
 func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 	// extract branchID
@@ -318,8 +318,8 @@ func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 // @Param		collaboratorID	path	string	true	"Collaborator ID"
 // @Produce		json
 // @Success 	200 		{object}	models.BranchCollaboratorDTO
-// @Failure		400
-// @Failure		404
+// @Failure		400			{object} 	utils.HTTPError
+// @Failure		404			{object} 	utils.HTTPError
 // @Router 		/branches/collaborators/{collaboratorID}	[get]
 func (branchController *BranchController) GetBranchCollaborator(c *gin.Context) {
 	// extract collaboratorID id
@@ -352,8 +352,8 @@ func (branchController *BranchController) GetBranchCollaborator(c *gin.Context) 
 // @Produce		text/html
 // @Success 	200		{object}	[]byte
 // @Success		202		{object}	[]byte
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/render	[get]
 func (branchController *BranchController) GetRender(c *gin.Context) {
 	// extract branchID id
@@ -398,8 +398,8 @@ func (branchController *BranchController) GetRender(c *gin.Context) {
 // @Param		branchID	path		string				true	"Branch ID"
 // @Produce		application/zip
 // @Success 	200		{object}	[]byte
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/repository	[get]
 func (branchController *BranchController) GetProject(c *gin.Context) {
 	// extract branch id
@@ -440,8 +440,8 @@ func (branchController *BranchController) GetProject(c *gin.Context) {
 // @Param		file			formData	file			true	"Repository to create"
 // @Produce		application/json
 // @Success 	200
-// @Failure		400
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/upload		[post]
 func (branchController *BranchController) UploadProject(c *gin.Context) {
 	// extract file
@@ -483,9 +483,9 @@ func (branchController *BranchController) UploadProject(c *gin.Context) {
 // @Param		branchID	path		string				true	"Branch ID"
 // @Produce		application/json
 // @Success 	200		{object}	map[string]int64
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/tree		[get]
 func (branchController *BranchController) GetFiletree(c *gin.Context) {
 	// extract branchID id
@@ -524,8 +524,8 @@ func (branchController *BranchController) GetFiletree(c *gin.Context) {
 // @Param		filepath	path		string				true	"Filepath"
 // @Produce		application/octet-stream
 // @Success 	200		{object}	[]byte
-// @Failure		404
-// @Failure		500
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/file/{filepath}	[get]
 func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 	// extract branchID id
@@ -592,9 +592,9 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		application/json
 // @Success 	200		{array}		models.DiscussionDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/branches/{branchID}/discussions 	[get]
 func (branchController *BranchController) GetDiscussions(_ *gin.Context) {
 	// TODO ahh its paginated
@@ -607,8 +607,8 @@ func (branchController *BranchController) GetDiscussions(_ *gin.Context) {
 // @Param		closedBranchID	path		string			true	"Closed Branch ID"
 // @Produce		application/json
 // @Success 	200		{array}		models.ClosedBranchDTO
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router		/branches/closed/{closedBranchID}		[get]
 func (branchController *BranchController) GetClosedBranch(c *gin.Context) {
 	// extract branchID id
@@ -640,8 +640,8 @@ func (branchController *BranchController) GetClosedBranch(c *gin.Context) {
 // @Param		branchID	path		string			true	"Branch ID"
 // @Produce		application/json
 // @Success 	200		{array}		models.BranchCollaboratorDTO
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router		/branches/collaborators/all/{branchID}		[get]
 func (branchController *BranchController) GetAllBranchCollaborators(c *gin.Context) {
 	// Get branch ID from path param
