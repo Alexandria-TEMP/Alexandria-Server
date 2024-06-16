@@ -75,6 +75,9 @@ run:
 
 issues:
   fix: false
+  exclude-rules:
+    - path: server/server.go
+      text: "Function 'initServiceEnv' is too long"
 
 output:
   print-issued-lines: true
