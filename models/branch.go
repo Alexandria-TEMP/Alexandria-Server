@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"slices"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -71,7 +72,7 @@ type Branch struct {
 type BranchDTO struct {
 	ID uint `json:"id" example:"1"`
 	// MR's proposed changes
-	UpdatedPostTitle                     *string                  `json:"UpdatedPostTitle" example:"Updated Project Post Title"`
+	UpdatedPostTitle                     *string                  `json:"updatedPostTitle" example:"Updated Project Post Title"`
 	UpdatedCompletionStatus              *ProjectCompletionStatus `json:"updatedCompletionStatus" example:"ongoing"`
 	UpdatedScientificFieldTagContainerID *uint                    `json:"updatedScientificFieldTagContainerID" example:"1"`
 	// MR metadata
@@ -82,6 +83,8 @@ type BranchDTO struct {
 	RenderStatus              RenderStatus              `json:"renderStatus" example:"pending"`
 	DiscussionContainerID     uint                      `json:"discussionContainerID" example:"1"`
 	BranchOverallReviewStatus BranchOverallReviewStatus `json:"branchOverallReviewStatus" example:"open for review"`
+	CreatedAt                 time.Time                 `json:"createdAt"`
+	UpdatedAt                 time.Time                 `json:"updatedAt"`
 }
 
 func (model *Branch) GetID() uint {
@@ -101,6 +104,8 @@ func (model *Branch) IntoDTO() BranchDTO {
 		model.RenderStatus,
 		model.DiscussionContainerID,
 		model.BranchOverallReviewStatus,
+		model.CreatedAt,
+		model.UpdatedAt,
 	}
 }
 

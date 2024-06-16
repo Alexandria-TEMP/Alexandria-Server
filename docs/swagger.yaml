@@ -207,6 +207,8 @@ definitions:
         items:
           type: integer
         type: array
+      createdAt:
+        type: string
       discussionContainerID:
         example: 1
         type: integer
@@ -226,6 +228,8 @@ definitions:
         items:
           type: integer
         type: array
+      updatedAt:
+        type: string
       updatedCompletionStatus:
         allOf:
         - $ref: '#/definitions/models.ProjectCompletionStatus'
@@ -432,6 +436,8 @@ definitions:
         items:
           type: integer
         type: array
+      createdAt:
+        type: string
       discussionContainerID:
         example: 1
         type: integer
@@ -451,6 +457,8 @@ definitions:
         type: integer
       title:
         example: Post Title
+        type: string
+      updatedAt:
         type: string
     type: object
   models.PostType:
@@ -489,6 +497,8 @@ definitions:
         items:
           type: integer
         type: array
+      createdAt:
+        type: string
       id:
         example: 1
         type: integer
@@ -510,9 +520,15 @@ definitions:
         - $ref: '#/definitions/models.ProjectCompletionStatus'
         example: ongoing
       projectFeedbackPreference:
+<<<<<<< HEAD
         allOf:
         - $ref: '#/definitions/models.ProjectFeedbackPreference'
         example: formal feedback
+=======
+        $ref: '#/definitions/models.ProjectFeedbackPreference'
+      updatedAt:
+        type: string
+>>>>>>> main
     type: object
   models.ProjectReviewStatus:
     enum:

@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
@@ -12,11 +13,14 @@ func TestBranchJSONMarshaling(t *testing.T) {
 	projectPostID := uint(45)
 	updatedPostTitle := "Updated Post Title"
 	updatedCompletionStatus := Idea
+
+	createdAt := time.Now().Add(time.Minute).UTC()
+	updatedAt := time.Now().Add(time.Hour).UTC()
 	updatedScientificFieldTagContainerID := uint(20)
 
 	// This model...
 	model := Branch{
-		Model: gorm.Model{ID: 44},
+		Model: gorm.Model{ID: 44, CreatedAt: createdAt, UpdatedAt: updatedAt},
 		Collaborators: []*BranchCollaborator{
 			{Model: gorm.Model{ID: 100}},
 			{Model: gorm.Model{ID: 50}},
@@ -55,6 +59,8 @@ func TestBranchJSONMarshaling(t *testing.T) {
 		DiscussionContainerID:                5,
 		RenderStatus:                         Pending,
 		BranchOverallReviewStatus:            BranchOpenForReview,
+		CreatedAt:                            createdAt,
+		UpdatedAt:                            updatedAt,
 	}
 
 	dto := BranchDTO{}

@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"slices"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -48,6 +49,8 @@ type PostDTO struct {
 	ScientificFieldTagContainerID uint         `json:"scientificFieldTagContainerID" example:"1"`
 	DiscussionContainerID         uint         `json:"discussionContainerID" example:"1"`
 	RenderStatus                  RenderStatus `json:"renderStatus" example:"success"`
+	CreatedAt                     time.Time    `json:"createdAt"`
+	UpdatedAt                     time.Time    `json:"updatedAt"`
 }
 
 func (model *Post) GetID() uint {
@@ -63,6 +66,8 @@ func (model *Post) IntoDTO() PostDTO {
 		model.ScientificFieldTagContainerID,
 		model.DiscussionContainerID,
 		model.RenderStatus,
+		model.CreatedAt,
+		model.UpdatedAt,
 	}
 }
 

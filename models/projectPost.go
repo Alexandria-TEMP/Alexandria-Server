@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"slices"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -78,6 +79,8 @@ type ProjectPostDTO struct {
 	ProjectCompletionStatus   ProjectCompletionStatus   `json:"projectCompletionStatus" example:"ongoing"`
 	ProjectFeedbackPreference ProjectFeedbackPreference `json:"projectFeedbackPreference" example:"formal feedback"`
 	PostReviewStatus          ProjectReviewStatus       `json:"postReviewStatus" example:"open"`
+	CreatedAt                 time.Time                 `json:"createdAt"`
+	UpdatedAt                 time.Time                 `json:"updatedAt"`
 }
 
 func (model *ProjectPost) GetID() uint {
@@ -93,6 +96,8 @@ func (model *ProjectPost) IntoDTO() ProjectPostDTO {
 		model.ProjectCompletionStatus,
 		model.ProjectFeedbackPreference,
 		model.PostReviewStatus,
+		model.CreatedAt,
+		model.UpdatedAt,
 	}
 }
 

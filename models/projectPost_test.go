@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -22,8 +23,11 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 		DiscussionContainerID:       50,
 	}
 
+	createdAt := time.Now().Add(time.Minute).UTC()
+	updatedAt := time.Now().Add(time.Hour).UTC()
+
 	model := ProjectPost{
-		Model:        gorm.Model{ID: 42},
+		Model:        gorm.Model{ID: 42, CreatedAt: createdAt, UpdatedAt: updatedAt},
 		Post:         post,
 		PostID:       88,
 		OpenBranches: []*Branch{{Model: gorm.Model{ID: 44}}},
@@ -45,6 +49,8 @@ func TestProjectPostJSONMarshaling(t *testing.T) {
 		ProjectCompletionStatus:   Completed,
 		ProjectFeedbackPreference: FormalFeedback,
 		PostReviewStatus:          RevisionNeeded,
+		CreatedAt:                 createdAt,
+		UpdatedAt:                 updatedAt,
 	}
 
 	dto := ProjectPostDTO{}

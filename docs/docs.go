@@ -3647,6 +3647,9 @@ const docTemplate = `{
                         1
                     ]
                 },
+                "createdAt": {
+                    "type": "string"
+                },
                 "discussionContainerID": {
                     "type": "integer",
                     "example": 1
@@ -3675,6 +3678,9 @@ const docTemplate = `{
                     "example": [
                         1
                     ]
+                },
+                "updatedAt": {
+                    "type": "string"
                 },
                 "updatedCompletionStatus": {
                     "allOf": [
@@ -3979,6 +3985,9 @@ const docTemplate = `{
                         1
                     ]
                 },
+                "createdAt": {
+                    "type": "string"
+                },
                 "discussionContainerID": {
                     "type": "integer",
                     "example": 1
@@ -4008,8 +4017,15 @@ const docTemplate = `{
                     "example": 1
                 },
                 "title": {
+<<<<<<< HEAD
                     "type": "string",
                     "example": "Post Title"
+=======
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+>>>>>>> main
                 }
             }
         },
@@ -4062,6 +4078,9 @@ const docTemplate = `{
                         1
                     ]
                 },
+                "createdAt": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer",
                     "example": 1
@@ -4096,12 +4115,19 @@ const docTemplate = `{
                     "example": "ongoing"
                 },
                 "projectFeedbackPreference": {
+<<<<<<< HEAD
                     "allOf": [
                         {
                             "$ref": "#/definitions/models.ProjectFeedbackPreference"
                         }
                     ],
                     "example": "formal feedback"
+=======
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                },
+                "updatedAt": {
+                    "type": "string"
+>>>>>>> main
                 }
             }
         },
