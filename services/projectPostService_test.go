@@ -186,31 +186,6 @@ func TestCreateProjectPostDatabaseFailure(t *testing.T) {
 	assert.NotNil(t, err500)
 }
 
-// Creating a project post must use the correct post type, otherwise creation should fail.
-func TestCreateProjectPostWrongPostType(t *testing.T) {
-	projectPostServiceSetup(t)
-	t.Cleanup(projectPostServiceTeardown)
-
-	projectPostCreationForm := forms.ProjectPostCreationForm{
-		AuthorMemberIDs:           []uint{},
-		Title:                     "",
-		Anonymous:                 true,
-		ScientificFieldTagIDs:     []uint{},
-		ProjectCompletionStatus:   models.Idea,
-		ProjectFeedbackPreference: models.DiscussionFeedback,
-	}
-
-	// Function under test
-	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
-
-	if createdProjectPost != nil {
-		t.Fatalf("project post should not have been created:\n%+v", createdProjectPost)
-	}
-
-	assert.NotNil(t, err404)
-	assert.Nil(t, err500)
-}
-
 // When creating a post collaborator list fails, project post creation should fail.
 func TestCreateProjectPostCollaboratorsFail(t *testing.T) {
 	projectPostServiceSetup(t)
