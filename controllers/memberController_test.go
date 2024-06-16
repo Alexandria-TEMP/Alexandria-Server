@@ -269,7 +269,7 @@ func TestLoginMember4002(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
-func TestLoginMember404(t *testing.T) {
+func TestLoginMember401(t *testing.T) {
 	beforeEachMember(t)
 
 	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(nil, errors.New("failed"))
@@ -283,7 +283,7 @@ func TestLoginMember404(t *testing.T) {
 	responseJSON, _ := io.ReadAll(responseRecorder.Body)
 	_ = json.Unmarshal(responseJSON, &responsemember)
 
-	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+	assert.Equal(t, http.StatusUnauthorized, responseRecorder.Result().StatusCode)
 }
 
 func TestRefreshToken200(t *testing.T) {
@@ -334,7 +334,7 @@ func TestRefreshToken4002(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
-func TestRefreshToken404(t *testing.T) {
+func TestRefreshToken401(t *testing.T) {
 	beforeEachMember(t)
 
 	mockMemberService.EXPECT().RefreshToken(&exampleTokenRefreshForm).Return(nil, errors.New("failed"))
@@ -348,5 +348,5 @@ func TestRefreshToken404(t *testing.T) {
 	responseJSON, _ := io.ReadAll(responseRecorder.Body)
 	_ = json.Unmarshal(responseJSON, &responsemember)
 
-	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+	assert.Equal(t, http.StatusUnauthorized, responseRecorder.Result().StatusCode)
 }
