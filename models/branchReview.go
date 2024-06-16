@@ -39,7 +39,7 @@ type BranchReviewDTO struct {
 	BranchID             uint                 `json:"branchID" example:"1"`
 	MemberID             uint                 `json:"memberID" example:"1"`
 	BranchReviewDecision BranchReviewDecision `json:"branchReviewDecision" example:"approved"`
-	Feedback             string               `json:"feedback" example:"Feedback"`
+	Feedback             string               `json:"feedback" example:"Fantastic work!"`
 	CreatedAt            time.Time            `json:"createdAt"`
 }
 

@@ -4,7 +4,7 @@ import "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/a
 
 type ProjectPostCreationForm struct {
 	AuthorMemberIDs           []uint                           `json:"authorMemberIDs" example:"1"`
-	Title                     string                           `json:"title" example:"Post Title"`
+	Title                     string                           `json:"title" example:"Project Post Title"`
 	Anonymous                 bool                             `json:"anonymous" example:"false"`
 	ScientificFieldTagIDs     []uint                           `json:"scientificFieldTagIDs" example:"1"`
 	ProjectCompletionStatus   models.ProjectCompletionStatus   `json:"projectCompletionStatus" example:"ongoing"`

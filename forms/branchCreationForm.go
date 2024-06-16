@@ -8,7 +8,7 @@ type BranchCreationForm struct {
 	// TODO New files to add to the version
 
 	// Changes made by the branch
-	UpdatedPostTitle           *string                           `json:"updatedPostTitle" example:"Updated Post Title"`
+	UpdatedPostTitle           *string                           `json:"updatedPostTitle" example:"Updated Project Post Title"`
 	UpdatedCompletionStatus    *models.ProjectCompletionStatus   `json:"updatedCompletionStatus" example:"completed"`
 	UpdatedScientificFieldIDs  []uint                            `json:"updatedScientificFieldIDs" example:"1"`
 	UpdatedFeedbackPreferences *models.ProjectFeedbackPreference `json:"updatedFeedbackPreferences" example:"formal feedback"`

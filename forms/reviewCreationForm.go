@@ -8,7 +8,7 @@ type ReviewCreationForm struct {
 	BranchID             uint                        `json:"branchID" example:"1"`
 	ReviewingMemberID    uint                        `json:"reviewingMemberID" example:"1"`
 	BranchReviewDecision models.BranchReviewDecision `json:"branchReviewDecision" example:"approved"`
-	Feedback             string                      `json:"feedback" example:"Feedback"`
+	Feedback             string                      `json:"feedback" example:"Fantastic work!"`
 }
 
 // Whether the form itself contains valid data. Should NOT contain business logic (such as "if Foo > 0, Bar may not be 1")

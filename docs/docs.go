@@ -125,10 +125,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.ClosedBranchDTO"
-                            }
+                            "$ref": "#/definitions/models.ClosedBranchDTO"
                         }
                     },
                     "400": {
@@ -3385,7 +3382,7 @@ const docTemplate = `{
                 "updatedPostTitle": {
                     "description": "Changes made by the branch",
                     "type": "string",
-                    "example": "Updated Post Title"
+                    "example": "Updated Project Post Title"
                 },
                 "updatedScientificFieldIDs": {
                     "type": "array",
@@ -3412,7 +3409,7 @@ const docTemplate = `{
                 },
                 "text": {
                     "type": "string",
-                    "example": "Discussion text"
+                    "example": "Discussion text."
                 }
             }
         },
@@ -3542,7 +3539,7 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string",
-                    "example": "Post Title"
+                    "example": "Project Post Title"
                 }
             }
         },
@@ -3557,7 +3554,8 @@ const docTemplate = `{
                 },
                 "parentID": {
                     "description": "The Discussion this Discussion will be added to",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -3581,7 +3579,7 @@ const docTemplate = `{
                 },
                 "feedback": {
                     "type": "string",
-                    "example": "Feedback"
+                    "example": "Fantastic work!"
                 },
                 "reviewingMemberID": {
                     "type": "integer",
@@ -3594,7 +3592,8 @@ const docTemplate = `{
             "properties": {
                 "containerID": {
                     "description": "The DiscussionContainer this Discussion will be added to",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "discussion": {
                     "$ref": "#/definitions/forms.DiscussionCreationForm"
@@ -3624,7 +3623,7 @@ const docTemplate = `{
                 "UpdatedPostTitle": {
                     "description": "MR's proposed changes",
                     "type": "string",
-                    "example": "Updated Post Title"
+                    "example": "Updated Project Post Title"
                 },
                 "branchOverallReviewStatus": {
                     "allOf": [

@@ -119,10 +119,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.ClosedBranchDTO"
-                            }
+                            "$ref": "#/definitions/models.ClosedBranchDTO"
                         }
                     },
                     "400": {
@@ -3379,7 +3376,7 @@
                 "updatedPostTitle": {
                     "description": "Changes made by the branch",
                     "type": "string",
-                    "example": "Updated Post Title"
+                    "example": "Updated Project Post Title"
                 },
                 "updatedScientificFieldIDs": {
                     "type": "array",
@@ -3406,7 +3403,7 @@
                 },
                 "text": {
                     "type": "string",
-                    "example": "Discussion text"
+                    "example": "Discussion text."
                 }
             }
         },
@@ -3536,7 +3533,7 @@
                 },
                 "title": {
                     "type": "string",
-                    "example": "Post Title"
+                    "example": "Project Post Title"
                 }
             }
         },
@@ -3551,7 +3548,8 @@
                 },
                 "parentID": {
                     "description": "The Discussion this Discussion will be added to",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -3575,7 +3573,7 @@
                 },
                 "feedback": {
                     "type": "string",
-                    "example": "Feedback"
+                    "example": "Fantastic work!"
                 },
                 "reviewingMemberID": {
                     "type": "integer",
@@ -3588,7 +3586,8 @@
             "properties": {
                 "containerID": {
                     "description": "The DiscussionContainer this Discussion will be added to",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "discussion": {
                     "$ref": "#/definitions/forms.DiscussionCreationForm"
@@ -3618,7 +3617,7 @@
                 "UpdatedPostTitle": {
                     "description": "MR's proposed changes",
                     "type": "string",
-                    "example": "Updated Post Title"
+                    "example": "Updated Project Post Title"
                 },
                 "branchOverallReviewStatus": {
                     "allOf": [

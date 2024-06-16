@@ -607,7 +607,7 @@ func (branchController *BranchController) GetDiscussions(c *gin.Context) {
 // @Tags 		branches
 // @Param		closedBranchID	path		string			true	"Closed Branch ID"
 // @Produce		application/json
-// @Success 	200		{array}		models.ClosedBranchDTO
+// @Success 	200		{object}	models.ClosedBranchDTO
 // @Failure		400		{object} 	utils.HTTPError
 // @Failure		404		{object} 	utils.HTTPError
 // @Router		/branches/closed/{closedBranchID}		[get]

@@ -5,7 +5,7 @@ type DiscussionCreationForm struct {
 	Anonymous bool `json:"anonymous" example:"false"`
 	MemberID  uint `json:"memberID" example:"1"`
 
-	Text string `json:"text" example:"Discussion text"`
+	Text string `json:"text" example:"Discussion text."`
 }
 
 // Whether the form itself contains valid data. Should NOT contain business logic (such as "if Foo > 0, Bar may not be 1")
@@ -15,7 +15,7 @@ func (form *DiscussionCreationForm) IsValid() bool {
 
 type RootDiscussionCreationForm struct {
 	// The DiscussionContainer this Discussion will be added to
-	ContainerID uint `json:"containerID"`
+	ContainerID uint `json:"containerID" example:"1"`
 
 	DiscussionCreationForm DiscussionCreationForm `json:"discussion"`
 }
@@ -26,7 +26,7 @@ func (form *RootDiscussionCreationForm) IsValid() bool {
 
 type ReplyDiscussionCreationForm struct {
 	// The Discussion this Discussion will be added to
-	ParentID uint `json:"parentID"`
+	ParentID uint `json:"parentID" example:"1"`
 
 	DiscussionCreationForm DiscussionCreationForm `json:"discussion"`
 }

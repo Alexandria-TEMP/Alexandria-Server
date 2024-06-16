@@ -28,7 +28,7 @@ definitions:
         example: formal feedback
       updatedPostTitle:
         description: Changes made by the branch
-        example: Updated Post Title
+        example: Updated Project Post Title
         type: string
       updatedScientificFieldIDs:
         example:
@@ -47,7 +47,7 @@ definitions:
         example: 1
         type: integer
       text:
-        example: Discussion text
+        example: Discussion text.
         type: string
     type: object
   forms.MemberCreationForm:
@@ -134,7 +134,7 @@ definitions:
           type: integer
         type: array
       title:
-        example: Post Title
+        example: Project Post Title
         type: string
     type: object
   forms.ProjectPostFilterForm:
@@ -145,6 +145,7 @@ definitions:
         $ref: '#/definitions/forms.DiscussionCreationForm'
       parentID:
         description: The Discussion this Discussion will be added to
+        example: 1
         type: integer
     type: object
   forms.ReportCreationForm:
@@ -159,7 +160,7 @@ definitions:
         - $ref: '#/definitions/models.BranchReviewDecision'
         example: approved
       feedback:
-        example: Feedback
+        example: Fantastic work!
         type: string
       reviewingMemberID:
         example: 1
@@ -169,6 +170,7 @@ definitions:
     properties:
       containerID:
         description: The DiscussionContainer this Discussion will be added to
+        example: 1
         type: integer
       discussion:
         $ref: '#/definitions/forms.DiscussionCreationForm'
@@ -189,7 +191,7 @@ definitions:
     properties:
       UpdatedPostTitle:
         description: MR's proposed changes
-        example: Updated Post Title
+        example: Updated Project Post Title
         type: string
       branchOverallReviewStatus:
         allOf:
@@ -1003,9 +1005,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.ClosedBranchDTO'
-            type: array
+            $ref: '#/definitions/models.ClosedBranchDTO'
         "400":
           description: Bad Request
           schema:

@@ -71,7 +71,7 @@ type Branch struct {
 type BranchDTO struct {
 	ID uint `json:"id" example:"1"`
 	// MR's proposed changes
-	UpdatedPostTitle                     *string                  `json:"UpdatedPostTitle" example:"Updated Post Title"`
+	UpdatedPostTitle                     *string                  `json:"UpdatedPostTitle" example:"Updated Project Post Title"`
 	UpdatedCompletionStatus              *ProjectCompletionStatus `json:"updatedCompletionStatus" example:"ongoing"`
 	UpdatedScientificFieldTagContainerID *uint                    `json:"updatedScientificFieldTagContainerID" example:"1"`
 	// MR metadata
