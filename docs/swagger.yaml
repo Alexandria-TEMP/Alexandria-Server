@@ -35,21 +35,6 @@ definitions:
       text:
         type: string
     type: object
-  forms.GroupedBranchForm:
-    properties:
-      openForReviewIDs:
-        items:
-          type: integer
-        type: array
-      peerReviewedIDs:
-        items:
-          type: integer
-        type: array
-      rejectedIDs:
-        items:
-          type: integer
-        type: array
-    type: object
   forms.MemberCreationForm:
     properties:
       email:
@@ -207,6 +192,21 @@ definitions:
     x-enum-varnames:
     - Rejected
     - Approved
+  models.BranchesGroupedByReviewStatusDTO:
+    properties:
+      approvedClosedBranchIDs:
+        items:
+          type: integer
+        type: array
+      openBranchIDs:
+        items:
+          type: integer
+        type: array
+      rejectedClosedBranchIDs:
+        items:
+          type: integer
+        type: array
+    type: object
   models.ClosedBranchDTO:
     properties:
       branchID:
@@ -2126,9 +2126,9 @@ paths:
       consumes:
       - application/json
       description: Returns all branch IDs of this project post, grouped by each branch's
-        branchreview status
+        review status
       parameters:
-      - description: post ID
+      - description: project post ID
         in: path
         name: projectPostID
         required: true
@@ -2139,14 +2139,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/forms.GroupedBranchForm'
+            $ref: '#/definitions/models.BranchesGroupedByReviewStatusDTO'
         "400":
           description: Bad Request
         "404":
           description: Not Found
         "500":
           description: Internal Server Error
-      summary: Returns branch IDs grouped by each branch status
+      summary: Get branch IDs by review status
       tags:
       - project-posts
   /project-posts/from-github:

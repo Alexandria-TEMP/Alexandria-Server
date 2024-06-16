@@ -129,3 +129,11 @@ func reviewsToIDs(reviews []*BranchReview) []uint {
 
 	return ids
 }
+
+// Holds IDs of Branches and ClosedBranches
+// Categorized by their BranchReviewStatus
+type BranchesGroupedByReviewStatusDTO struct {
+	OpenBranchIDs           []uint `json:"openBranchIDs"`
+	RejectedClosedBranchIDs []uint `json:"rejectedClosedBranchIDs"`
+	ApprovedClosedBranchIDs []uint `json:"approvedClosedBranchIDs"`
+}
