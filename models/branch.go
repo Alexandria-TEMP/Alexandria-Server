@@ -72,9 +72,9 @@ type Branch struct {
 type BranchDTO struct {
 	ID uint `json:"id"`
 	// MR's proposed changes
-	UpdatedPostTitle             *string                  `json:"UpdatedPostTitle"`
-	UpdatedCompletionStatus      *ProjectCompletionStatus `json:"updatedCompletionStatus"`
-	UpdatedScientificFieldTagIDs []uint                   `json:"updatedScientificFieldTagIDs"`
+	UpdatedPostTitle                     *string                  `json:"UpdatedPostTitle"`
+	UpdatedCompletionStatus              *ProjectCompletionStatus `json:"updatedCompletionStatus"`
+	UpdatedScientificFieldTagContainerID *uint                    `json:"updatedScientificFieldTagContainerID"`
 	// MR metadata
 	CollaboratorIDs           []uint                    `json:"collaboratorIDs"`
 	ReviewIDs                 []uint                    `json:"reviewIDs"`
@@ -96,7 +96,7 @@ func (model *Branch) IntoDTO() BranchDTO {
 		model.ID,
 		model.UpdatedPostTitle,
 		model.UpdatedCompletionStatus,
-		ScientificFieldTagContainerIntoIDs(model.UpdatedScientificFieldTagContainer),
+		model.UpdatedScientificFieldTagContainerID,
 		branchCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
 		model.ProjectPostID,

@@ -21,13 +21,13 @@ type Member struct {
 }
 
 type MemberDTO struct {
-	ID                    uint   `json:"id"`
-	FirstName             string `json:"firstName"`
-	LastName              string `json:"lastName"`
-	Email                 string `json:"email"`
-	Password              string `json:"password"`
-	Institution           string `json:"institution"`
-	ScientificFieldTagIDs []uint `json:"scientificFieldTagIDs"`
+	ID                            uint   `json:"id"`
+	FirstName                     string `json:"firstName"`
+	LastName                      string `json:"lastName"`
+	Email                         string `json:"email"`
+	Password                      string `json:"password"`
+	Institution                   string `json:"institution"`
+	ScientificFieldTagContainerID uint   `json:"scientificFieldTagContainerID"`
 }
 
 type MemberShortFormDTO struct {
@@ -48,7 +48,7 @@ func (model *Member) IntoDTO() MemberDTO {
 		model.Email,
 		model.Password,
 		model.Institution,
-		ScientificFieldTagContainerIntoIDs(&model.ScientificFieldTagContainer),
+		model.ScientificFieldTagContainerID,
 	}
 }
 

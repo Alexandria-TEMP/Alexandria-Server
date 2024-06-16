@@ -13,7 +13,8 @@ import (
 // @BasePath /api/v2
 
 type TagController struct {
-	TagService interfaces.TagService
+	TagService                         interfaces.TagService
+	ScientificFieldTagContainerService interfaces.ScientificFieldTagContainerService
 }
 
 // GetScientificFieldTag godoc
@@ -27,7 +28,7 @@ type TagController struct {
 // @Failure		400		{object} 	utils.HTTPError
 // @Failure		404		{object} 	utils.HTTPError
 // @Failure		500		{object} 	utils.HTTPError
-// @Router 		/tags/scientific/:tagID	[get]
+// @Router 		/tags/scientific/{tagID}	[get]
 func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 	// extract the id of the scientific field tag
 	tagIDStr := c.Param("tagID")
@@ -87,6 +88,40 @@ func (tagController *TagController) GetScientificTags(c *gin.Context) {
 	// if correct response send the tags back
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, tagDTOs)
+}
+
+// GetScientificFieldTagContainer godoc
+// @Summary 	Get scientific tag container
+// @Description Get a scientific tag container by its ID, to access its scientific tags
+// @Tags 		tags
+// @Accept  	json
+// @Param		containerID		path		string			true	"scientific tag container ID"
+// @Produce		json
+// @Success 	200 		{object}	models.ScientificFieldTagContainerDTO
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router 		/tags/scientific/containers/{containerID}	[get]
+func (tagController *TagController) GetScientificFieldTagContainer(c *gin.Context) {
+	// Get tag container ID from path
+	containerIDString := c.Param("containerID")
+
+	containerID, err := strconv.ParseUint(containerIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to parse container ID '%s' as unsigned integer: %s", containerIDString, err)})
+
+		return
+	}
+
+	// Fetch the container from the database
+	container, err := tagController.ScientificFieldTagContainerService.GetScientificFieldTagContainer(uint(containerID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to fetch scientific field tag container with ID %d: %s", containerID, err)})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, container)
 }
 
 // GetCompletionStatusTags godoc

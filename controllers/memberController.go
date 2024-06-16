@@ -129,43 +129,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 // @Failure		500		{object} 	utils.HTTPError
 // @Router 		/members 		[put]
 func (memberController *MemberController) UpdateMember(c *gin.Context) {
-	// get the new member object
-	updatedMember := models.MemberDTO{}
-	err := c.BindJSON(&updatedMember)
-
-	// check for errors
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind updated member from request body: %s", err)})
-
-		return
-	}
-
-	// get array of strings, create array of tags
-	tagIDs := updatedMember.ScientificFieldTagIDs
-	// call the method from the tag service
-	tagArray, err := memberController.TagService.GetTagsFromIDs(tagIDs)
-	tagContainer := models.ScientificFieldTagContainer{
-		ScientificFieldTags: tagArray,
-	}
-
-	// if there is an error, return a 400 bad request status
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to bind tag IDs from request body: %s", err)})
-
-		return
-	}
-
-	err = memberController.MemberService.UpdateMember(&updatedMember, &tagContainer)
-	// check for errors again
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to update member: %s", err)})
-
-		return
-	}
-
-	// send back a positive response if member updated successfully
-	c.Header("Content-Type", "application/json")
-	c.Status(http.StatusOK)
+	c.Status(http.StatusNotImplemented)
 }
 
 // DeleteMember godoc

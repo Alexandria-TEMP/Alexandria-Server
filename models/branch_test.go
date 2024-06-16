@@ -16,6 +16,7 @@ func TestBranchJSONMarshaling(t *testing.T) {
 
 	createdAt := time.Now().Add(time.Minute).UTC()
 	updatedAt := time.Now().Add(time.Hour).UTC()
+	updatedScientificFieldTagContainerID := uint(20)
 
 	// This model...
 	model := Branch{
@@ -34,31 +35,32 @@ func TestBranchJSONMarshaling(t *testing.T) {
 				Feedback:             "LGTM",
 			},
 		},
-		DiscussionContainerID:              5,
-		ProjectPostID:                      &projectPostID,
-		BranchTitle:                        "My Cool MR",
-		UpdatedPostTitle:                   &updatedPostTitle,
-		UpdatedCompletionStatus:            &updatedCompletionStatus,
-		UpdatedScientificFieldTagContainer: &ScientificFieldTagContainer{},
-		RenderStatus:                       Pending,
-		BranchOverallReviewStatus:          BranchOpenForReview,
+		DiscussionContainerID:                5,
+		ProjectPostID:                        &projectPostID,
+		BranchTitle:                          "My Cool MR",
+		UpdatedPostTitle:                     &updatedPostTitle,
+		UpdatedCompletionStatus:              &updatedCompletionStatus,
+		UpdatedScientificFieldTagContainer:   &ScientificFieldTagContainer{},
+		UpdatedScientificFieldTagContainerID: &updatedScientificFieldTagContainerID,
+		RenderStatus:                         Pending,
+		BranchOverallReviewStatus:            BranchOpenForReview,
 	}
 
 	// should equal this DTO!
 	targetDTO := BranchDTO{
-		ID:                           44,
-		CollaboratorIDs:              []uint{100, 50},
-		ReviewIDs:                    []uint{2},
-		ProjectPostID:                &projectPostID,
-		BranchTitle:                  "My Cool MR",
-		UpdatedPostTitle:             &updatedPostTitle,
-		UpdatedCompletionStatus:      &updatedCompletionStatus,
-		UpdatedScientificFieldTagIDs: []uint{},
-		DiscussionContainerID:        5,
-		RenderStatus:                 Pending,
-		BranchOverallReviewStatus:    BranchOpenForReview,
-		CreatedAt:                    createdAt,
-		UpdatedAt:                    updatedAt,
+		ID:                                   44,
+		CollaboratorIDs:                      []uint{100, 50},
+		ReviewIDs:                            []uint{2},
+		ProjectPostID:                        &projectPostID,
+		BranchTitle:                          "My Cool MR",
+		UpdatedPostTitle:                     &updatedPostTitle,
+		UpdatedCompletionStatus:              &updatedCompletionStatus,
+		UpdatedScientificFieldTagContainerID: &updatedScientificFieldTagContainerID,
+		DiscussionContainerID:                5,
+		RenderStatus:                         Pending,
+		BranchOverallReviewStatus:            BranchOpenForReview,
+		CreatedAt:                            createdAt,
+		UpdatedAt:                            updatedAt,
 	}
 
 	dto := BranchDTO{}

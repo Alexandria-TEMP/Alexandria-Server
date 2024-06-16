@@ -158,10 +158,8 @@ definitions:
         type: string
       updatedCompletionStatus:
         $ref: '#/definitions/models.ProjectCompletionStatus'
-      updatedScientificFieldTagIDs:
-        items:
-          type: integer
-        type: array
+      updatedScientificFieldTagContainerID:
+        type: integer
     type: object
   models.BranchOverallReviewStatus:
     enum:
@@ -286,10 +284,8 @@ definitions:
         type: string
       password:
         type: string
-      scientificFieldTagIDs:
-        items:
-          type: integer
-        type: array
+      scientificFieldTagContainerID:
+        type: integer
     type: object
   models.MemberShortFormDTO:
     properties:
@@ -327,10 +323,8 @@ definitions:
         $ref: '#/definitions/models.PostType'
       renderStatus:
         $ref: '#/definitions/models.RenderStatus'
-      scientificFieldTagIDs:
-        items:
-          type: integer
-        type: array
+      scientificFieldTagContainerID:
+        type: integer
       title:
         type: string
       updatedAt:
@@ -410,6 +404,15 @@ definitions:
     - Pending
     - Failure
   models.ReportDTO:
+    type: object
+  models.ScientificFieldTagContainerDTO:
+    properties:
+      id:
+        type: integer
+      scientificFieldTagIDs:
+        items:
+          type: integer
+        type: array
     type: object
   models.ScientificFieldTagDTO:
     properties:
@@ -2615,7 +2618,7 @@ paths:
       summary: Returns all scientific tags
       tags:
       - tags
-  /tags/scientific/:tagID:
+  /tags/scientific/{tagID}:
     get:
       consumes:
       - application/json
@@ -2646,6 +2649,34 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Get scientific field tag from database
+      tags:
+      - tags
+  /tags/scientific/containers/{containerID}:
+    get:
+      consumes:
+      - application/json
+      description: Get a scientific tag container by its ID, to access its scientific
+        tags
+      parameters:
+      - description: scientific tag container ID
+        in: path
+        name: containerID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ScientificFieldTagContainerDTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get scientific tag container
       tags:
       - tags
 swagger: "2.0"
