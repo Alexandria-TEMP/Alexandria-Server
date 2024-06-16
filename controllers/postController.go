@@ -511,3 +511,45 @@ func (postController *PostController) GetProjectPostIfExists(c *gin.Context) {
 	// Return the project post's ID
 	c.JSON(http.StatusOK, projectPost.ID)
 }
+
+// GetAllPostCollaborators godoc
+// @Summary 	Get all post collaborators of a post
+// @Description Returns all post collaborators of the post with the given ID
+// @Tags 		posts
+// @Param		postID	path		string		true	"Post ID"
+// @Produce		application/json
+// @Success 	200		{array}		models.PostCollaboratorDTO
+// @Failure		400
+// @Failure		404
+// @Router		/posts/collaborators/all/{postID}		[get]
+func (postController *PostController) GetAllPostCollaborators(c *gin.Context) {
+	// Get post ID from path param
+	postIDString := c.Param("postID")
+
+	postID, err := strconv.ParseUint(postIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to parse post ID '%s' as unsigned integer: %s", postIDString, err)})
+
+		return
+	}
+
+	// Get the post itself
+	post, err := postController.PostService.GetPost(uint(postID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get post with ID %d: %s", postID, err)})
+
+		return
+	}
+
+	postCollaborators := post.Collaborators
+
+	// Turn each post collaborator into a DTO
+	postCollaboratorDTOs := make([]*models.PostCollaboratorDTO, len(postCollaborators))
+
+	for i, postCollaborator := range postCollaborators {
+		postCollaboratorDTO := postCollaborator.IntoDTO()
+		postCollaboratorDTOs[i] = &postCollaboratorDTO
+	}
+
+	c.JSON(http.StatusOK, postCollaboratorDTOs)
+}

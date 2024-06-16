@@ -9,6 +9,7 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -618,4 +619,46 @@ func (branchController *BranchController) GetClosedBranch(c *gin.Context) {
 
 	// response
 	c.JSON(http.StatusOK, closedBranch.IntoDTO())
+}
+
+// GetAllBranchCollaborators godoc
+// @Summary 	Get all branch collaborators of a branch
+// @Description Returns all branch collaborators of the branch with the given ID
+// @Tags 		branches
+// @Param		branchID	path		string			true	"Branch ID"
+// @Produce		application/json
+// @Success 	200		{array}		models.BranchCollaboratorDTO
+// @Failure		400
+// @Failure		404
+// @Router		/branches/collaborators/all/{branchID}		[get]
+func (branchController *BranchController) GetAllBranchCollaborators(c *gin.Context) {
+	// Get branch ID from path param
+	branchIDString := c.Param("branchID")
+
+	branchID, err := strconv.ParseUint(branchIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to parse branch ID '%s' as unsigned integer: %s", branchIDString, err)})
+
+		return
+	}
+
+	// Get the branch itself
+	branch, err := branchController.BranchService.GetBranch(uint(branchID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get branch with ID %d: %s", branchID, err)})
+
+		return
+	}
+
+	branchCollaborators := branch.Collaborators
+
+	// Turn each branch collaborator into a DTO
+	branchCollaboratorDTOs := make([]*models.BranchCollaboratorDTO, len(branchCollaborators))
+
+	for i, branchCollaborator := range branchCollaborators {
+		branchCollaboratorDTO := branchCollaborator.IntoDTO()
+		branchCollaboratorDTOs[i] = &branchCollaboratorDTO
+	}
+
+	c.JSON(http.StatusOK, branchCollaboratorDTOs)
 }
