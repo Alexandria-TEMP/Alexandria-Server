@@ -71,6 +71,36 @@ func (mr *MockProjectPostServiceMockRecorder) Filter(page, size, form any) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Filter", reflect.TypeOf((*MockProjectPostService)(nil).Filter), page, size, form)
 }
 
+// GetBranchesGroupedByReviewStatus mocks base method.
+func (m *MockProjectPostService) GetBranchesGroupedByReviewStatus(projectPostID uint) (*models.BranchesGroupedByReviewStatusDTO, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBranchesGroupedByReviewStatus", projectPostID)
+	ret0, _ := ret[0].(*models.BranchesGroupedByReviewStatusDTO)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBranchesGroupedByReviewStatus indicates an expected call of GetBranchesGroupedByReviewStatus.
+func (mr *MockProjectPostServiceMockRecorder) GetBranchesGroupedByReviewStatus(projectPostID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBranchesGroupedByReviewStatus", reflect.TypeOf((*MockProjectPostService)(nil).GetBranchesGroupedByReviewStatus), projectPostID)
+}
+
+// GetDiscussionContainersFromMergeHistory mocks base method.
+func (m *MockProjectPostService) GetDiscussionContainersFromMergeHistory(postID uint) (*models.DiscussionContainerProjectHistoryDTO, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDiscussionContainersFromMergeHistory", postID)
+	ret0, _ := ret[0].(*models.DiscussionContainerProjectHistoryDTO)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDiscussionContainersFromMergeHistory indicates an expected call of GetDiscussionContainersFromMergeHistory.
+func (mr *MockProjectPostServiceMockRecorder) GetDiscussionContainersFromMergeHistory(postID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDiscussionContainersFromMergeHistory", reflect.TypeOf((*MockProjectPostService)(nil).GetDiscussionContainersFromMergeHistory), postID)
+}
+
 // GetProjectPost mocks base method.
 func (m *MockProjectPostService) GetProjectPost(postID uint) (*models.ProjectPost, error) {
 	m.ctrl.T.Helper()

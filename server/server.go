@@ -79,6 +79,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, sec
 		PostRepository:        repositoryEnv.postRepository,
 		ProjectPostRepository: repositoryEnv.projectPostRepository,
 		Filesystem:            fs,
+		BranchService:         nil, // Circular dependency filled in later...
 	}
 	postCollaboratorService := &services.PostCollaboratorService{
 		PostCollaboratorRepository: repositoryEnv.postCollaboratorRepository,
@@ -90,11 +91,12 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, sec
 	}
 	postService := &services.PostService{
 		PostRepository:                        repositoryEnv.postRepository,
+		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
 		MemberRepository:                      repositoryEnv.memberRepository,
 		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
 		Filesystem:                            fs,
-		RenderService:                         renderService,
 		PostCollaboratorService:               postCollaboratorService,
+		RenderService:                         renderService,
 		TagService:                            tagService,
 	}
 	memberService := &services.MemberService{
@@ -117,9 +119,10 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, sec
 		TagService:                    tagService,
 	}
 	projectPostService := &services.ProjectPostService{
-		PostRepository:                        repositoryEnv.postRepository,
 		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
 		MemberRepository:                      repositoryEnv.memberRepository,
+		ClosedBranchRepository:                repositoryEnv.closedBranchRepository,
+		PostRepository:                        repositoryEnv.postRepository,
 		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
 		Filesystem:                            renderService.Filesystem,
 		PostCollaboratorService:               postCollaboratorService,
@@ -163,9 +166,10 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 			TagService:    serviceEnv.tagService,
 		},
 		projectPostController: &controllers.ProjectPostController{
-			PostService:        serviceEnv.postService,
-			ProjectPostService: serviceEnv.projectPostService,
-			RenderService:      serviceEnv.renderService,
+			ProjectPostService:         serviceEnv.projectPostService,
+			DiscussionContainerService: serviceEnv.discussionContainerService,
+			PostService:                serviceEnv.postService,
+			RenderService:              serviceEnv.renderService,
 		},
 		discussionController: &controllers.DiscussionController{
 			DiscussionService: serviceEnv.discussionService,

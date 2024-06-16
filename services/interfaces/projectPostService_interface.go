@@ -14,4 +14,10 @@ type ProjectPostService interface {
 
 	// Return a filtered list of project post IDs
 	Filter(page, size int, form forms.ProjectPostFilterForm) ([]uint, error)
+
+	// GetBranchesGroupedByReviewStatus returns branch IDs grouped by their branch review status
+	GetBranchesGroupedByReviewStatus(projectPostID uint) (*models.BranchesGroupedByReviewStatusDTO, error)
+
+	// GetDiscussionContainersFromMergeHistory returns discussion containers from the current project version + all previous merged versions
+	GetDiscussionContainersFromMergeHistory(postID uint) (*models.DiscussionContainerProjectHistoryDTO, error)
 }

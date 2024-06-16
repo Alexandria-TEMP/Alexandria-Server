@@ -294,7 +294,7 @@ func (postController *PostController) UploadPost(c *gin.Context) {
 	err = postController.PostService.UploadPost(c, file, uint(postID))
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 
 		return
 	}
@@ -481,4 +481,81 @@ func (postController *PostController) GetMainFileFromProject(c *gin.Context) {
 	c.Header("Content-Type", fileContentType.String())
 	c.Header("Content-Length", fmt.Sprintf("%d", fileInfo.Size()))
 	c.File(absFilepath)
+}
+
+// GetProjectPostIfExists godoc
+// @Summary 	Get Project Post of Post
+// @Description Get the Project Post ID that encapsulates a Post, if this Project Post exists
+// @Tags 		posts
+// @Param		postID		path		string				true	"Post ID"
+// @Produce		application/json
+// @Success 	200		{object}	uint
+// @Failure		404
+// @Failure		500
+// @Router 		/posts/{postID}/project-post	[get]
+func (postController *PostController) GetProjectPostIfExists(c *gin.Context) {
+	// Note: this endpoint kind of goes against the data model's design philosophy, and is quite a hacky fix.
+	// TODO reconsider how composition of posts and project posts is implemented & integrated.
+	// Get post ID from path
+	postIDString := c.Param("postID")
+
+	postID, err := strconv.ParseUint(postIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to parse post ID '%s' as unsigned integer: %s", postIDString, err)})
+
+		return
+	}
+
+	// Get the post's project post
+	projectPost, err := postController.PostService.GetProjectPost(uint(postID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get project post of post with ID %d: %s", postID, err)})
+
+		return
+	}
+
+	// Return the project post's ID
+	c.JSON(http.StatusOK, projectPost.ID)
+}
+
+// GetAllPostCollaborators godoc
+// @Summary 	Get all post collaborators of a post
+// @Description Returns all post collaborators of the post with the given ID
+// @Tags 		posts
+// @Param		postID	path		string		true	"Post ID"
+// @Produce		application/json
+// @Success 	200		{array}		models.PostCollaboratorDTO
+// @Failure		400
+// @Failure		404
+// @Router		/posts/collaborators/all/{postID}		[get]
+func (postController *PostController) GetAllPostCollaborators(c *gin.Context) {
+	// Get post ID from path param
+	postIDString := c.Param("postID")
+
+	postID, err := strconv.ParseUint(postIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to parse post ID '%s' as unsigned integer: %s", postIDString, err)})
+
+		return
+	}
+
+	// Get the post itself
+	post, err := postController.PostService.GetPost(uint(postID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get post with ID %d: %s", postID, err)})
+
+		return
+	}
+
+	postCollaborators := post.Collaborators
+
+	// Turn each post collaborator into a DTO
+	postCollaboratorDTOs := make([]*models.PostCollaboratorDTO, len(postCollaborators))
+
+	for i, postCollaborator := range postCollaborators {
+		postCollaboratorDTO := postCollaborator.IntoDTO()
+		postCollaboratorDTOs[i] = &postCollaboratorDTO
+	}
+
+	c.JSON(http.StatusOK, postCollaboratorDTOs)
 }

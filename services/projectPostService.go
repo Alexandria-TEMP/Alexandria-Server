@@ -11,6 +11,7 @@ import (
 )
 
 type ProjectPostService struct {
+	ClosedBranchRepository                database.ModelRepositoryInterface[*models.ClosedBranch]
 	PostRepository                        database.ModelRepositoryInterface[*models.Post]
 	ProjectPostRepository                 database.ModelRepositoryInterface[*models.ProjectPost]
 	MemberRepository                      database.ModelRepositoryInterface[*models.Member]
@@ -164,4 +165,86 @@ func (projectPostService *ProjectPostService) Filter(page, size int, _ forms.Pro
 	}
 
 	return ids, nil
+}
+
+func (projectPostService *ProjectPostService) GetBranchesGroupedByReviewStatus(projectPostID uint) (*models.BranchesGroupedByReviewStatusDTO, error) {
+	// Get the project post
+	projectPost, err := projectPostService.ProjectPostRepository.GetByID(projectPostID)
+	if err != nil {
+		return nil, fmt.Errorf("could not find project post with ID %d: %w", projectPostID, err)
+	}
+
+	// We categorize branches in three categories:
+	// 1) Open for review
+	// 2) Rejected
+	// 3) Approved (peer reviewed)
+
+	openForReviewBranchIDs := make([]uint, len(projectPost.OpenBranches))
+	rejectedClosedBranchIDs := []uint{}
+	approvedClosedBranchIDs := []uint{}
+
+	// Add every single open branch
+	for i, branch := range projectPost.OpenBranches {
+		openForReviewBranchIDs[i] = branch.ID
+	}
+
+	// Add closed branches that are rejected
+	for _, branch := range projectPost.ClosedBranches {
+		if branch.BranchReviewDecision == models.Rejected {
+			rejectedClosedBranchIDs = append(rejectedClosedBranchIDs, branch.ID)
+		}
+	}
+
+	// Add closed branches that are approved
+	for _, branch := range projectPost.ClosedBranches {
+		if branch.BranchReviewDecision == models.Approved {
+			approvedClosedBranchIDs = append(approvedClosedBranchIDs, branch.ID)
+		}
+	}
+
+	groupedBranchesByStatus := &models.BranchesGroupedByReviewStatusDTO{
+		OpenBranchIDs:           openForReviewBranchIDs,
+		RejectedClosedBranchIDs: rejectedClosedBranchIDs,
+		ApprovedClosedBranchIDs: approvedClosedBranchIDs,
+	}
+
+	return groupedBranchesByStatus, nil
+}
+
+func (projectPostService *ProjectPostService) GetDiscussionContainersFromMergeHistory(projectPostID uint) (*models.DiscussionContainerProjectHistoryDTO, error) {
+	// Get each discussion container, from every closed & merged branch. Sources of containers:
+	// 1) On the underlying post
+	// 2) On each closed + merged branch
+	// Get the post's discussion container
+	projectPost, err := projectPostService.ProjectPostRepository.GetByID(projectPostID)
+	if err != nil {
+		return nil, fmt.Errorf("could not get project post: %w", err)
+	}
+
+	postDiscussionContainerID := projectPost.Post.DiscussionContainerID
+
+	// Get each closed + merged branch's discussion container
+	closedApprovedBranches, err := projectPostService.ClosedBranchRepository.Query("branch_review_decision = 'approved'")
+	if err != nil {
+		return nil, fmt.Errorf("could not get closed approved branches of project post: %w", err)
+	}
+
+	// Transform each branch into a 'branch + discussion container DTO', which holds
+	// the 'closed branch' ID, and the discussion container ID from the branch itself
+	discussionContainersWithBranches := make([]models.DiscussionContainerWithBranchDTO, len(closedApprovedBranches))
+
+	for i, closedApprovedBranch := range closedApprovedBranches {
+		discussionContainersWithBranches[i] = models.DiscussionContainerWithBranchDTO{
+			DiscussionContainerID: closedApprovedBranch.Branch.DiscussionContainerID,
+			ClosedBranchID:        closedApprovedBranch.ID,
+		}
+	}
+
+	// Create the final history DTO, holding all the discussion containers
+	discussionContainerHistory := models.DiscussionContainerProjectHistoryDTO{
+		CurrentDiscussionContainerID:     postDiscussionContainerID,
+		MergedBranchDiscussionContainers: discussionContainersWithBranches,
+	}
+
+	return &discussionContainerHistory, nil
 }

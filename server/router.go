@@ -90,6 +90,7 @@ func branchRouter(v2 *gin.RouterGroup, controllers *ControllerEnv, middleware Mi
 	branchRouter.POST("/reviews", middleware.CheckAuth, controllers.branchController.CreateReview)
 	branchRouter.GET("/:branchID/can-review/:memberID", middleware.CheckAuth, controllers.branchController.MemberCanReview)
 	branchRouter.GET("/collaborators/:collaboratorID", controllers.branchController.GetBranchCollaborator)
+	branchRouter.GET("/collaborators/all/:branchID", controllers.branchController.GetAllBranchCollaborators)
 	branchRouter.GET("/:branchID/render", controllers.branchController.GetRender)
 	branchRouter.GET("/:branchID/repository", controllers.branchController.GetProject)
 	branchRouter.POST("/:branchID/upload", middleware.CheckAuth, controllers.branchController.UploadProject)
@@ -125,7 +126,7 @@ func projectPostRouter(v2 *gin.RouterGroup, controllers *ControllerEnv, middlewa
 	projectPostRouter.PUT("", middleware.CheckAuth, controllers.projectPostController.UpdateProjectPost)
 	projectPostRouter.DELETE("/:projectPostID", middleware.CheckAuth, controllers.projectPostController.DeleteProjectPost)
 	projectPostRouter.POST("/from-github", middleware.CheckAuth, controllers.projectPostController.CreateProjectPostFromGithub)
-	projectPostRouter.GET("/:projectPostID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
+	projectPostRouter.GET("/:projectPostID/all-discussion-containers", controllers.projectPostController.GetProjectPostDiscussionContainers)
 	projectPostRouter.GET("/:projectPostID/branches-by-status", controllers.projectPostController.GetProjectPostBranchesByStatus)
 }
 
@@ -141,10 +142,12 @@ func postRouter(v2 *gin.RouterGroup, controllers *ControllerEnv, middleware Midd
 	postRouter.GET("/reports/:reportID", controllers.postController.GetPostReport)
 	postRouter.GET("/collaborators/:collaboratorID", controllers.postController.GetPostCollaborator)
 	postRouter.POST("/:postID/upload", middleware.CheckAuth, controllers.postController.UploadPost)
+	postRouter.GET("/collaborators/all/:postID", controllers.postController.GetAllPostCollaborators)
 	postRouter.GET("/:postID/render", controllers.postController.GetMainRender)
 	postRouter.GET("/:postID/repository", controllers.postController.GetMainProject)
 	postRouter.GET("/:postID/tree", controllers.postController.GetMainFiletree)
 	postRouter.GET("/:postID/file/*filepath", controllers.postController.GetMainFileFromProject)
+	postRouter.GET("/:postID/project-post", controllers.postController.GetProjectPostIfExists)
 }
 
 func discussionContainerRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {

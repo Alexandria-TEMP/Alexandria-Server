@@ -80,7 +80,7 @@ type BranchDTO struct {
 	ProjectPostID             *uint                     `json:"projectPostID"`
 	BranchTitle               string                    `json:"branchTitle"`
 	RenderStatus              RenderStatus              `json:"renderStatus"`
-	DiscussionIDs             []uint                    `json:"discussionIDs"`
+	DiscussionContainerID     uint                      `json:"discussionContainerID"`
 	BranchOverallReviewStatus BranchOverallReviewStatus `json:"branchOverallReviewStatus"`
 }
 
@@ -99,7 +99,7 @@ func (model *Branch) IntoDTO() BranchDTO {
 		model.ProjectPostID,
 		model.BranchTitle,
 		model.RenderStatus,
-		discussionContainerIntoIDs(&model.DiscussionContainer),
+		model.DiscussionContainerID,
 		model.BranchOverallReviewStatus,
 	}
 }
@@ -130,13 +130,10 @@ func reviewsToIDs(reviews []*BranchReview) []uint {
 	return ids
 }
 
-// Helper function for JSON marshaling
-func discussionContainerIntoIDs(discussions *DiscussionContainer) []uint {
-	ids := make([]uint, len(discussions.Discussions))
-
-	for i, discussion := range discussions.Discussions {
-		ids[i] = discussion.ID
-	}
-
-	return ids
+// Holds IDs of Branches and ClosedBranches
+// Categorized by their BranchReviewStatus
+type BranchesGroupedByReviewStatusDTO struct {
+	OpenBranchIDs           []uint `json:"openBranchIDs"`
+	RejectedClosedBranchIDs []uint `json:"rejectedClosedBranchIDs"`
+	ApprovedClosedBranchIDs []uint `json:"approvedClosedBranchIDs"`
 }

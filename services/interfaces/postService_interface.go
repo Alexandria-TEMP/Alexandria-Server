@@ -24,4 +24,7 @@ type PostService interface {
 
 	// Return a filtered list of post IDs
 	Filter(page, size int, form forms.PostFilterForm) ([]uint, error)
+
+	// Get a post's surrounding project post, if it exists
+	GetProjectPost(postID uint) (*models.ProjectPost, error)
 }

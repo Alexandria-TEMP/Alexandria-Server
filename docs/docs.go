@@ -142,6 +142,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/branches/collaborators/all/{branchID}": {
+            "get": {
+                "description": "Returns all branch collaborators of the branch with the given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Get all branch collaborators of a branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.BranchCollaboratorDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
         "/branches/collaborators/{collaboratorID}": {
             "get": {
                 "description": "Get a branch collaborator by ID, a member who has collaborated on a branch",
@@ -1923,6 +1961,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/posts/collaborators/all/{postID}": {
+            "get": {
+                "description": "Returns all post collaborators of the post with the given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get all post collaborators of a post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.PostCollaboratorDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
         "/posts/collaborators/{collaboratorID}": {
             "get": {
                 "description": "Get a post collaborator by ID, a member who has collaborated on a post",
@@ -2177,6 +2253,41 @@ const docTemplate = `{
                             "items": {
                                 "type": "integer"
                             }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}/project-post": {
+            "get": {
+                "description": "Get the Project Post ID that encapsulates a Post, if this Project Post exists",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get Project Post of Post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
                         }
                     },
                     "404": {
@@ -2689,9 +2800,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/project-posts/{projectPostID}/all-discussions": {
+        "/project-posts/{projectPostID}/all-discussion-containers": {
             "get": {
-                "description": "Returns all discussion IDs on this project post over all its previous versions, instead of only the current version",
+                "description": "Returns all discussion container IDs on this project post over all its previous merged versions, instead of only the current version",
                 "consumes": [
                     "application/json"
                 ],
@@ -2701,11 +2812,11 @@ const docTemplate = `{
                 "tags": [
                     "project-posts"
                 ],
-                "summary": "Returns all discussion IDs associated with the project post",
+                "summary": "Returns all discussion container IDs associated with the project post",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "post ID",
+                        "description": "project post ID",
                         "name": "projectPostID",
                         "in": "path",
                         "required": true
@@ -2715,10 +2826,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
+                            "$ref": "#/definitions/models.DiscussionContainerProjectHistoryDTO"
                         }
                     },
                     "400": {
@@ -2735,7 +2843,7 @@ const docTemplate = `{
         },
         "/project-posts/{projectPostID}/branches-by-status": {
             "get": {
-                "description": "Returns all branch IDs of this project post, grouped by each branch's branchreview status",
+                "description": "Returns all branch IDs of this project post, grouped by each branch's review status",
                 "consumes": [
                     "application/json"
                 ],
@@ -2745,11 +2853,11 @@ const docTemplate = `{
                 "tags": [
                     "project-posts"
                 ],
-                "summary": "Returns branch IDs grouped by each branch status",
+                "summary": "Get branch IDs by review status",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "post ID",
+                        "description": "project post ID",
                         "name": "projectPostID",
                         "in": "path",
                         "required": true
@@ -2759,7 +2867,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/forms.GroupedBranchForm"
+                            "$ref": "#/definitions/models.BranchesGroupedByReviewStatusDTO"
                         }
                     },
                     "400": {
@@ -2985,29 +3093,6 @@ const docTemplate = `{
                 }
             }
         },
-        "forms.GroupedBranchForm": {
-            "type": "object",
-            "properties": {
-                "openForReviewIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "peerReviewedIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "rejectedIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                }
-            }
-        },
         "forms.MemberAuthForm": {
             "type": "object",
             "properties": {
@@ -3183,11 +3268,8 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "discussionIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "discussionContainerID": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -3262,6 +3344,29 @@ const docTemplate = `{
                 "Approved"
             ]
         },
+        "models.BranchesGroupedByReviewStatusDTO": {
+            "type": "object",
+            "properties": {
+                "approvedClosedBranchIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "openBranchIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "rejectedClosedBranchIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "models.ClosedBranchDTO": {
             "type": "object",
             "properties": {
@@ -3305,6 +3410,31 @@ const docTemplate = `{
                     }
                 },
                 "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.DiscussionContainerProjectHistoryDTO": {
+            "type": "object",
+            "properties": {
+                "currentDiscussionContainerID": {
+                    "type": "integer"
+                },
+                "mergedBranchDiscussionContainers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.DiscussionContainerWithBranchDTO"
+                    }
+                }
+            }
+        },
+        "models.DiscussionContainerWithBranchDTO": {
+            "type": "object",
+            "properties": {
+                "closedBranchID": {
+                    "type": "integer"
+                },
+                "discussionContainerID": {
                     "type": "integer"
                 }
             }
@@ -3409,11 +3539,8 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "discussionIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "discussionContainerID": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"

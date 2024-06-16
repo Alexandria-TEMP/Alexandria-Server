@@ -9,16 +9,19 @@ import (
 )
 
 func TestDiscussionContainerJSONMarshaling(t *testing.T) {
+	rootDiscussionID := uint(10)
+
 	discussionContainer := DiscussionContainer{
 		Model: gorm.Model{ID: 5},
 		Discussions: []*Discussion{
 			{
-				Model:       gorm.Model{ID: 10},
+				Model:       gorm.Model{ID: rootDiscussionID},
 				ContainerID: 5,
 			},
 			{
 				Model:       gorm.Model{ID: 12},
 				ContainerID: 5,
+				ParentID:    &rootDiscussionID,
 			},
 		},
 	}
@@ -35,7 +38,7 @@ func TestDiscussionContainerJSONMarshaling(t *testing.T) {
 
 	expectedDTO := DiscussionContainerDTO{
 		ID:            5,
-		DiscussionIDs: []uint{10, 12},
+		DiscussionIDs: []uint{rootDiscussionID},
 	}
 
 	if !reflect.DeepEqual(createdDTO, expectedDTO) {

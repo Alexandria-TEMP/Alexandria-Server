@@ -1,5 +1,6 @@
 services:
   backend:
+    container_name: alexandria_backend
     build:
       context: .
       target: run # This should stay as 'run'.
@@ -10,6 +11,8 @@ services:
       - ./:/app
     ports: 
       - 8080:8080
+    networks:
+      - alexandria_network
     # TODO This is only good for a prototype. Database credentials should not
     # be kept in memory/environment variables in a production context.
     environment: 
@@ -37,6 +40,8 @@ services:
     # This port is exposed so that you can inspect the database from your host machine.
     ports:
       - 3306:3306
+    networks:
+      - alexandria_network
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
@@ -63,6 +68,8 @@ services:
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
     ports:
       - 3307:3306
+    networks:
+      - alexandria_network
     volumes:
       - test_db_data:/var/lib/mysql
     healthcheck:
@@ -81,3 +88,10 @@ services:
 volumes:
   db_data:
   test_db_data:
+
+# Define a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+networks:
+  alexandria_network:
+    # name must be specified to ensure it's the same in both frontend an backend
+    name: alexandria_network 

@@ -35,21 +35,6 @@ definitions:
       text:
         type: string
     type: object
-  forms.GroupedBranchForm:
-    properties:
-      openForReviewIDs:
-        items:
-          type: integer
-        type: array
-      peerReviewedIDs:
-        items:
-          type: integer
-        type: array
-      rejectedIDs:
-        items:
-          type: integer
-        type: array
-    type: object
   forms.MemberAuthForm:
     properties:
       email:
@@ -167,10 +152,8 @@ definitions:
         items:
           type: integer
         type: array
-      discussionIDs:
-        items:
-          type: integer
-        type: array
+      discussionContainerID:
+        type: integer
       id:
         type: integer
       projectPostID:
@@ -221,6 +204,21 @@ definitions:
     x-enum-varnames:
     - Rejected
     - Approved
+  models.BranchesGroupedByReviewStatusDTO:
+    properties:
+      approvedClosedBranchIDs:
+        items:
+          type: integer
+        type: array
+      openBranchIDs:
+        items:
+          type: integer
+        type: array
+      rejectedClosedBranchIDs:
+        items:
+          type: integer
+        type: array
+    type: object
   models.ClosedBranchDTO:
     properties:
       branchID:
@@ -251,6 +249,22 @@ definitions:
           type: integer
         type: array
       id:
+        type: integer
+    type: object
+  models.DiscussionContainerProjectHistoryDTO:
+    properties:
+      currentDiscussionContainerID:
+        type: integer
+      mergedBranchDiscussionContainers:
+        items:
+          $ref: '#/definitions/models.DiscussionContainerWithBranchDTO'
+        type: array
+    type: object
+  models.DiscussionContainerWithBranchDTO:
+    properties:
+      closedBranchID:
+        type: integer
+      discussionContainerID:
         type: integer
     type: object
   models.DiscussionDTO:
@@ -318,10 +332,8 @@ definitions:
         items:
           type: integer
         type: array
-      discussionIDs:
-        items:
-          type: integer
-        type: array
+      discussionContainerID:
+        type: integer
       id:
         type: integer
       postType:
@@ -860,6 +872,31 @@ paths:
         "404":
           description: Not Found
       summary: Get a branch collaborator by ID
+      tags:
+      - branches
+  /branches/collaborators/all/{branchID}:
+    get:
+      description: Returns all branch collaborators of the branch with the given ID
+      parameters:
+      - description: Branch ID
+        in: path
+        name: branchID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.BranchCollaboratorDTO'
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Get all branch collaborators of a branch
       tags:
       - branches
   /branches/reviews:
@@ -1813,6 +1850,30 @@ paths:
       summary: Get a file from a post
       tags:
       - posts
+  /posts/{postID}/project-post:
+    get:
+      description: Get the Project Post ID that encapsulates a Post, if this Project
+        Post exists
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get Project Post of Post
+      tags:
+      - posts
   /posts/{postID}/render:
     get:
       description: Get the main render of the repository underlying a post if it exists
@@ -2028,6 +2089,31 @@ paths:
       summary: Get a post collaborator by ID
       tags:
       - posts
+  /posts/collaborators/all/{postID}:
+    get:
+      description: Returns all post collaborators of the post with the given ID
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.PostCollaboratorDTO'
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Get all post collaborators of a post
+      tags:
+      - posts
   /posts/from-github:
     post:
       consumes:
@@ -2208,14 +2294,14 @@ paths:
       summary: Get project post
       tags:
       - project-posts
-  /project-posts/{projectPostID}/all-discussions:
+  /project-posts/{projectPostID}/all-discussion-containers:
     get:
       consumes:
       - application/json
-      description: Returns all discussion IDs on this project post over all its previous
-        versions, instead of only the current version
+      description: Returns all discussion container IDs on this project post over
+        all its previous merged versions, instead of only the current version
       parameters:
-      - description: post ID
+      - description: project post ID
         in: path
         name: projectPostID
         required: true
@@ -2226,16 +2312,14 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              type: integer
-            type: array
+            $ref: '#/definitions/models.DiscussionContainerProjectHistoryDTO'
         "400":
           description: Bad Request
         "404":
           description: Not Found
         "500":
           description: Internal Server Error
-      summary: Returns all discussion IDs associated with the project post
+      summary: Returns all discussion container IDs associated with the project post
       tags:
       - project-posts
   /project-posts/{projectPostID}/branches-by-status:
@@ -2243,9 +2327,9 @@ paths:
       consumes:
       - application/json
       description: Returns all branch IDs of this project post, grouped by each branch's
-        branchreview status
+        review status
       parameters:
-      - description: post ID
+      - description: project post ID
         in: path
         name: projectPostID
         required: true
@@ -2256,14 +2340,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/forms.GroupedBranchForm'
+            $ref: '#/definitions/models.BranchesGroupedByReviewStatusDTO'
         "400":
           description: Bad Request
         "404":
           description: Not Found
         "500":
           description: Internal Server Error
-      summary: Returns branch IDs grouped by each branch status
+      summary: Get branch IDs by review status
       tags:
       - project-posts
   /project-posts/from-github:

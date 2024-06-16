@@ -31,7 +31,7 @@ func beforeEachBranch(t *testing.T) {
 	mockClosedBranchRepository = mocks.NewMockModelRepositoryInterface[*models.ClosedBranch](mockCtrl)
 	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
 	mockProjectPostRepository = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
-	mockReviewRepository = mocks.NewMockModelRepositoryInterface[*models.BranchReview](mockCtrl)
+	mockBranchReviewRepository = mocks.NewMockModelRepositoryInterface[*models.BranchReview](mockCtrl)
 	mockDiscussionContainerRepository = mocks.NewMockModelRepositoryInterface[*models.DiscussionContainer](mockCtrl)
 	mockDiscussionRepository = mocks.NewMockModelRepositoryInterface[*models.Discussion](mockCtrl)
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
@@ -45,7 +45,7 @@ func beforeEachBranch(t *testing.T) {
 		BranchRepository:              mockBranchRepository,
 		PostRepository:                mockPostRepository,
 		ProjectPostRepository:         mockProjectPostRepository,
-		ReviewRepository:              mockReviewRepository,
+		ReviewRepository:              mockBranchReviewRepository,
 		DiscussionContainerRepository: mockDiscussionContainerRepository,
 		DiscussionRepository:          mockDiscussionRepository,
 		MemberRepository:              mockMemberRepository,
@@ -381,7 +381,7 @@ func TestCreateReviewSuccess(t *testing.T) {
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, nil)
-	mockReviewRepository.EXPECT().Create(expected).Return(nil)
+	mockBranchReviewRepository.EXPECT().Create(expected).Return(nil)
 	mockBranchRepository.EXPECT().Update(newBranch).Return(newBranch, nil)
 
 	branchreview, err := branchService.CreateReview(form)
@@ -436,7 +436,7 @@ func TestCreateReviewSuccessMergeDoesntSupercede(t *testing.T) {
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, nil)
-	mockReviewRepository.EXPECT().Create(expected).Return(nil)
+	mockBranchReviewRepository.EXPECT().Create(expected).Return(nil)
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
 	mockFilesystem.EXPECT().Merge("10", "master").Return(nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(5)).Return(projectPost, nil)
@@ -517,7 +517,7 @@ func TestCreateReviewSuccessMergeSupercedes(t *testing.T) {
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(initialBranch, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(&models.Member{Model: gorm.Model{ID: 11}}, nil)
-	mockReviewRepository.EXPECT().Create(expectedReview).Return(nil)
+	mockBranchReviewRepository.EXPECT().Create(expectedReview).Return(nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(8)).Return(initialProjectPost, nil)
 	mockDiscussionContainerRepository.EXPECT().GetByID(uint(0)).Return(discussions, nil)
 	mockClosedBranchRepository.EXPECT().Query(&models.ClosedBranch{ProjectPostID: 5}).Return([]*models.ClosedBranch{oldApprovedBranch}, nil)
@@ -607,7 +607,7 @@ func TestCreateReviewFailedUpdateBranch(t *testing.T) {
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, nil)
-	mockReviewRepository.EXPECT().Create(expected).Return(nil)
+	mockBranchReviewRepository.EXPECT().Create(expected).Return(nil)
 	mockBranchRepository.EXPECT().Update(newBranch).Return(newBranch, errors.New("failed"))
 
 	_, err := branchService.CreateReview(form)
@@ -1061,4 +1061,78 @@ func TestGetFileFromProjectFileDoesNotExist(t *testing.T) {
 	absFilepath, err := branchService.GetFileFromProject(10, relFilepath)
 	assert.NotNil(t, err)
 	assert.Equal(t, "", absFilepath)
+}
+
+func TestCloseBranchButDontMarkProjectPostAsRevisionNeeded(t *testing.T) {
+	beforeEachBranch(t)
+
+	postID := uint(5)
+	projectPostID := uint(10)
+	postDiscussionContainerID := uint(15)
+
+	branchID := uint(15)
+	reviewingMemberID := uint(1)
+
+	reviewingMember := &models.Member{
+		Model: gorm.Model{ID: reviewingMemberID},
+	}
+
+	branch := &models.Branch{
+		Model:                     gorm.Model{ID: branchID},
+		ProjectPostID:             &projectPostID,
+		BranchOverallReviewStatus: models.BranchOpenForReview,
+	}
+
+	post := &models.Post{
+		Model:                 gorm.Model{ID: postID},
+		DiscussionContainer:   models.DiscussionContainer{Model: gorm.Model{ID: postDiscussionContainerID}},
+		DiscussionContainerID: postDiscussionContainerID,
+	}
+
+	projectPost := &models.ProjectPost{
+		Model:  gorm.Model{ID: projectPostID},
+		Post:   *post,
+		PostID: postID,
+		OpenBranches: []*models.Branch{
+			branch,
+		},
+		ClosedBranches:   []*models.ClosedBranch{},
+		PostReviewStatus: models.Reviewed,
+	}
+
+	reviewCreationForm := forms.ReviewCreationForm{
+		BranchID:             branchID,
+		ReviewingMemberID:    reviewingMemberID,
+		BranchReviewDecision: "rejected",
+		Feedback:             "ur grammar is bad",
+	}
+
+	// Setup mock getters
+	mockMemberRepository.EXPECT().GetByID(reviewingMemberID).Return(reviewingMember, nil).Times(1)
+	mockBranchRepository.EXPECT().GetByID(branchID).Return(branch, nil).Times(1)
+	mockProjectPostRepository.EXPECT().GetByID(projectPostID).Return(projectPost, nil).Times(1)
+	mockDiscussionContainerRepository.EXPECT().GetByID(postDiscussionContainerID).Return(&post.DiscussionContainer, nil).Times(1)
+
+	// Setup mock creates & updates
+	mockBranchRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
+	mockBranchRepository.EXPECT().Update(gomock.Any()).Return(branch, nil).Times(1)
+	mockBranchReviewRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
+
+	// Setup mock queries
+	mockClosedBranchRepository.EXPECT().Query(gomock.Any()).Return([]*models.ClosedBranch{}, nil).Times(1)
+
+	// Use argument capture to extract the project post passed to the repo update method
+	var capturedProjectPost *models.ProjectPost
+
+	mockProjectPostRepository.EXPECT().Update(gomock.Any()).Do(func(arg *models.ProjectPost) {
+		capturedProjectPost = arg
+	})
+
+	// Function under test
+	_, err := branchService.CreateReview(reviewCreationForm)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, models.Reviewed, capturedProjectPost.PostReviewStatus)
 }
