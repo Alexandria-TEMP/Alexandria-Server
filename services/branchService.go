@@ -242,7 +242,14 @@ func (branchService *BranchService) closeBranch(branch *models.Branch) error {
 		}
 	} else {
 		closedBranch.BranchReviewDecision = models.Rejected
-		projectPost.PostReviewStatus = models.RevisionNeeded
+
+		// If the branch was rejected, and the project post was "open for review", this
+		// means the project post itself has been marked "revision needed".
+		// If the branch was rejected, and the project post was already peer reviewed,
+		// it shall remain peer reviewed.
+		if projectPost.PostReviewStatus == models.Open {
+			projectPost.PostReviewStatus = models.RevisionNeeded
+		}
 	}
 
 	// remove project post id so that it is no longer in open branches
