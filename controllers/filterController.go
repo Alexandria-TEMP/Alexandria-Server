@@ -27,9 +27,9 @@ type FilterController struct {
 // @Param		size	query		uint					false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/filter/posts		[get]
 func (filterController *FilterController) FilterPosts(c *gin.Context) {
 	var postFilterForm forms.PostFilterForm
@@ -71,9 +71,9 @@ func (filterController *FilterController) FilterPosts(c *gin.Context) {
 // @Param		size		query		uint						false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/filter/project-posts		[get]
 func (filterController *FilterController) FilterProjectPosts(c *gin.Context) {
 	var projectPostFilterForm forms.ProjectPostFilterForm

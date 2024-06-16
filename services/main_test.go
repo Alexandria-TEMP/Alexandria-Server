@@ -25,7 +25,7 @@ var (
 	mockClosedBranchRepository                *mocks.MockModelRepositoryInterface[*models.ClosedBranch]
 	mockPostRepository                        *mocks.MockModelRepositoryInterface[*models.Post]
 	mockProjectPostRepository                 *mocks.MockModelRepositoryInterface[*models.ProjectPost]
-	mockReviewRepository                      *mocks.MockModelRepositoryInterface[*models.BranchReview]
+	mockBranchReviewRepository                *mocks.MockModelRepositoryInterface[*models.BranchReview]
 	mockBranchCollaboratorRepository          *mocks.MockModelRepositoryInterface[*models.BranchCollaborator]
 	mockPostCollaboratorRepository            *mocks.MockModelRepositoryInterface[*models.PostCollaborator]
 	mockDiscussionContainerRepository         *mocks.MockModelRepositoryInterface[*models.DiscussionContainer]

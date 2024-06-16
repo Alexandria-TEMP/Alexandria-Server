@@ -24,10 +24,10 @@ type TagController struct {
 // @Accept  	json
 // @Param		tagID		path		string			true	"tag ID"
 // @Produce		json
-// @Success 	200 		{object}	models.ScientificFieldTagDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Success 	200 	{object}	models.ScientificFieldTagDTO
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/tags/scientific/{tagID}	[get]
 func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 	// extract the id of the scientific field tag
@@ -36,7 +36,7 @@ func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 
 	// if this caused an error, print it and return status 400: bad input
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid tag ID, cannot interpret as integer, id=%s ", tagIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid tag ID, cannot interpret '%s' as integer: %s ", tagIDStr, err)})
 
 		return
 	}
@@ -49,7 +49,7 @@ func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 
 	// if there was an error, print it and return status 404: not found
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot get member because no tag with this ID exists, id=%d", tagID)})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot get member because no tag with ID '%d' exists: %s", tagID, err)})
 
 		return
 	}
@@ -65,14 +65,14 @@ func (tagController *TagController) GetScientificFieldTag(c *gin.Context) {
 // @Tags 		tags
 // @Produce		json
 // @Success 	200		{array}		models.ScientificFieldTagDTO
-// @Failure		404
-// @Failure		500
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/tags/scientific	[get]
 func (tagController *TagController) GetScientificTags(c *gin.Context) {
 	tagObjects, err := tagController.TagService.GetAllScientificFieldTags()
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot get tags, error: %v", err.Error())})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot get tags: %s", err)})
 
 		return
 	}
@@ -130,8 +130,8 @@ func (tagController *TagController) GetScientificFieldTagContainer(c *gin.Contex
 // @Tags		tags
 // @Produce		json
 // @Success		200		{array}		models.ProjectCompletionStatus
-// @Failure		400
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/tags/completion-status	[get]
 func (tagController *TagController) GetCompletionStatusTags(c *gin.Context) {
 	completionStatusTags := []models.PostType{models.Project, models.Question, models.Reflection}
@@ -145,8 +145,8 @@ func (tagController *TagController) GetCompletionStatusTags(c *gin.Context) {
 // @Tags		tags
 // @Produce		json
 // @Success		200		{array}		models.PostType
-// @Failure		400
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/tags/post-type	[get]
 func (tagController *TagController) GetPostTypeTags(c *gin.Context) {
 	postTypeTags := []models.PostType{models.Project, models.Question, models.Reflection}
@@ -160,8 +160,8 @@ func (tagController *TagController) GetPostTypeTags(c *gin.Context) {
 // @Tags		tags
 // @Produce		json
 // @Success		200		{array}		models.ProjectFeedbackPreference
-// @Failure		400
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/tags/feedback-preference	[get]
 func (tagController *TagController) GetFeedbackPreferenceTags(c *gin.Context) {
 	feedbackPreferenceTags := []models.ProjectFeedbackPreference{models.DiscussionFeedback, models.FormalFeedback}
