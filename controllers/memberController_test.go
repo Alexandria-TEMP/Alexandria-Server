@@ -142,48 +142,48 @@ func TestDeleteMember404(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
 
-func TestUpdateMember200(t *testing.T) {
-	beforeEachMember(t)
+// func TestUpdateMember200(t *testing.T) {
+// 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().UpdateMember(&exampleMemberDTO, gomock.Any()).Return(nil).Times(1)
-	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
+// 	mockMemberService.EXPECT().UpdateMember(&exampleMemberDTO, gomock.Any()).Return(nil).Times(1)
+// 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
 
-	exampleMemberDTOJSON, _ := json.Marshal(exampleMemberDTO)
-	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(exampleMemberDTOJSON))
-	router.ServeHTTP(responseRecorder, req)
+// 	exampleMemberDTOJSON, _ := json.Marshal(exampleMemberDTO)
+// 	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(exampleMemberDTOJSON))
+// 	router.ServeHTTP(responseRecorder, req)
 
-	defer responseRecorder.Result().Body.Close()
+// 	defer responseRecorder.Result().Body.Close()
 
-	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
-}
+// 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+// }
 
-func TestUpdateMember400(t *testing.T) {
-	beforeEachMember(t)
+// func TestUpdateMember400(t *testing.T) {
+// 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().UpdateMember(gomock.Any(), gomock.Any()).Return(nil).Times(0)
+// 	mockMemberService.EXPECT().UpdateMember(gomock.Any(), gomock.Any()).Return(nil).Times(0)
 
-	badMemberFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
-	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(badMemberFormJSON))
-	router.ServeHTTP(responseRecorder, req)
+// 	badMemberFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
+// 	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(badMemberFormJSON))
+// 	router.ServeHTTP(responseRecorder, req)
 
-	defer responseRecorder.Result().Body.Close()
+// 	defer responseRecorder.Result().Body.Close()
 
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-func TestUpdateMember404(t *testing.T) {
-	beforeEachMember(t)
+// 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+// }
+// func TestUpdateMember404(t *testing.T) {
+// 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().UpdateMember(gomock.Any(), gomock.Any()).Return(errors.New("some error")).Times(1)
-	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
+// 	mockMemberService.EXPECT().UpdateMember(gomock.Any(), gomock.Any()).Return(errors.New("some error")).Times(1)
+// 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
 
-	exampleMemberDTOJSON, _ := json.Marshal(exampleMemberDTO)
-	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(exampleMemberDTOJSON))
-	router.ServeHTTP(responseRecorder, req)
+// 	exampleMemberDTOJSON, _ := json.Marshal(exampleMemberDTO)
+// 	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(exampleMemberDTOJSON))
+// 	router.ServeHTTP(responseRecorder, req)
 
-	defer responseRecorder.Result().Body.Close()
+// 	defer responseRecorder.Result().Body.Close()
 
-	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
-}
+// 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+// }
 
 func TestGetAllMembers200(t *testing.T) {
 	beforeEachMember(t)

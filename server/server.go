@@ -28,16 +28,17 @@ type RepositoryEnv struct {
 }
 
 type ServiceEnv struct {
-	postService                interfaces.PostService
-	memberService              interfaces.MemberService
-	branchService              interfaces.BranchService
-	renderService              interfaces.RenderService
-	projectPostService         interfaces.ProjectPostService
-	postCollaboratorService    interfaces.PostCollaboratorService
-	branchCollaboratorService  interfaces.BranchCollaboratorService
-	discussionService          interfaces.DiscussionService
-	discussionContainerService interfaces.DiscussionContainerService
-	tagService                 interfaces.TagService
+	postService                        interfaces.PostService
+	memberService                      interfaces.MemberService
+	branchService                      interfaces.BranchService
+	renderService                      interfaces.RenderService
+	projectPostService                 interfaces.ProjectPostService
+	postCollaboratorService            interfaces.PostCollaboratorService
+	branchCollaboratorService          interfaces.BranchCollaboratorService
+	discussionService                  interfaces.DiscussionService
+	discussionContainerService         interfaces.DiscussionContainerService
+	tagService                         interfaces.TagService
+	scientificFieldTagContainerService interfaces.ScientificFieldTagContainerService
 }
 
 type ControllerEnv struct {
@@ -97,9 +98,6 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		RenderService:                         renderService,
 		TagService:                            tagService,
 	}
-	memberService := &services.MemberService{
-		MemberRepository: repositoryEnv.memberRepository,
-	}
 	branchService := &services.BranchService{
 		BranchRepository:              repositoryEnv.branchRepository,
 		ClosedBranchRepository:        repositoryEnv.closedBranchRepository,
@@ -132,22 +130,27 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
 		MemberRepository:              repositoryEnv.memberRepository,
 	}
-	discussionContainerService := &services.DiscussionContainerService{
-		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
-	}
 	renderService.BranchService = branchService // added afterwards since both require eachother
 
+	// TODO we really need an automated DI solution..
 	return ServiceEnv{
-		postService:                postService,
-		memberService:              memberService,
-		branchService:              branchService,
-		renderService:              renderService,
-		projectPostService:         projectPostService,
-		postCollaboratorService:    postCollaboratorService,
-		branchCollaboratorService:  branchCollaboratorService,
-		discussionService:          discussionService,
-		discussionContainerService: discussionContainerService,
-		tagService:                 tagService,
+		postService: postService,
+		memberService: &services.MemberService{
+			MemberRepository: repositoryEnv.memberRepository,
+		},
+		branchService:             branchService,
+		renderService:             renderService,
+		projectPostService:        projectPostService,
+		postCollaboratorService:   postCollaboratorService,
+		branchCollaboratorService: branchCollaboratorService,
+		discussionService:         discussionService,
+		discussionContainerService: &services.DiscussionContainerService{
+			DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
+		},
+		tagService: tagService,
+		scientificFieldTagContainerService: &services.ScientificFieldTagContainerService{
+			ContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
+		},
 	}
 }
 
@@ -184,7 +187,8 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 			BranchCollaboratorService: serviceEnv.branchCollaboratorService,
 		},
 		tagController: &controllers.TagController{
-			TagService: serviceEnv.tagService,
+			TagService:                         serviceEnv.tagService,
+			ScientificFieldTagContainerService: serviceEnv.scientificFieldTagContainerService,
 		},
 	}
 }

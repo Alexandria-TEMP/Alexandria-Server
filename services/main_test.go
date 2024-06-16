@@ -86,12 +86,12 @@ func TestMain(m *testing.M) {
 		},
 	}
 	exampleMemberDTO = models.MemberDTO{
-		FirstName:             "John",
-		LastName:              "Smith",
-		Email:                 "john.smith@gmail.com",
-		Password:              "password",
-		Institution:           "TU Delft",
-		ScientificFieldTagIDs: []uint{},
+		FirstName:                     "John",
+		LastName:                      "Smith",
+		Email:                         "john.smith@gmail.com",
+		Password:                      "password",
+		Institution:                   "TU Delft",
+		ScientificFieldTagContainerID: 0,
 	}
 
 	cwd, _ = os.Getwd()

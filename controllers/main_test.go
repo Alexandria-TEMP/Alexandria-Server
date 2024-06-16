@@ -19,15 +19,16 @@ var (
 	branchController BranchController
 	postController   PostController
 	memberController *MemberController
-	tagController    *TagController
+	tagController    TagController
 
-	mockBranchService             *mocks.MockBranchService
-	mockRenderService             *mocks.MockRenderService
-	mockBranchCollaboratorService *mocks.MockBranchCollaboratorService
-	mockPostCollaboratorService   *mocks.MockPostCollaboratorService
-	mockMemberService             *mocks.MockMemberService
-	mockTagService                *mocks.MockTagService
-	mockPostService               *mocks.MockPostService
+	mockBranchService                      *mocks.MockBranchService
+	mockRenderService                      *mocks.MockRenderService
+	mockBranchCollaboratorService          *mocks.MockBranchCollaboratorService
+	mockMemberService                      *mocks.MockMemberService
+	mockTagService                         *mocks.MockTagService
+	mockScientificFieldTagContainerService *mocks.MockScientificFieldTagContainerService
+	mockPostCollaboratorService            *mocks.MockPostCollaboratorService
+	mockPostService                        *mocks.MockPostService
 
 	exampleBranch       models.Branch
 	exampleReview       models.BranchReview
@@ -65,12 +66,12 @@ func TestMain(m *testing.M) {
 		},
 	}
 	exampleMemberDTO = models.MemberDTO{
-		FirstName:             "John",
-		LastName:              "Smith",
-		Email:                 "john.smith@gmail.com",
-		Password:              "password",
-		Institution:           "TU Delft",
-		ScientificFieldTagIDs: []uint{},
+		FirstName:                     "John",
+		LastName:                      "Smith",
+		Email:                         "john.smith@gmail.com",
+		Password:                      "password",
+		Institution:                   "TU Delft",
+		ScientificFieldTagContainerID: 0,
 	}
 
 	exampleMemberForm = forms.MemberCreationForm{
@@ -135,6 +136,7 @@ func SetUpRouter() *gin.Engine {
 	router.GET("/api/v2/tags/scientific/:tagID", func(c *gin.Context) {
 		tagController.GetScientificFieldTag(c)
 	})
+	router.GET("/api/v2/tags/scientific/containers/:containerID", tagController.GetScientificFieldTagContainer)
 
 	postRouter := router.Group("/api/v2/posts")
 	postRouter.GET("/collaborators/all/:postID", postController.GetAllPostCollaborators)
