@@ -83,8 +83,8 @@ type BranchDTO struct {
 	RenderStatus              RenderStatus              `json:"renderStatus" example:"pending"`
 	DiscussionContainerID     uint                      `json:"discussionContainerID" example:"1"`
 	BranchOverallReviewStatus BranchOverallReviewStatus `json:"branchOverallReviewStatus" example:"open for review"`
-	CreatedAt                 time.Time                 `json:"createdAt"`
-	UpdatedAt                 time.Time                 `json:"updatedAt"`
+	CreatedAt                 time.Time                 `json:"createdAt" example:"2024-06-16T16:00:43.234Z"`
+	UpdatedAt                 time.Time                 `json:"updatedAt" example:"2024-06-16T16:00:43.234Z"`
 }
 
 func (model *Branch) GetID() uint {

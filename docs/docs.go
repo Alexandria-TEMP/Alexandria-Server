@@ -3620,11 +3620,6 @@ const docTemplate = `{
         "models.BranchDTO": {
             "type": "object",
             "properties": {
-                "UpdatedPostTitle": {
-                    "description": "MR's proposed changes",
-                    "type": "string",
-                    "example": "Updated Project Post Title"
-                },
                 "branchOverallReviewStatus": {
                     "allOf": [
                         {
@@ -3648,7 +3643,8 @@ const docTemplate = `{
                     ]
                 },
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 },
                 "discussionContainerID": {
                     "type": "integer",
@@ -3680,7 +3676,8 @@ const docTemplate = `{
                     ]
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 },
                 "updatedCompletionStatus": {
                     "allOf": [
@@ -3689,6 +3686,11 @@ const docTemplate = `{
                         }
                     ],
                     "example": "ongoing"
+                },
+                "updatedPostTitle": {
+                    "description": "MR's proposed changes",
+                    "type": "string",
+                    "example": "Updated Project Post Title"
                 },
                 "updatedScientificFieldTagContainerID": {
                     "type": "integer",
@@ -3725,7 +3727,8 @@ const docTemplate = `{
                     "example": "approved"
                 },
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 },
                 "feedback": {
                     "type": "string",
@@ -3986,7 +3989,8 @@ const docTemplate = `{
                     ]
                 },
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 },
                 "discussionContainerID": {
                     "type": "integer",
@@ -4017,15 +4021,12 @@ const docTemplate = `{
                     "example": 1
                 },
                 "title": {
-<<<<<<< HEAD
                     "type": "string",
                     "example": "Post Title"
-=======
-                    "type": "string"
                 },
                 "updatedAt": {
-                    "type": "string"
->>>>>>> main
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 }
             }
         },
@@ -4079,7 +4080,8 @@ const docTemplate = `{
                     ]
                 },
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 },
                 "id": {
                     "type": "integer",
@@ -4115,19 +4117,16 @@ const docTemplate = `{
                     "example": "ongoing"
                 },
                 "projectFeedbackPreference": {
-<<<<<<< HEAD
                     "allOf": [
                         {
                             "$ref": "#/definitions/models.ProjectFeedbackPreference"
                         }
                     ],
                     "example": "formal feedback"
-=======
-                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 },
                 "updatedAt": {
-                    "type": "string"
->>>>>>> main
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 }
             }
         },

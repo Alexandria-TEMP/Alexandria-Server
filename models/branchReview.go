@@ -40,7 +40,7 @@ type BranchReviewDTO struct {
 	MemberID             uint                 `json:"memberID" example:"1"`
 	BranchReviewDecision BranchReviewDecision `json:"branchReviewDecision" example:"approved"`
 	Feedback             string               `json:"feedback" example:"Fantastic work!"`
-	CreatedAt            time.Time            `json:"createdAt"`
+	CreatedAt            time.Time            `json:"createdAt" example:"2024-06-16T16:00:43.234Z"`
 }
 
 func (model *BranchReview) GetID() uint {

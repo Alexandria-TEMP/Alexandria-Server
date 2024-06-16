@@ -49,8 +49,8 @@ type PostDTO struct {
 	ScientificFieldTagContainerID uint         `json:"scientificFieldTagContainerID" example:"1"`
 	DiscussionContainerID         uint         `json:"discussionContainerID" example:"1"`
 	RenderStatus                  RenderStatus `json:"renderStatus" example:"success"`
-	CreatedAt                     time.Time    `json:"createdAt"`
-	UpdatedAt                     time.Time    `json:"updatedAt"`
+	CreatedAt                     time.Time    `json:"createdAt" example:"2024-06-16T16:00:43.234Z"`
+	UpdatedAt                     time.Time    `json:"updatedAt" example:"2024-06-16T16:00:43.234Z"`
 }
 
 func (model *Post) GetID() uint {

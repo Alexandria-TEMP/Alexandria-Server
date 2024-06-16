@@ -79,8 +79,8 @@ type ProjectPostDTO struct {
 	ProjectCompletionStatus   ProjectCompletionStatus   `json:"projectCompletionStatus" example:"ongoing"`
 	ProjectFeedbackPreference ProjectFeedbackPreference `json:"projectFeedbackPreference" example:"formal feedback"`
 	PostReviewStatus          ProjectReviewStatus       `json:"postReviewStatus" example:"open"`
-	CreatedAt                 time.Time                 `json:"createdAt"`
-	UpdatedAt                 time.Time                 `json:"updatedAt"`
+	CreatedAt                 time.Time                 `json:"createdAt" example:"2024-06-16T16:00:43.234Z"`
+	UpdatedAt                 time.Time                 `json:"updatedAt" example:"2024-06-16T16:00:43.234Z"`
 }
 
 func (model *ProjectPost) GetID() uint {
