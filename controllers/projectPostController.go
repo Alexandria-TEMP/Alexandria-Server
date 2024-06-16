@@ -59,6 +59,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 // @Description Create a new project post with a single open branch. Upload to this branch in order to have your post reviewed.
 // @Tags 		project-posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
@@ -105,6 +106,7 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 // @Description Update any number of the aspects of a project post
 // @Tags 		project-posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
 // @Produce		json
 // @Success 	200
@@ -143,6 +145,7 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 // @Description Delete a project post with given ID from database
 // @Tags 		project-posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		projectPostID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
@@ -161,6 +164,7 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Con
 // @Description However, the post files are imported from the given Github repository
 // @Tags 		project-posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.ProjectPostCreationForm	true	"Post Creation Form"
 // @Param		url		query	string							true	"Github repository url"
 // @Produce		json

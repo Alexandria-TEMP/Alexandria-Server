@@ -66,7 +66,7 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 // @Tags 		members
 // @Accept  	json
 // @Param		form	body	forms.MemberCreationForm	true	"Member Creation Form"
-// @Produce		jsonj
+// @Produce		json
 // @Success 	200 	{object} 	models.LoggedInMemberDTO
 // @Failure		400
 // @Failure		500
@@ -124,6 +124,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 // @Description Update the fields of a member
 // @Tags 		members
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		member	body		models.MemberDTO		true	"Updated member"
 // @Produce		json
 // @Success 	200
@@ -174,6 +175,7 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 // @Description Delete a member with given ID from database
 // @Tags 		members
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200
@@ -240,7 +242,7 @@ func (memberController *MemberController) GetAllMembers(c *gin.Context) {
 // @Description	Logs a member in based on email and password and returns an access and refresh token.
 // @Tags 		members
 // @Accept 		json
-// @Param		member	body		models.MemberAuthForm		true	"Member Authentication Form"
+// @Param		member	body		forms.MemberAuthForm		true	"Member Authentication Form"
 // @Produce		json
 // @Success 	200		{object}	models.LoggedInMemberDTO
 // @Failure		400
@@ -279,7 +281,7 @@ func (memberController *MemberController) LoginMember(c *gin.Context) {
 // @Description	Refreshes the access token with a refresh token.
 // @Tags 		members
 // @Accept 		json
-// @Param		member	body		models.TokenRefreshForm		true	"Token Refresh Form"
+// @Param		member	body		forms.TokenRefreshForm		true	"Token Refresh Form"
 // @Produce		json
 // @Success 	200		{object}	models.TokenPairDTO
 // @Failure		400
@@ -389,6 +391,7 @@ func (memberController *MemberController) GetMemberDiscussions(_ *gin.Context) {
 // @Description Adds a post to the saved posts of a member
 // @Tags 		members
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		memberID		path		string			true	"member ID"
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
@@ -405,6 +408,7 @@ func (memberController *MemberController) AddMemberSavedPost(_ *gin.Context) {
 // @Description Adds a project post to the saved project posts of a member
 // @Tags 		members
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		memberID		path		string			true	"member ID"
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json

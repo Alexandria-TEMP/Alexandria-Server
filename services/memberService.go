@@ -11,6 +11,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	AccessTokenDuration  = 15 // mins
+	RefreshTokenDuration = 72 // hours
+)
+
 type MemberService struct {
 	Secret           string
 	MemberRepository database.ModelRepositoryInterface[*models.Member]
@@ -199,7 +204,7 @@ func (memberService *MemberService) RefreshToken(form *forms.TokenRefreshForm) (
 // The access token is short lived (15 mins), but the refresh token has a long expiration time (3 days).
 // When the access token expires, the refresh token can be used to generate a new pair of tokens.
 // Credit: https://medium.com/monstar-lab-bangladesh-engineering/jwt-auth-in-go-dde432440924
-func (memberService *MemberService) generateTokenPair(memberID uint) (string, string, error) {
+func (memberService *MemberService) generateTokenPair(memberID uint) (t, rt string, err error) {
 	// CREATE ACCESS TOKEN
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Header["typ"] = "access"
@@ -207,10 +212,9 @@ func (memberService *MemberService) generateTokenPair(memberID uint) (string, st
 	// Set claims
 	claims, _ := token.Claims.(jwt.MapClaims)
 	claims["sub"] = memberID
-	claims["exp"] = time.Now().Add(time.Minute * 15).Unix() // 15 min timout
+	claims["exp"] = time.Now().Add(time.Minute * time.Duration(AccessTokenDuration)).Unix() // 15 min timout
 
-	// Generate encoded token and send it as response.
-	t, err := token.SignedString([]byte(memberService.Secret))
+	t, err = token.SignedString([]byte(memberService.Secret))
 	if err != nil {
 		return "", "", err
 	}
@@ -220,12 +224,11 @@ func (memberService *MemberService) generateTokenPair(memberID uint) (string, st
 	refreshToken.Header["typ"] = "refresh"
 
 	// Set claims
-	rtClaims := refreshToken.Claims.(jwt.MapClaims)
+	rtClaims, _ := refreshToken.Claims.(jwt.MapClaims)
 	rtClaims["sub"] = memberID
-	rtClaims["exp"] = time.Now().Add(time.Hour * 72).Unix() // 3 day timout
+	rtClaims["exp"] = time.Now().Add(time.Hour * time.Duration(RefreshTokenDuration)).Unix() // 3 day timout
 
-	// Generate encoded token and send it as response.
-	rt, err := refreshToken.SignedString([]byte(memberService.Secret))
+	rt, err = refreshToken.SignedString([]byte(memberService.Secret))
 	if err != nil {
 		return "", "", err
 	}

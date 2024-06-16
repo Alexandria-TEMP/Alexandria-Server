@@ -61,6 +61,7 @@ func (branchController *BranchController) GetBranch(c *gin.Context) {
 // @Description Note that Member IDs passed here, get converted to Collaborator IDs.
 // @Tags 		branches
 // @Accept  	application/json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.BranchCreationForm	true	"Branch Creation Form"
 // @Produce		application/json
 // @Success 	200 	{object} 	models.BranchDTO
@@ -107,6 +108,7 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 // @Description Update any number of the aspects of a branch
 // @Tags 		branches
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		branch	body		models.BranchDTO		true	"Updated Branch"
 // @Produce		json
 // @Success 	200
@@ -121,6 +123,7 @@ func (branchController *BranchController) UpdateBranch(_ *gin.Context) {
 // @Description Delete a branch with given ID from database
 // @Tags 		branches
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		branchID		path		string			true	"branch ID"
 // @Produce		json
 // @Success 	200
@@ -224,6 +227,7 @@ func (branchController *BranchController) GetReview(c *gin.Context) {
 // @Description Adds a branchreview to a branch
 // @Tags 		branches
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.ReviewCreationForm	true	"branchreview creation form"
 // @Produce		json
 // @Success 	200		{object}	models.BranchReviewDTO
@@ -267,6 +271,7 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 // @Description Returns false if user is unauthorized to branchreview the branch
 // @Tags 		branches
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		branchID		path		string			true	"branch ID"
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
@@ -435,6 +440,7 @@ func (branchController *BranchController) GetProject(c *gin.Context) {
 // @Description Call this after you create a post, and supply it with the actual post contents.
 // @Tags 		branches
 // @Accept  	multipart/form-data
+// @Param 		Authorization header string true "Access Token"
 // @Param		branchID		path		string			true	"Branch ID"
 // @Param		file			formData	file			true	"Repository to create"
 // @Produce		application/json

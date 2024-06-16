@@ -15,14 +15,15 @@ func SetUpRouter(controllers *ControllerEnv, secret string) *gin.Engine {
 	router.Use(cors.Default())
 	router.RedirectTrailingSlash = false
 	router.RedirectFixedPath = false
-	err := router.SetTrustedProxies(nil)
-	if err != nil {
+
+	if router.SetTrustedProxies(nil) != nil {
 		return nil
 	}
 
 	// Init middleware
-	if err := InitializeMiddleware(controllers.memberController.MemberService, secret); err != nil {
-		return nil
+	middleware := Middleware{
+		MemberService: controllers.memberController.MemberService,
+		Secret:        secret,
 	}
 
 	// Setup swagger documentation
@@ -33,19 +34,19 @@ func SetUpRouter(controllers *ControllerEnv, secret string) *gin.Engine {
 	// Setup routing
 	v2 := router.Group("/api/v2")
 
-	postRouter(v2, controllers)
+	postRouter(v2, controllers, middleware)
 
-	projectPostRouter(v2, controllers)
+	projectPostRouter(v2, controllers, middleware)
 
-	memberRouter(v2, controllers)
+	memberRouter(v2, controllers, middleware)
 
-	branchRouter(v2, controllers)
+	branchRouter(v2, controllers, middleware)
 
 	filterRouter(v2, controllers)
 
 	tagRouter(v2, controllers)
 
-	discussionRouter(v2, controllers)
+	discussionRouter(v2, controllers, middleware)
 
 	discussionContainerRouter(v2, controllers)
 
@@ -67,79 +68,79 @@ func tagRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	tagRouter.GET("/feedback-preference", controllers.tagController.GetFeedbackPreferenceTags)
 }
 
-func discussionRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
+func discussionRouter(v2 *gin.RouterGroup, controllers *ControllerEnv, middleware Middleware) {
 	discussionRouter := v2.Group("/discussions")
 	discussionRouter.GET("/:discussionID", controllers.discussionController.GetDiscussion)
-	discussionRouter.POST("/roots", CheckAuth, controllers.discussionController.CreateRootDiscussion)
-	discussionRouter.POST("/replies", CheckAuth, controllers.discussionController.CreateReplyDiscussion)
-	discussionRouter.DELETE("/:discussionID", CheckAuth, controllers.discussionController.DeleteDiscussion)
-	discussionRouter.POST("/:discussionID/reports", CheckAuth, controllers.discussionController.AddDiscussionReport)
+	discussionRouter.POST("/roots", middleware.CheckAuth, controllers.discussionController.CreateRootDiscussion)
+	discussionRouter.POST("/replies", middleware.CheckAuth, controllers.discussionController.CreateReplyDiscussion)
+	discussionRouter.DELETE("/:discussionID", middleware.CheckAuth, controllers.discussionController.DeleteDiscussion)
+	discussionRouter.POST("/:discussionID/reports", middleware.CheckAuth, controllers.discussionController.AddDiscussionReport)
 	discussionRouter.GET("/:discussionID/reports", controllers.discussionController.GetDiscussionReports)
 	discussionRouter.GET("/reports/:reportID", controllers.discussionController.GetDiscussionReport)
 }
 
-func branchRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
+func branchRouter(v2 *gin.RouterGroup, controllers *ControllerEnv, middleware Middleware) {
 	branchRouter := v2.Group("/branches")
 	branchRouter.GET("/:branchID", controllers.branchController.GetBranch)
-	branchRouter.POST("", CheckAuth, controllers.branchController.CreateBranch)
-	branchRouter.PUT("", CheckAuth, controllers.branchController.UpdateBranch)
-	branchRouter.DELETE("/:branchID", CheckAuth, controllers.branchController.DeleteBranch)
+	branchRouter.POST("", middleware.CheckAuth, controllers.branchController.CreateBranch)
+	branchRouter.PUT("", middleware.CheckAuth, controllers.branchController.UpdateBranch)
+	branchRouter.DELETE("/:branchID", middleware.CheckAuth, controllers.branchController.DeleteBranch)
 	branchRouter.GET("/:branchID/review-statuses", controllers.branchController.GetReviewStatus)
 	branchRouter.GET("/reviews/:reviewID", controllers.branchController.GetReview)
-	branchRouter.POST("/reviews", CheckAuth, controllers.branchController.CreateReview)
-	branchRouter.GET("/:branchID/can-review/:memberID", CheckAuth, controllers.branchController.MemberCanReview)
+	branchRouter.POST("/reviews", middleware.CheckAuth, controllers.branchController.CreateReview)
+	branchRouter.GET("/:branchID/can-review/:memberID", middleware.CheckAuth, controllers.branchController.MemberCanReview)
 	branchRouter.GET("/collaborators/:collaboratorID", controllers.branchController.GetBranchCollaborator)
 	branchRouter.GET("/:branchID/render", controllers.branchController.GetRender)
 	branchRouter.GET("/:branchID/repository", controllers.branchController.GetProject)
-	branchRouter.POST("/:branchID/upload", CheckAuth, controllers.branchController.UploadProject)
+	branchRouter.POST("/:branchID/upload", middleware.CheckAuth, controllers.branchController.UploadProject)
 	branchRouter.GET("/:branchID/tree", controllers.branchController.GetFiletree)
 	branchRouter.GET("/:branchID/file/*filepath", controllers.branchController.GetFileFromProject)
 	branchRouter.GET("/:branchID/discussions", controllers.branchController.GetDiscussions)
 	branchRouter.GET("/closed/:closedBranchID", controllers.branchController.GetClosedBranch)
 }
 
-func memberRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
+func memberRouter(v2 *gin.RouterGroup, controllers *ControllerEnv, middleware Middleware) {
 	memberRouter := v2.Group("/members")
 	memberRouter.GET("/:memberID", controllers.memberController.GetMember)
 	memberRouter.POST("", controllers.memberController.CreateMember)
-	memberRouter.PUT("", CheckAuth, controllers.memberController.UpdateMember)
-	memberRouter.DELETE("/:memberID", CheckAuth, controllers.memberController.DeleteMember)
+	memberRouter.PUT("", middleware.CheckAuth, controllers.memberController.UpdateMember)
+	memberRouter.DELETE("/:memberID", middleware.CheckAuth, controllers.memberController.DeleteMember)
 	memberRouter.GET("", controllers.memberController.GetAllMembers)
 	memberRouter.GET("/:memberID/posts", controllers.memberController.GetMemberPosts)
 	memberRouter.GET("/:memberID/project-posts", controllers.memberController.GetMemberProjectPosts)
 	memberRouter.GET("/:memberID/branches", controllers.memberController.GetMemberBranches)
 	memberRouter.GET("/:memberID/discussions", controllers.memberController.GetMemberDiscussions)
-	memberRouter.POST("/:memberID/saved-posts", CheckAuth, controllers.memberController.AddMemberSavedPost)
-	memberRouter.POST("/:memberID/saved-project-posts", CheckAuth, controllers.memberController.AddMemberSavedProjectPost)
+	memberRouter.POST("/:memberID/saved-posts", middleware.CheckAuth, controllers.memberController.AddMemberSavedPost)
+	memberRouter.POST("/:memberID/saved-project-posts", middleware.CheckAuth, controllers.memberController.AddMemberSavedProjectPost)
 	memberRouter.GET("/:memberID/saved-posts", controllers.memberController.GetMemberSavedPosts)
 	memberRouter.GET("/:memberID/saved-project-posts", controllers.memberController.GetMemberSavedProjectPosts)
 	memberRouter.GET("/login", controllers.memberController.LoginMember)
 	memberRouter.GET("/token", controllers.memberController.RefreshToken)
 }
 
-func projectPostRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
+func projectPostRouter(v2 *gin.RouterGroup, controllers *ControllerEnv, middleware Middleware) {
 	projectPostRouter := v2.Group("/project-posts")
 	projectPostRouter.GET("/:projectPostID", controllers.projectPostController.GetProjectPost)
-	projectPostRouter.POST("", CheckAuth, controllers.projectPostController.CreateProjectPost)
-	projectPostRouter.PUT("", CheckAuth, controllers.projectPostController.UpdateProjectPost)
-	projectPostRouter.DELETE("/:projectPostID", CheckAuth, controllers.projectPostController.DeleteProjectPost)
-	projectPostRouter.POST("/from-github", CheckAuth, controllers.projectPostController.CreateProjectPostFromGithub)
+	projectPostRouter.POST("", middleware.CheckAuth, controllers.projectPostController.CreateProjectPost)
+	projectPostRouter.PUT("", middleware.CheckAuth, controllers.projectPostController.UpdateProjectPost)
+	projectPostRouter.DELETE("/:projectPostID", middleware.CheckAuth, controllers.projectPostController.DeleteProjectPost)
+	projectPostRouter.POST("/from-github", middleware.CheckAuth, controllers.projectPostController.CreateProjectPostFromGithub)
 	projectPostRouter.GET("/:projectPostID/all-discussions", controllers.projectPostController.GetProjectPostDiscussions)
 	projectPostRouter.GET("/:projectPostID/branches-by-status", controllers.projectPostController.GetProjectPostBranchesByStatus)
 }
 
-func postRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
+func postRouter(v2 *gin.RouterGroup, controllers *ControllerEnv, middleware Middleware) {
 	postRouter := v2.Group("/posts")
 	postRouter.GET("/:postID", controllers.postController.GetPost)
-	postRouter.POST("", CheckAuth, controllers.postController.CreatePost)
-	postRouter.PUT("", CheckAuth, controllers.postController.UpdatePost)
-	postRouter.DELETE("/:postID", CheckAuth, controllers.postController.DeletePost)
-	postRouter.POST("/from-github", CheckAuth, controllers.postController.CreatePostFromGithub)
-	postRouter.POST("/:postID/reports", CheckAuth, controllers.postController.AddPostReport)
+	postRouter.POST("", middleware.CheckAuth, controllers.postController.CreatePost)
+	postRouter.PUT("", middleware.CheckAuth, controllers.postController.UpdatePost)
+	postRouter.DELETE("/:postID", middleware.CheckAuth, controllers.postController.DeletePost)
+	postRouter.POST("/from-github", middleware.CheckAuth, controllers.postController.CreatePostFromGithub)
+	postRouter.POST("/:postID/reports", middleware.CheckAuth, controllers.postController.AddPostReport)
 	postRouter.GET("/:postID/reports", controllers.postController.GetPostReports)
 	postRouter.GET("/reports/:reportID", controllers.postController.GetPostReport)
 	postRouter.GET("/collaborators/:collaboratorID", controllers.postController.GetPostCollaborator)
-	postRouter.POST("/:postID/upload", CheckAuth, controllers.postController.UploadPost)
+	postRouter.POST("/:postID/upload", middleware.CheckAuth, controllers.postController.UploadPost)
 	postRouter.GET("/:postID/render", controllers.postController.GetMainRender)
 	postRouter.GET("/:postID/repository", controllers.postController.GetMainProject)
 	postRouter.GET("/:postID/tree", controllers.postController.GetMainFiletree)

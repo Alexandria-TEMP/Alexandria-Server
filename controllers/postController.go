@@ -62,6 +62,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 // @Description Create a new question or discussion post. Cannot be a project post.
 // @Tags 		posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.PostDTO
@@ -100,6 +101,7 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 // @Description Update any number of aspects of a question or discussion post
 // @Tags 		posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		post	body		models.PostDTO		true	"Updated Post"
 // @Produce		json
 // @Success 	200
@@ -139,6 +141,7 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 // @Description Delete a post with given ID from database
 // @Tags 		posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
@@ -157,6 +160,7 @@ func (postController *PostController) DeletePost(_ *gin.Context) {
 // @Description However, the post files are imported from the given Github repository
 // @Tags 		posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
 // @Param		url		query	string					true	"Github repository url"
 // @Produce		json
@@ -174,6 +178,7 @@ func (postController *PostController) CreatePostFromGithub(_ *gin.Context) {
 // @Description Create a new report for a post
 // @Tags 		posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.ReportCreationForm	true	"Report Creation Form"
 // @Param		postID	path	string						true	"Post ID"
 // @Produce		json
@@ -257,6 +262,7 @@ func (postController *PostController) GetPostReport(_ *gin.Context) {
 // @Description Specifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.
 // @Tags 		posts
 // @Accept  	multipart/form-data
+// @Param 		Authorization header string true "Access Token"
 // @Param		postID			path		string			true	"Post ID"
 // @Param		file			formData	file			true	"Repository to create"
 // @Produce		application/json

@@ -55,6 +55,7 @@ func (discussionController *DiscussionController) GetDiscussion(c *gin.Context) 
 // @Description Create a new root-level discussion, meaning a discussion that is not a reply.
 // @Tags 		discussions
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.RootDiscussionCreationForm	true	"Root Discussion Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.DiscussionDTO
@@ -93,6 +94,7 @@ func (discussionController *DiscussionController) CreateRootDiscussion(c *gin.Co
 // @Description Create a new reply-type discussion, so a discussion that is a child of another discussion.
 // @Tags 		discussions
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.ReplyDiscussionCreationForm	true	"Reply Discussion Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.DiscussionDTO
@@ -131,6 +133,7 @@ func (discussionController *DiscussionController) CreateReplyDiscussion(c *gin.C
 // @Description Delete a discussion with given ID from database
 // @Tags 		discussions
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		discussionID		path		string			true	"discussion ID"
 // @Produce		json
 // @Success 	200
@@ -147,6 +150,7 @@ func (discussionController *DiscussionController) DeleteDiscussion(_ *gin.Contex
 // @Description Create a new report for a discussion
 // @Tags 		discussions
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.ReportCreationForm	true	"Report Creation Form"
 // @Param		discussionID		path		string			true	"Discussion ID"
 // @Produce		json

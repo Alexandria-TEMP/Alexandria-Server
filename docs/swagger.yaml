@@ -50,6 +50,13 @@ definitions:
           type: integer
         type: array
     type: object
+  forms.MemberAuthForm:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
   forms.MemberCreationForm:
     properties:
       email:
@@ -131,6 +138,11 @@ definitions:
         type: integer
       discussion:
         $ref: '#/definitions/forms.DiscussionCreationForm'
+    type: object
+  forms.TokenRefreshForm:
+    properties:
+      refreshToken:
+        type: string
     type: object
   models.BranchCollaboratorDTO:
     properties:
@@ -254,6 +266,15 @@ definitions:
       text:
         type: string
     type: object
+  models.LoggedInMemberDTO:
+    properties:
+      accessToken:
+        type: string
+      member:
+        $ref: '#/definitions/models.MemberDTO'
+      refreshToken:
+        type: string
+    type: object
   models.MemberDTO:
     properties:
       email:
@@ -265,8 +286,6 @@ definitions:
       institution:
         type: string
       lastName:
-        type: string
-      password:
         type: string
       scientificFieldTagIDs:
         items:
@@ -400,6 +419,13 @@ definitions:
           type: integer
         type: array
     type: object
+  models.TokenPairDTO:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
   reports.DiscussionReportDTO:
     properties:
       discussionID:
@@ -425,6 +451,11 @@ paths:
         Create a new branch linked to a project post.
         Note that Member IDs passed here, get converted to Collaborator IDs.
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Branch Creation Form
         in: body
         name: form
@@ -450,6 +481,11 @@ paths:
       - application/json
       description: Update any number of the aspects of a branch
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Updated Branch
         in: body
         name: branch
@@ -474,6 +510,11 @@ paths:
       - application/json
       description: Delete a branch with given ID from database
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: branch ID
         in: path
         name: branchID
@@ -525,6 +566,11 @@ paths:
         Returns true if the user fulfills the requirements to branchreview the branch
         Returns false if user is unauthorized to branchreview the branch
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: branch ID
         in: path
         name: branchID
@@ -738,6 +784,11 @@ paths:
         Specifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.
         Call this after you create a post, and supply it with the actual post contents.
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Branch ID
         in: path
         name: branchID
@@ -817,6 +868,11 @@ paths:
       - application/json
       description: Adds a branchreview to a branch
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: branchreview creation form
         in: body
         name: form
@@ -897,6 +953,11 @@ paths:
       - application/json
       description: Delete a discussion with given ID from database
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: discussion ID
         in: path
         name: discussionID
@@ -976,6 +1037,11 @@ paths:
       - application/json
       description: Create a new report for a discussion
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Report Creation Form
         in: body
         name: form
@@ -1010,6 +1076,11 @@ paths:
       description: Create a new reply-type discussion, so a discussion that is a child
         of another discussion.
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Reply Discussion Creation Form
         in: body
         name: form
@@ -1062,6 +1133,11 @@ paths:
       description: Create a new root-level discussion, meaning a discussion that is
         not a reply.
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Root Discussion Creation Form
         in: body
         name: form
@@ -1184,7 +1260,10 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new member from the given fields
+      description: |-
+        Create a new member from the given fields.
+        The member must have a unique email address, which isn't associated with any other accounts.
+        They are automatically logged in, and an access + refresh token pair is returned alongside the member
       parameters:
       - description: Member Creation Form
         in: body
@@ -1198,7 +1277,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.MemberDTO'
+            $ref: '#/definitions/models.LoggedInMemberDTO'
         "400":
           description: Bad Request
         "500":
@@ -1211,6 +1290,11 @@ paths:
       - application/json
       description: Update the fields of a member
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Updated member
         in: body
         name: member
@@ -1235,6 +1319,11 @@ paths:
       - application/json
       description: Delete a member with given ID from database
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: member ID
         in: path
         name: memberID
@@ -1431,6 +1520,11 @@ paths:
       - application/json
       description: Adds a post to the saved posts of a member
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: member ID
         in: path
         name: memberID
@@ -1488,6 +1582,11 @@ paths:
       - application/json
       description: Adds a project post to the saved project posts of a member
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: member ID
         in: path
         name: memberID
@@ -1510,12 +1609,74 @@ paths:
       summary: Adds new saved project post
       tags:
       - members
+  /members/login:
+    get:
+      consumes:
+      - application/json
+      description: Logs a member in based on email and password and returns an access
+        and refresh token.
+      parameters:
+      - description: Member Authentication Form
+        in: body
+        name: member
+        required: true
+        schema:
+          $ref: '#/definitions/forms.MemberAuthForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoggedInMemberDTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Logs a member in
+      tags:
+      - members
+  /members/token:
+    get:
+      consumes:
+      - application/json
+      description: Refreshes the access token with a refresh token.
+      parameters:
+      - description: Token Refresh Form
+        in: body
+        name: member
+        required: true
+        schema:
+          $ref: '#/definitions/forms.TokenRefreshForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TokenPairDTO'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Refreshes the access token.
+      tags:
+      - members
   /posts:
     post:
       consumes:
       - application/json
       description: Create a new question or discussion post. Cannot be a project post.
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Post Creation Form
         in: body
         name: form
@@ -1541,6 +1702,11 @@ paths:
       - application/json
       description: Update any number of aspects of a question or discussion post
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Updated Post
         in: body
         name: post
@@ -1567,6 +1733,11 @@ paths:
       - application/json
       description: Delete a post with given ID from database
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: post ID
         in: path
         name: postID
@@ -1708,6 +1879,11 @@ paths:
       - application/json
       description: Create a new report for a post
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Report Creation Form
         in: body
         name: form
@@ -1797,6 +1973,11 @@ paths:
         Upload a zipped quarto project to a post. This is the main version of the post, as there are no other versions.
         Specifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Post ID
         in: path
         name: postID
@@ -1856,6 +2037,11 @@ paths:
         Creates a post in the same way as CreatePost
         However, the post files are imported from the given Github repository
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Post Creation Form
         in: body
         name: form
@@ -1915,6 +2101,11 @@ paths:
       description: Create a new project post with a single open branch. Upload to
         this branch in order to have your post reviewed.
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Project Post Creation Form
         in: body
         name: form
@@ -1940,6 +2131,11 @@ paths:
       - application/json
       description: Update any number of the aspects of a project post
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Updated Project Post
         in: body
         name: post
@@ -1964,6 +2160,11 @@ paths:
       - application/json
       description: Delete a project post with given ID from database
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: post ID
         in: path
         name: projectPostID
@@ -2074,6 +2275,11 @@ paths:
         Creates a project post in the same way as CreateProjectPost
         However, the post files are imported from the given Github repository
       parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Post Creation Form
         in: body
         name: form

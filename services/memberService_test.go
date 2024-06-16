@@ -121,6 +121,36 @@ func TestCreateMemberUnsuccessful(t *testing.T) {
 	assert.Equal(t, expectedErr, err)
 }
 
+func TestCreateMemberDuplicateEmail(t *testing.T) {
+	beforeEachMember(t)
+
+	expectedErr := fmt.Errorf("error")
+
+	// set up repository mock to return an error
+	mockMemberRepository.EXPECT().Create(gomock.Any()).Return(expectedErr)
+	mockMemberRepository.EXPECT().Query(&models.Member{Email: "john.smith@gmail.com"}).Return([]*models.Member{nil, nil}, nil)
+
+	// set up a member creation form
+	memberForm := forms.MemberCreationForm{
+		FirstName:   "John",
+		LastName:    "Smith",
+		Email:       "john.smith@gmail.com",
+		Password:    "password",
+		Institution: "TU Delft",
+	}
+
+	// manually set up the member tags
+	userTags := models.ScientificFieldTagContainer{
+		ScientificFieldTags: []*models.ScientificFieldTag{exampleSTag1, exampleSTag2},
+	}
+
+	// call service method under test
+	_, err := memberService.CreateMember(&memberForm, &userTags)
+
+	// verify the error was returned correctly
+	assert.NotNil(t, err)
+}
+
 func TestUpdateMemberSuccessful(t *testing.T) {
 	beforeEachMember(t)
 
@@ -224,6 +254,56 @@ func TestLoginMemberFailureNoEmailMatches(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-// func TestRefreshTokenSuccess(t *testing.T) {
+func TestRefreshTokenSuccess(t *testing.T) {
+	beforeEachMember(t)
 
-// }
+	// generate valid refresh token
+	_, refreshToken, err := memberService.generateTokenPair(uint(1))
+	assert.Nil(t, err)
+
+	mockMemberRepository.EXPECT().GetByID(uint(1)).Return(nil, nil)
+
+	validForm := forms.TokenRefreshForm{RefreshToken: refreshToken}
+
+	tokenPair, err := memberService.RefreshToken(&validForm)
+	assert.Nil(t, err)
+	assert.NotNil(t, tokenPair.AccessToken)
+	assert.NotNil(t, tokenPair.RefreshToken)
+}
+
+func TestRefreshTokenFailureWrongTyp(t *testing.T) {
+	beforeEachMember(t)
+
+	// generate valid refresh token
+	accessToken, _, err := memberService.generateTokenPair(uint(1))
+	assert.Nil(t, err)
+
+	mockMemberRepository.EXPECT().GetByID(uint(1))
+
+	validForm := forms.TokenRefreshForm{RefreshToken: accessToken}
+
+	_, err = memberService.RefreshToken(&validForm)
+	assert.NotNil(t, err)
+}
+
+func TestRefreshTokenFailureInvalid(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberRepository.EXPECT().GetByID(uint(1))
+
+	validForm := forms.TokenRefreshForm{RefreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"}
+
+	_, err := memberService.RefreshToken(&validForm)
+	assert.NotNil(t, err)
+}
+
+func TestRefreshTokenFailureCantParse(t *testing.T) {
+	beforeEachMember(t)
+
+	mockMemberRepository.EXPECT().GetByID(uint(1))
+
+	validForm := forms.TokenRefreshForm{RefreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6ddpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWFsIjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"}
+
+	_, err := memberService.RefreshToken(&validForm)
+	assert.NotNil(t, err)
+}
