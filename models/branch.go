@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"slices"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -82,6 +83,8 @@ type BranchDTO struct {
 	RenderStatus              RenderStatus              `json:"renderStatus"`
 	DiscussionContainerID     uint                      `json:"discussionContainerID"`
 	BranchOverallReviewStatus BranchOverallReviewStatus `json:"branchOverallReviewStatus"`
+	CreatedAt                 time.Time                 `json:"createdAt"`
+	UpdatedAt                 time.Time                 `json:"updatedAt"`
 }
 
 func (model *Branch) GetID() uint {
@@ -101,6 +104,8 @@ func (model *Branch) IntoDTO() BranchDTO {
 		model.RenderStatus,
 		model.DiscussionContainerID,
 		model.BranchOverallReviewStatus,
+		model.CreatedAt,
+		model.UpdatedAt,
 	}
 }
 
