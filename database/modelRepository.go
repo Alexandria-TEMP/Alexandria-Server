@@ -55,7 +55,7 @@ func (repo *ModelRepository[T]) Update(object T) (T, error) {
 	}
 
 	// Save the new data
-	result = repo.Database.Save(object)
+	result = repo.Database.Preload(clause.Associations).Save(object)
 	if result.Error != nil {
 		var zero T
 		return zero, fmt.Errorf("could not update model with ID %d: %w", id, result.Error)
@@ -86,7 +86,7 @@ func (repo *ModelRepository[T]) Delete(id uint) error {
 func (repo *ModelRepository[T]) Query(conds ...interface{}) ([]T, error) {
 	var models []T
 
-	result := repo.Database.Preload(clause.Associations).Find(&models, conds[0:]...)
+	result := repo.Database.Preload(clause.Associations).Order("created_at DESC").Find(&models, conds[0:]...)
 
 	if result.Error != nil {
 		return nil, fmt.Errorf("could not query: result.Error")
@@ -102,7 +102,7 @@ func (repo *ModelRepository[T]) QueryPaginated(page, size int, conds ...interfac
 		// Performs pagination
 		offset := (page - 1) * size
 		return db.Offset(offset).Limit(size)
-	}).Preload(clause.Associations).Find(&models, conds[0:]...)
+	}).Preload(clause.Associations).Order("created_at DESC").Find(&models, conds[0:]...)
 
 	if result.Error != nil {
 		return nil, fmt.Errorf("could not query: result.Error")

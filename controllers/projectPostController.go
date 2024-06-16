@@ -14,7 +14,10 @@ import (
 // @BasePath /api/v2
 
 type ProjectPostController struct {
-	ProjectPostService interfaces.ProjectPostService
+	ProjectPostService         interfaces.ProjectPostService
+	DiscussionContainerService interfaces.DiscussionContainerService
+	PostService                interfaces.PostService
+	RenderService              interfaces.RenderService
 }
 
 // GetProjectPost godoc
@@ -22,54 +25,53 @@ type ProjectPostController struct {
 // @Description Get a project post by ID
 // @Tags 		project-posts
 // @Accept  	json
-// @Param		postID		path		string			true	"Post ID"
+// @Param		projectPostID		path		string			true	"Post ID"
 // @Produce		json
 // @Success 	200 		{object}	models.ProjectPostDTO
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		404 		{object} 	utils.HTTPError
-// @Failure		500 		{object} 	utils.HTTPError
-// @Router 		/project-posts/{postID}	[get]
+// @Failure		400
+// @Failure		404
+// @Router 		/project-posts/{projectPostID}	[get]
 func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Context) {
-	// extract postID
-	postIDStr := c.Param("postID")
-	postID, err := strconv.ParseUint(postIDStr, 10, 64)
+	// extract projectPostID
+	projectPostIDStr := c.Param("projectPostID")
+	projectPostID, err := strconv.ParseUint(projectPostIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not interpret ID %s as unsigned integer, reason: %s", postIDStr, err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not interpret ID %s as unsigned integer, reason: %s", projectPostIDStr, err)})
 
 		return
 	}
 
-	projectPost, err := projectPostController.ProjectPostService.GetProjectPost(uint(postID))
+	projectPost, err := projectPostController.ProjectPostService.GetProjectPost(uint(projectPostID))
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get project post, reason: %s", err)})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get project post, reason: %v", err.Error())})
 
 		return
 	}
 
 	// response
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, projectPost)
+	c.JSON(http.StatusOK, projectPost.IntoDTO())
 }
 
 // CreateProjectPost godoc
 // @Summary 	Create new project post
-// @Description Create a new project post
+// @Description Create a new project post with a single open branch. Upload to this branch in order to have your post reviewed.
 // @Tags 		project-posts
 // @Accept  	json
 // @Param		form	body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500 	{object} 	utils.HTTPError
+// @Failure		400
+// @Failure		500
 // @Router 		/project-posts		[post]
 func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Context) {
 	form := forms.ProjectPostCreationForm{}
 	err := c.BindJSON(&form)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid project post creation form: %s", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid project post creation form: %v", err.Error())})
 
 		return
 	}
@@ -80,16 +82,23 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 		return
 	}
 
-	projectPost, err := projectPostController.ProjectPostService.CreateProjectPost(&form)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("internal server error: %s", err)})
+	projectPost, err404, err500 := projectPostController.ProjectPostService.CreateProjectPost(&form)
+
+	if err404 != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("not found: %v", err404.Error())})
+
+		return
+	}
+
+	if err500 != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("internal server error: %v", err500.Error())})
 
 		return
 	}
 
 	// response
 	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, projectPost)
+	c.JSON(http.StatusOK, projectPost.IntoDTO())
 }
 
 // UpdateProjectPost godoc
@@ -100,10 +109,8 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 // @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
 // @Produce		json
 // @Success 	200
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		404 		{object} 	utils.HTTPError
-// @Failure		500 		{object} 	utils.HTTPError
+// @Failure		400
+// @Failure		404
 // @Router 		/project-posts 		[put]
 func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Context) {
 	// extract post
@@ -137,13 +144,13 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 // @Description Delete a project post with given ID from database
 // @Tags 		project-posts
 // @Accept  	json
-// @Param		postID		path		string			true	"post ID"
+// @Param		projectPostID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
-// @Router 		/project-posts/{postID} 		[delete]
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router 		/project-posts/{projectPostID} 		[delete]
 func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Context) {
 	// delete method goes here
 }
@@ -159,42 +166,77 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Con
 // @Param		url		query	string							true	"Github repository url"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500 	{object} 	utils.HTTPError
-// @Failure 	502 	{object}	utils.HTTPError
+// @Failure		400
+// @Failure		500
+// @Failure 	502
 // @Router 		/project-posts/from-github 		[post]
 func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(_ *gin.Context) {
 
 }
 
-// GetProjectPostDiscussions godoc
-// @Summary Returns all discussion IDs associated with the project post
-// @Description Returns all discussion IDs on this project post over all its previous versions, instead of only the current version
+// GetProjectPostDiscussionContainers godoc
+// @Summary Returns all discussion container IDs associated with the project post
+// @Description Returns all discussion container IDs on this project post over all its previous merged versions, instead of only the current version
 // @Tags 		project-posts
 // @Accept  	json
-// @Param		postID		path		string			true	"post ID"
+// @Param		projectPostID		path		string			true	"project post ID"
 // @Produce		json
-// @Success 	200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
-// @Router		/project-posts/{postID}/all-discussions 	[get]
-func (projectPostController *ProjectPostController) GetProjectPostDiscussions(_ *gin.Context) {
-	// TODO implement
+// @Success 	200		{object}	models.DiscussionContainerProjectHistoryDTO
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router		/project-posts/{projectPostID}/all-discussion-containers 	[get]
+func (projectPostController *ProjectPostController) GetProjectPostDiscussionContainers(c *gin.Context) {
+	// Get project post ID from path
+	projectPostIDString := c.Param("projectPostID")
+
+	projectPostID, err := strconv.ParseUint(projectPostIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not parse project post ID '%s' as unsigned integer: %s", projectPostIDString, err)})
+
+		return
+	}
+
+	// Get the discussion container history!
+	discussionContainerHistory, err := projectPostController.ProjectPostService.GetDiscussionContainersFromMergeHistory(uint(projectPostID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get discussion containers of project post: %s", err)})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, discussionContainerHistory)
 }
 
-// GetProjectPostMRsByStatus godoc
-// @Summary 	Returns MR IDs grouped by each MR status
-// @Description Returns all MR IDs of this project post, grouped by each MR's review status
+// GetProjectPostBranchesByStatus godoc
+// @Summary 	Get branch IDs by review status
+// @Description Returns all branch IDs of this project post, grouped by each branch's review status
 // @Tags		project-posts
 // @Accept		json
-// @Param		postID	path	string	true	"post ID"
+// @Param		projectPostID	path	string	true	"project post ID"
 // @Produce		json
-// @Success		200		{object}	forms.GroupedBranchForm
-// @Failure		400		{object}	utils.HTTPError
-// @Failure		404		{object}	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
-// @Router		/project-posts/{postID}/branches-by-status	[get]
-func (projectPostController *ProjectPostController) GetProjectPostMRsByStatus(_ *gin.Context) {
-	// TODO implement
+// @Success		200		{object}	models.BranchesGroupedByReviewStatusDTO
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router		/project-posts/{projectPostID}/branches-by-status	[get]
+func (projectPostController *ProjectPostController) GetProjectPostBranchesByStatus(c *gin.Context) {
+	// Get project post ID from path
+	projectPostIDString := c.Param("projectPostID")
+
+	projectPostID, err := strconv.ParseUint(projectPostIDString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not parse project post ID '%s' as unsigned integer: %s", projectPostIDString, err)})
+
+		return
+	}
+
+	branchesGroupedByStatus, err := projectPostController.ProjectPostService.GetBranchesGroupedByReviewStatus(uint(projectPostID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get branches by status: %s", err)})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, branchesGroupedByStatus)
 }

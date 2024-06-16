@@ -64,11 +64,6 @@ test_pkg_controllers:
   variables:
     PKG: controllers
 
-test_pkg_filesystem:
-  extends: .package_tests
-  variables:
-    PKG: filesystem
-
 test_pkg_models:
   extends: .package_tests
   variables:
@@ -78,8 +73,3 @@ test_pkg_services:
   extends: .package_tests
   variables:
     PKG: services
-
-test_pkg_utils:
-  extends: .package_tests
-  variables:
-    PKG: utils

@@ -2,6 +2,7 @@ package filesystem
 
 import (
 	"archive/zip"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-git/go-git/v5"
 )
 
 type Filesystem struct {
@@ -20,6 +22,7 @@ type Filesystem struct {
 	CurrentQuartoDirPath string
 	CurrentZipFilePath   string
 	CurrentRenderDirPath string
+	CurrentRepository    *git.Repository
 }
 
 var (
@@ -28,6 +31,22 @@ var (
 	defaultZipName             = "quarto_project.zip"
 	defaultQuartoDirectoryName = "quarto_project"
 )
+
+// NewFilesystem initializes a new filesystem by setting the root to the current working directory and assigning default values.
+func NewFilesystem() *Filesystem {
+	filesystem := &Filesystem{
+		rootPath:            defaultRootPath,
+		zipName:             defaultZipName,
+		quartoDirectoryName: defaultQuartoDirectoryName,
+	}
+
+	err := os.MkdirAll(filesystem.rootPath, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+
+	return filesystem
+}
 
 func (filesystem *Filesystem) GetCurrentDirPath() string {
 	return filesystem.CurrentDirPath
@@ -45,43 +64,28 @@ func (filesystem *Filesystem) GetCurrentRenderDirPath() string {
 	return filesystem.CurrentRenderDirPath
 }
 
-// InitFilesystem initializes a new filesystem by setting the root to the current working directory and assigning default values.
-func InitFilesystem() *Filesystem {
-	filesystem := &Filesystem{
-		rootPath:            defaultRootPath,
-		zipName:             defaultZipName,
-		quartoDirectoryName: defaultQuartoDirectoryName,
-	}
-
-	err := os.MkdirAll(filesystem.rootPath, os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-
-	return filesystem
-}
-
-// SetCurrentVersion will set the paths the filesystem uses in accordance with the IDs passed.
-func (filesystem *Filesystem) SetCurrentVersion(versionID uint) {
-	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(versionID), 10))
+func (filesystem *Filesystem) CheckoutDirectory(postID uint) {
+	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10))
 	filesystem.CurrentQuartoDirPath = filepath.Join(filesystem.CurrentDirPath, filesystem.quartoDirectoryName)
 	filesystem.CurrentZipFilePath = filepath.Join(filesystem.CurrentDirPath, filesystem.zipName)
 	filesystem.CurrentRenderDirPath = filepath.Join(filesystem.CurrentDirPath, "render")
+
+	// try to open repository if it exists
+	filesystem.CurrentRepository, _ = filesystem.CheckoutRepository()
 }
 
-// SaveRepository saves a zip file to a ./vfs/{versionID} in the filesystem and return the path to the directory.
-func (filesystem *Filesystem) SaveRepository(c *gin.Context, file *multipart.FileHeader) error {
+func (filesystem *Filesystem) SaveZipFile(c *gin.Context, file *multipart.FileHeader) error {
 	// Save zip file
 	err := c.SaveUploadedFile(file, filesystem.CurrentZipFilePath)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to save uploaded file: %w", err)
 	}
 
 	return nil
 }
 
-// Unzip will unzip the quarto_project.zip file, if present, of any post version.
+// Unzip will unzip the quarto_project.zip file, if present.
 // Errors if there is no such file or it can't unzip it.
 func (filesystem *Filesystem) Unzip() error {
 	archive, err := zip.OpenReader(filesystem.CurrentZipFilePath)
@@ -97,28 +101,28 @@ func (filesystem *Filesystem) Unzip() error {
 			err = os.MkdirAll(filePath, os.ModePerm)
 
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to make directory: %w", err)
 			}
 
 			continue
 		}
 
 		if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
-			return err
+			return fmt.Errorf("failed to make file: %w", err)
 		}
 
 		dstFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to open file to copy: %w", err)
 		}
 
 		fileInArchive, err := f.Open()
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to open file in zip: %w", err)
 		}
 
 		if _, err := io.Copy(dstFile, fileInArchive); err != nil {
-			return err
+			return fmt.Errorf("failed to copy file contents: %w", err)
 		}
 
 		dstFile.Close()
@@ -128,8 +132,8 @@ func (filesystem *Filesystem) Unzip() error {
 	return nil
 }
 
-// RemoveRepository entirely removes a version repository
-func (filesystem *Filesystem) RemoveRepository() error {
+// RemoveRepository entirely removes a repository
+func (filesystem *Filesystem) DeleteRepository() error {
 	err := os.RemoveAll(filesystem.CurrentDirPath)
 
 	if err != nil {
@@ -176,14 +180,14 @@ func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
 
 			relativePath, err := filepath.Rel(filesystem.CurrentQuartoDirPath, path)
 
+			if err != nil {
+				return fmt.Errorf("the rquested file lies outside of the repository: %w", err)
+			}
+
 			// If its a directory add it with size -1
 			if info.IsDir() {
 				fileTree[relativePath] = -1
 				return nil
-			}
-
-			if err != nil {
-				return err
 			}
 
 			fileTree[relativePath] = info.Size()
@@ -192,7 +196,7 @@ func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
 		})
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to recursively walk files: %w", err)
 	}
 
 	return fileTree, nil

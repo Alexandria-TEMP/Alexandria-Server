@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -27,9 +26,9 @@ type MemberController struct {
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200 		{object}	models.MemberDTO
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		404 		{object} 	utils.HTTPError
-// @Failure		500			{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{memberID}	[get]
 func (memberController *MemberController) GetMember(c *gin.Context) {
 	// extract the id of the member
@@ -50,13 +49,12 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 
 	// if there was an error, print it and return status 404: not found
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get member: %s", err)})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get member with ID %d: %s", memberID, err)})
 
 		return
 	}
 
 	// if correct response send the member back
-	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, member)
 }
 
@@ -68,8 +66,8 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 // @Param		form	body	forms.MemberCreationForm	true	"Member Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.MemberDTO
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		500
 // @Router 		/members 		[post]
 func (memberController *MemberController) CreateMember(c *gin.Context) {
 	form := forms.MemberCreationForm{}
@@ -95,7 +93,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	// getting the tags from tag service
 	tagArray, err := memberController.TagService.GetTagsFromIDs(tagIDs)
 
-	tagContainer := tags.ScientificFieldTagContainer{
+	tagContainer := models.ScientificFieldTagContainer{
 		ScientificFieldTags: tagArray,
 	}
 
@@ -127,9 +125,8 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 // @Param		member	body		models.MemberDTO		true	"Updated member"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		404
+// @Failure		500
 // @Router 		/members 		[put]
 func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	// get the new member object
@@ -147,7 +144,7 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 	tagIDs := updatedMember.ScientificFieldTagIDs
 	// call the method from the tag service
 	tagArray, err := memberController.TagService.GetTagsFromIDs(tagIDs)
-	tagContainer := tags.ScientificFieldTagContainer{
+	tagContainer := models.ScientificFieldTagContainer{
 		ScientificFieldTags: tagArray,
 	}
 
@@ -179,9 +176,9 @@ func (memberController *MemberController) UpdateMember(c *gin.Context) {
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{memberID} 		[delete]
 func (memberController *MemberController) DeleteMember(c *gin.Context) {
 	// extract the id of the member
@@ -221,8 +218,8 @@ func (memberController *MemberController) DeleteMember(c *gin.Context) {
 // @Tags		members
 // @Produce		json
 // @Success		200		{array}		models.MemberShortFormDTO
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		404
+// @Failure		500
 // @Router		/members	[get]
 func (memberController *MemberController) GetAllMembers(c *gin.Context) {
 	members, err := memberController.MemberService.GetAllMembers()
@@ -247,9 +244,9 @@ func (memberController *MemberController) GetAllMembers(c *gin.Context) {
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{memberID}/posts 		[get]
 func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 	// return all the posts
@@ -265,9 +262,9 @@ func (memberController *MemberController) GetMemberPosts(_ *gin.Context) {
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{memberID}/project-posts 		[get]
 func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) {
 	// return all the project posts
@@ -283,9 +280,9 @@ func (memberController *MemberController) GetMemberProjectPosts(_ *gin.Context) 
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{memberID}/branches 		[get]
 func (memberController *MemberController) GetMemberBranches(_ *gin.Context) {
 	// return all the branches
@@ -301,9 +298,9 @@ func (memberController *MemberController) GetMemberBranches(_ *gin.Context) {
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{memberID}/discussions		[get]
 func (memberController *MemberController) GetMemberDiscussions(_ *gin.Context) {
 	// returns all the discussions this member is a part of
@@ -319,8 +316,8 @@ func (memberController *MemberController) GetMemberDiscussions(_ *gin.Context) {
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		500
 // @Router 		/members/{memberID}/saved-posts/{postID} 		[post]
 func (memberController *MemberController) AddMemberSavedPost(_ *gin.Context) {
 
@@ -335,8 +332,8 @@ func (memberController *MemberController) AddMemberSavedPost(_ *gin.Context) {
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		500
 // @Router 		/members/{memberID}/saved-project-posts/{postID} 		[post]
 func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Context) {
 
@@ -350,9 +347,9 @@ func (memberController *MemberController) AddMemberSavedProjectPost(_ *gin.Conte
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{memberID}/saved-posts 		[get]
 func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
 	// return all saved posts of this member
@@ -367,9 +364,9 @@ func (memberController *MemberController) GetMemberSavedPosts(_ *gin.Context) {
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/members/{memberID}/saved-project-posts 		[get]
 func (memberController *MemberController) GetMemberSavedProjectPosts(_ *gin.Context) {
 	// return all the project posts that this member has saved

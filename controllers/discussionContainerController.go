@@ -23,9 +23,9 @@ type DiscussionContainerController struct {
 // @Param		discussionContainerID		path		string			true	"Discussion Container ID"
 // @Produce		json
 // @Success 	200 		{object}	models.DiscussionContainerDTO
-// @Failure		400 		{object} 	utils.HTTPError
-// @Failure		404 		{object} 	utils.HTTPError
-// @Failure		500 		{object} 	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/discussion-containers/{discussionContainerID}	[get]
 func (discussionContainerController *DiscussionContainerController) GetDiscussionContainer(c *gin.Context) {
 	// Get the discussion container ID from the path
@@ -41,7 +41,7 @@ func (discussionContainerController *DiscussionContainerController) GetDiscussio
 	// Fetch the discussion container from the database
 	discussionContainer, err := discussionContainerController.DiscussionContainerService.GetDiscussionContainer(uint(discussionContainerID))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get discussion container: %s", err)})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get discussion container: %v", err.Error())})
 
 		return
 	}

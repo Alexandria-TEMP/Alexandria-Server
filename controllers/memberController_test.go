@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -76,7 +75,7 @@ func TestCreateMember200(t *testing.T) {
 	beforeEachMember(t)
 
 	mockMemberService.EXPECT().CreateMember(&exampleMemberForm, gomock.Any()).Return(&exampleMember, nil).Times(1)
-	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*tags.ScientificFieldTag{}, nil).Times(1)
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
 
 	exampleMemberFormJSON, _ := json.Marshal(exampleMemberForm)
 	req, _ := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(exampleMemberFormJSON))
@@ -147,7 +146,7 @@ func TestUpdateMember200(t *testing.T) {
 	beforeEachMember(t)
 
 	mockMemberService.EXPECT().UpdateMember(&exampleMemberDTO, gomock.Any()).Return(nil).Times(1)
-	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*tags.ScientificFieldTag{}, nil).Times(1)
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
 
 	exampleMemberDTOJSON, _ := json.Marshal(exampleMemberDTO)
 	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(exampleMemberDTOJSON))
@@ -175,7 +174,7 @@ func TestUpdateMember404(t *testing.T) {
 	beforeEachMember(t)
 
 	mockMemberService.EXPECT().UpdateMember(gomock.Any(), gomock.Any()).Return(errors.New("some error")).Times(1)
-	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*tags.ScientificFieldTag{}, nil).Times(1)
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
 
 	exampleMemberDTOJSON, _ := json.Marshal(exampleMemberDTO)
 	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(exampleMemberDTOJSON))

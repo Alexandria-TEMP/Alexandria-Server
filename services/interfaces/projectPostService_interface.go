@@ -9,9 +9,15 @@ import (
 
 type ProjectPostService interface {
 	GetProjectPost(postID uint) (*models.ProjectPost, error)
-	CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error)
+	CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error, error)
 	UpdateProjectPost(updatedPost *models.ProjectPost) error
 
 	// Return a filtered list of project post IDs
-	Filter(page, size int, form forms.FilterForm) ([]uint, error)
+	Filter(page, size int, form forms.ProjectPostFilterForm) ([]uint, error)
+
+	// GetBranchesGroupedByReviewStatus returns branch IDs grouped by their branch review status
+	GetBranchesGroupedByReviewStatus(projectPostID uint) (*models.BranchesGroupedByReviewStatusDTO, error)
+
+	// GetDiscussionContainersFromMergeHistory returns discussion containers from the current project version + all previous merged versions
+	GetDiscussionContainersFromMergeHistory(postID uint) (*models.DiscussionContainerProjectHistoryDTO, error)
 }

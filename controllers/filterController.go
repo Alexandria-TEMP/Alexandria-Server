@@ -22,26 +22,26 @@ type FilterController struct {
 // @Description Endpoint is offset-paginated
 // @Tags 		filtering
 // @Accept  	json
-// @Param		form	body		forms.FilterForm	true	"Filter form"
-// @Param 		page	query		uint				false	"page query"
-// @Param		size	query		uint				false	"page size"
+// @Param		form	body		forms.PostFilterForm	true	"Post filter form"
+// @Param 		page	query		uint					false	"page query"
+// @Param		size	query		uint					false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/filter/posts		[get]
 func (filterController *FilterController) FilterPosts(c *gin.Context) {
-	var filterForm forms.FilterForm
+	var postFilterForm forms.PostFilterForm
 
-	err := c.BindJSON(&filterForm)
+	err := c.BindJSON(&postFilterForm)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to bind form JSON: %s", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to bind form JSON: %v", err.Error())})
 
 		return
 	}
 
-	if !filterForm.IsValid() {
+	if !postFilterForm.IsValid() {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
 
 		return
@@ -50,9 +50,9 @@ func (filterController *FilterController) FilterPosts(c *gin.Context) {
 	page := c.GetInt("page")
 	size := c.GetInt("size")
 
-	postIDs, err := filterController.PostService.Filter(page, size, filterForm)
+	postIDs, err := filterController.PostService.Filter(page, size, postFilterForm)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering posts failed: %s", err)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering posts failed: %v", err.Error())})
 
 		return
 	}
@@ -66,26 +66,26 @@ func (filterController *FilterController) FilterPosts(c *gin.Context) {
 // @Description Endpoint is offset-paginated
 // @Tags 		filtering
 // @Accept  	json
-// @Param		form		body		forms.FilterForm	true	"Filter form"
-// @Param 		page		query		uint				false	"page query"
-// @Param		size		query		uint				false	"page size"
+// @Param		form		body		forms.ProjectPostFilterForm	true	"Project post filter form"
+// @Param 		page		query		uint						false	"page query"
+// @Param		size		query		uint						false	"page size"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400 	{object} 	utils.HTTPError
-// @Failure		404 	{object} 	utils.HTTPError
-// @Failure		500		{object}	utils.HTTPError
+// @Failure		400
+// @Failure		404
+// @Failure		500
 // @Router 		/filter/project-posts		[get]
 func (filterController *FilterController) FilterProjectPosts(c *gin.Context) {
-	var filterForm forms.FilterForm
+	var projectPostFilterForm forms.ProjectPostFilterForm
 
-	err := c.BindJSON(&filterForm)
+	err := c.BindJSON(&projectPostFilterForm)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to bind form JSON: %s", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to bind form JSON: %v", err.Error())})
 
 		return
 	}
 
-	if !filterForm.IsValid() {
+	if !projectPostFilterForm.IsValid() {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
 
 		return
@@ -94,9 +94,9 @@ func (filterController *FilterController) FilterProjectPosts(c *gin.Context) {
 	page := c.GetInt("page")
 	size := c.GetInt("size")
 
-	projectPostIDs, err := filterController.ProjectPostService.Filter(page, size, filterForm)
+	projectPostIDs, err := filterController.ProjectPostService.Filter(page, size, projectPostFilterForm)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering project posts failed: %s", err)})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering project posts failed: %v", err.Error())})
 	}
 
 	c.JSON(http.StatusOK, projectPostIDs)

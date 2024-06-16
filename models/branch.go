@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"slices"
 
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models/tags"
 	"gorm.io/gorm"
 )
 
@@ -21,7 +20,7 @@ func (enum *RenderStatus) IsValid() bool {
 	return slices.Contains(valid, *enum)
 }
 
-// The branch's aggregated review status, derived from its individual reviews' statuses
+// The branch's aggregated branchreview status, derived from its individual reviews' statuses
 type BranchOverallReviewStatus string
 
 const (
@@ -41,12 +40,11 @@ type Branch struct {
 	/////////////////////////////////////////////
 	// The branch's proposed changes:
 
-	NewPostTitle string
-
-	UpdatedCompletionStatus ProjectCompletionStatus
-	// Branch has a ScientificFieldTagContainer
-	UpdatedScientificFieldTagContainer   tags.ScientificFieldTagContainer `gorm:"foreignKey:UpdatedScientificFieldTagContainerID"`
-	UpdatedScientificFieldTagContainerID uint
+	UpdatedPostTitle                     *string
+	UpdatedCompletionStatus              *ProjectCompletionStatus
+	UpdatedFeedbackPreferences           *ProjectFeedbackPreference
+	UpdatedScientificFieldTagContainer   *ScientificFieldTagContainer `gorm:"foreignKey:UpdatedScientificFieldTagContainerID"`
+	UpdatedScientificFieldTagContainerID *uint
 
 	/////////////////////////////////////////////
 	// The branch's metadata:
@@ -62,27 +60,27 @@ type Branch struct {
 	DiscussionContainerID uint
 
 	// ProjectPost has many Branch
-	ProjectPostID uint
+	ProjectPostID *uint
 
 	BranchTitle string
 
-	RenderStatus       RenderStatus
-	BranchReviewStatus BranchOverallReviewStatus
+	RenderStatus              RenderStatus
+	BranchOverallReviewStatus BranchOverallReviewStatus
 }
 
 type BranchDTO struct {
 	ID uint `json:"id"`
 	// MR's proposed changes
-	NewPostTitle                 string                  `json:"newPostTitle"`
-	UpdatedCompletionStatus      ProjectCompletionStatus `json:"updatedCompletionStatus"`
-	UpdatedScientificFieldTagIDs []uint                  `json:"updatedScientificFieldTagIDs"`
+	UpdatedPostTitle             *string                  `json:"UpdatedPostTitle"`
+	UpdatedCompletionStatus      *ProjectCompletionStatus `json:"updatedCompletionStatus"`
+	UpdatedScientificFieldTagIDs []uint                   `json:"updatedScientificFieldTagIDs"`
 	// MR metadata
 	CollaboratorIDs           []uint                    `json:"collaboratorIDs"`
 	ReviewIDs                 []uint                    `json:"reviewIDs"`
-	ProjectPostID             uint                      `json:"projectPostIDs"`
+	ProjectPostID             *uint                     `json:"projectPostID"`
 	BranchTitle               string                    `json:"branchTitle"`
 	RenderStatus              RenderStatus              `json:"renderStatus"`
-	DiscussionIDs             []uint                    `json:"discussionIDs"`
+	DiscussionContainerID     uint                      `json:"discussionContainerID"`
 	BranchOverallReviewStatus BranchOverallReviewStatus `json:"branchOverallReviewStatus"`
 }
 
@@ -93,16 +91,16 @@ func (model *Branch) GetID() uint {
 func (model *Branch) IntoDTO() BranchDTO {
 	return BranchDTO{
 		model.ID,
-		model.NewPostTitle,
+		model.UpdatedPostTitle,
 		model.UpdatedCompletionStatus,
-		tags.ScientificFieldTagContainerIntoIDs(&model.UpdatedScientificFieldTagContainer),
+		ScientificFieldTagContainerIntoIDs(model.UpdatedScientificFieldTagContainer),
 		branchCollaboratorsToIDs(model.Collaborators),
 		reviewsToIDs(model.Reviews),
 		model.ProjectPostID,
 		model.BranchTitle,
 		model.RenderStatus,
-		discussionContainerIntoIDs(&model.DiscussionContainer),
-		model.BranchReviewStatus,
+		model.DiscussionContainerID,
+		model.BranchOverallReviewStatus,
 	}
 }
 
@@ -125,20 +123,17 @@ func branchCollaboratorsToIDs(collaborators []*BranchCollaborator) []uint {
 func reviewsToIDs(reviews []*BranchReview) []uint {
 	ids := make([]uint, len(reviews))
 
-	for i, review := range reviews {
-		ids[i] = review.ID
+	for i, branchreview := range reviews {
+		ids[i] = branchreview.ID
 	}
 
 	return ids
 }
 
-// Helper function for JSON marshaling
-func discussionContainerIntoIDs(discussions *DiscussionContainer) []uint {
-	ids := make([]uint, len(discussions.Discussions))
-
-	for i, discussion := range discussions.Discussions {
-		ids[i] = discussion.ID
-	}
-
-	return ids
+// Holds IDs of Branches and ClosedBranches
+// Categorized by their BranchReviewStatus
+type BranchesGroupedByReviewStatusDTO struct {
+	OpenBranchIDs           []uint `json:"openBranchIDs"`
+	RejectedClosedBranchIDs []uint `json:"rejectedClosedBranchIDs"`
+	ApprovedClosedBranchIDs []uint `json:"approvedClosedBranchIDs"`
 }

@@ -44,22 +44,10 @@ const docTemplate = `{
                         "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     }
                 }
             },
@@ -93,17 +81,87 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.BranchDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/branches/closed/{closedBranchID}": {
+            "get": {
+                "description": "Returns a closed branch given an id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Returns a closed branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Closed Branch ID",
+                        "name": "closedBranchID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ClosedBranchDTO"
+                            }
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/branches/collaborators/all/{branchID}": {
+            "get": {
+                "description": "Returns all branch collaborators of the branch with the given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Get all branch collaborators of a branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.BranchCollaboratorDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     }
                 }
             }
@@ -138,29 +196,17 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     }
                 }
             }
         },
-        "/branches/reviews/{reviewID}": {
-            "get": {
-                "description": "Returns a review of a branch with the given ID",
+        "/branches/reviews": {
+            "post": {
+                "description": "Adds a branchreview to a branch",
                 "consumes": [
                     "application/json"
                 ],
@@ -170,11 +216,54 @@ const docTemplate = `{
                 "tags": [
                     "branches"
                 ],
-                "summary": "Returns a branch review by ID",
+                "summary": "Adds a branchreview to a branch",
+                "parameters": [
+                    {
+                        "description": "branchreview creation form",
+                        "name": "form",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.ReviewCreationForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.BranchReviewDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/branches/reviews/{reviewID}": {
+            "get": {
+                "description": "Returns a branchreview with given ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Returns a branchreview",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "review ID",
+                        "description": "branchreview ID",
                         "name": "reviewID",
                         "in": "path",
                         "required": true
@@ -188,22 +277,10 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     }
                 }
             }
@@ -238,22 +315,10 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     }
                 }
             },
@@ -283,29 +348,20 @@ const docTemplate = `{
                         "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
         },
         "/branches/{branchID}/can-review/{memberID}": {
             "get": {
-                "description": "Returns true if the user fulfills the requirements to review the branch\nReturns false if user is unauthorized to review the branch",
+                "description": "Returns true if the user fulfills the requirements to branchreview the branch\nReturns false if user is unauthorized to branchreview the branch",
                 "consumes": [
                     "application/json"
                 ],
@@ -315,7 +371,7 @@ const docTemplate = `{
                 "tags": [
                     "branches"
                 ],
-                "summary": "Returns whether the user is allowed to review this branch",
+                "summary": "Returns whether the user is allowed to branchreview this branch",
                 "parameters": [
                     {
                         "type": "string",
@@ -340,22 +396,196 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/branches/{branchID}/discussions": {
+            "get": {
+                "description": "Returns all discussions on this version that are not a reply to another discussion\nEndpoint is offset-paginated",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Returns all level 1 discussions associated with the version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page query",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.DiscussionDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/branches/{branchID}/file/{filepath}": {
+            "get": {
+                "description": "Get the contents of a single file from a project of a branch",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Get a file from a project",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filepath",
+                        "name": "filepath",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
                         }
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/branches/{branchID}/render": {
+            "get": {
+                "description": "Get the render of the repository underlying a branch if it exists and has been rendered successfully",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Get the render of a branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
                         }
+                    },
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/branches/{branchID}/repository": {
+            "get": {
+                "description": "Get the entire zipped repository of a branch",
+                "produces": [
+                    "application/zip"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Get the repository of a branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     }
                 }
             }
@@ -393,31 +623,60 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     }
                 }
             }
         },
-        "/branches/{branchID}/reviews": {
-            "post": {
-                "description": "Adds a review to a branch",
-                "consumes": [
+        "/branches/{branchID}/tree": {
+            "get": {
+                "description": "Get the filetree of a project of a branch",
+                "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "branches"
+                ],
+                "summary": "Get the filetree of a project",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Branch ID",
+                        "name": "branchID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/branches/{branchID}/upload": {
+            "post": {
+                "description": "Upload a new project version to a specific, preexisting, branch as a zipped quarto project.\nSpecifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.\nCall this after you create a post, and supply it with the actual post contents.",
+                "consumes": [
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -425,23 +684,21 @@ const docTemplate = `{
                 "tags": [
                     "branches"
                 ],
-                "summary": "Adds a review to a branch",
+                "summary": "Upload a new project version to a branch",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "branch ID",
+                        "description": "Branch ID",
                         "name": "branchID",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "review creation form",
-                        "name": "form",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/forms.ReviewCreationForm"
-                        }
+                        "type": "file",
+                        "description": "Repository to create",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -449,22 +706,10 @@ const docTemplate = `{
                         "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -499,22 +744,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -551,16 +787,10 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -592,22 +822,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -644,16 +865,10 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -688,22 +903,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -733,22 +939,13 @@ const docTemplate = `{
                         "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -786,22 +983,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -843,22 +1031,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -878,12 +1057,12 @@ const docTemplate = `{
                 "summary": "Filters all posts",
                 "parameters": [
                     {
-                        "description": "Filter form",
+                        "description": "Post filter form",
                         "name": "form",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.FilterForm"
+                            "$ref": "#/definitions/forms.PostFilterForm"
                         }
                     },
                     {
@@ -910,22 +1089,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -945,12 +1115,12 @@ const docTemplate = `{
                 "summary": "Filters all project posts",
                 "parameters": [
                     {
-                        "description": "Filter form",
+                        "description": "Project post filter form",
                         "name": "form",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/forms.FilterForm"
+                            "$ref": "#/definitions/forms.ProjectPostFilterForm"
                         }
                     },
                     {
@@ -977,22 +1147,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1018,16 +1179,10 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -1058,23 +1213,11 @@ const docTemplate = `{
                     "200": {
                         "description": "OK"
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -1109,16 +1252,10 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1153,22 +1290,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -1198,22 +1326,13 @@ const docTemplate = `{
                         "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1251,22 +1370,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1304,22 +1414,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1357,22 +1458,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1410,22 +1502,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1463,22 +1546,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1517,16 +1591,10 @@ const docTemplate = `{
                         "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1564,22 +1632,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1618,16 +1677,10 @@ const docTemplate = `{
                         "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1661,22 +1714,13 @@ const docTemplate = `{
                         "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -1711,16 +1755,48 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts/collaborators/all/{postID}": {
+            "get": {
+                "description": "Returns all post collaborators of the post with the given ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get all post collaborators of a post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.PostCollaboratorDTO"
+                            }
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     }
                 }
             }
@@ -1755,22 +1831,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1814,22 +1881,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     },
                     "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Gateway"
                     }
                 }
             }
@@ -1861,22 +1919,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1911,22 +1960,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -1956,22 +1996,140 @@ const docTemplate = `{
                         "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}/file/{filepath}": {
+            "get": {
+                "description": "Get the contents of a single file from the main version of a post",
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get a file from a post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filepath",
+                        "name": "filepath",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
                         }
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}/project-post": {
+            "get": {
+                "description": "Get the Project Post ID that encapsulates a Post, if this Project Post exists",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get Project Post of Post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
+                            "type": "integer"
                         }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}/render": {
+            "get": {
+                "description": "Get the main render of the repository underlying a post if it exists and has been rendered successfully",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get the main render of a post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     }
                 }
             }
@@ -2009,22 +2167,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             },
@@ -2066,22 +2215,134 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}/repository": {
+            "get": {
+                "description": "Get the entire zipped main repository of a post",
+                "produces": [
+                    "application/zip"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get the main repository of a post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}/tree": {
+            "get": {
+                "description": "Get the filetree of a the main version of a post, together with the size of the file in bytes.\nDirectories have a size of -1.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Get the filetree of a post",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}/upload": {
+            "post": {
+                "description": "Upload a zipped quarto project to a post. This is the main version of the post, as there are no other versions.\nSpecifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Upload a new project version to a branch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Repository to create",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -2115,27 +2376,15 @@ const docTemplate = `{
                         "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     }
                 }
             },
             "post": {
-                "description": "Create a new project post",
+                "description": "Create a new project post with a single open branch. Upload to this branch in order to have your post reviewed.",
                 "consumes": [
                     "application/json"
                 ],
@@ -2165,16 +2414,10 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -2218,27 +2461,18 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     },
                     "502": {
-                        "description": "Bad Gateway",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Gateway"
                     }
                 }
             }
         },
-        "/project-posts/{postID}": {
+        "/project-posts/{projectPostID}": {
             "get": {
                 "description": "Get a project post by ID",
                 "consumes": [
@@ -2255,7 +2489,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Post ID",
-                        "name": "postID",
+                        "name": "projectPostID",
                         "in": "path",
                         "required": true
                     }
@@ -2268,22 +2502,10 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     }
                 }
             },
@@ -2303,7 +2525,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "post ID",
-                        "name": "postID",
+                        "name": "projectPostID",
                         "in": "path",
                         "required": true
                     }
@@ -2313,29 +2535,20 @@ const docTemplate = `{
                         "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
         },
-        "/project-posts/{postID}/all-discussions": {
+        "/project-posts/{projectPostID}/all-discussion-containers": {
             "get": {
-                "description": "Returns all discussion IDs on this project post over all its previous versions, instead of only the current version",
+                "description": "Returns all discussion container IDs on this project post over all its previous merged versions, instead of only the current version",
                 "consumes": [
                     "application/json"
                 ],
@@ -2345,12 +2558,12 @@ const docTemplate = `{
                 "tags": [
                     "project-posts"
                 ],
-                "summary": "Returns all discussion IDs associated with the project post",
+                "summary": "Returns all discussion container IDs associated with the project post",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "post ID",
-                        "name": "postID",
+                        "description": "project post ID",
+                        "name": "projectPostID",
                         "in": "path",
                         "required": true
                     }
@@ -2359,36 +2572,24 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
+                            "$ref": "#/definitions/models.DiscussionContainerProjectHistoryDTO"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
         },
-        "/project-posts/{postID}/branches-by-status": {
+        "/project-posts/{projectPostID}/branches-by-status": {
             "get": {
-                "description": "Returns all MR IDs of this project post, grouped by each MR's review status",
+                "description": "Returns all branch IDs of this project post, grouped by each branch's review status",
                 "consumes": [
                     "application/json"
                 ],
@@ -2398,12 +2599,12 @@ const docTemplate = `{
                 "tags": [
                     "project-posts"
                 ],
-                "summary": "Returns MR IDs grouped by each MR status",
+                "summary": "Get branch IDs by review status",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "post ID",
-                        "name": "postID",
+                        "description": "project post ID",
+                        "name": "projectPostID",
                         "in": "path",
                         "required": true
                     }
@@ -2412,26 +2613,17 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/forms.GroupedBranchForm"
+                            "$ref": "#/definitions/models.BranchesGroupedByReviewStatusDTO"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -2457,16 +2649,10 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -2492,16 +2678,10 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -2527,16 +2707,10 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -2557,21 +2731,15 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/tags.ScientificFieldTagDTO"
+                                "$ref": "#/definitions/models.ScientificFieldTagDTO"
                             }
                         }
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -2586,7 +2754,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "members"
+                    "tags"
                 ],
                 "summary": "Get scientific field tag from database",
                 "parameters": [
@@ -2602,26 +2770,17 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/tags.ScientificFieldTagDTO"
+                            "$ref": "#/definitions/models.ScientificFieldTagDTO"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Bad Request"
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -2629,7 +2788,41 @@ const docTemplate = `{
     },
     "definitions": {
         "forms.BranchCreationForm": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "anonymous": {
+                    "type": "boolean"
+                },
+                "branchTitle": {
+                    "type": "string"
+                },
+                "collaboratingMemberIDs": {
+                    "description": "The branch's metadata",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "projectPostID": {
+                    "type": "integer"
+                },
+                "updatedCompletionStatus": {
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                },
+                "updatedFeedbackPreferences": {
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                },
+                "updatedPostTitle": {
+                    "description": "Changes made by the branch",
+                    "type": "string"
+                },
+                "updatedScientificFieldIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "forms.DiscussionCreationForm": {
             "type": "object",
@@ -2643,32 +2836,6 @@ const docTemplate = `{
                 },
                 "text": {
                     "type": "string"
-                }
-            }
-        },
-        "forms.FilterForm": {
-            "type": "object"
-        },
-        "forms.GroupedBranchForm": {
-            "type": "object",
-            "properties": {
-                "openForReviewIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "peerReviewedIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "rejectedIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
                 }
             }
         },
@@ -2714,10 +2881,10 @@ const docTemplate = `{
                 "postType": {
                     "$ref": "#/definitions/models.PostType"
                 },
-                "scientificFieldTags": {
+                "scientificFieldTagIDs": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/tags.ScientificFieldTag"
+                        "type": "integer"
                     }
                 },
                 "title": {
@@ -2725,19 +2892,30 @@ const docTemplate = `{
                 }
             }
         },
+        "forms.PostFilterForm": {
+            "type": "object",
+            "properties": {
+                "includeProjectPosts": {
+                    "type": "boolean"
+                }
+            }
+        },
         "forms.ProjectPostCreationForm": {
             "type": "object",
             "properties": {
-                "completionStatus": {
-                    "$ref": "#/definitions/models.ProjectCompletionStatus"
-                },
-                "feedbackPreference": {
-                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
-                },
                 "postCreationForm": {
                     "$ref": "#/definitions/forms.PostCreationForm"
+                },
+                "projectCompletionStatus": {
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                },
+                "projectFeedbackPreference": {
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 }
             }
+        },
+        "forms.ProjectPostFilterForm": {
+            "type": "object"
         },
         "forms.ReplyDiscussionCreationForm": {
             "type": "object",
@@ -2757,6 +2935,9 @@ const docTemplate = `{
         "forms.ReviewCreationForm": {
             "type": "object",
             "properties": {
+                "branchID": {
+                    "type": "integer"
+                },
                 "branchReviewDecision": {
                     "$ref": "#/definitions/models.BranchReviewDecision"
                 },
@@ -2797,6 +2978,10 @@ const docTemplate = `{
         "models.BranchDTO": {
             "type": "object",
             "properties": {
+                "UpdatedPostTitle": {
+                    "description": "MR's proposed changes",
+                    "type": "string"
+                },
                 "branchOverallReviewStatus": {
                     "$ref": "#/definitions/models.BranchOverallReviewStatus"
                 },
@@ -2810,20 +2995,13 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "discussionIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "discussionContainerID": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "newPostTitle": {
-                    "description": "MR's proposed changes",
-                    "type": "string"
-                },
-                "projectPostIDs": {
+                "projectPostID": {
                     "type": "integer"
                 },
                 "renderStatus": {
@@ -2893,6 +3071,49 @@ const docTemplate = `{
                 "Approved"
             ]
         },
+        "models.BranchesGroupedByReviewStatusDTO": {
+            "type": "object",
+            "properties": {
+                "approvedClosedBranchIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "openBranchIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "rejectedClosedBranchIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "models.ClosedBranchDTO": {
+            "type": "object",
+            "properties": {
+                "branchID": {
+                    "type": "integer"
+                },
+                "branchReviewDecision": {
+                    "$ref": "#/definitions/models.BranchReviewDecision"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "projectPostID": {
+                    "type": "integer"
+                },
+                "supercededBranchID": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.CollaborationType": {
             "type": "string",
             "enum": [
@@ -2916,6 +3137,31 @@ const docTemplate = `{
                     }
                 },
                 "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.DiscussionContainerProjectHistoryDTO": {
+            "type": "object",
+            "properties": {
+                "currentDiscussionContainerID": {
+                    "type": "integer"
+                },
+                "mergedBranchDiscussionContainers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.DiscussionContainerWithBranchDTO"
+                    }
+                }
+            }
+        },
+        "models.DiscussionContainerWithBranchDTO": {
+            "type": "object",
+            "properties": {
+                "closedBranchID": {
+                    "type": "integer"
+                },
+                "discussionContainerID": {
                     "type": "integer"
                 }
             }
@@ -3009,17 +3255,17 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "discussionIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "discussionContainerID": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
                 },
                 "postType": {
                     "$ref": "#/definitions/models.PostType"
+                },
+                "renderStatus": {
+                    "$ref": "#/definitions/models.RenderStatus"
                 },
                 "scientificFieldTagIDs": {
                     "type": "array",
@@ -3078,12 +3324,6 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "completionStatus": {
-                    "$ref": "#/definitions/models.ProjectCompletionStatus"
-                },
-                "feedbackPreference": {
-                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
-                },
                 "id": {
                     "type": "integer"
                 },
@@ -3093,11 +3333,17 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "post": {
-                    "$ref": "#/definitions/models.PostDTO"
+                "postID": {
+                    "type": "integer"
                 },
                 "postReviewStatus": {
                     "$ref": "#/definitions/models.ProjectReviewStatus"
+                },
+                "projectCompletionStatus": {
+                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                },
+                "projectFeedbackPreference": {
+                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
                 }
             }
         },
@@ -3130,26 +3376,7 @@ const docTemplate = `{
         "models.ReportDTO": {
             "type": "object"
         },
-        "reports.DiscussionReportDTO": {
-            "type": "object",
-            "properties": {
-                "discussionID": {
-                    "type": "integer"
-                }
-            }
-        },
-        "reports.PostReportDTO": {
-            "type": "object",
-            "properties": {
-                "postID": {
-                    "type": "integer"
-                }
-            }
-        },
-        "tags.ScientificFieldTag": {
-            "type": "object"
-        },
-        "tags.ScientificFieldTagDTO": {
+        "models.ScientificFieldTagDTO": {
             "type": "object",
             "properties": {
                 "id": {
@@ -3169,11 +3396,19 @@ const docTemplate = `{
                 }
             }
         },
-        "utils.HTTPError": {
+        "reports.DiscussionReportDTO": {
             "type": "object",
             "properties": {
-                "error": {
-                    "type": "string"
+                "discussionID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "reports.PostReportDTO": {
+            "type": "object",
+            "properties": {
+                "postID": {
+                    "type": "integer"
                 }
             }
         }
