@@ -63,6 +63,7 @@ func tagRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	tagRouter := v2.Group("/tags")
 	tagRouter.GET("/scientific", controllers.tagController.GetScientificTags)
 	tagRouter.GET("/scientific/:tagID", controllers.tagController.GetScientificFieldTag)
+	tagRouter.GET("/scientific/containers/:containerID", controllers.tagController.GetScientificFieldTagContainer)
 	tagRouter.GET("/completion-status", controllers.tagController.GetCompletionStatusTags)
 	tagRouter.GET("/post-type", controllers.tagController.GetPostTypeTags)
 	tagRouter.GET("/feedback-preference", controllers.tagController.GetFeedbackPreferenceTags)

@@ -29,8 +29,8 @@ type BranchController struct {
 // @Param		branchID		path		string			true	"Branch ID"
 // @Produce		application/json
 // @Success 	200 		{object}	models.BranchDTO
-// @Failure		400
-// @Failure		404
+// @Failure		400			{object} 	utils.HTTPError
+// @Failure		404			{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}	[get]
 func (branchController *BranchController) GetBranch(c *gin.Context) {
 	// extract branchID
@@ -38,7 +38,7 @@ func (branchController *BranchController) GetBranch(c *gin.Context) {
 	branchID, err := strconv.ParseInt(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", branchIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", branchIDStr, err)})
 
 		return
 	}
@@ -66,8 +66,8 @@ func (branchController *BranchController) GetBranch(c *gin.Context) {
 // @Param		form	body	forms.BranchCreationForm	true	"Branch Creation Form"
 // @Produce		application/json
 // @Success 	200 	{object} 	models.BranchDTO
-// @Failure		404
-// @Failure		500
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches 		[post]
 func (branchController *BranchController) CreateBranch(c *gin.Context) {
 	// extract branchCreationForm
@@ -75,7 +75,7 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 	err := c.BindJSON(&form)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind BranchCreationForm from request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind BranchCreationForm from request body: %s", err)})
 
 		return
 	}
@@ -113,10 +113,11 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 // @Param		branch	body		models.BranchDTO		true	"Updated Branch"
 // @Produce		json
 // @Success 	200
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches 		[put]
-func (branchController *BranchController) UpdateBranch(_ *gin.Context) {
+func (branchController *BranchController) UpdateBranch(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // DeleteBranch godoc
@@ -128,9 +129,9 @@ func (branchController *BranchController) UpdateBranch(_ *gin.Context) {
 // @Param		branchID		path		string			true	"branch ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID} 		[delete]
 func (branchController *BranchController) DeleteBranch(c *gin.Context) {
 	// extract branchID
@@ -138,7 +139,7 @@ func (branchController *BranchController) DeleteBranch(c *gin.Context) {
 	branchID, err := strconv.ParseInt(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", branchIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", branchIDStr, err)})
 
 		return
 	}
@@ -161,8 +162,8 @@ func (branchController *BranchController) DeleteBranch(c *gin.Context) {
 // @Param		branchID		path		string			true	"branch ID"
 // @Produce		json
 // @Success 	200		{array}		models.BranchOverallReviewStatus
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/review-statuses	[get]
 func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 	// extract branchID
@@ -170,7 +171,7 @@ func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 	branchID, err := strconv.ParseInt(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", branchIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", branchIDStr, err)})
 
 		return
 	}
@@ -196,8 +197,8 @@ func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 // @Param		reviewID			path		string			true	"branchreview ID"
 // @Produce		json
 // @Success 	200		{object}	models.BranchReviewDTO
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches/reviews/{reviewID}		[get]
 func (branchController *BranchController) GetReview(c *gin.Context) {
 	// extract reviewID
@@ -205,7 +206,7 @@ func (branchController *BranchController) GetReview(c *gin.Context) {
 	reviewID, err := strconv.ParseInt(reviewIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branchreview ID, cannot interpret as integer, id=%s ", reviewIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branchreview ID '%s', cannot interpret as integer: %s", reviewIDStr, err)})
 
 		return
 	}
@@ -232,9 +233,9 @@ func (branchController *BranchController) GetReview(c *gin.Context) {
 // @Param		form	body	forms.ReviewCreationForm	true	"branchreview creation form"
 // @Produce		json
 // @Success 	200		{object}	models.BranchReviewDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches/reviews		[post]
 func (branchController *BranchController) CreateReview(c *gin.Context) {
 	// extract ReviewCreationForm
@@ -242,7 +243,7 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 	err := c.BindJSON(&form)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind ReviewCreationForm from request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind ReviewCreationForm from request body: %s", err)})
 
 		return
 	}
@@ -277,9 +278,9 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{object}		boolean
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/can-review/{memberID}		[get]
 func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 	// extract branchID
@@ -287,7 +288,7 @@ func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 	branchID, err := strconv.ParseInt(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", branchIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", branchIDStr, err)})
 
 		return
 	}
@@ -297,7 +298,7 @@ func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 	memberID, err := strconv.ParseInt(memberIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%s ", memberIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", memberIDStr, err)})
 
 		return
 	}
@@ -323,8 +324,8 @@ func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 // @Param		collaboratorID	path	string	true	"Collaborator ID"
 // @Produce		json
 // @Success 	200 		{object}	models.BranchCollaboratorDTO
-// @Failure		400
-// @Failure		404
+// @Failure		400			{object} 	utils.HTTPError
+// @Failure		404			{object} 	utils.HTTPError
 // @Router 		/branches/collaborators/{collaboratorID}	[get]
 func (branchController *BranchController) GetBranchCollaborator(c *gin.Context) {
 	// extract collaboratorID id
@@ -332,7 +333,7 @@ func (branchController *BranchController) GetBranchCollaborator(c *gin.Context) 
 	collaboratorID, err := strconv.ParseUint(collaboratorIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", collaboratorIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", collaboratorIDStr, err)})
 
 		return
 	}
@@ -357,8 +358,8 @@ func (branchController *BranchController) GetBranchCollaborator(c *gin.Context) 
 // @Produce		text/html
 // @Success 	200		{object}	[]byte
 // @Success		202		{object}	[]byte
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/render	[get]
 func (branchController *BranchController) GetRender(c *gin.Context) {
 	// extract branchID id
@@ -366,7 +367,7 @@ func (branchController *BranchController) GetRender(c *gin.Context) {
 	branchID, err := strconv.ParseUint(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", branchIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", branchIDStr, err)})
 
 		return
 	}
@@ -403,8 +404,8 @@ func (branchController *BranchController) GetRender(c *gin.Context) {
 // @Param		branchID	path		string				true	"Branch ID"
 // @Produce		application/zip
 // @Success 	200		{object}	[]byte
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/repository	[get]
 func (branchController *BranchController) GetProject(c *gin.Context) {
 	// extract branch id
@@ -412,7 +413,7 @@ func (branchController *BranchController) GetProject(c *gin.Context) {
 	branchID, err := strconv.ParseUint(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", branchIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", branchIDStr, err)})
 
 		return
 	}
@@ -446,8 +447,8 @@ func (branchController *BranchController) GetProject(c *gin.Context) {
 // @Param		file			formData	file			true	"Repository to create"
 // @Produce		application/json
 // @Success 	200
-// @Failure		400
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/upload		[post]
 func (branchController *BranchController) UploadProject(c *gin.Context) {
 	// extract file
@@ -464,7 +465,7 @@ func (branchController *BranchController) UploadProject(c *gin.Context) {
 	branchID, err := strconv.ParseUint(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", branchIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", branchIDStr, err)})
 
 		return
 	}
@@ -489,9 +490,9 @@ func (branchController *BranchController) UploadProject(c *gin.Context) {
 // @Param		branchID	path		string				true	"Branch ID"
 // @Produce		application/json
 // @Success 	200		{object}	map[string]int64
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/tree		[get]
 func (branchController *BranchController) GetFiletree(c *gin.Context) {
 	// extract branchID id
@@ -499,7 +500,7 @@ func (branchController *BranchController) GetFiletree(c *gin.Context) {
 	branchID, err := strconv.ParseUint(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", branchIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", branchIDStr, err)})
 
 		return
 	}
@@ -530,8 +531,8 @@ func (branchController *BranchController) GetFiletree(c *gin.Context) {
 // @Param		filepath	path		string				true	"Filepath"
 // @Produce		application/octet-stream
 // @Success 	200		{object}	[]byte
-// @Failure		404
-// @Failure		500
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/file/{filepath}	[get]
 func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 	// extract branchID id
@@ -539,7 +540,7 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 	branchID, err := strconv.ParseUint(branchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", branchIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", branchIDStr, err)})
 
 		return
 	}
@@ -559,8 +560,20 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 	fileData, err2 := os.Open(absFilepath)
 	fileInfo, err3 := fileData.Stat()
 
-	if err1 != nil || err2 != nil || err3 != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file"})
+	if err1 != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to read file: %s", err1)})
+
+		return
+	}
+
+	if err2 != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to read file: %s", err2)})
+
+		return
+	}
+
+	if err3 != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to read file: %s", err3)})
 
 		return
 	}
@@ -586,12 +599,12 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 // @Param		pageSize	query		uint			false	"page size"
 // @Produce		application/json
 // @Success 	200		{array}		models.DiscussionDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/branches/{branchID}/discussions 	[get]
-func (branchController *BranchController) GetDiscussions(_ *gin.Context) {
-	// TODO ahh its paginated
+func (branchController *BranchController) GetDiscussions(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // GetClosedBranch godoc
@@ -601,8 +614,8 @@ func (branchController *BranchController) GetDiscussions(_ *gin.Context) {
 // @Param		closedBranchID	path		string			true	"Closed Branch ID"
 // @Produce		application/json
 // @Success 	200		{array}		models.ClosedBranchDTO
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router		/branches/closed/{closedBranchID}		[get]
 func (branchController *BranchController) GetClosedBranch(c *gin.Context) {
 	// extract branchID id
@@ -610,7 +623,7 @@ func (branchController *BranchController) GetClosedBranch(c *gin.Context) {
 	closedBranchID, err := strconv.ParseUint(closedBranchIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid closed branch ID, cannot interpret as integer, id=%v ", closedBranchIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid closed branch ID '%s', cannot interpret as integer: %s", closedBranchIDStr, err)})
 
 		return
 	}
@@ -634,8 +647,8 @@ func (branchController *BranchController) GetClosedBranch(c *gin.Context) {
 // @Param		branchID	path		string			true	"Branch ID"
 // @Produce		application/json
 // @Success 	200		{array}		models.BranchCollaboratorDTO
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router		/branches/collaborators/all/{branchID}		[get]
 func (branchController *BranchController) GetAllBranchCollaborators(c *gin.Context) {
 	// Get branch ID from path param

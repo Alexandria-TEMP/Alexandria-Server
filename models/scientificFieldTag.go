@@ -6,13 +6,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type ScientificFieldTagContainer struct {
-	gorm.Model
-
-	// ScientificFieldTagContainer has many ScientificFieldTag
-	ScientificFieldTags []*ScientificFieldTag `gorm:"many2many:tag_containers;"`
-}
-
 // a scientific field tag is a tag representing a specific scientific field
 type ScientificFieldTag struct {
 	gorm.Model
@@ -36,10 +29,6 @@ func (model *ScientificFieldTag) GetID() uint {
 	return model.Model.ID
 }
 
-func (model *ScientificFieldTagContainer) GetID() uint {
-	return model.Model.ID
-}
-
 func (model *ScientificFieldTag) IntoDTO() ScientificFieldTagDTO {
 	return ScientificFieldTagDTO{
 		model.ID,
@@ -59,27 +48,6 @@ func ScientificFieldTagIntoIDs(subtags []*ScientificFieldTag) []uint {
 
 	for i, subtag := range subtags {
 		ids[i] = subtag.ID
-	}
-
-	return ids
-}
-
-// Helper function for JSON marshaling
-func ScientificFieldTagContainerIntoIDs(scientificFieldTags *ScientificFieldTagContainer) []uint {
-	if scientificFieldTags == nil {
-		ints := []uint{}
-		return ints
-	}
-
-	if len(scientificFieldTags.ScientificFieldTags) == 0 {
-		ints := []uint{}
-		return ints
-	}
-
-	ids := make([]uint, len(scientificFieldTags.ScientificFieldTags))
-
-	for i, tag := range scientificFieldTags.ScientificFieldTags {
-		ids[i] = tag.ID
 	}
 
 	return ids

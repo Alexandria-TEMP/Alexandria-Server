@@ -4,14 +4,18 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 func TestPostJSONMarshaling(t *testing.T) {
+	createdAt := time.Now().Add(time.Minute).UTC()
+	updatedAt := time.Now().Add(time.Hour).UTC()
+
 	// This model...
 	model := Post{
-		Model: gorm.Model{ID: 88},
+		Model: gorm.Model{ID: 88, CreatedAt: createdAt, UpdatedAt: updatedAt},
 		Collaborators: []*PostCollaborator{
 			{
 				Model:             gorm.Model{ID: 1},
@@ -28,21 +32,24 @@ func TestPostJSONMarshaling(t *testing.T) {
 				CollaborationType: Contributor,
 			},
 		},
-		DiscussionContainerID:       5,
-		Title:                       "Nice Post",
-		PostType:                    Question,
-		ScientificFieldTagContainer: ScientificFieldTagContainer{},
-		DiscussionContainer:         DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
+		DiscussionContainerID:         5,
+		Title:                         "Nice Post",
+		PostType:                      Question,
+		ScientificFieldTagContainer:   ScientificFieldTagContainer{},
+		ScientificFieldTagContainerID: 50,
+		DiscussionContainer:           DiscussionContainer{Discussions: []*Discussion{{Model: gorm.Model{ID: 95}}}},
 	}
 
 	// should equal this DTO!
 	targetDTO := PostDTO{
-		ID:                    88,
-		CollaboratorIDs:       []uint{1, 60},
-		Title:                 "Nice Post",
-		PostType:              Question,
-		ScientificFieldTagIDs: []uint{},
-		DiscussionContainerID: 5,
+		ID:                            88,
+		CollaboratorIDs:               []uint{1, 60},
+		Title:                         "Nice Post",
+		PostType:                      Question,
+		ScientificFieldTagContainerID: 50,
+		DiscussionContainerID:         5,
+		CreatedAt:                     createdAt,
+		UpdatedAt:                     updatedAt,
 	}
 
 	dto := PostDTO{}

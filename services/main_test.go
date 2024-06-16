@@ -95,11 +95,11 @@ func TestMain(m *testing.M) {
 		Password:    "$2a$10$2pDWbDrNIg2E497oZuy1wultNyt/VNQLZMSZUyaRnNFsRaNzd24Z6",
 	}
 	exampleMemberDTO = models.MemberDTO{
-		FirstName:             "John",
-		LastName:              "Smith",
-		Email:                 "john.smith@gmail.com",
-		Institution:           "TU Delft",
-		ScientificFieldTagIDs: []uint{},
+		FirstName:                     "John",
+		LastName:                      "Smith",
+		Email:                         "john.smith@gmail.com",
+		Institution:                   "TU Delft",
+		ScientificFieldTagContainerID: 0,
 	}
 	exampleMemberAuthForm = forms.MemberAuthForm{
 		Email:    "john.smith@gmail.com",

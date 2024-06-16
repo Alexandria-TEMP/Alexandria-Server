@@ -21,12 +21,12 @@ type Member struct {
 }
 
 type MemberDTO struct {
-	ID                    uint   `json:"id"`
-	FirstName             string `json:"firstName"`
-	LastName              string `json:"lastName"`
-	Email                 string `json:"email"`
-	Institution           string `json:"institution"`
-	ScientificFieldTagIDs []uint `json:"scientificFieldTagIDs"`
+	ID                            uint   `json:"id"`
+	FirstName                     string `json:"firstName"`
+	LastName                      string `json:"lastName"`
+	Email                         string `json:"email"`
+	Institution                   string `json:"institution"`
+	ScientificFieldTagContainerID uint   `json:"scientificFieldTagContainerID"`
 }
 
 type LoggedInMemberDTO struct {
@@ -57,7 +57,7 @@ func (model *Member) IntoDTO() MemberDTO {
 		model.LastName,
 		model.Email,
 		model.Institution,
-		ScientificFieldTagContainerIntoIDs(&model.ScientificFieldTagContainer),
+		model.ScientificFieldTagContainerID,
 	}
 }
 

@@ -27,9 +27,9 @@ type ProjectPostController struct {
 // @Accept  	json
 // @Param		projectPostID		path		string			true	"Post ID"
 // @Produce		json
-// @Success 	200 		{object}	models.ProjectPostDTO
-// @Failure		400
-// @Failure		404
+// @Success 	200 	{object}	models.ProjectPostDTO
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/project-posts/{projectPostID}	[get]
 func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Context) {
 	// extract projectPostID
@@ -37,7 +37,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 	projectPostID, err := strconv.ParseUint(projectPostIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not interpret ID %s as unsigned integer, reason: %s", projectPostIDStr, err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not interpret ID %s as unsigned integer: %s", projectPostIDStr, err)})
 
 		return
 	}
@@ -45,7 +45,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 	projectPost, err := projectPostController.ProjectPostService.GetProjectPost(uint(projectPostID))
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get project post, reason: %v", err.Error())})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get project post: %v", err.Error())})
 
 		return
 	}
@@ -64,8 +64,8 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 // @Param		form	body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/project-posts		[post]
 func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Context) {
 	form := forms.ProjectPostCreationForm{}
@@ -111,8 +111,8 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 // @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
 // @Produce		json
 // @Success 	200
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/project-posts 		[put]
 func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Context) {
 	// extract post
@@ -122,7 +122,7 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 	// TODO convert from project post DTO to updated project post
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated ProjectPost from request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind updated ProjectPost from request body: %s", err)})
 
 		return
 	}
@@ -131,7 +131,7 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 	err = projectPostController.ProjectPostService.UpdateProjectPost(&updatedProjectPost)
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "cannot update post because no ProjectPost with this ID exists"})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot update post: %s", err)})
 
 		return
 	}
@@ -150,12 +150,12 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 // @Param		projectPostID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/project-posts/{projectPostID} 		[delete]
-func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Context) {
-	// delete method goes here
+func (projectPostController *ProjectPostController) DeleteProjectPost(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // CreateProjectPostFromGithub godoc
@@ -170,12 +170,12 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Con
 // @Param		url		query	string							true	"Github repository url"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
-// @Failure		400
-// @Failure		500
-// @Failure 	502
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
+// @Failure 	502		{object} 	utils.HTTPError
 // @Router 		/project-posts/from-github 		[post]
-func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(_ *gin.Context) {
-
+func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // GetProjectPostDiscussionContainers godoc
@@ -186,9 +186,9 @@ func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(
 // @Param		projectPostID		path		string			true	"project post ID"
 // @Produce		json
 // @Success 	200		{object}	models.DiscussionContainerProjectHistoryDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/project-posts/{projectPostID}/all-discussion-containers 	[get]
 func (projectPostController *ProjectPostController) GetProjectPostDiscussionContainers(c *gin.Context) {
 	// Get project post ID from path
@@ -220,9 +220,9 @@ func (projectPostController *ProjectPostController) GetProjectPostDiscussionCont
 // @Param		projectPostID	path	string	true	"project post ID"
 // @Produce		json
 // @Success		200		{object}	models.BranchesGroupedByReviewStatusDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/project-posts/{projectPostID}/branches-by-status	[get]
 func (projectPostController *ProjectPostController) GetProjectPostBranchesByStatus(c *gin.Context) {
 	// Get project post ID from path

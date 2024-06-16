@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -12,6 +13,7 @@ import (
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	gomock "go.uber.org/mock/gomock"
+	"gorm.io/gorm"
 )
 
 func beforeEachTag(t *testing.T) {
@@ -20,10 +22,18 @@ func beforeEachTag(t *testing.T) {
 
 	defer mockCtrl.Finish()
 
-	responseRecorder = httptest.NewRecorder()
-
+	// Setup mocks
 	mockTagService = mock_interfaces.NewMockTagService(mockCtrl)
-	tagController = &TagController{TagService: mockTagService}
+	mockScientificFieldTagContainerService = mock_interfaces.NewMockScientificFieldTagContainerService(mockCtrl)
+
+	// Setup SUT
+	tagController = TagController{
+		TagService:                         mockTagService,
+		ScientificFieldTagContainerService: mockScientificFieldTagContainerService,
+	}
+
+	// Setup HTTP testing
+	responseRecorder = httptest.NewRecorder()
 }
 
 func TestGetScientificTags200(t *testing.T) {
@@ -109,4 +119,55 @@ func TestGetScientificFieldTag404(t *testing.T) {
 	defer responseRecorder.Result().Body.Close()
 
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}
+
+func TestGetScientificFieldTagContainerGoodWeather(t *testing.T) {
+	beforeEachTag(t)
+
+	containerID := uint(20)
+
+	container := &models.ScientificFieldTagContainer{
+		Model: gorm.Model{ID: containerID},
+		ScientificFieldTags: []*models.ScientificFieldTag{
+			{Model: gorm.Model{ID: 2}},
+			{Model: gorm.Model{ID: 3}},
+			{Model: gorm.Model{ID: 5}},
+		},
+	}
+
+	// Setup mocks
+	mockScientificFieldTagContainerService.EXPECT().GetScientificFieldTagContainer(containerID).Return(container, nil).Times(1)
+
+	// Construct request
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/tags/scientific/containers/%d", containerID), http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check response
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+
+	// Read body
+	bytes, err := io.ReadAll(responseRecorder.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Parse body
+	var responseScientificFieldTagContainerDTO models.ScientificFieldTagContainerDTO
+	if err := json.Unmarshal(bytes, &responseScientificFieldTagContainerDTO); err != nil {
+		t.Fatal(err)
+	}
+
+	// Check body
+	expectedScientificFieldTagContainerDTO := models.ScientificFieldTagContainerDTO{
+		ID:                    containerID,
+		ScientificFieldTagIDs: []uint{2, 3, 5},
+	}
+
+	assert.Equal(t, expectedScientificFieldTagContainerDTO, responseScientificFieldTagContainerDTO)
 }

@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"slices"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -41,13 +42,15 @@ type Post struct {
 }
 
 type PostDTO struct {
-	ID                    uint         `json:"id"`
-	CollaboratorIDs       []uint       `json:"collaboratorIDs"`
-	Title                 string       `json:"title"`
-	PostType              PostType     `json:"postType"`
-	ScientificFieldTagIDs []uint       `json:"scientificFieldTagIDs"`
-	DiscussionContainerID uint         `json:"discussionContainerID"`
-	RenderStatus          RenderStatus `json:"renderStatus"`
+	ID                            uint         `json:"id"`
+	CollaboratorIDs               []uint       `json:"collaboratorIDs"`
+	Title                         string       `json:"title"`
+	PostType                      PostType     `json:"postType"`
+	ScientificFieldTagContainerID uint         `json:"scientificFieldTagContainerID"`
+	DiscussionContainerID         uint         `json:"discussionContainerID"`
+	RenderStatus                  RenderStatus `json:"renderStatus"`
+	CreatedAt                     time.Time    `json:"createdAt"`
+	UpdatedAt                     time.Time    `json:"updatedAt"`
 }
 
 func (model *Post) GetID() uint {
@@ -60,9 +63,11 @@ func (model *Post) IntoDTO() PostDTO {
 		postCollaboratorsToIDs(model.Collaborators),
 		model.Title,
 		model.PostType,
-		ScientificFieldTagContainerIntoIDs(&model.ScientificFieldTagContainer),
+		model.ScientificFieldTagContainerID,
 		model.DiscussionContainerID,
 		model.RenderStatus,
+		model.CreatedAt,
+		model.UpdatedAt,
 	}
 }
 
