@@ -128,14 +128,14 @@ func (memberService *MemberService) LogInMember(form *forms.MemberAuthForm) (*mo
 	}
 
 	if len(members) == 0 {
-		return nil, fmt.Errorf("there are no members with the email %s", form.Email)
+		return nil, fmt.Errorf("no members with email %s found", form.Email)
 	}
 
 	member := members[0]
 
 	// compare passwords
 	if err := bcrypt.CompareHashAndPassword([]byte(member.Password), []byte(form.Password)); err != nil {
-		return nil, fmt.Errorf("invalid password: %w", err)
+		return nil, fmt.Errorf("invalid password")
 	}
 
 	// generate tokens

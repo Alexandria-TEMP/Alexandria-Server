@@ -62,7 +62,8 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 // @Summary 	Create a new member
 // @Description Create a new member from the given fields.
 // @Description The member must have a unique email address, which isn't associated with any other accounts.
-// @Description They are automatically logged in, and an access + refresh token pair is returned alongside the member
+// @Description They are automatically logged in, and an access + refresh token pair is returned alongside the member.
+// @Description	The access-token is valid for 15 minutes and the refresh token is valid for 3 days.
 // @Tags 		members
 // @Accept  	json
 // @Param		form	body	forms.MemberCreationForm	true	"Member Creation Form"
@@ -206,6 +207,7 @@ func (memberController *MemberController) GetAllMembers(c *gin.Context) {
 // LoginMember godoc
 // @Summary		Logs a member in
 // @Description	Logs a member in based on email and password and returns an access and refresh token.
+// @Description	The access-token is valid for 15 minutes and the refresh token is valid for 3 days.
 // @Tags 		members
 // @Accept 		json
 // @Param		member	body		forms.MemberAuthForm		true	"Member Authentication Form"
@@ -245,6 +247,7 @@ func (memberController *MemberController) LoginMember(c *gin.Context) {
 // RefreshToken godoc
 // @Summary		Refreshes the access token.
 // @Description	Refreshes the access token with a refresh token.
+// @Description	The access-token is valid for 15 minutes and the refresh token is valid for 3 days.
 // @Tags 		members
 // @Accept 		json
 // @Param		member	body		forms.TokenRefreshForm		true	"Token Refresh Form"
