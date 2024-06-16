@@ -29,9 +29,9 @@ type PostController struct {
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
 // @Success 	200 		{object}	models.PostDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400			{object} 	utils.HTTPError
+// @Failure		404			{object} 	utils.HTTPError
+// @Failure		500			{object} 	utils.HTTPError
 // @Router 		/posts/{postID}	[get]
 func (postController *PostController) GetPost(c *gin.Context) {
 	// extract postID
@@ -39,7 +39,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%s ", postIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret '%s' as integer: %s", postIDStr, err)})
 
 		return
 	}
@@ -48,7 +48,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 	post, err := postController.PostService.GetPost(uint(postID))
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "cannot get post because no post with this ID exists"})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to get post: %s", err)})
 
 		return
 	}
@@ -65,15 +65,15 @@ func (postController *PostController) GetPost(c *gin.Context) {
 // @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.PostDTO
-// @Failure		400
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/posts 		[post]
 func (postController *PostController) CreatePost(c *gin.Context) {
 	form := forms.PostCreationForm{}
 	err := c.BindJSON(&form)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind PostCreationForm from request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind PostCreationForm from request body: %s", err)})
 
 		return
 	}
@@ -86,7 +86,7 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 
 	post, err := postController.PostService.CreatePost(&form)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post, reason: %v", err.Error())})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post: %s", err)})
 
 		return
 	}
@@ -103,9 +103,9 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 // @Param		post	body		models.PostDTO		true	"Updated Post"
 // @Produce		json
 // @Success 	200
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/posts 		[put]
 func (postController *PostController) UpdatePost(c *gin.Context) {
 	// extract post
@@ -115,7 +115,7 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 	// TODO convert from Post DTO to updated Post data
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind updated Post from request body"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind updated Post from request body: %s", err)})
 
 		return
 	}
@@ -124,7 +124,7 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 	err = postController.PostService.UpdatePost(&updatedPost)
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "cannot update post because no post with this ID exists"})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot update post because no post with this ID exists: %s", err)})
 
 		return
 	}
@@ -142,12 +142,12 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/posts/{postID} 		[delete]
-func (postController *PostController) DeletePost(_ *gin.Context) {
-	// delete method goes here
+func (postController *PostController) DeletePost(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // CreatePostFromGithub godoc
@@ -161,12 +161,12 @@ func (postController *PostController) DeletePost(_ *gin.Context) {
 // @Param		url		query	string					true	"Github repository url"
 // @Produce		json
 // @Success 	200 	{object} 	models.PostDTO
-// @Failure		400
-// @Failure		500
-// @Failure 	502
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
+// @Failure 	502		{object} 	utils.HTTPError
 // @Router 		/posts/from-github 		[post]
-func (postController *PostController) CreatePostFromGithub(_ *gin.Context) {
-
+func (postController *PostController) CreatePostFromGithub(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // AddPostReport godoc
@@ -178,12 +178,12 @@ func (postController *PostController) CreatePostFromGithub(_ *gin.Context) {
 // @Param		postID	path	string						true	"Post ID"
 // @Produce		json
 // @Success 	200 	{object} 	models.ReportDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/posts/{postID}/reports 		[post]
-func (postController *PostController) AddPostReport(_ *gin.Context) {
-
+func (postController *PostController) AddPostReport(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // GetPostReports godoc
@@ -194,12 +194,12 @@ func (postController *PostController) AddPostReport(_ *gin.Context) {
 // @Param		postID		path		string			true	"Post ID"
 // @Produce		json
 // @Success 	200		{array}		uint
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/posts/{postID}/reports 		[get]
-func (postController *PostController) GetPostReports(_ *gin.Context) {
-	// TODO implement
+func (postController *PostController) GetPostReports(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // GetCollaborator godoc
@@ -210,9 +210,9 @@ func (postController *PostController) GetPostReports(_ *gin.Context) {
 // @Param		collaboratorID	path	string	true	"Collaborator ID"
 // @Produce		json
 // @Success 	200 		{object}	models.PostCollaboratorDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400			{object} 	utils.HTTPError
+// @Failure		404			{object} 	utils.HTTPError
+// @Failure		500			{object} 	utils.HTTPError
 // @Router 		/posts/collaborators/{collaboratorID}	[get]
 func (postController *PostController) GetPostCollaborator(c *gin.Context) {
 	idString := c.Param("collaboratorID")
@@ -243,12 +243,12 @@ func (postController *PostController) GetPostCollaborator(c *gin.Context) {
 // @Param		reportID	path	string	true	"Report ID"
 // @Produce		json
 // @Success		200		{object}	reports.PostReportDTO
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router		/posts/reports/{reportID}				[get]
-func (postController *PostController) GetPostReport(_ *gin.Context) {
-	// TODO implement
+func (postController *PostController) GetPostReport(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // UploadPost
@@ -261,15 +261,15 @@ func (postController *PostController) GetPostReport(_ *gin.Context) {
 // @Param		file			formData	file			true	"Repository to create"
 // @Produce		application/json
 // @Success 	200
-// @Failure		400
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/posts/{postID}/upload		[post]
 func (postController *PostController) UploadPost(c *gin.Context) {
 	// extract file
 	file, err := c.FormFile("file")
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "no file found"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("no file found: %s", err)})
 
 		return
 	}
@@ -279,7 +279,7 @@ func (postController *PostController) UploadPost(c *gin.Context) {
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", postIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", postIDStr, err)})
 
 		return
 	}
@@ -305,8 +305,8 @@ func (postController *PostController) UploadPost(c *gin.Context) {
 // @Produce		text/html
 // @Success 	200		{object}	[]byte
 // @Success		202		{object}	[]byte
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/posts/{postID}/render	[get]
 func (postController *PostController) GetMainRender(c *gin.Context) {
 	// extract postID
@@ -314,7 +314,7 @@ func (postController *PostController) GetMainRender(c *gin.Context) {
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID '%s', cannot interpret as integer: %s", postIDStr, err)})
 
 		return
 	}
@@ -351,8 +351,8 @@ func (postController *PostController) GetMainRender(c *gin.Context) {
 // @Param		postID	path		string				true	"Post ID"
 // @Produce		application/zip
 // @Success 	200		{object}	[]byte
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router 		/posts/{postID}/repository	[get]
 func (postController *PostController) GetMainProject(c *gin.Context) {
 	// extract postID
@@ -360,7 +360,7 @@ func (postController *PostController) GetMainProject(c *gin.Context) {
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID '%s', cannot interpret as integer: %s", postIDStr, err)})
 
 		return
 	}
@@ -390,9 +390,9 @@ func (postController *PostController) GetMainProject(c *gin.Context) {
 // @Param		postID	path		string				true	"Post ID"
 // @Produce		application/json
 // @Success 	200		{object}	map[string]int64
-// @Failure		400
-// @Failure		404
-// @Failure		500
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/posts/{postID}/tree		[get]
 func (postController *PostController) GetMainFiletree(c *gin.Context) {
 	// extract postID
@@ -400,7 +400,7 @@ func (postController *PostController) GetMainFiletree(c *gin.Context) {
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID '%s', cannot interpret as integer: %s", postIDStr, err)})
 
 		return
 	}
@@ -431,8 +431,8 @@ func (postController *PostController) GetMainFiletree(c *gin.Context) {
 // @Param		filepath	path		string				true	"Filepath"
 // @Produce		application/octet-stream
 // @Success 	200		{object}	[]byte
-// @Failure		404
-// @Failure		500
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/posts/{postID}/file/{filepath}	[get]
 func (postController *PostController) GetMainFileFromProject(c *gin.Context) {
 	// extract postID
@@ -484,8 +484,8 @@ func (postController *PostController) GetMainFileFromProject(c *gin.Context) {
 // @Param		postID		path		string				true	"Post ID"
 // @Produce		application/json
 // @Success 	200		{object}	uint
-// @Failure		404
-// @Failure		500
+// @Failure		404		{object} 	utils.HTTPError
+// @Failure		500		{object} 	utils.HTTPError
 // @Router 		/posts/{postID}/project-post	[get]
 func (postController *PostController) GetProjectPostIfExists(c *gin.Context) {
 	// Note: this endpoint kind of goes against the data model's design philosophy, and is quite a hacky fix.
@@ -519,8 +519,8 @@ func (postController *PostController) GetProjectPostIfExists(c *gin.Context) {
 // @Param		postID	path		string		true	"Post ID"
 // @Produce		application/json
 // @Success 	200		{array}		models.PostCollaboratorDTO
-// @Failure		400
-// @Failure		404
+// @Failure		400		{object} 	utils.HTTPError
+// @Failure		404		{object} 	utils.HTTPError
 // @Router		/posts/collaborators/all/{postID}		[get]
 func (postController *PostController) GetAllPostCollaborators(c *gin.Context) {
 	// Get post ID from path param
