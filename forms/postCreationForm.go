@@ -5,8 +5,6 @@ import (
 )
 
 type PostCreationForm struct {
-	// TODO send files somehow?
-
 	AuthorMemberIDs       []uint          `json:"authorMemberIDs" example:"1"`
 	Title                 string          `json:"title" example:"Post Title"`
 	Anonymous             bool            `json:"anonymous" example:"false"`

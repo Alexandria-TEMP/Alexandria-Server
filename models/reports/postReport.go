@@ -18,7 +18,7 @@ type PostReport struct {
 }
 
 type PostReportDTO struct {
-	PostID uint
+	PostID uint `json:"postID" example:"1"`
 }
 
 func (model *PostReport) GetID() uint {

@@ -69,19 +69,19 @@ type Branch struct {
 }
 
 type BranchDTO struct {
-	ID uint `json:"id"`
+	ID uint `json:"id" example:"1"`
 	// MR's proposed changes
-	UpdatedPostTitle                     *string                  `json:"UpdatedPostTitle"`
-	UpdatedCompletionStatus              *ProjectCompletionStatus `json:"updatedCompletionStatus"`
-	UpdatedScientificFieldTagContainerID *uint                    `json:"updatedScientificFieldTagContainerID"`
+	UpdatedPostTitle                     *string                  `json:"UpdatedPostTitle" example:"Updated Post Title"`
+	UpdatedCompletionStatus              *ProjectCompletionStatus `json:"updatedCompletionStatus" example:"ongoing"`
+	UpdatedScientificFieldTagContainerID *uint                    `json:"updatedScientificFieldTagContainerID" example:"1"`
 	// MR metadata
-	CollaboratorIDs           []uint                    `json:"collaboratorIDs"`
-	ReviewIDs                 []uint                    `json:"reviewIDs"`
-	ProjectPostID             *uint                     `json:"projectPostID"`
-	BranchTitle               string                    `json:"branchTitle"`
-	RenderStatus              RenderStatus              `json:"renderStatus"`
-	DiscussionContainerID     uint                      `json:"discussionContainerID"`
-	BranchOverallReviewStatus BranchOverallReviewStatus `json:"branchOverallReviewStatus"`
+	CollaboratorIDs           []uint                    `json:"collaboratorIDs" example:"1"`
+	ReviewIDs                 []uint                    `json:"reviewIDs" example:"1"`
+	ProjectPostID             *uint                     `json:"projectPostID" example:"1"`
+	BranchTitle               string                    `json:"branchTitle" example:"Proposed Changes"`
+	RenderStatus              RenderStatus              `json:"renderStatus" example:"pending"`
+	DiscussionContainerID     uint                      `json:"discussionContainerID" example:"1"`
+	BranchOverallReviewStatus BranchOverallReviewStatus `json:"branchOverallReviewStatus" example:"open for review"`
 }
 
 func (model *Branch) GetID() uint {
@@ -133,7 +133,7 @@ func reviewsToIDs(reviews []*BranchReview) []uint {
 // Holds IDs of Branches and ClosedBranches
 // Categorized by their BranchReviewStatus
 type BranchesGroupedByReviewStatusDTO struct {
-	OpenBranchIDs           []uint `json:"openBranchIDs"`
-	RejectedClosedBranchIDs []uint `json:"rejectedClosedBranchIDs"`
-	ApprovedClosedBranchIDs []uint `json:"approvedClosedBranchIDs"`
+	OpenBranchIDs           []uint `json:"openBranchIDs" example:"1"`
+	RejectedClosedBranchIDs []uint `json:"rejectedClosedBranchIDs" example:"2"`
+	ApprovedClosedBranchIDs []uint `json:"approvedClosedBranchIDs" example:"3"`
 }

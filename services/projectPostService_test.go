@@ -71,13 +71,10 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 	projectPostCreationForm := forms.ProjectPostCreationForm{
-		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:       []uint{memberA.ID, memberB.ID},
-			Title:                 "My Awesome Project Post",
-			Anonymous:             false,
-			PostType:              models.Project,
-			ScientificFieldTagIDs: []uint{},
-		},
+		AuthorMemberIDs:           []uint{memberA.ID, memberB.ID},
+		Title:                     "My Awesome Project Post",
+		Anonymous:                 false,
+		ScientificFieldTagIDs:     []uint{},
 		ProjectCompletionStatus:   models.Ongoing,
 		ProjectFeedbackPreference: models.FormalFeedback,
 	}
@@ -152,13 +149,10 @@ func TestCreateProjectPostDatabaseFailure(t *testing.T) {
 		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 	projectPostCreationForm := forms.ProjectPostCreationForm{
-		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:       []uint{},
-			Title:                 "My Broken Project Post",
-			Anonymous:             true,
-			PostType:              models.Project,
-			ScientificFieldTagIDs: []uint{},
-		},
+		AuthorMemberIDs:           []uint{},
+		Title:                     "My Broken Project Post",
+		Anonymous:                 true,
+		ScientificFieldTagIDs:     []uint{},
 		ProjectCompletionStatus:   models.Completed,
 		ProjectFeedbackPreference: models.FormalFeedback,
 	}
@@ -198,13 +192,10 @@ func TestCreateProjectPostWrongPostType(t *testing.T) {
 	t.Cleanup(projectPostServiceTeardown)
 
 	projectPostCreationForm := forms.ProjectPostCreationForm{
-		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:       []uint{},
-			Title:                 "",
-			Anonymous:             true,
-			PostType:              models.Question,
-			ScientificFieldTagIDs: []uint{},
-		},
+		AuthorMemberIDs:           []uint{},
+		Title:                     "",
+		Anonymous:                 true,
+		ScientificFieldTagIDs:     []uint{},
 		ProjectCompletionStatus:   models.Idea,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
 	}
@@ -226,13 +217,10 @@ func TestCreateProjectPostCollaboratorsFail(t *testing.T) {
 	t.Cleanup(projectPostServiceTeardown)
 
 	projectPostCreationForm := forms.ProjectPostCreationForm{
-		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:       []uint{10, 15},
-			Title:                 "",
-			Anonymous:             false,
-			PostType:              models.Project,
-			ScientificFieldTagIDs: []uint{},
-		},
+		AuthorMemberIDs:           []uint{10, 15},
+		Title:                     "",
+		Anonymous:                 false,
+		ScientificFieldTagIDs:     []uint{},
 		ProjectCompletionStatus:   models.Idea,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
 	}
@@ -260,13 +248,10 @@ func TestCreateProjectBranchCollaboratorsFail(t *testing.T) {
 		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 	projectPostCreationForm := forms.ProjectPostCreationForm{
-		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:       []uint{memberA.ID, memberB.ID},
-			Title:                 "",
-			Anonymous:             false,
-			PostType:              models.Project,
-			ScientificFieldTagIDs: []uint{},
-		},
+		AuthorMemberIDs:           []uint{memberA.ID, memberB.ID},
+		Title:                     "",
+		Anonymous:                 false,
+		ScientificFieldTagIDs:     []uint{},
 		ProjectCompletionStatus:   models.Idea,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
 	}

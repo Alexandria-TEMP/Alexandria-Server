@@ -21,19 +21,19 @@ type Member struct {
 }
 
 type MemberDTO struct {
-	ID                            uint   `json:"id"`
-	FirstName                     string `json:"firstName"`
-	LastName                      string `json:"lastName"`
-	Email                         string `json:"email"`
-	Password                      string `json:"password"`
-	Institution                   string `json:"institution"`
-	ScientificFieldTagContainerID uint   `json:"scientificFieldTagContainerID"`
+	ID                            uint   `json:"id" example:"1"`
+	FirstName                     string `json:"firstName" example:"John"`
+	LastName                      string `json:"lastName" example:"Doe"`
+	Email                         string `json:"email" example:"example@example.example"`
+	Password                      string `json:"password" example:"password"`
+	Institution                   string `json:"institution" example:"Example University"`
+	ScientificFieldTagContainerID uint   `json:"scientificFieldTagContainerID" example:"1"`
 }
 
 type MemberShortFormDTO struct {
-	ID        uint   `json:"id"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
+	ID        uint   `json:"id" example:"1"`
+	FirstName string `json:"firstName" example:"John"`
+	LastName  string `json:"lastName" example:"Doe"`
 }
 
 func (model *Member) GetID() uint {
