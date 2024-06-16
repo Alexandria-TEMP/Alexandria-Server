@@ -116,8 +116,8 @@ func memberRouter(v2 *gin.RouterGroup, controllers *ControllerEnv, middleware Mi
 	memberRouter.POST("/:memberID/saved-project-posts", middleware.CheckAuth, controllers.memberController.AddMemberSavedProjectPost)
 	memberRouter.GET("/:memberID/saved-posts", controllers.memberController.GetMemberSavedPosts)
 	memberRouter.GET("/:memberID/saved-project-posts", controllers.memberController.GetMemberSavedProjectPosts)
-	memberRouter.GET("/login", controllers.memberController.LoginMember)
-	memberRouter.GET("/token", controllers.memberController.RefreshToken)
+	memberRouter.POST("/login", controllers.memberController.LoginMember)
+	memberRouter.POST("/token", controllers.memberController.RefreshToken)
 }
 
 func projectPostRouter(v2 *gin.RouterGroup, controllers *ControllerEnv, middleware Middleware) {

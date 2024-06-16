@@ -214,7 +214,7 @@ func (memberController *MemberController) GetAllMembers(c *gin.Context) {
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router 		/members/login 		[get]
+// @Router 		/members/login 		[post]
 func (memberController *MemberController) LoginMember(c *gin.Context) {
 	form := &forms.MemberAuthForm{}
 	// bind the fields of the param to the JSON of the model
@@ -253,7 +253,7 @@ func (memberController *MemberController) LoginMember(c *gin.Context) {
 // @Failure		400
 // @Failure		404
 // @Failure		500
-// @Router 		/members/token	[get]
+// @Router 		/members/token	[post]
 func (memberController *MemberController) RefreshToken(c *gin.Context) {
 	form := &forms.TokenRefreshForm{}
 	// bind the fields of the param to the JSON of the model
