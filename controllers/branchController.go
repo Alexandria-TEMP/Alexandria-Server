@@ -114,7 +114,8 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 // @Failure		400		{object} 	utils.HTTPError
 // @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches 		[put]
-func (branchController *BranchController) UpdateBranch(_ *gin.Context) {
+func (branchController *BranchController) UpdateBranch(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // DeleteBranch godoc
@@ -596,8 +597,8 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 // @Failure		404		{object} 	utils.HTTPError
 // @Failure		500		{object} 	utils.HTTPError
 // @Router		/branches/{branchID}/discussions 	[get]
-func (branchController *BranchController) GetDiscussions(_ *gin.Context) {
-	// TODO ahh its paginated
+func (branchController *BranchController) GetDiscussions(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // GetClosedBranch godoc

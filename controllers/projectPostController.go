@@ -151,8 +151,8 @@ func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Con
 // @Failure		404		{object} 	utils.HTTPError
 // @Failure		500		{object} 	utils.HTTPError
 // @Router 		/project-posts/{projectPostID} 		[delete]
-func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Context) {
-	// delete method goes here
+func (projectPostController *ProjectPostController) DeleteProjectPost(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // CreateProjectPostFromGithub godoc
@@ -170,8 +170,8 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(_ *gin.Con
 // @Failure		500		{object} 	utils.HTTPError
 // @Failure 	502		{object} 	utils.HTTPError
 // @Router 		/project-posts/from-github 		[post]
-func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(_ *gin.Context) {
-
+func (projectPostController *ProjectPostController) CreateProjectPostFromGithub(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // GetProjectPostDiscussionContainers godoc

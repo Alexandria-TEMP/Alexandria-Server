@@ -146,8 +146,8 @@ func (postController *PostController) UpdatePost(c *gin.Context) {
 // @Failure		404		{object} 	utils.HTTPError
 // @Failure		500		{object} 	utils.HTTPError
 // @Router 		/posts/{postID} 		[delete]
-func (postController *PostController) DeletePost(_ *gin.Context) {
-	// delete method goes here
+func (postController *PostController) DeletePost(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // CreatePostFromGithub godoc
@@ -165,8 +165,8 @@ func (postController *PostController) DeletePost(_ *gin.Context) {
 // @Failure		500		{object} 	utils.HTTPError
 // @Failure 	502		{object} 	utils.HTTPError
 // @Router 		/posts/from-github 		[post]
-func (postController *PostController) CreatePostFromGithub(_ *gin.Context) {
-
+func (postController *PostController) CreatePostFromGithub(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // AddPostReport godoc
@@ -182,8 +182,8 @@ func (postController *PostController) CreatePostFromGithub(_ *gin.Context) {
 // @Failure		404		{object} 	utils.HTTPError
 // @Failure		500		{object} 	utils.HTTPError
 // @Router 		/posts/{postID}/reports 		[post]
-func (postController *PostController) AddPostReport(_ *gin.Context) {
-
+func (postController *PostController) AddPostReport(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // GetPostReports godoc
@@ -198,8 +198,8 @@ func (postController *PostController) AddPostReport(_ *gin.Context) {
 // @Failure		404		{object} 	utils.HTTPError
 // @Failure		500		{object} 	utils.HTTPError
 // @Router 		/posts/{postID}/reports 		[get]
-func (postController *PostController) GetPostReports(_ *gin.Context) {
-	// TODO implement
+func (postController *PostController) GetPostReports(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // GetCollaborator godoc
@@ -247,8 +247,8 @@ func (postController *PostController) GetPostCollaborator(c *gin.Context) {
 // @Failure		404		{object} 	utils.HTTPError
 // @Failure		500		{object} 	utils.HTTPError
 // @Router		/posts/reports/{reportID}				[get]
-func (postController *PostController) GetPostReport(_ *gin.Context) {
-	// TODO implement
+func (postController *PostController) GetPostReport(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // UploadPost

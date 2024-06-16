@@ -138,8 +138,8 @@ func (discussionController *DiscussionController) CreateReplyDiscussion(c *gin.C
 // @Failure		404		{object} 	utils.HTTPError
 // @Failure		500		{object} 	utils.HTTPError
 // @Router 		/discussions/{discussionID} 		[delete]
-func (discussionController *DiscussionController) DeleteDiscussion(_ *gin.Context) {
-	// delete method goes here
+func (discussionController *DiscussionController) DeleteDiscussion(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // AddDiscussionReport godoc
@@ -155,8 +155,8 @@ func (discussionController *DiscussionController) DeleteDiscussion(_ *gin.Contex
 // @Failure		404		{object} 	utils.HTTPError
 // @Failure		500		{object} 	utils.HTTPError
 // @Router 		/discussions/{discussionID}/reports 		[post]
-func (discussionController *DiscussionController) AddDiscussionReport(_ *gin.Context) {
-
+func (discussionController *DiscussionController) AddDiscussionReport(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // GetDiscussionReports godoc
@@ -171,8 +171,8 @@ func (discussionController *DiscussionController) AddDiscussionReport(_ *gin.Con
 // @Failure		404		{object} 	utils.HTTPError
 // @Failure		500		{object} 	utils.HTTPError
 // @Router 		/discussions/{discussionID}/reports 		[get]
-func (discussionController *DiscussionController) GetDiscussionReports(_ *gin.Context) {
-	// TODO implement
+func (discussionController *DiscussionController) GetDiscussionReports(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
 
 // GetDiscussionReport godoc
@@ -186,6 +186,6 @@ func (discussionController *DiscussionController) GetDiscussionReports(_ *gin.Co
 // @Failure		404		{object} 	utils.HTTPError
 // @Failure		500		{object} 	utils.HTTPError
 // @Router		/discussions/reports/{reportID}				[get]
-func (discussionController *DiscussionController) GetDiscussionReport(_ *gin.Context) {
-	// TODO implement
+func (discussionController *DiscussionController) GetDiscussionReport(c *gin.Context) {
+	c.Status(http.StatusNotImplemented)
 }
