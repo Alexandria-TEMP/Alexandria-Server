@@ -4,8 +4,8 @@ import "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/a
 
 type ProjectPostCreationForm struct {
 	PostCreationForm          PostCreationForm                 `json:"postCreationForm"`
-	ProjectCompletionStatus   models.ProjectCompletionStatus   `json:"projectCompletionStatus"`
-	ProjectFeedbackPreference models.ProjectFeedbackPreference `json:"projectFeedbackPreference"`
+	ProjectCompletionStatus   models.ProjectCompletionStatus   `json:"projectCompletionStatus" example:"ongoing"`
+	ProjectFeedbackPreference models.ProjectFeedbackPreference `json:"projectFeedbackPreference" example:"formal feedback"`
 }
 
 // Whether the form itself contains valid data. Should NOT contain business logic (such as "if Foo > 0, Bar may not be 1")

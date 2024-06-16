@@ -3,24 +3,36 @@ definitions:
   forms.BranchCreationForm:
     properties:
       anonymous:
+        example: false
         type: boolean
       branchTitle:
+        example: Proposed Changes
         type: string
       collaboratingMemberIDs:
         description: The branch's metadata
+        example:
+        - 1
         items:
           type: integer
         type: array
       projectPostID:
+        example: 1
         type: integer
       updatedCompletionStatus:
-        $ref: '#/definitions/models.ProjectCompletionStatus'
+        allOf:
+        - $ref: '#/definitions/models.ProjectCompletionStatus'
+        example: completed
       updatedFeedbackPreferences:
-        $ref: '#/definitions/models.ProjectFeedbackPreference'
+        allOf:
+        - $ref: '#/definitions/models.ProjectFeedbackPreference'
+        example: formal feedback
       updatedPostTitle:
         description: Changes made by the branch
+        example: Updated Post Title
         type: string
       updatedScientificFieldIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
@@ -29,28 +41,38 @@ definitions:
     properties:
       anonymous:
         description: If anonymous, the discussion will ignore member ID
+        example: false
         type: boolean
       memberID:
+        example: 1
         type: integer
       text:
+        example: Discussion text
         type: string
     type: object
   forms.MemberCreationForm:
     properties:
       email:
+        example: example@example.example
         type: string
       firstName:
+        example: John
         type: string
       institution:
+        example: Example University
         type: string
       lastName:
+        example: Doe
         type: string
       password:
         description: |-
           making the password just a string for now
           TODO: some hashing or semblance of security
+        example: password
         type: string
       scientificFieldTagIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
@@ -58,23 +80,32 @@ definitions:
   forms.PostCreationForm:
     properties:
       anonymous:
+        example: false
         type: boolean
       authorMemberIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
       postType:
-        $ref: '#/definitions/models.PostType'
+        allOf:
+        - $ref: '#/definitions/models.PostType'
+        example: question
       scientificFieldTagIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
       title:
+        example: Post Title
         type: string
     type: object
   forms.PostFilterForm:
     properties:
       includeProjectPosts:
+        example: true
         type: boolean
     type: object
   forms.ProjectPostCreationForm:
@@ -82,9 +113,13 @@ definitions:
       postCreationForm:
         $ref: '#/definitions/forms.PostCreationForm'
       projectCompletionStatus:
-        $ref: '#/definitions/models.ProjectCompletionStatus'
+        allOf:
+        - $ref: '#/definitions/models.ProjectCompletionStatus'
+        example: ongoing
       projectFeedbackPreference:
-        $ref: '#/definitions/models.ProjectFeedbackPreference'
+        allOf:
+        - $ref: '#/definitions/models.ProjectFeedbackPreference'
+        example: formal feedback
     type: object
   forms.ProjectPostFilterForm:
     type: object
@@ -101,12 +136,17 @@ definitions:
   forms.ReviewCreationForm:
     properties:
       branchID:
+        example: 1
         type: integer
       branchReviewDecision:
-        $ref: '#/definitions/models.BranchReviewDecision'
+        allOf:
+        - $ref: '#/definitions/models.BranchReviewDecision'
+        example: approved
       feedback:
+        example: Feedback
         type: string
       reviewingMemberID:
+        example: 1
         type: integer
     type: object
   forms.RootDiscussionCreationForm:
@@ -428,6 +468,7 @@ definitions:
   utils.HTTPError:
     properties:
       error:
+        example: 'failed to something: reason'
         type: string
     type: object
 host: localhost:8080

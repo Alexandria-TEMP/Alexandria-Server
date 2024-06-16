@@ -8,16 +8,16 @@ type BranchCreationForm struct {
 	// TODO New files to add to the version
 
 	// Changes made by the branch
-	UpdatedPostTitle           *string                           `json:"updatedPostTitle"`
-	UpdatedCompletionStatus    *models.ProjectCompletionStatus   `json:"updatedCompletionStatus"`
-	UpdatedScientificFieldIDs  []uint                            `json:"updatedScientificFieldIDs"`
-	UpdatedFeedbackPreferences *models.ProjectFeedbackPreference `json:"updatedFeedbackPreferences"`
+	UpdatedPostTitle           *string                           `json:"updatedPostTitle" example:"Updated Post Title"`
+	UpdatedCompletionStatus    *models.ProjectCompletionStatus   `json:"updatedCompletionStatus" example:"completed"`
+	UpdatedScientificFieldIDs  []uint                            `json:"updatedScientificFieldIDs" example:"1"`
+	UpdatedFeedbackPreferences *models.ProjectFeedbackPreference `json:"updatedFeedbackPreferences" example:"formal feedback"`
 
 	// The branch's metadata
-	CollaboratingMemberIDs []uint `json:"collaboratingMemberIDs"`
-	ProjectPostID          uint   `json:"projectPostID"`
-	BranchTitle            string `json:"branchTitle"`
-	Anonymous              bool   `json:"anonymous"`
+	CollaboratingMemberIDs []uint `json:"collaboratingMemberIDs" example:"1"`
+	ProjectPostID          uint   `json:"projectPostID" example:"1"`
+	BranchTitle            string `json:"branchTitle" example:"Proposed Changes"`
+	Anonymous              bool   `json:"anonymous" example:"false"`
 }
 
 // Whether the form itself contains valid data. Should NOT contain business logic (such as "if Foo > 0, Bar may not be 1")
