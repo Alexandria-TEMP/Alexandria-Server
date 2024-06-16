@@ -303,10 +303,8 @@ definitions:
         type: string
       lastName:
         type: string
-      scientificFieldTagIDs:
-        items:
-          type: integer
-        type: array
+      scientificFieldTagContainerID:
+        type: integer
     type: object
   models.MemberShortFormDTO:
     properties:
@@ -1460,7 +1458,8 @@ paths:
       description: |-
         Create a new member from the given fields.
         The member must have a unique email address, which isn't associated with any other accounts.
-        They are automatically logged in, and an access + refresh token pair is returned alongside the member
+        They are automatically logged in, and an access + refresh token pair is returned alongside the member.
+        The access-token is valid for 15 minutes and the refresh token is valid for 3 days.
       parameters:
       - description: Member Creation Form
         in: body
@@ -1474,7 +1473,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.LoggedInMemberDTO'
+            $ref: '#/definitions/models.MemberDTO'
         "400":
           description: Bad Request
           schema:
@@ -1871,11 +1870,12 @@ paths:
       tags:
       - members
   /members/login:
-    get:
+    post:
       consumes:
       - application/json
-      description: Logs a member in based on email and password and returns an access
-        and refresh token.
+      description: |-
+        Logs a member in based on email and password and returns an access and refresh token.
+        The access-token is valid for 15 minutes and the refresh token is valid for 3 days.
       parameters:
       - description: Member Authentication Form
         in: body
@@ -1900,10 +1900,12 @@ paths:
       tags:
       - members
   /members/token:
-    get:
+    post:
       consumes:
       - application/json
-      description: Refreshes the access token with a refresh token.
+      description: |-
+        Refreshes the access token with a refresh token.
+        The access-token is valid for 15 minutes and the refresh token is valid for 3 days.
       parameters:
       - description: Token Refresh Form
         in: body

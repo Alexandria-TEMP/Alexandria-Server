@@ -1512,7 +1512,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create a new member from the given fields.\nThe member must have a unique email address, which isn't associated with any other accounts.\nThey are automatically logged in, and an access + refresh token pair is returned alongside the member",
+                "description": "Create a new member from the given fields.\nThe member must have a unique email address, which isn't associated with any other accounts.\nThey are automatically logged in, and an access + refresh token pair is returned alongside the member.\nThe access-token is valid for 15 minutes and the refresh token is valid for 3 days.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1538,7 +1538,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.LoggedInMemberDTO"
+                            "$ref": "#/definitions/models.MemberDTO"
                         }
                     },
                     "400": {
@@ -1557,8 +1557,8 @@ const docTemplate = `{
             }
         },
         "/members/login": {
-            "get": {
-                "description": "Logs a member in based on email and password and returns an access and refresh token.",
+            "post": {
+                "description": "Logs a member in based on email and password and returns an access and refresh token.\nThe access-token is valid for 15 minutes and the refresh token is valid for 3 days.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1600,8 +1600,8 @@ const docTemplate = `{
             }
         },
         "/members/token": {
-            "get": {
-                "description": "Refreshes the access token with a refresh token.",
+            "post": {
+                "description": "Refreshes the access token with a refresh token.\nThe access-token is valid for 15 minutes and the refresh token is valid for 3 days.",
                 "consumes": [
                     "application/json"
                 ],
@@ -4048,11 +4048,8 @@ const docTemplate = `{
                 "lastName": {
                     "type": "string"
                 },
-                "scientificFieldTagIDs": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                "scientificFieldTagContainerID": {
+                    "type": "integer"
                 }
             }
         },
