@@ -3543,6 +3543,9 @@
                         "type": "integer"
                     }
                 },
+                "createdAt": {
+                    "type": "string"
+                },
                 "discussionContainerID": {
                     "type": "integer"
                 },
@@ -3560,6 +3563,9 @@
                     "items": {
                         "type": "integer"
                     }
+                },
+                "updatedAt": {
+                    "type": "string"
                 },
                 "updatedCompletionStatus": {
                     "$ref": "#/definitions/models.ProjectCompletionStatus"
@@ -3797,6 +3803,9 @@
                         "type": "integer"
                     }
                 },
+                "createdAt": {
+                    "type": "string"
+                },
                 "discussionContainerID": {
                     "type": "integer"
                 },
@@ -3813,6 +3822,9 @@
                     "type": "integer"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
                     "type": "string"
                 }
             }
@@ -3863,6 +3875,9 @@
                         "type": "integer"
                     }
                 },
+                "createdAt": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -3883,6 +3898,9 @@
                 },
                 "projectFeedbackPreference": {
                     "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                },
+                "updatedAt": {
+                    "type": "string"
                 }
             }
         },

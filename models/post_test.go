@@ -4,14 +4,18 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 func TestPostJSONMarshaling(t *testing.T) {
+	createdAt := time.Now().Add(time.Minute).UTC()
+	updatedAt := time.Now().Add(time.Hour).UTC()
+
 	// This model...
 	model := Post{
-		Model: gorm.Model{ID: 88},
+		Model: gorm.Model{ID: 88, CreatedAt: createdAt, UpdatedAt: updatedAt},
 		Collaborators: []*PostCollaborator{
 			{
 				Model:             gorm.Model{ID: 1},
@@ -44,6 +48,8 @@ func TestPostJSONMarshaling(t *testing.T) {
 		PostType:                      Question,
 		ScientificFieldTagContainerID: 50,
 		DiscussionContainerID:         5,
+		CreatedAt:                     createdAt,
+		UpdatedAt:                     updatedAt,
 	}
 
 	dto := PostDTO{}

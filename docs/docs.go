@@ -3549,6 +3549,9 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
+                "createdAt": {
+                    "type": "string"
+                },
                 "discussionContainerID": {
                     "type": "integer"
                 },
@@ -3566,6 +3569,9 @@ const docTemplate = `{
                     "items": {
                         "type": "integer"
                     }
+                },
+                "updatedAt": {
+                    "type": "string"
                 },
                 "updatedCompletionStatus": {
                     "$ref": "#/definitions/models.ProjectCompletionStatus"
@@ -3803,6 +3809,9 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
+                "createdAt": {
+                    "type": "string"
+                },
                 "discussionContainerID": {
                     "type": "integer"
                 },
@@ -3819,6 +3828,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
                     "type": "string"
                 }
             }
@@ -3869,6 +3881,9 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
+                "createdAt": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -3889,6 +3904,9 @@ const docTemplate = `{
                 },
                 "projectFeedbackPreference": {
                     "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                },
+                "updatedAt": {
+                    "type": "string"
                 }
             }
         },

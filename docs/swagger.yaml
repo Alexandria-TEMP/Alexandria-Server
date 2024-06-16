@@ -140,6 +140,8 @@ definitions:
         items:
           type: integer
         type: array
+      createdAt:
+        type: string
       discussionContainerID:
         type: integer
       id:
@@ -152,6 +154,8 @@ definitions:
         items:
           type: integer
         type: array
+      updatedAt:
+        type: string
       updatedCompletionStatus:
         $ref: '#/definitions/models.ProjectCompletionStatus'
       updatedScientificFieldTagContainerID:
@@ -309,6 +313,8 @@ definitions:
         items:
           type: integer
         type: array
+      createdAt:
+        type: string
       discussionContainerID:
         type: integer
       id:
@@ -320,6 +326,8 @@ definitions:
       scientificFieldTagContainerID:
         type: integer
       title:
+        type: string
+      updatedAt:
         type: string
     type: object
   models.PostType:
@@ -356,6 +364,8 @@ definitions:
         items:
           type: integer
         type: array
+      createdAt:
+        type: string
       id:
         type: integer
       openBranchIDs:
@@ -370,6 +380,8 @@ definitions:
         $ref: '#/definitions/models.ProjectCompletionStatus'
       projectFeedbackPreference:
         $ref: '#/definitions/models.ProjectFeedbackPreference'
+      updatedAt:
+        type: string
     type: object
   models.ProjectReviewStatus:
     enum:
