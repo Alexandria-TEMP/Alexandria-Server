@@ -47,7 +47,7 @@ definitions:
         example: 1
         type: integer
       text:
-        example: Discussion text.
+        example: Discussion content.
         type: string
     type: object
   forms.MemberCreationForm:
@@ -256,7 +256,7 @@ definitions:
       createdAt:
         type: string
       feedback:
-        example: Feedback
+        example: Fantastic work!
         type: string
       id:
         example: 1
@@ -369,7 +369,7 @@ definitions:
           type: integer
         type: array
       text:
-        example: Discussion content
+        example: Discussion content.
         type: string
     type: object
   models.MemberDTO:

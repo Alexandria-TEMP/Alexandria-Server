@@ -176,6 +176,8 @@ func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 	// Get statuses of a branch
 	statuses, err := branchController.BranchService.GetReviewStatus(uint(branchID))
 
+	// TODO this is incorrect, the endpoint should return statuses of the branch's reviews, not the status of the branch itself
+
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 

@@ -3403,7 +3403,7 @@
                 },
                 "text": {
                     "type": "string",
-                    "example": "Discussion text."
+                    "example": "Discussion content."
                 }
             }
         },
@@ -3717,7 +3717,7 @@
                 },
                 "feedback": {
                     "type": "string",
-                    "example": "Feedback"
+                    "example": "Fantastic work!"
                 },
                 "id": {
                     "type": "integer",
@@ -3882,7 +3882,7 @@
                 },
                 "text": {
                     "type": "string",
-                    "example": "Discussion content"
+                    "example": "Discussion content."
                 }
             }
         },

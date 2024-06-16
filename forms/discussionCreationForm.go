@@ -5,7 +5,7 @@ type DiscussionCreationForm struct {
 	Anonymous bool `json:"anonymous" example:"false"`
 	MemberID  uint `json:"memberID" example:"1"`
 
-	Text string `json:"text" example:"Discussion text."`
+	Text string `json:"text" example:"Discussion content."`
 }
 
 // Whether the form itself contains valid data. Should NOT contain business logic (such as "if Foo > 0, Bar may not be 1")

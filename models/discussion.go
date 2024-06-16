@@ -27,7 +27,7 @@ type DiscussionDTO struct {
 	ID       uint   `json:"id" example:"1"`
 	MemberID *uint  `json:"memberID" example:"1"`
 	ReplyIDs []uint `json:"replyIDs" example:"2"`
-	Text     string `json:"text" example:"Discussion content"`
+	Text     string `json:"text" example:"Discussion content."`
 }
 
 func (model *Discussion) GetID() uint {

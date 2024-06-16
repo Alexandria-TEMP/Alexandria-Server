@@ -3409,7 +3409,7 @@ const docTemplate = `{
                 },
                 "text": {
                     "type": "string",
-                    "example": "Discussion text."
+                    "example": "Discussion content."
                 }
             }
         },
@@ -3723,7 +3723,7 @@ const docTemplate = `{
                 },
                 "feedback": {
                     "type": "string",
-                    "example": "Feedback"
+                    "example": "Fantastic work!"
                 },
                 "id": {
                     "type": "integer",
@@ -3888,7 +3888,7 @@ const docTemplate = `{
                 },
                 "text": {
                     "type": "string",
-                    "example": "Discussion content"
+                    "example": "Discussion content."
                 }
             }
         },
