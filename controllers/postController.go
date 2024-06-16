@@ -269,7 +269,7 @@ func (postController *PostController) UploadPost(c *gin.Context) {
 	file, err := c.FormFile("file")
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "no file found"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("no file found: %s", err)})
 
 		return
 	}
@@ -279,7 +279,7 @@ func (postController *PostController) UploadPost(c *gin.Context) {
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID, cannot interpret as integer, id=%v ", postIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", postIDStr, err)})
 
 		return
 	}
@@ -314,7 +314,7 @@ func (postController *PostController) GetMainRender(c *gin.Context) {
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID '%s', cannot interpret as integer: %s", postIDStr, err)})
 
 		return
 	}
@@ -360,7 +360,7 @@ func (postController *PostController) GetMainProject(c *gin.Context) {
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID '%s', cannot interpret as integer: %s", postIDStr, err)})
 
 		return
 	}
@@ -400,7 +400,7 @@ func (postController *PostController) GetMainFiletree(c *gin.Context) {
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID, cannot interpret as integer, id=%v ", postIDStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID '%s', cannot interpret as integer: %s", postIDStr, err)})
 
 		return
 	}

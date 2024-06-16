@@ -37,7 +37,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 	projectPostID, err := strconv.ParseUint(projectPostIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not interpret ID %s as unsigned integer, reason: %s", projectPostIDStr, err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("could not interpret ID %s as unsigned integer: %s", projectPostIDStr, err)})
 
 		return
 	}
@@ -45,7 +45,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 	projectPost, err := projectPostController.ProjectPostService.GetProjectPost(uint(projectPostID))
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get project post, reason: %v", err.Error())})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("could not get project post: %v", err.Error())})
 
 		return
 	}
