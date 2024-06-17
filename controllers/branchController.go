@@ -103,21 +103,6 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 	c.JSON(http.StatusOK, branch.IntoDTO())
 }
 
-// UpdateBranch godoc
-// @Summary 	Update branch
-// @Description Update any number of the aspects of a branch
-// @Tags 		branches
-// @Accept  	json
-// @Param		branch	body		models.BranchDTO		true	"Updated Branch"
-// @Produce		json
-// @Success 	200
-// @Failure		400		{object} 	utils.HTTPError
-// @Failure		404		{object} 	utils.HTTPError
-// @Router 		/branches 		[put]
-func (branchController *BranchController) UpdateBranch(c *gin.Context) {
-	c.Status(http.StatusNotImplemented)
-}
-
 // DeleteBranch godoc
 // @Summary 	Delete a branch
 // @Description Delete a branch with given ID from database
