@@ -75,7 +75,7 @@ func TestGetMember404(t *testing.T) {
 func TestCreateMember200(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().CreateMember(&exampleMemberForm, gomock.Any()).Return(&exampleMemberLoggedInDTO, nil).Times(1)
+	mockMemberService.EXPECT().CreateMember(&exampleMemberForm, gomock.Any()).Return("access", "refresh", &exampleMember, nil).Times(1)
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
 
 	exampleMemberFormJSON, _ := json.Marshal(exampleMemberForm)
@@ -93,7 +93,7 @@ func TestCreateMember200(t *testing.T) {
 func TestCreateMember400(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Return(nil, errors.New("some error")).Times(0)
+	mockMemberService.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Return("", "", nil, errors.New("some error")).Times(0)
 
 	badMemberFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
 	req, _ := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(badMemberFormJSON))

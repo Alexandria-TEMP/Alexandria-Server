@@ -108,7 +108,12 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	}
 
 	// create and add to database through the memberService
-	loggedInMember, err := memberController.MemberService.CreateMember(&form, &tagContainer)
+	accessToken, refreshToken, member, err := memberController.MemberService.CreateMember(&form, &tagContainer)
+	loggedInMember := models.LoggedInMemberDTO{
+		Member:       member.IntoDTO(),
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
 
 	// if the member service throws an error, return a 400 Bad request status
 	if err != nil {

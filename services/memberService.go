@@ -27,26 +27,26 @@ func (memberService *MemberService) GetMember(memberID uint) (*models.Member, er
 	return member, err
 }
 
-func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (*models.LoggedInMemberDTO, error) {
+func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (accessToken, refreshToken string, member *models.Member, err error) {
 	// check if user with this email already exists
 	duplicateMember, err := memberService.MemberRepository.Query(&models.Member{Email: form.Email})
 	if err != nil {
-		return nil, fmt.Errorf("failed to find all existing member with email %s", form.Email)
+		return accessToken, refreshToken, member, fmt.Errorf("failed to find all existing member with email %s", form.Email)
 	}
 
 	if len(duplicateMember) != 0 {
-		return nil, fmt.Errorf("a user with the email %s already exists", form.Email)
+		return accessToken, refreshToken, member, fmt.Errorf("a user with the email %s already exists", form.Email)
 	}
 
 	// hash password
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, fmt.Errorf("failed to hash password: %w", err)
+		return accessToken, refreshToken, member, fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	// create member
 	// for now no input sanitization for the strings - so first name, last name, email, institution, etc.
-	member := &models.Member{
+	member = &models.Member{
 		FirstName:                   form.FirstName,
 		LastName:                    form.LastName,
 		Email:                       form.Email,
@@ -58,23 +58,16 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 	// save member to db
 	err = memberService.MemberRepository.Create(member)
 	if err != nil {
-		return nil, err
+		return accessToken, refreshToken, member, err
 	}
 
 	// generate tokens
-	accessToken, RefreshToken, err := memberService.generateTokenPair(member.ID)
+	accessToken, refreshToken, err = memberService.generateTokenPair(member.ID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate token pair: %w", err)
+		return accessToken, refreshToken, member, fmt.Errorf("failed to generate token pair: %w", err)
 	}
 
-	// create logged in member dto
-	loggedInMember := &models.LoggedInMemberDTO{
-		Member:       member.IntoDTO(),
-		AccessToken:  accessToken,
-		RefreshToken: RefreshToken,
-	}
-
-	return loggedInMember, err
+	return accessToken, refreshToken, member, err
 }
 
 func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, userFields *models.ScientificFieldTagContainer) error {

@@ -77,7 +77,9 @@ func TestMain(m *testing.M) {
 		ScientificFieldTagContainerID: 0,
 	}
 	exampleMemberLoggedInDTO = models.LoggedInMemberDTO{
-		Member: exampleMemberDTO,
+		Member:       exampleMemberDTO,
+		AccessToken:  "access",
+		RefreshToken: "refresh",
 	}
 	exampleMemberAuthForm = forms.MemberAuthForm{
 		Email:    "john.smith@gmail.com",

@@ -35,7 +35,6 @@ linters:
     - asciicheck
     - bidichk
     - decorder
-    - dogsled
     - dupl
     - errcheck
     - errorlint

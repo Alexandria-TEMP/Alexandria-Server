@@ -9,7 +9,7 @@ import (
 
 type MemberService interface {
 	GetMember(memberID uint) (*models.Member, error)
-	CreateMember(memberForm *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (*models.LoggedInMemberDTO, error)
+	CreateMember(memberForm *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (string, string, *models.Member, error)
 	UpdateMember(updatedMember *models.MemberDTO, userFields *models.ScientificFieldTagContainer) error
 	DeleteMember(memberID uint) error
 	GetAllMembers() ([]*models.MemberShortFormDTO, error)

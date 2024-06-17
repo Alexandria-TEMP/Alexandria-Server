@@ -79,13 +79,13 @@ func TestCreateMemberSuccessful(t *testing.T) {
 		ScientificFieldTags: []*models.ScientificFieldTag{exampleSTag1, exampleSTag2},
 	}
 	// call service method under test
-	member, err := memberService.CreateMember(&memberForm, &userTags)
+	_, _, member, err := memberService.CreateMember(&memberForm, &userTags)
 
 	// verify that the member object was created correctly
-	assert.Equal(t, exampleMember.FirstName, member.Member.FirstName)
-	assert.Equal(t, exampleMember.LastName, member.Member.LastName)
-	assert.Equal(t, exampleMember.Email, member.Member.Email)
-	assert.Equal(t, exampleMember.Institution, member.Member.Institution)
+	assert.Equal(t, exampleMember.FirstName, member.FirstName)
+	assert.Equal(t, exampleMember.LastName, member.LastName)
+	assert.Equal(t, exampleMember.Email, member.Email)
+	assert.Equal(t, exampleMember.Institution, member.Institution)
 
 	// verify that there was no error
 	assert.Nil(t, err)
@@ -115,7 +115,7 @@ func TestCreateMemberUnsuccessful(t *testing.T) {
 	}
 
 	// call service method under test
-	_, err := memberService.CreateMember(&memberForm, &userTags)
+	_, _, _, err := memberService.CreateMember(&memberForm, &userTags)
 
 	// verify the error was returned correctly
 	assert.Equal(t, expectedErr, err)
@@ -145,7 +145,7 @@ func TestCreateMemberDuplicateEmail(t *testing.T) {
 	}
 
 	// call service method under test
-	_, err := memberService.CreateMember(&memberForm, &userTags)
+	_, _, _, err := memberService.CreateMember(&memberForm, &userTags)
 
 	// verify the error was returned correctly
 	assert.NotNil(t, err)
