@@ -35,12 +35,12 @@ type BranchReview struct {
 }
 
 type BranchReviewDTO struct {
-	ID                   uint                 `json:"id"`
-	BranchID             uint                 `json:"branchID"`
-	MemberID             uint                 `json:"memberID"`
-	BranchReviewDecision BranchReviewDecision `json:"branchReviewDecision"`
-	Feedback             string               `json:"feedback"`
-	CreatedAt            time.Time            `json:"createdAt"`
+	ID                   uint                 `json:"id" example:"1"`
+	BranchID             uint                 `json:"branchID" example:"1"`
+	MemberID             uint                 `json:"memberID" example:"1"`
+	BranchReviewDecision BranchReviewDecision `json:"branchReviewDecision" example:"approved"`
+	Feedback             string               `json:"feedback" example:"Fantastic work!"`
+	CreatedAt            time.Time            `json:"createdAt" example:"2024-06-16T16:00:43.234Z"`
 }
 
 func (model *BranchReview) GetID() uint {

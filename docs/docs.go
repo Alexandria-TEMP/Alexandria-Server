@@ -125,10 +125,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.ClosedBranchDTO"
-                            }
+                            "$ref": "#/definitions/models.ClosedBranchDTO"
                         }
                     },
                     "400": {
@@ -3345,36 +3342,56 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "anonymous": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "branchTitle": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Proposed Changes"
                 },
                 "collaboratingMemberIDs": {
                     "description": "The branch's metadata",
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 },
                 "projectPostID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "updatedCompletionStatus": {
-                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProjectCompletionStatus"
+                        }
+                    ],
+                    "example": "completed"
                 },
                 "updatedFeedbackPreferences": {
-                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                        }
+                    ],
+                    "example": "formal feedback"
                 },
                 "updatedPostTitle": {
                     "description": "Changes made by the branch",
-                    "type": "string"
+                    "type": "string",
+                    "example": "Updated Project Post Title"
                 },
                 "updatedScientificFieldIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 }
             }
         },
@@ -3383,13 +3400,16 @@ const docTemplate = `{
             "properties": {
                 "anonymous": {
                     "description": "If anonymous, the discussion will ignore member ID",
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "memberID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "text": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Discussion content."
                 }
             }
         },
@@ -3397,26 +3417,34 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "example@example.example"
                 },
                 "firstName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "John"
                 },
                 "institution": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Example University"
                 },
                 "lastName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Doe"
                 },
                 "password": {
                     "description": "making the password just a string for now\nTODO: some hashing or semblance of security",
-                    "type": "string"
+                    "type": "string",
+                    "example": "password"
                 },
                 "scientificFieldTagIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 }
             }
         },
@@ -3424,25 +3452,38 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "anonymous": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "authorMemberIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 },
                 "postType": {
-                    "$ref": "#/definitions/models.PostType"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.PostType"
+                        }
+                    ],
+                    "example": "question"
                 },
                 "scientificFieldTagIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 },
                 "title": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Post Title"
                 }
             }
         },
@@ -3450,21 +3491,55 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "includeProjectPosts": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },
         "forms.ProjectPostCreationForm": {
             "type": "object",
             "properties": {
-                "postCreationForm": {
-                    "$ref": "#/definitions/forms.PostCreationForm"
+                "anonymous": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "authorMemberIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "example": [
+                        1
+                    ]
                 },
                 "projectCompletionStatus": {
-                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProjectCompletionStatus"
+                        }
+                    ],
+                    "example": "ongoing"
                 },
                 "projectFeedbackPreference": {
-                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                        }
+                    ],
+                    "example": "formal feedback"
+                },
+                "scientificFieldTagIDs": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "example": [
+                        1
+                    ]
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Project Post Title"
                 }
             }
         },
@@ -3479,7 +3554,8 @@ const docTemplate = `{
                 },
                 "parentID": {
                     "description": "The Discussion this Discussion will be added to",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -3490,16 +3566,24 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "branchID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "branchReviewDecision": {
-                    "$ref": "#/definitions/models.BranchReviewDecision"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.BranchReviewDecision"
+                        }
+                    ],
+                    "example": "approved"
                 },
                 "feedback": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Fantastic work!"
                 },
                 "reviewingMemberID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -3508,7 +3592,8 @@ const docTemplate = `{
             "properties": {
                 "containerID": {
                     "description": "The DiscussionContainer this Discussion will be added to",
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "discussion": {
                     "$ref": "#/definitions/forms.DiscussionCreationForm"
@@ -3519,65 +3604,97 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "branchID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "memberID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
         "models.BranchDTO": {
             "type": "object",
             "properties": {
-                "UpdatedPostTitle": {
-                    "description": "MR's proposed changes",
-                    "type": "string"
-                },
                 "branchOverallReviewStatus": {
-                    "$ref": "#/definitions/models.BranchOverallReviewStatus"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.BranchOverallReviewStatus"
+                        }
+                    ],
+                    "example": "open for review"
                 },
                 "branchTitle": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Proposed Changes"
                 },
                 "collaboratorIDs": {
                     "description": "MR metadata",
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 },
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 },
                 "discussionContainerID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "projectPostID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "renderStatus": {
-                    "$ref": "#/definitions/models.RenderStatus"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.RenderStatus"
+                        }
+                    ],
+                    "example": "pending"
                 },
                 "reviewIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 },
                 "updatedCompletionStatus": {
-                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProjectCompletionStatus"
+                        }
+                    ],
+                    "example": "ongoing"
+                },
+                "updatedPostTitle": {
+                    "description": "MR's proposed changes",
+                    "type": "string",
+                    "example": "Updated Project Post Title"
                 },
                 "updatedScientificFieldTagContainerID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -3598,22 +3715,32 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "branchID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "branchReviewDecision": {
-                    "$ref": "#/definitions/models.BranchReviewDecision"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.BranchReviewDecision"
+                        }
+                    ],
+                    "example": "approved"
                 },
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 },
                 "feedback": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Fantastic work!"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "memberID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -3635,19 +3762,28 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        3
+                    ]
                 },
                 "openBranchIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 },
                 "rejectedClosedBranchIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        2
+                    ]
                 }
             }
         },
@@ -3655,19 +3791,28 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "branchID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "branchReviewDecision": {
-                    "$ref": "#/definitions/models.BranchReviewDecision"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.BranchReviewDecision"
+                        }
+                    ],
+                    "example": "approved"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "projectPostID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "supercededBranchID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },
@@ -3691,10 +3836,14 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -3702,7 +3851,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "currentDiscussionContainerID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "mergedBranchDiscussionContainers": {
                     "type": "array",
@@ -3716,10 +3866,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "closedBranchID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "discussionContainerID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },
@@ -3727,19 +3879,25 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "memberID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "replyIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        2
+                    ]
                 },
                 "text": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Discussion content."
                 }
             }
         },
@@ -3747,25 +3905,32 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "example@example.example"
                 },
                 "firstName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "John"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "institution": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Example University"
                 },
                 "lastName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Doe"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "password"
                 },
                 "scientificFieldTagContainerID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -3773,13 +3938,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "firstName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "John"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "lastName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Doe"
                 }
             }
         },
@@ -3787,16 +3955,24 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "collaborationType": {
-                    "$ref": "#/definitions/models.CollaborationType"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.CollaborationType"
+                        }
+                    ],
+                    "example": "author"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "memberID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "postID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -3807,31 +3983,50 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 },
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 },
                 "discussionContainerID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "postType": {
-                    "$ref": "#/definitions/models.PostType"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.PostType"
+                        }
+                    ],
+                    "example": "question"
                 },
                 "renderStatus": {
-                    "$ref": "#/definitions/models.RenderStatus"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.RenderStatus"
+                        }
+                    ],
+                    "example": "success"
                 },
                 "scientificFieldTagContainerID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "title": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Post Title"
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 }
             }
         },
@@ -3879,34 +4074,59 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 },
                 "createdAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "openBranchIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 },
                 "postID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "postReviewStatus": {
-                    "$ref": "#/definitions/models.ProjectReviewStatus"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProjectReviewStatus"
+                        }
+                    ],
+                    "example": "open"
                 },
                 "projectCompletionStatus": {
-                    "$ref": "#/definitions/models.ProjectCompletionStatus"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProjectCompletionStatus"
+                        }
+                    ],
+                    "example": "ongoing"
                 },
                 "projectFeedbackPreference": {
-                    "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                        }
+                    ],
+                    "example": "formal feedback"
                 },
                 "updatedAt": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
                 }
             }
         },
@@ -3943,13 +4163,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "scientificFieldTagIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        1
+                    ]
                 }
             }
         },
@@ -3957,19 +4181,25 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "parentID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 3
                 },
                 "scientificField": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "linear algebra"
                 },
                 "subtagIDs": {
                     "type": "array",
                     "items": {
                         "type": "integer"
-                    }
+                    },
+                    "example": [
+                        2
+                    ]
                 }
             }
         },
@@ -3977,7 +4207,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "discussionID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -3985,7 +4216,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "postID": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -3993,7 +4225,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "error": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "failed to something: reason"
                 }
             }
         }

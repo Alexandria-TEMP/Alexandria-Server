@@ -29,22 +29,16 @@ func (projectPostService *ProjectPostService) GetProjectPost(id uint) (*models.P
 }
 
 func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error, error) {
-	// This function may only be used to create Posts of type Project.
-	if form.PostCreationForm.PostType != models.Project {
-		return nil, fmt.Errorf("function CreateProjectPost may only create Post of type Project. received: %s",
-			form.PostCreationForm.PostType), nil
-	}
-
 	// Create the post
-	post, err := projectPostService.creatPostForProjectPost(form)
+	post, err := projectPostService.createPostForProjectPost(form)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not create post: %w", err), nil
 	}
 
 	// Information about the creators of this Project Post
-	memberIDs := form.PostCreationForm.AuthorMemberIDs
-	anonymous := form.PostCreationForm.Anonymous
+	memberIDs := form.AuthorMemberIDs
+	anonymous := form.Anonymous
 
 	// A new project post starts with a single "initial proposed changes" branch. This is how project posts,
 	// themselves, are initially peer reviewed. While this initial proposed changes branch is open, no other
@@ -101,10 +95,10 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 	return &projectPost, nil, nil
 }
 
-func (projectPostService *ProjectPostService) creatPostForProjectPost(form *forms.ProjectPostCreationForm) (*models.Post, error) {
+func (projectPostService *ProjectPostService) createPostForProjectPost(form *forms.ProjectPostCreationForm) (*models.Post, error) {
 	// Information about the creators of this Project Post
-	memberIDs := form.PostCreationForm.AuthorMemberIDs
-	anonymous := form.PostCreationForm.Anonymous
+	memberIDs := form.AuthorMemberIDs
+	anonymous := form.Anonymous
 
 	postCollaborators, err := projectPostService.PostCollaboratorService.MembersToPostCollaborators(memberIDs, anonymous, models.Author)
 	if err != nil {
@@ -112,7 +106,7 @@ func (projectPostService *ProjectPostService) creatPostForProjectPost(form *form
 	}
 
 	// convert []uint to []*models.ScientificFieldTag
-	tags, err := projectPostService.TagService.GetTagsFromIDs(form.PostCreationForm.ScientificFieldTagIDs)
+	tags, err := projectPostService.TagService.GetTagsFromIDs(form.ScientificFieldTagIDs)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to get tags from ids: %w", err)
@@ -130,8 +124,8 @@ func (projectPostService *ProjectPostService) creatPostForProjectPost(form *form
 	// This Post instance will be embedded into the Project Post
 	post := &models.Post{
 		Collaborators:               postCollaborators,
-		Title:                       form.PostCreationForm.Title,
-		PostType:                    form.PostCreationForm.PostType,
+		Title:                       form.Title,
+		PostType:                    models.Project,
 		ScientificFieldTagContainer: *postTagContainer,
 		RenderStatus:                models.Success,
 		DiscussionContainer: models.DiscussionContainer{

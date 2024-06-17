@@ -19,9 +19,9 @@ type BranchCollaborator struct {
 }
 
 type BranchCollaboratorDTO struct {
-	ID       uint `json:"id"`
-	MemberID uint `json:"memberID"`
-	BranchID uint `json:"branchID"`
+	ID       uint `json:"id" example:"1"`
+	MemberID uint `json:"memberID" example:"1"`
+	BranchID uint `json:"branchID" example:"1"`
 }
 
 func (model *BranchCollaborator) GetID() uint {

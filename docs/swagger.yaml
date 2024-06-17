@@ -3,24 +3,36 @@ definitions:
   forms.BranchCreationForm:
     properties:
       anonymous:
+        example: false
         type: boolean
       branchTitle:
+        example: Proposed Changes
         type: string
       collaboratingMemberIDs:
         description: The branch's metadata
+        example:
+        - 1
         items:
           type: integer
         type: array
       projectPostID:
+        example: 1
         type: integer
       updatedCompletionStatus:
-        $ref: '#/definitions/models.ProjectCompletionStatus'
+        allOf:
+        - $ref: '#/definitions/models.ProjectCompletionStatus'
+        example: completed
       updatedFeedbackPreferences:
-        $ref: '#/definitions/models.ProjectFeedbackPreference'
+        allOf:
+        - $ref: '#/definitions/models.ProjectFeedbackPreference'
+        example: formal feedback
       updatedPostTitle:
         description: Changes made by the branch
+        example: Updated Project Post Title
         type: string
       updatedScientificFieldIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
@@ -29,28 +41,38 @@ definitions:
     properties:
       anonymous:
         description: If anonymous, the discussion will ignore member ID
+        example: false
         type: boolean
       memberID:
+        example: 1
         type: integer
       text:
+        example: Discussion content.
         type: string
     type: object
   forms.MemberCreationForm:
     properties:
       email:
+        example: example@example.example
         type: string
       firstName:
+        example: John
         type: string
       institution:
+        example: Example University
         type: string
       lastName:
+        example: Doe
         type: string
       password:
         description: |-
           making the password just a string for now
           TODO: some hashing or semblance of security
+        example: password
         type: string
       scientificFieldTagIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
@@ -58,33 +80,62 @@ definitions:
   forms.PostCreationForm:
     properties:
       anonymous:
+        example: false
         type: boolean
       authorMemberIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
       postType:
-        $ref: '#/definitions/models.PostType'
+        allOf:
+        - $ref: '#/definitions/models.PostType'
+        example: question
       scientificFieldTagIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
       title:
+        example: Post Title
         type: string
     type: object
   forms.PostFilterForm:
     properties:
       includeProjectPosts:
+        example: true
         type: boolean
     type: object
   forms.ProjectPostCreationForm:
     properties:
-      postCreationForm:
-        $ref: '#/definitions/forms.PostCreationForm'
+      anonymous:
+        example: false
+        type: boolean
+      authorMemberIDs:
+        example:
+        - 1
+        items:
+          type: integer
+        type: array
       projectCompletionStatus:
-        $ref: '#/definitions/models.ProjectCompletionStatus'
+        allOf:
+        - $ref: '#/definitions/models.ProjectCompletionStatus'
+        example: ongoing
       projectFeedbackPreference:
-        $ref: '#/definitions/models.ProjectFeedbackPreference'
+        allOf:
+        - $ref: '#/definitions/models.ProjectFeedbackPreference'
+        example: formal feedback
+      scientificFieldTagIDs:
+        example:
+        - 1
+        items:
+          type: integer
+        type: array
+      title:
+        example: Project Post Title
+        type: string
     type: object
   forms.ProjectPostFilterForm:
     type: object
@@ -94,6 +145,7 @@ definitions:
         $ref: '#/definitions/forms.DiscussionCreationForm'
       parentID:
         description: The Discussion this Discussion will be added to
+        example: 1
         type: integer
     type: object
   forms.ReportCreationForm:
@@ -101,18 +153,24 @@ definitions:
   forms.ReviewCreationForm:
     properties:
       branchID:
+        example: 1
         type: integer
       branchReviewDecision:
-        $ref: '#/definitions/models.BranchReviewDecision'
+        allOf:
+        - $ref: '#/definitions/models.BranchReviewDecision'
+        example: approved
       feedback:
+        example: Fantastic work!
         type: string
       reviewingMemberID:
+        example: 1
         type: integer
     type: object
   forms.RootDiscussionCreationForm:
     properties:
       containerID:
         description: The DiscussionContainer this Discussion will be added to
+        example: 1
         type: integer
       discussion:
         $ref: '#/definitions/forms.DiscussionCreationForm'
@@ -120,45 +178,66 @@ definitions:
   models.BranchCollaboratorDTO:
     properties:
       branchID:
+        example: 1
         type: integer
       id:
+        example: 1
         type: integer
       memberID:
+        example: 1
         type: integer
     type: object
   models.BranchDTO:
     properties:
-      UpdatedPostTitle:
-        description: MR's proposed changes
-        type: string
       branchOverallReviewStatus:
-        $ref: '#/definitions/models.BranchOverallReviewStatus'
+        allOf:
+        - $ref: '#/definitions/models.BranchOverallReviewStatus'
+        example: open for review
       branchTitle:
+        example: Proposed Changes
         type: string
       collaboratorIDs:
         description: MR metadata
+        example:
+        - 1
         items:
           type: integer
         type: array
       createdAt:
+        example: "2024-06-16T16:00:43.234Z"
         type: string
       discussionContainerID:
+        example: 1
         type: integer
       id:
+        example: 1
         type: integer
       projectPostID:
+        example: 1
         type: integer
       renderStatus:
-        $ref: '#/definitions/models.RenderStatus'
+        allOf:
+        - $ref: '#/definitions/models.RenderStatus'
+        example: pending
       reviewIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
       updatedAt:
+        example: "2024-06-16T16:00:43.234Z"
         type: string
       updatedCompletionStatus:
-        $ref: '#/definitions/models.ProjectCompletionStatus'
+        allOf:
+        - $ref: '#/definitions/models.ProjectCompletionStatus'
+        example: ongoing
+      updatedPostTitle:
+        description: MR's proposed changes
+        example: Updated Project Post Title
+        type: string
       updatedScientificFieldTagContainerID:
+        example: 1
         type: integer
     type: object
   models.BranchOverallReviewStatus:
@@ -174,16 +253,23 @@ definitions:
   models.BranchReviewDTO:
     properties:
       branchID:
+        example: 1
         type: integer
       branchReviewDecision:
-        $ref: '#/definitions/models.BranchReviewDecision'
+        allOf:
+        - $ref: '#/definitions/models.BranchReviewDecision'
+        example: approved
       createdAt:
+        example: "2024-06-16T16:00:43.234Z"
         type: string
       feedback:
+        example: Fantastic work!
         type: string
       id:
+        example: 1
         type: integer
       memberID:
+        example: 1
         type: integer
     type: object
   models.BranchReviewDecision:
@@ -197,14 +283,20 @@ definitions:
   models.BranchesGroupedByReviewStatusDTO:
     properties:
       approvedClosedBranchIDs:
+        example:
+        - 3
         items:
           type: integer
         type: array
       openBranchIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
       rejectedClosedBranchIDs:
+        example:
+        - 2
         items:
           type: integer
         type: array
@@ -212,14 +304,20 @@ definitions:
   models.ClosedBranchDTO:
     properties:
       branchID:
+        example: 1
         type: integer
       branchReviewDecision:
-        $ref: '#/definitions/models.BranchReviewDecision'
+        allOf:
+        - $ref: '#/definitions/models.BranchReviewDecision'
+        example: approved
       id:
+        example: 1
         type: integer
       projectPostID:
+        example: 1
         type: integer
       supercededBranchID:
+        example: 2
         type: integer
     type: object
   models.CollaborationType:
@@ -235,15 +333,19 @@ definitions:
   models.DiscussionContainerDTO:
     properties:
       discussionIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
       id:
+        example: 1
         type: integer
     type: object
   models.DiscussionContainerProjectHistoryDTO:
     properties:
       currentDiscussionContainerID:
+        example: 1
         type: integer
       mergedBranchDiscussionContainers:
         items:
@@ -253,81 +355,115 @@ definitions:
   models.DiscussionContainerWithBranchDTO:
     properties:
       closedBranchID:
+        example: 1
         type: integer
       discussionContainerID:
+        example: 2
         type: integer
     type: object
   models.DiscussionDTO:
     properties:
       id:
+        example: 1
         type: integer
       memberID:
+        example: 1
         type: integer
       replyIDs:
+        example:
+        - 2
         items:
           type: integer
         type: array
       text:
+        example: Discussion content.
         type: string
     type: object
   models.MemberDTO:
     properties:
       email:
+        example: example@example.example
         type: string
       firstName:
+        example: John
         type: string
       id:
+        example: 1
         type: integer
       institution:
+        example: Example University
         type: string
       lastName:
+        example: Doe
         type: string
       password:
+        example: password
         type: string
       scientificFieldTagContainerID:
+        example: 1
         type: integer
     type: object
   models.MemberShortFormDTO:
     properties:
       firstName:
+        example: John
         type: string
       id:
+        example: 1
         type: integer
       lastName:
+        example: Doe
         type: string
     type: object
   models.PostCollaboratorDTO:
     properties:
       collaborationType:
-        $ref: '#/definitions/models.CollaborationType'
+        allOf:
+        - $ref: '#/definitions/models.CollaborationType'
+        example: author
       id:
+        example: 1
         type: integer
       memberID:
+        example: 1
         type: integer
       postID:
+        example: 1
         type: integer
     type: object
   models.PostDTO:
     properties:
       collaboratorIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
       createdAt:
+        example: "2024-06-16T16:00:43.234Z"
         type: string
       discussionContainerID:
+        example: 1
         type: integer
       id:
+        example: 1
         type: integer
       postType:
-        $ref: '#/definitions/models.PostType'
+        allOf:
+        - $ref: '#/definitions/models.PostType'
+        example: question
       renderStatus:
-        $ref: '#/definitions/models.RenderStatus'
+        allOf:
+        - $ref: '#/definitions/models.RenderStatus'
+        example: success
       scientificFieldTagContainerID:
+        example: 1
         type: integer
       title:
+        example: Post Title
         type: string
       updatedAt:
+        example: "2024-06-16T16:00:43.234Z"
         type: string
     type: object
   models.PostType:
@@ -361,26 +497,40 @@ definitions:
   models.ProjectPostDTO:
     properties:
       closedBranchIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
       createdAt:
+        example: "2024-06-16T16:00:43.234Z"
         type: string
       id:
+        example: 1
         type: integer
       openBranchIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
       postID:
+        example: 1
         type: integer
       postReviewStatus:
-        $ref: '#/definitions/models.ProjectReviewStatus'
+        allOf:
+        - $ref: '#/definitions/models.ProjectReviewStatus'
+        example: open
       projectCompletionStatus:
-        $ref: '#/definitions/models.ProjectCompletionStatus'
+        allOf:
+        - $ref: '#/definitions/models.ProjectCompletionStatus'
+        example: ongoing
       projectFeedbackPreference:
-        $ref: '#/definitions/models.ProjectFeedbackPreference'
+        allOf:
+        - $ref: '#/definitions/models.ProjectFeedbackPreference'
+        example: formal feedback
       updatedAt:
+        example: "2024-06-16T16:00:43.234Z"
         type: string
     type: object
   models.ProjectReviewStatus:
@@ -408,8 +558,11 @@ definitions:
   models.ScientificFieldTagContainerDTO:
     properties:
       id:
+        example: 1
         type: integer
       scientificFieldTagIDs:
+        example:
+        - 1
         items:
           type: integer
         type: array
@@ -417,12 +570,17 @@ definitions:
   models.ScientificFieldTagDTO:
     properties:
       id:
+        example: 1
         type: integer
       parentID:
+        example: 3
         type: integer
       scientificField:
+        example: linear algebra
         type: string
       subtagIDs:
+        example:
+        - 2
         items:
           type: integer
         type: array
@@ -430,16 +588,19 @@ definitions:
   reports.DiscussionReportDTO:
     properties:
       discussionID:
+        example: 1
         type: integer
     type: object
   reports.PostReportDTO:
     properties:
       postID:
+        example: 1
         type: integer
     type: object
   utils.HTTPError:
     properties:
       error:
+        example: 'failed to something: reason'
         type: string
     type: object
 host: localhost:8080
@@ -863,9 +1024,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.ClosedBranchDTO'
-            type: array
+            $ref: '#/definitions/models.ClosedBranchDTO'
         "400":
           description: Bad Request
           schema:

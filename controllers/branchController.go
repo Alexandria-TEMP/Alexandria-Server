@@ -176,6 +176,8 @@ func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 	// Get statuses of a branch
 	statuses, err := branchController.BranchService.GetReviewStatus(uint(branchID))
 
+	// TODO this is incorrect, the endpoint should return statuses of the branch's reviews, not the status of the branch itself
+
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 
@@ -607,7 +609,7 @@ func (branchController *BranchController) GetDiscussions(c *gin.Context) {
 // @Tags 		branches
 // @Param		closedBranchID	path		string			true	"Closed Branch ID"
 // @Produce		application/json
-// @Success 	200		{array}		models.ClosedBranchDTO
+// @Success 	200		{object}	models.ClosedBranchDTO
 // @Failure		400		{object} 	utils.HTTPError
 // @Failure		404		{object} 	utils.HTTPError
 // @Router		/branches/closed/{closedBranchID}		[get]

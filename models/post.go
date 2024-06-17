@@ -42,15 +42,15 @@ type Post struct {
 }
 
 type PostDTO struct {
-	ID                            uint         `json:"id"`
-	CollaboratorIDs               []uint       `json:"collaboratorIDs"`
-	Title                         string       `json:"title"`
-	PostType                      PostType     `json:"postType"`
-	ScientificFieldTagContainerID uint         `json:"scientificFieldTagContainerID"`
-	DiscussionContainerID         uint         `json:"discussionContainerID"`
-	RenderStatus                  RenderStatus `json:"renderStatus"`
-	CreatedAt                     time.Time    `json:"createdAt"`
-	UpdatedAt                     time.Time    `json:"updatedAt"`
+	ID                            uint         `json:"id" example:"1"`
+	CollaboratorIDs               []uint       `json:"collaboratorIDs" example:"1"`
+	Title                         string       `json:"title" example:"Post Title"`
+	PostType                      PostType     `json:"postType" example:"question"`
+	ScientificFieldTagContainerID uint         `json:"scientificFieldTagContainerID" example:"1"`
+	DiscussionContainerID         uint         `json:"discussionContainerID" example:"1"`
+	RenderStatus                  RenderStatus `json:"renderStatus" example:"success"`
+	CreatedAt                     time.Time    `json:"createdAt" example:"2024-06-16T16:00:43.234Z"`
+	UpdatedAt                     time.Time    `json:"updatedAt" example:"2024-06-16T16:00:43.234Z"`
 }
 
 func (model *Post) GetID() uint {

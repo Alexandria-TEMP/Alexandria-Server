@@ -14,8 +14,8 @@ type ScientificFieldTagContainer struct {
 }
 
 type ScientificFieldTagContainerDTO struct {
-	ID                    uint   `json:"id"`
-	ScientificFieldTagIDs []uint `json:"scientificFieldTagIDs"`
+	ID                    uint   `json:"id" example:"1"`
+	ScientificFieldTagIDs []uint `json:"scientificFieldTagIDs" example:"1"`
 }
 
 func (model *ScientificFieldTagContainer) GetID() uint {

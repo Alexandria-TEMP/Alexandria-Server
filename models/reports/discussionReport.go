@@ -18,7 +18,7 @@ type DiscussionReport struct {
 }
 
 type DiscussionReportDTO struct {
-	DiscussionID uint
+	DiscussionID uint `json:"discussionID" example:"1"`
 }
 
 func (model *DiscussionReport) GetID() uint {
