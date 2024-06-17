@@ -81,7 +81,7 @@ func branchRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	branchRouter.POST("", controllers.branchController.CreateBranch)
 	branchRouter.PUT("", controllers.branchController.UpdateBranch)
 	branchRouter.DELETE("/:branchID", controllers.branchController.DeleteBranch)
-	branchRouter.GET("/:branchID/review-statuses", controllers.branchController.GetReviewStatus)
+	branchRouter.GET("/:branchID/review-statuses", controllers.branchController.GetAllBranchReviewStatuses)
 	branchRouter.GET("/reviews/:reviewID", controllers.branchController.GetReview)
 	branchRouter.POST("/reviews", controllers.branchController.CreateReview)
 	branchRouter.GET("/:branchID/can-review/:memberID", controllers.branchController.MemberCanReview)
