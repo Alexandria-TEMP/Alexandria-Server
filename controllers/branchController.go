@@ -151,7 +151,7 @@ func (branchController *BranchController) DeleteBranch(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// GetReviewStatus godoc
+// GetAllBranchReviewStatuses godoc
 // @Summary 	Returns status of all branch reviews
 // @Description Returns an array of the statuses of all the reviews of this branch
 // @Tags 		branches
@@ -162,7 +162,7 @@ func (branchController *BranchController) DeleteBranch(c *gin.Context) {
 // @Failure		400		{object} 	utils.HTTPError
 // @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/review-statuses	[get]
-func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
+func (branchController *BranchController) GetAllBranchReviewStatuses(c *gin.Context) {
 	// extract branchID
 	branchIDStr := c.Param("branchID")
 	branchID, err := strconv.ParseInt(branchIDStr, 10, 64)
@@ -174,9 +174,7 @@ func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 	}
 
 	// Get statuses of a branch
-	statuses, err := branchController.BranchService.GetReviewStatus(uint(branchID))
-
-	// TODO this is incorrect, the endpoint should return statuses of the branch's reviews, not the status of the branch itself
+	statuses, err := branchController.BranchService.GetAllBranchReviewStatuses(uint(branchID))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})

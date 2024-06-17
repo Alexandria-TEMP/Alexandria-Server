@@ -227,45 +227,6 @@ func TestDeleteBranch404(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
 
-func TestGetReviewStatus200(t *testing.T) {
-	beforeEachBranch(t)
-
-	mockBranchService.EXPECT().GetReviewStatus(uint(1)).Return([]models.BranchReviewDecision{models.Approved, models.Rejected}, nil)
-
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/branchreview-statuses", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
-}
-
-func TestGetReviewStatus400(t *testing.T) {
-	beforeEachBranch(t)
-
-	mockBranchService.EXPECT().GetReviewStatus(gomock.Any()).Times(0)
-
-	req, _ := http.NewRequest("GET", "/api/v2/branches/bad/branchreview-statuses", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestGetReviewStatus404(t *testing.T) {
-	beforeEachBranch(t)
-
-	mockBranchService.EXPECT().GetReviewStatus(uint(1)).Return(nil, errors.New("branch not found"))
-
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/branchreview-statuses", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
-}
-
 func TestGetReview200(t *testing.T) {
 	beforeEachBranch(t)
 
@@ -368,7 +329,7 @@ func TestMemberCanReview200(t *testing.T) {
 
 	mockBranchService.EXPECT().MemberCanReview(uint(1), uint(1)).Return(true, nil)
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/can-branchreview/1", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/branches/1/can-review/1", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -381,7 +342,7 @@ func TestMemberCanReview400BranchID(t *testing.T) {
 
 	mockBranchService.EXPECT().MemberCanReview(gomock.Any(), gomock.Any()).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/bad/can-branchreview/1", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/branches/bad/can-review/1", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -394,7 +355,7 @@ func TestMemberCanReview400MemberID(t *testing.T) {
 
 	mockBranchService.EXPECT().MemberCanReview(gomock.Any(), gomock.Any()).Times(0)
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/can-branchreview/bad", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/branches/1/can-review/bad", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -407,7 +368,7 @@ func TestMemberCanReview404(t *testing.T) {
 
 	mockBranchService.EXPECT().MemberCanReview(uint(1), uint(1)).Return(false, errors.New("branch or member not found"))
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/members/1/can-branchreview", http.NoBody)
+	req, _ := http.NewRequest("GET", "/api/v2/branches/1/members/1/can-review", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -782,4 +743,73 @@ func TestGetAllBranchCollaboratorsBadBranchID(t *testing.T) {
 
 	// Check status
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestGetReviewStatusGoodWeather(t *testing.T) {
+	beforeEachBranch(t)
+
+	branchID := uint(10)
+
+	// Setup mocks
+	mockBranchService.EXPECT().GetAllBranchReviewStatuses(branchID).Return([]models.BranchReviewDecision{
+		models.Approved,
+		models.Approved,
+		models.Rejected,
+	}, nil).Times(1)
+
+	// Construct request
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/branches/%d/review-statuses", branchID), http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+
+	// Get JSON
+	jsonBytes, err := io.ReadAll(responseRecorder.Result().Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Parse JSON
+	var responseReviewStatuses []models.BranchReviewDecision
+	if err := json.Unmarshal(jsonBytes, &responseReviewStatuses); err != nil {
+		t.Fatal(err)
+	}
+
+	// Check JSON
+	expectedReviewStatuses := []models.BranchReviewDecision{
+		models.Approved,
+		models.Approved,
+		models.Rejected,
+	}
+
+	assert.Equal(t, expectedReviewStatuses, responseReviewStatuses)
+}
+
+func TestGetReviewStatusBranchDNE(t *testing.T) {
+	beforeEachBranch(t)
+
+	branchID := uint(10)
+
+	// Setup mocks
+	mockBranchService.EXPECT().GetAllBranchReviewStatuses(branchID).Return(nil, fmt.Errorf("oh no")).Times(1)
+
+	// Construct request
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/branches/%d/review-statuses", branchID), http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
