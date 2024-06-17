@@ -181,7 +181,7 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 
 	// ensure the branch isn't already closed
 	if branch.BranchOverallReviewStatus != models.BranchOpenForReview {
-		return branchreview, fmt.Errorf("branch is already reviewed with status %v", branch.BranchOverallReviewStatus)
+		return branchreview, fmt.Errorf("branch is already reviewed with status '%v'", branch.BranchOverallReviewStatus)
 	}
 
 	// get member
