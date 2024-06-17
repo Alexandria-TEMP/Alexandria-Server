@@ -19,10 +19,10 @@ type ScientificFieldTag struct {
 }
 
 type ScientificFieldTagDTO struct {
-	ID              uint   `json:"id"`
-	ScientificField string `json:"scientificField"`
-	SubtagIDs       []uint `json:"subtagIDs"`
-	ParentID        *uint  `json:"parentID"`
+	ID              uint   `json:"id" example:"1"`
+	ScientificField string `json:"scientificField" example:"linear algebra"`
+	SubtagIDs       []uint `json:"subtagIDs" example:"2"`
+	ParentID        *uint  `json:"parentID" example:"3"`
 }
 
 func (model *ScientificFieldTag) GetID() uint {

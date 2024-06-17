@@ -72,15 +72,15 @@ type ProjectPost struct {
 }
 
 type ProjectPostDTO struct {
-	ID                        uint                      `json:"id"`
-	PostID                    uint                      `json:"postID"`
-	OpenBranchIDs             []uint                    `json:"openBranchIDs"`
-	ClosedBranchIDs           []uint                    `json:"closedBranchIDs"`
-	ProjectCompletionStatus   ProjectCompletionStatus   `json:"projectCompletionStatus"`
-	ProjectFeedbackPreference ProjectFeedbackPreference `json:"projectFeedbackPreference"`
-	PostReviewStatus          ProjectReviewStatus       `json:"postReviewStatus"`
-	CreatedAt                 time.Time                 `json:"createdAt"`
-	UpdatedAt                 time.Time                 `json:"updatedAt"`
+	ID                        uint                      `json:"id" example:"1"`
+	PostID                    uint                      `json:"postID" example:"1"`
+	OpenBranchIDs             []uint                    `json:"openBranchIDs" example:"1"`
+	ClosedBranchIDs           []uint                    `json:"closedBranchIDs" example:"1"`
+	ProjectCompletionStatus   ProjectCompletionStatus   `json:"projectCompletionStatus" example:"ongoing"`
+	ProjectFeedbackPreference ProjectFeedbackPreference `json:"projectFeedbackPreference" example:"formal feedback"`
+	PostReviewStatus          ProjectReviewStatus       `json:"postReviewStatus" example:"open"`
+	CreatedAt                 time.Time                 `json:"createdAt" example:"2024-06-16T16:00:43.234Z"`
+	UpdatedAt                 time.Time                 `json:"updatedAt" example:"2024-06-16T16:00:43.234Z"`
 }
 
 func (model *ProjectPost) GetID() uint {

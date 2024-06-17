@@ -14,8 +14,8 @@ type DiscussionContainer struct {
 }
 
 type DiscussionContainerDTO struct {
-	ID            uint   `json:"id"`
-	DiscussionIDs []uint `json:"discussionIDs"`
+	ID            uint   `json:"id" example:"1"`
+	DiscussionIDs []uint `json:"discussionIDs" example:"1"`
 }
 
 func (model *DiscussionContainer) GetID() uint {
@@ -36,14 +36,14 @@ func (model *DiscussionContainer) MarshalJSON() ([]byte, error) {
 // Links discussion containers with their place of origin, for purpose
 // of sending a project post's entire discussion history.
 type DiscussionContainerProjectHistoryDTO struct {
-	CurrentDiscussionContainerID     uint                               `json:"currentDiscussionContainerID"`
+	CurrentDiscussionContainerID     uint                               `json:"currentDiscussionContainerID" example:"1"`
 	MergedBranchDiscussionContainers []DiscussionContainerWithBranchDTO `json:"mergedBranchDiscussionContainers"`
 }
 
 // Represents a discussion container plus the branch it originated from
 type DiscussionContainerWithBranchDTO struct {
-	DiscussionContainerID uint `json:"discussionContainerID"`
-	ClosedBranchID        uint `json:"closedBranchID"`
+	DiscussionContainerID uint `json:"discussionContainerID" example:"2"`
+	ClosedBranchID        uint `json:"closedBranchID" example:"1"`
 }
 
 // onlyRootDiscussionsIntoIDs takes a list of discussions, and returns the IDs of all root discussions

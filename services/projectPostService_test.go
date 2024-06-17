@@ -71,13 +71,10 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 	projectPostCreationForm := forms.ProjectPostCreationForm{
-		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:       []uint{memberA.ID, memberB.ID},
-			Title:                 "My Awesome Project Post",
-			Anonymous:             false,
-			PostType:              models.Project,
-			ScientificFieldTagIDs: []uint{},
-		},
+		AuthorMemberIDs:           []uint{memberA.ID, memberB.ID},
+		Title:                     "My Awesome Project Post",
+		Anonymous:                 false,
+		ScientificFieldTagIDs:     []uint{},
 		ProjectCompletionStatus:   models.Ongoing,
 		ProjectFeedbackPreference: models.FormalFeedback,
 	}
@@ -152,13 +149,10 @@ func TestCreateProjectPostDatabaseFailure(t *testing.T) {
 		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 	projectPostCreationForm := forms.ProjectPostCreationForm{
-		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:       []uint{},
-			Title:                 "My Broken Project Post",
-			Anonymous:             true,
-			PostType:              models.Project,
-			ScientificFieldTagIDs: []uint{},
-		},
+		AuthorMemberIDs:           []uint{},
+		Title:                     "My Broken Project Post",
+		Anonymous:                 true,
+		ScientificFieldTagIDs:     []uint{},
 		ProjectCompletionStatus:   models.Completed,
 		ProjectFeedbackPreference: models.FormalFeedback,
 	}
@@ -192,47 +186,16 @@ func TestCreateProjectPostDatabaseFailure(t *testing.T) {
 	assert.NotNil(t, err500)
 }
 
-// Creating a project post must use the correct post type, otherwise creation should fail.
-func TestCreateProjectPostWrongPostType(t *testing.T) {
-	projectPostServiceSetup(t)
-	t.Cleanup(projectPostServiceTeardown)
-
-	projectPostCreationForm := forms.ProjectPostCreationForm{
-		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:       []uint{},
-			Title:                 "",
-			Anonymous:             true,
-			PostType:              models.Question,
-			ScientificFieldTagIDs: []uint{},
-		},
-		ProjectCompletionStatus:   models.Idea,
-		ProjectFeedbackPreference: models.DiscussionFeedback,
-	}
-
-	// Function under test
-	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
-
-	if createdProjectPost != nil {
-		t.Fatalf("project post should not have been created:\n%+v", createdProjectPost)
-	}
-
-	assert.NotNil(t, err404)
-	assert.Nil(t, err500)
-}
-
 // When creating a post collaborator list fails, project post creation should fail.
 func TestCreateProjectPostCollaboratorsFail(t *testing.T) {
 	projectPostServiceSetup(t)
 	t.Cleanup(projectPostServiceTeardown)
 
 	projectPostCreationForm := forms.ProjectPostCreationForm{
-		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:       []uint{10, 15},
-			Title:                 "",
-			Anonymous:             false,
-			PostType:              models.Project,
-			ScientificFieldTagIDs: []uint{},
-		},
+		AuthorMemberIDs:           []uint{10, 15},
+		Title:                     "",
+		Anonymous:                 false,
+		ScientificFieldTagIDs:     []uint{},
 		ProjectCompletionStatus:   models.Idea,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
 	}
@@ -260,13 +223,10 @@ func TestCreateProjectBranchCollaboratorsFail(t *testing.T) {
 		ScientificFieldTags: []*models.ScientificFieldTag{},
 	}
 	projectPostCreationForm := forms.ProjectPostCreationForm{
-		PostCreationForm: forms.PostCreationForm{
-			AuthorMemberIDs:       []uint{memberA.ID, memberB.ID},
-			Title:                 "",
-			Anonymous:             false,
-			PostType:              models.Project,
-			ScientificFieldTagIDs: []uint{},
-		},
+		AuthorMemberIDs:           []uint{memberA.ID, memberB.ID},
+		Title:                     "",
+		Anonymous:                 false,
+		ScientificFieldTagIDs:     []uint{},
 		ProjectCompletionStatus:   models.Idea,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
 	}
