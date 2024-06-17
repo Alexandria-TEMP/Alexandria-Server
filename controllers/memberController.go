@@ -117,21 +117,6 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	c.JSON(http.StatusOK, member)
 }
 
-// UpdateMember godoc
-// @Summary 	Update a member
-// @Description Update the fields of a member
-// @Tags 		members
-// @Accept  	json
-// @Param		member	body		models.MemberDTO		true	"Updated member"
-// @Produce		json
-// @Success 	200
-// @Failure		404		{object} 	utils.HTTPError
-// @Failure		500		{object} 	utils.HTTPError
-// @Router 		/members 		[put]
-func (memberController *MemberController) UpdateMember(c *gin.Context) {
-	c.Status(http.StatusNotImplemented)
-}
-
 // DeleteMember godoc
 // @Summary 	Delete a member
 // @Description Delete a member with given ID from database

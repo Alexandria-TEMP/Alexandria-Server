@@ -115,17 +115,3 @@ func (mr *MockProjectPostServiceMockRecorder) GetProjectPost(postID any) *gomock
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectPost", reflect.TypeOf((*MockProjectPostService)(nil).GetProjectPost), postID)
 }
-
-// UpdateProjectPost mocks base method.
-func (m *MockProjectPostService) UpdateProjectPost(updatedPost *models.ProjectPost) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateProjectPost", updatedPost)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdateProjectPost indicates an expected call of UpdateProjectPost.
-func (mr *MockProjectPostServiceMockRecorder) UpdateProjectPost(updatedPost any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProjectPost", reflect.TypeOf((*MockProjectPostService)(nil).UpdateProjectPost), updatedPost)
-}

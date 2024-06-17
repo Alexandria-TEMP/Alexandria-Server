@@ -87,11 +87,6 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 	return &post, nil
 }
 
-func (postService *PostService) UpdatePost(_ *models.Post) error {
-	// TODO: Access repo to update post here
-	return nil
-}
-
 func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileHeader, postID uint) error {
 	// get post
 	post, err := postService.PostRepository.GetByID(postID)
