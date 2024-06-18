@@ -16,54 +16,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/branches": {
-            "put": {
-                "description": "Update any number of the aspects of a branch",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "branches"
-                ],
-                "summary": "Update branch",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Access Token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Updated Branch",
-                        "name": "branch",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.BranchDTO"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            },
             "post": {
                 "description": "Create a new branch linked to a project post.\nNote that Member IDs passed here, get converted to Collaborator IDs.",
                 "consumes": [
@@ -306,7 +258,7 @@ const docTemplate = `{
         },
         "/branches/reviews/{reviewID}": {
             "get": {
-                "description": "Returns a branchreview with given ID",
+                "description": "Returns a branch review with given ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -316,7 +268,7 @@ const docTemplate = `{
                 "tags": [
                     "branches"
                 ],
-                "summary": "Returns a branchreview",
+                "summary": "Returns a branch review",
                 "parameters": [
                     {
                         "type": "string",
@@ -1460,54 +1412,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
-                "description": "Update the fields of a member",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "members"
-                ],
-                "summary": "Update a member",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Access Token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Updated member",
-                        "name": "member",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.MemberDTO"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            },
             "post": {
                 "description": "Create a new member from the given fields.\nThe member must have a unique email address, which isn't associated with any other accounts.\nThey are automatically logged in, and an access + refresh token pair is returned alongside the member.\nThe access-token is valid for 15 minutes and the refresh token is valid for 3 days.",
                 "consumes": [
@@ -2170,60 +2074,6 @@ const docTemplate = `{
             }
         },
         "/posts": {
-            "put": {
-                "description": "Update any number of aspects of a question or discussion post",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "posts"
-                ],
-                "summary": "Update post",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Access Token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Updated Post",
-                        "name": "post",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.PostDTO"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            },
             "post": {
                 "description": "Create a new question or discussion post. Cannot be a project post.",
                 "consumes": [
@@ -2997,54 +2847,6 @@ const docTemplate = `{
             }
         },
         "/project-posts": {
-            "put": {
-                "description": "Update any number of the aspects of a project post",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "project-posts"
-                ],
-                "summary": "Update project post",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Access Token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Updated Project Post",
-                        "name": "post",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ProjectPostDTO"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            },
             "post": {
                 "description": "Create a new project post with a single open branch. Upload to this branch in order to have your post reviewed.",
                 "consumes": [

@@ -672,38 +672,6 @@ paths:
       summary: Create new branch
       tags:
       - branches
-    put:
-      consumes:
-      - application/json
-      description: Update any number of the aspects of a branch
-      parameters:
-      - description: Access Token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: Updated Branch
-        in: body
-        name: branch
-        required: true
-        schema:
-          $ref: '#/definitions/models.BranchDTO'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Update branch
-      tags:
-      - branches
   /branches/{branchID}:
     delete:
       consumes:
@@ -1188,7 +1156,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Returns a branchreview with given ID
+      description: Returns a branch review with given ID
       parameters:
       - description: branchreview ID
         in: path
@@ -1210,7 +1178,7 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/utils.HTTPError'
-      summary: Returns a branchreview
+      summary: Returns a branch review
       tags:
       - branches
   /discussion-containers/{discussionContainerID}:
@@ -1641,38 +1609,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create a new member
-      tags:
-      - members
-    put:
-      consumes:
-      - application/json
-      description: Update the fields of a member
-      parameters:
-      - description: Access Token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: Updated member
-        in: body
-        name: member
-        required: true
-        schema:
-          $ref: '#/definitions/models.MemberDTO'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Update a member
       tags:
       - members
   /members/{memberID}:
@@ -2120,42 +2056,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new post
-      tags:
-      - posts
-    put:
-      consumes:
-      - application/json
-      description: Update any number of aspects of a question or discussion post
-      parameters:
-      - description: Access Token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: Updated Post
-        in: body
-        name: post
-        required: true
-        schema:
-          $ref: '#/definitions/models.PostDTO'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Update post
       tags:
       - posts
   /posts/{postID}:
@@ -2680,38 +2580,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.HTTPError'
       summary: Create new project post
-      tags:
-      - project-posts
-    put:
-      consumes:
-      - application/json
-      description: Update any number of the aspects of a project post
-      parameters:
-      - description: Access Token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: Updated Project Post
-        in: body
-        name: post
-        required: true
-        schema:
-          $ref: '#/definitions/models.ProjectPostDTO'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      summary: Update project post
       tags:
       - project-posts
   /project-posts/{projectPostID}:
