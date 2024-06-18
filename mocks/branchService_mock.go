@@ -43,10 +43,10 @@ func (m *MockBranchService) EXPECT() *MockBranchServiceMockRecorder {
 }
 
 // CreateBranch mocks base method.
-func (m *MockBranchService) CreateBranch(branchCreationForm *forms.BranchCreationForm, member *models.Member) (models.Branch, error, error) {
+func (m *MockBranchService) CreateBranch(branchCreationForm *forms.BranchCreationForm, member *models.Member) (*models.Branch, error, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateBranch", branchCreationForm, member)
-	ret0, _ := ret[0].(models.Branch)
+	ret0, _ := ret[0].(*models.Branch)
 	ret1, _ := ret[1].(error)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
@@ -59,10 +59,10 @@ func (mr *MockBranchServiceMockRecorder) CreateBranch(branchCreationForm, member
 }
 
 // CreateReview mocks base method.
-func (m *MockBranchService) CreateReview(reviewCreationForm forms.ReviewCreationForm, reviewingMember *models.Member) (models.BranchReview, error) {
+func (m *MockBranchService) CreateReview(reviewCreationForm forms.ReviewCreationForm, reviewingMember *models.Member) (*models.BranchReview, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateReview", reviewCreationForm, reviewingMember)
-	ret0, _ := ret[0].(models.BranchReview)
+	ret0, _ := ret[0].(*models.BranchReview)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -103,10 +103,10 @@ func (mr *MockBranchServiceMockRecorder) GetAllBranchReviewStatuses(branchID any
 }
 
 // GetBranch mocks base method.
-func (m *MockBranchService) GetBranch(branchID uint) (models.Branch, error) {
+func (m *MockBranchService) GetBranch(branchID uint) (*models.Branch, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetBranch", branchID)
-	ret0, _ := ret[0].(models.Branch)
+	ret0, _ := ret[0].(*models.Branch)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -194,10 +194,10 @@ func (mr *MockBranchServiceMockRecorder) GetProject(branchID any) *gomock.Call {
 }
 
 // GetReview mocks base method.
-func (m *MockBranchService) GetReview(reviewID uint) (models.BranchReview, error) {
+func (m *MockBranchService) GetReview(reviewID uint) (*models.BranchReview, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetReview", reviewID)
-	ret0, _ := ret[0].(models.BranchReview)
+	ret0, _ := ret[0].(*models.BranchReview)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -65,7 +65,7 @@ func TestGetBranchSuccess(t *testing.T) {
 
 	branch, err := branchService.GetBranch(uint(9))
 	assert.Nil(t, err)
-	assert.Equal(t, *successBranch, branch)
+	assert.Equal(t, successBranch, branch)
 }
 
 func TestGetBranchFailed(t *testing.T) {
@@ -113,7 +113,7 @@ func TestCreateBranchSuccess(t *testing.T) {
 
 	assert.Nil(t, err404)
 	assert.Nil(t, err500)
-	assert.Equal(t, outputBranch, &branch)
+	assert.Equal(t, outputBranch, branch)
 }
 
 func TestCreateBranchNoProjectPost(t *testing.T) {
@@ -385,7 +385,7 @@ func TestCreateReviewSuccess(t *testing.T) {
 
 	branchreview, err := branchService.CreateReview(form, &models.Member{Model: gorm.Model{ID: 11}})
 	assert.Nil(t, err)
-	assert.Equal(t, expected, &branchreview)
+	assert.Equal(t, expected, branchreview)
 }
 
 func TestCreateReviewSuccessMergeDoesntSupercede(t *testing.T) {
@@ -452,7 +452,7 @@ func TestCreateReviewSuccessMergeDoesntSupercede(t *testing.T) {
 
 	branchreview, err := branchService.CreateReview(form, &models.Member{Model: gorm.Model{ID: 11}})
 	assert.Nil(t, err)
-	assert.Equal(t, expected, &branchreview)
+	assert.Equal(t, expected, branchreview)
 	assert.Equal(t, models.BranchPeerReviewed, branch.BranchOverallReviewStatus)
 	assert.Nil(t, projectPost.ClosedBranches[0].SupercededBranchID)
 }
@@ -1107,4 +1107,25 @@ func TestCloseBranchButDontMarkProjectPostAsRevisionNeeded(t *testing.T) {
 	}
 
 	assert.Equal(t, models.Reviewed, capturedProjectPost.PostReviewStatus)
+}
+
+func TestCreateReviewFailsWhenAlreadyReviewed(t *testing.T) {
+	beforeEachBranch(t)
+
+	// Setup data
+	branchID := uint(5)
+	branch := &models.Branch{
+		BranchOverallReviewStatus: models.BranchRejected,
+	}
+
+	// Setup mocks
+	mockBranchRepository.EXPECT().GetByID(branchID).Return(branch, nil).Times(1)
+
+	reviewCreationForm := forms.ReviewCreationForm{
+		BranchID: branchID,
+	}
+
+	// Function under test
+	_, err := branchService.CreateReview(reviewCreationForm, &models.Member{})
+	assert.NotNil(t, err)
 }

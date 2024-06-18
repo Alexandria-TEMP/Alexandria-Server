@@ -52,7 +52,7 @@ func beforeEachBranch(t *testing.T) {
 func TestGetBranch200(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().GetBranch(uint(1)).Return(exampleBranch, nil)
+	mockBranchService.EXPECT().GetBranch(uint(1)).Return(&exampleBranch, nil)
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/1", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -78,7 +78,7 @@ func TestGetBranch400(t *testing.T) {
 func TestGetBranch404(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().GetBranch(uint(1)).Return(exampleBranch, errors.New("branch not found"))
+	mockBranchService.EXPECT().GetBranch(uint(1)).Return(&exampleBranch, errors.New("branch not found"))
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/1", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -106,7 +106,7 @@ func TestCreateBranch200(t *testing.T) {
 	body, _ := json.Marshal(form)
 	member := &models.Member{}
 
-	mockBranchService.EXPECT().CreateBranch(&form, member).Return(exampleBranch, nil, nil)
+	mockBranchService.EXPECT().CreateBranch(&form, member).Return(&exampleBranch, nil, nil)
 
 	c, _ := gin.CreateTestContext(responseRecorder)
 	c.Set("currentMember", member)
@@ -175,7 +175,7 @@ func TestCreateBranch404(t *testing.T) {
 	body, _ := json.Marshal(form)
 	member := &models.Member{}
 
-	mockBranchService.EXPECT().CreateBranch(&form, member).Return(exampleBranch, errors.New("failed"), nil)
+	mockBranchService.EXPECT().CreateBranch(&form, member).Return(&exampleBranch, errors.New("failed"), nil)
 
 	c, _ := gin.CreateTestContext(responseRecorder)
 	c.Set("currentMember", member)
@@ -205,7 +205,7 @@ func TestCreateBranch500(t *testing.T) {
 	body, _ := json.Marshal(form)
 	member := &models.Member{}
 
-	mockBranchService.EXPECT().CreateBranch(&form, member).Return(exampleBranch, nil, errors.New("failed"))
+	mockBranchService.EXPECT().CreateBranch(&form, member).Return(&exampleBranch, nil, errors.New("failed"))
 
 	c, _ := gin.CreateTestContext(responseRecorder)
 	c.Set("currentMember", member)
@@ -259,7 +259,7 @@ func TestDeleteBranch404(t *testing.T) {
 func TestGetReview200(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().GetReview(uint(1)).Return(exampleReview, nil)
+	mockBranchService.EXPECT().GetReview(uint(1)).Return(&exampleReview, nil)
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/reviews/1", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -285,7 +285,7 @@ func TestGetReview400(t *testing.T) {
 func TestGetReview404(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().GetReview(uint(1)).Return(exampleReview, errors.New("branchreview not found"))
+	mockBranchService.EXPECT().GetReview(uint(1)).Return(&exampleReview, errors.New("branchreview not found"))
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/reviews/1", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -305,7 +305,7 @@ func TestCreateReview200(t *testing.T) {
 	body, _ := json.Marshal(form)
 	member := &models.Member{}
 
-	mockBranchService.EXPECT().CreateReview(form, member).Return(exampleReview, nil)
+	mockBranchService.EXPECT().CreateReview(form, member).Return(&exampleReview, nil)
 
 	c, _ := gin.CreateTestContext(responseRecorder)
 	c.Set("currentMember", member)
@@ -358,7 +358,7 @@ func TestCreateReview404(t *testing.T) {
 	body, _ := json.Marshal(form)
 	member := &models.Member{}
 
-	mockBranchService.EXPECT().CreateReview(form, member).Return(exampleReview, errors.New("branch not found"))
+	mockBranchService.EXPECT().CreateReview(form, member).Return(&exampleReview, errors.New("branch not found"))
 
 	c, _ := gin.CreateTestContext(responseRecorder)
 	c.Set("currentMember", member)
@@ -706,8 +706,7 @@ func TestGetAllBranchCollaboratorsGoodWeather(t *testing.T) {
 	}
 
 	// Setup mocks
-	// TODO this function should return *Branch, not Branch
-	mockBranchService.EXPECT().GetBranch(branchID).Return(*branch, nil).Times(1)
+	mockBranchService.EXPECT().GetBranch(branchID).Return(branch, nil).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/branches/collaborators/all/%d", branchID), http.NoBody)
@@ -757,8 +756,7 @@ func TestGetAllBranchCollaboratorsBranchDNE(t *testing.T) {
 	branchID := uint(20)
 
 	// Setup mocks
-	// TODO use nil here instead of models.Branch{}, once the function returns *Branch instead of Branch
-	mockBranchService.EXPECT().GetBranch(branchID).Return(models.Branch{}, fmt.Errorf("oh no")).Times(1)
+	mockBranchService.EXPECT().GetBranch(branchID).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/branches/collaborators/all/%d", branchID), http.NoBody)
