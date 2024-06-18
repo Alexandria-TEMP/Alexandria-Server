@@ -520,7 +520,7 @@ func TestUploadProject200(t *testing.T) {
 
 	writer.Close()
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches/1", body)
+	req, _ := http.NewRequest("POST", "/api/v2/branches/1/upload", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	router.ServeHTTP(responseRecorder, req)
 
@@ -534,7 +534,7 @@ func TestUploadProject400NoFile(t *testing.T) {
 
 	mockBranchService.EXPECT().UploadProject(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches/1", http.NoBody)
+	req, _ := http.NewRequest("POST", "/api/v2/branches/1/upload", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -554,7 +554,7 @@ func TestUploadProject400InvalidID(t *testing.T) {
 
 	writer.Close()
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches/bad", body)
+	req, _ := http.NewRequest("POST", "/api/v2/branches/bad/upload", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	router.ServeHTTP(responseRecorder, req)
 
@@ -575,7 +575,7 @@ func TestUploadProject500(t *testing.T) {
 
 	writer.Close()
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches/1", body)
+	req, _ := http.NewRequest("POST", "/api/v2/branches/1/upload", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	router.ServeHTTP(responseRecorder, req)
 

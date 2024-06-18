@@ -25,7 +25,7 @@ func beforeEachMember(t *testing.T) {
 
 	mockMemberService = mock_interfaces.NewMockMemberService(mockCtrl)
 	mockTagService = mock_interfaces.NewMockTagService(mockCtrl)
-	memberController = &MemberController{MemberService: mockMemberService, TagService: mockTagService}
+	memberController = MemberController{MemberService: mockMemberService, TagService: mockTagService}
 }
 
 func TestGetMember200(t *testing.T) {
