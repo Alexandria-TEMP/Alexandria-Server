@@ -813,3 +813,99 @@ func TestGetReviewStatusBranchDNE(t *testing.T) {
 	// Check status
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
+
+func TestGetClosedBranch(t *testing.T) {
+	beforeEachBranch(t)
+
+	// Setup data
+	branchID := uint(8)
+	closedBranchID := uint(5)
+	supercededBranchID := uint(10)
+	projectPostID := uint(2)
+
+	closedBranch := &models.ClosedBranch{
+		Model:                gorm.Model{ID: closedBranchID},
+		Branch:               models.Branch{},
+		BranchID:             branchID,
+		SupercededBranch:     &models.Branch{},
+		SupercededBranchID:   &supercededBranchID,
+		ProjectPostID:        projectPostID,
+		BranchReviewDecision: models.Approved,
+	}
+
+	// Setup mocks
+	mockBranchService.EXPECT().GetClosedBranch(closedBranchID).Return(closedBranch, nil).Times(1)
+
+	// Construct request
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/branches/closed/%d", closedBranchID), http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+
+	// Decode body
+	responseClosedBranchDTO := &models.ClosedBranchDTO{}
+	if err := json.NewDecoder(responseRecorder.Result().Body).Decode(responseClosedBranchDTO); err != nil {
+		t.Fatal(err)
+	}
+
+	expectedClosedBranchDTO := &models.ClosedBranchDTO{
+		ID:                   closedBranchID,
+		BranchID:             branchID,
+		SupercededBranchID:   &supercededBranchID,
+		ProjectPostID:        projectPostID,
+		BranchReviewDecision: models.Approved,
+	}
+
+	// Check body
+	assert.Equal(t, expectedClosedBranchDTO, responseClosedBranchDTO)
+}
+
+func TestGetClosedBranchDNE(t *testing.T) {
+	beforeEachBranch(t)
+
+	// Setup data
+	closedBranchID := uint(10)
+
+	// Setup mocks
+	mockBranchService.EXPECT().GetClosedBranch(closedBranchID).Return(nil, fmt.Errorf("oh no")).Times(1)
+
+	// Construct request
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/branches/closed/%d", closedBranchID), http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}
+
+func TestGetClosedBranchInvalidID(t *testing.T) {
+	beforeEachBranch(t)
+
+	// Setup data
+	closedBranchID := "Bad!!!"
+
+	// Construct request
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/branches/closed/%s", closedBranchID), http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}

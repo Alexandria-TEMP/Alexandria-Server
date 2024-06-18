@@ -113,6 +113,7 @@ func SetUpRouter() *gin.Engine {
 	branchRouter.GET("/:branchID/tree", branchController.GetFiletree)
 	branchRouter.GET("/:branchID/file/*filepath", branchController.GetFileFromProject)
 	branchRouter.GET("/:branchID/discussions", branchController.GetDiscussions)
+	branchRouter.GET("/closed/:closedBranchID", branchController.GetClosedBranch)
 
 	router.GET("/api/v2/members/:memberID", func(c *gin.Context) {
 		memberController.GetMember(c)
