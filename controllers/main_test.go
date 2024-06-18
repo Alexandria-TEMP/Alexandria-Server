@@ -34,6 +34,7 @@ var (
 	mockScientificFieldTagContainerService *mocks.MockScientificFieldTagContainerService
 	mockPostCollaboratorService            *mocks.MockPostCollaboratorService
 	mockPostService                        *mocks.MockPostService
+	mockProjectPostService                 *mocks.MockProjectPostService
 	mockDiscussionService                  *mocks.MockDiscussionService
 	mockDiscussionContainerService         *mocks.MockDiscussionContainerService
 
@@ -119,7 +120,6 @@ func SetUpRouter() *gin.Engine {
 func filterRouter(v2 *gin.RouterGroup, controller *FilterController) {
 	filterRouter := v2.Group("/filter")
 	filterRouter.GET("/posts", pagination.Default(), controller.FilterPosts)
-	filterRouter.GET("/project-posts", pagination.Default(), controller.FilterProjectPosts)
 }
 
 func tagRouter(v2 *gin.RouterGroup, controller *TagController) {

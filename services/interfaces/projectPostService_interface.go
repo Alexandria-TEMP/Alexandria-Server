@@ -11,9 +11,6 @@ type ProjectPostService interface {
 	GetProjectPost(postID uint) (*models.ProjectPost, error)
 	CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error, error)
 
-	// Return a filtered list of project post IDs
-	Filter(page, size int, form forms.ProjectPostFilterForm) ([]uint, error)
-
 	// GetBranchesGroupedByReviewStatus returns branch IDs grouped by their branch review status
 	GetBranchesGroupedByReviewStatus(projectPostID uint) (*models.BranchesGroupedByReviewStatusDTO, error)
 
