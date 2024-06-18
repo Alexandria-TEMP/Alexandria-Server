@@ -333,11 +333,6 @@ func (branchService *BranchService) merge(branch *models.Branch, closedBranch *m
 		return err
 	}
 
-	// save changes to post (isn't being saved properly at the end for some reason)
-	if _, err := branchService.PostRepository.Update(&projectPost.Post); err != nil {
-		return fmt.Errorf("failed to update post metadata")
-	}
-
 	return nil
 }
 
