@@ -34,6 +34,7 @@ var (
 	mockScientificFieldTagContainerService *mocks.MockScientificFieldTagContainerService
 	mockPostCollaboratorService            *mocks.MockPostCollaboratorService
 	mockPostService                        *mocks.MockPostService
+	mockDiscussionService                  *mocks.MockDiscussionService
 	mockDiscussionContainerService         *mocks.MockDiscussionContainerService
 
 	exampleBranch       models.Branch
