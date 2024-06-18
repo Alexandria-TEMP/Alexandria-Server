@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -78,8 +79,16 @@ func (discussionController *DiscussionController) CreateRootDiscussion(c *gin.Co
 		return
 	}
 
+	// get member
+	member, exists := c.Get("currentMember")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get logged in user"})
+
+		return
+	}
+
 	// Create discussion in the database
-	createdDiscussion, err := discussionController.DiscussionService.CreateRootDiscussion(&discussionCreationForm)
+	createdDiscussion, err := discussionController.DiscussionService.CreateRootDiscussion(&discussionCreationForm, member.(*models.Member))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create root discussion: %v", err.Error())})
 
@@ -117,8 +126,16 @@ func (discussionController *DiscussionController) CreateReplyDiscussion(c *gin.C
 		return
 	}
 
+	// get member
+	member, exists := c.Get("currentMember")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get logged in user"})
+
+		return
+	}
+
 	// Create discussion in the database
-	createdDiscussion, err := discussionController.DiscussionService.CreateReply(&discussionCreationForm)
+	createdDiscussion, err := discussionController.DiscussionService.CreateReply(&discussionCreationForm, member.(*models.Member))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create reply discussion: %v", err.Error())})
 

@@ -43,18 +43,18 @@ func (m *MockPostService) EXPECT() *MockPostServiceMockRecorder {
 }
 
 // CreatePost mocks base method.
-func (m *MockPostService) CreatePost(form *forms.PostCreationForm) (*models.Post, error) {
+func (m *MockPostService) CreatePost(form *forms.PostCreationForm, member *models.Member) (*models.Post, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreatePost", form)
+	ret := m.ctrl.Call(m, "CreatePost", form, member)
 	ret0, _ := ret[0].(*models.Post)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreatePost indicates an expected call of CreatePost.
-func (mr *MockPostServiceMockRecorder) CreatePost(form any) *gomock.Call {
+func (mr *MockPostServiceMockRecorder) CreatePost(form, member any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePost", reflect.TypeOf((*MockPostService)(nil).CreatePost), form)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatePost", reflect.TypeOf((*MockPostService)(nil).CreatePost), form, member)
 }
 
 // Filter mocks base method.

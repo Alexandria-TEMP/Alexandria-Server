@@ -85,7 +85,15 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 		return
 	}
 
-	post, err := postController.PostService.CreatePost(&form)
+	// get member
+	member, exists := c.Get("currentMember")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get logged in user"})
+
+		return
+	}
+
+	post, err := postController.PostService.CreatePost(&form, member.(*models.Member))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post: %s", err)})
 

@@ -130,17 +130,3 @@ func (mr *MockMemberServiceMockRecorder) RefreshToken(form any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RefreshToken", reflect.TypeOf((*MockMemberService)(nil).RefreshToken), form)
 }
-
-// UpdateMember mocks base method.
-func (m *MockMemberService) UpdateMember(updatedMember *models.MemberDTO, userFields *models.ScientificFieldTagContainer) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateMember", updatedMember, userFields)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdateMember indicates an expected call of UpdateMember.
-func (mr *MockMemberServiceMockRecorder) UpdateMember(updatedMember, userFields any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMember", reflect.TypeOf((*MockMemberService)(nil).UpdateMember), updatedMember, userFields)
-}

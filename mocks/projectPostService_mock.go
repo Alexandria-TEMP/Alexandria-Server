@@ -41,9 +41,9 @@ func (m *MockProjectPostService) EXPECT() *MockProjectPostServiceMockRecorder {
 }
 
 // CreateProjectPost mocks base method.
-func (m *MockProjectPostService) CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error, error) {
+func (m *MockProjectPostService) CreateProjectPost(form *forms.ProjectPostCreationForm, member *models.Member) (*models.ProjectPost, error, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateProjectPost", form)
+	ret := m.ctrl.Call(m, "CreateProjectPost", form, member)
 	ret0, _ := ret[0].(*models.ProjectPost)
 	ret1, _ := ret[1].(error)
 	ret2, _ := ret[2].(error)
@@ -51,9 +51,9 @@ func (m *MockProjectPostService) CreateProjectPost(form *forms.ProjectPostCreati
 }
 
 // CreateProjectPost indicates an expected call of CreateProjectPost.
-func (mr *MockProjectPostServiceMockRecorder) CreateProjectPost(form any) *gomock.Call {
+func (mr *MockProjectPostServiceMockRecorder) CreateProjectPost(form, member any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProjectPost", reflect.TypeOf((*MockProjectPostService)(nil).CreateProjectPost), form)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateProjectPost", reflect.TypeOf((*MockProjectPostService)(nil).CreateProjectPost), form, member)
 }
 
 // Filter mocks base method.

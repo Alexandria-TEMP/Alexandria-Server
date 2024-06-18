@@ -86,7 +86,15 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 		return
 	}
 
-	branch, err404, err500 := branchController.BranchService.CreateBranch(&form)
+	// get member
+	member, exists := c.Get("currentMember")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get logged in user"})
+
+		return
+	}
+
+	branch, err404, err500 := branchController.BranchService.CreateBranch(&form, member.(*models.Member))
 
 	if err404 != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err404.Error()})
@@ -238,8 +246,16 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 		return
 	}
 
+	// get member
+	reviewingMember, exists := c.Get("currentMember")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get logged in user"})
+
+		return
+	}
+
 	// create branchreview and add to branch
-	branchreview, err := branchController.BranchService.CreateReview(form)
+	branchreview, err := branchController.BranchService.CreateReview(form, reviewingMember.(*models.Member))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})

@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"slices"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
@@ -28,7 +29,7 @@ func (projectPostService *ProjectPostService) GetProjectPost(id uint) (*models.P
 	return projectPostService.ProjectPostRepository.GetByID(id)
 }
 
-func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error, error) {
+func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.ProjectPostCreationForm, member *models.Member) (*models.ProjectPost, error, error) {
 	// Create the post
 	post, err := projectPostService.createPostForProjectPost(form)
 
@@ -39,6 +40,11 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 	// Information about the creators of this Project Post
 	memberIDs := form.AuthorMemberIDs
 	anonymous := form.Anonymous
+
+	// check if creating member is in authors or branch is anonymous
+	if !anonymous && !slices.Contains(memberIDs, member.ID) {
+		return nil, fmt.Errorf("the creating member is not in the list of authors. either add the member or set the branch to anonymous"), nil
+	}
 
 	// A new project post starts with a single "initial proposed changes" branch. This is how project posts,
 	// themselves, are initially peer reviewed. While this initial proposed changes branch is open, no other

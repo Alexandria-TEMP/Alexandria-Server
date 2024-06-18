@@ -43,9 +43,6 @@ definitions:
         description: If anonymous, the discussion will ignore member ID
         example: false
         type: boolean
-      memberID:
-        example: 1
-        type: integer
       text:
         example: Discussion content.
         type: string
@@ -169,9 +166,6 @@ definitions:
       feedback:
         example: Fantastic work!
         type: string
-      reviewingMemberID:
-        example: 1
-        type: integer
     type: object
   forms.RootDiscussionCreationForm:
     properties:

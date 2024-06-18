@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
@@ -90,7 +91,74 @@ func TestGetBranch404(t *testing.T) {
 func TestCreateBranch200(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().CreateBranch(gomock.Any()).Return(exampleBranch, nil, nil)
+	updatedPostTitle := "new post title"
+	updatedCompletionStatus := models.Completed
+	updatedFeedbackPreferences := models.DiscussionFeedback
+	form := forms.BranchCreationForm{
+		UpdatedPostTitle:           &updatedPostTitle,
+		UpdatedCompletionStatus:    &updatedCompletionStatus,
+		UpdatedFeedbackPreferences: &updatedFeedbackPreferences,
+		UpdatedScientificFieldIDs:  []uint{},
+		CollaboratingMemberIDs:     []uint{1},
+		ProjectPostID:              5,
+		BranchTitle:                "test",
+	}
+	body, _ := json.Marshal(form)
+	member := &models.Member{}
+
+	mockBranchService.EXPECT().CreateBranch(&form, member).Return(exampleBranch, nil, nil)
+
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
+
+	branchController.CreateBranch(c)
+
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+}
+
+func TestCreateBranch4001(t *testing.T) {
+	beforeEachBranch(t)
+
+	member := &models.Member{}
+
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+
+	branchController.CreateBranch(c)
+
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestCreateBranch4002(t *testing.T) {
+	beforeEachBranch(t)
+
+	updatedPostTitle := "new post title"
+	updatedCompletionStatus := models.Completed
+	updatedFeedbackPreferences := models.DiscussionFeedback
+	form := forms.BranchCreationForm{
+		UpdatedPostTitle:           &updatedPostTitle,
+		UpdatedCompletionStatus:    &updatedCompletionStatus,
+		UpdatedFeedbackPreferences: &updatedFeedbackPreferences,
+		UpdatedScientificFieldIDs:  []uint{},
+		CollaboratingMemberIDs:     []uint{1},
+		ProjectPostID:              5,
+		BranchTitle:                "test",
+	}
+	body, _ := json.Marshal(form)
+
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
+
+	branchController.CreateBranch(c)
+
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestCreateBranch404(t *testing.T) {
+	beforeEachBranch(t)
 
 	updatedPostTitle := "post title"
 	updatedCompletionStatus := models.Completed
@@ -104,57 +172,17 @@ func TestCreateBranch200(t *testing.T) {
 		ProjectPostID:              5,
 		BranchTitle:                "test",
 	}
-	body, err := json.Marshal(form)
-	assert.Nil(t, err)
+	body, _ := json.Marshal(form)
+	member := &models.Member{}
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	router.ServeHTTP(responseRecorder, req)
+	mockBranchService.EXPECT().CreateBranch(&form, member).Return(exampleBranch, errors.New("failed"), nil)
 
-	defer responseRecorder.Result().Body.Close()
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
 
-	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
-}
-
-func TestCreateBranch400(t *testing.T) {
-	beforeEachBranch(t)
-
-	mockBranchService.EXPECT().CreateBranch(gomock.Any()).Times(0)
-
-	req, _ := http.NewRequest("POST", "/api/v2/branches", http.NoBody)
-	req.Header.Set("Content-Type", "application/json")
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestCreateBranch404(t *testing.T) {
-	beforeEachBranch(t)
-
-	mockBranchService.EXPECT().CreateBranch(gomock.Any()).Return(exampleBranch, errors.New("parent branch not found"), nil)
-
-	updatedPostTitle := "test"
-	updatedCompletionStatus := models.Completed
-	updatedFeedbackPreferences := models.DiscussionFeedback
-	form := forms.BranchCreationForm{
-		UpdatedPostTitle:           &updatedPostTitle,
-		UpdatedCompletionStatus:    &updatedCompletionStatus,
-		UpdatedFeedbackPreferences: &updatedFeedbackPreferences,
-		UpdatedScientificFieldIDs:  []uint{},
-		CollaboratingMemberIDs:     []uint{1},
-		ProjectPostID:              5,
-		BranchTitle:                "test",
-	}
-	body, err := json.Marshal(form)
-	assert.Nil(t, err)
-
-	req, _ := http.NewRequest("POST", "/api/v2/branches", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
+	branchController.CreateBranch(c)
 
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
@@ -162,9 +190,7 @@ func TestCreateBranch404(t *testing.T) {
 func TestCreateBranch500(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().CreateBranch(gomock.Any()).Return(exampleBranch, nil, errors.New("internal server error"))
-
-	updatedPostTitle := "title"
+	updatedPostTitle := "post title"
 	updatedCompletionStatus := models.Completed
 	updatedFeedbackPreferences := models.DiscussionFeedback
 	form := forms.BranchCreationForm{
@@ -176,14 +202,17 @@ func TestCreateBranch500(t *testing.T) {
 		ProjectPostID:              5,
 		BranchTitle:                "test",
 	}
-	body, err := json.Marshal(form)
-	assert.Nil(t, err)
+	body, _ := json.Marshal(form)
+	member := &models.Member{}
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	router.ServeHTTP(responseRecorder, req)
+	mockBranchService.EXPECT().CreateBranch(&form, member).Return(exampleBranch, nil, errors.New("failed"))
 
-	defer responseRecorder.Result().Body.Close()
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
+
+	branchController.CreateBranch(c)
 
 	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Result().StatusCode)
 }
@@ -269,35 +298,52 @@ func TestGetReview404(t *testing.T) {
 func TestCreateReview200(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().CreateReview(gomock.Any()).Return(exampleReview, nil)
-
 	form := forms.ReviewCreationForm{
 		BranchReviewDecision: models.Approved,
 		BranchID:             1,
-		ReviewingMemberID:    2,
 	}
-	body, err := json.Marshal(form)
-	assert.Nil(t, err)
+	body, _ := json.Marshal(form)
+	member := &models.Member{}
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches/reviews", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	router.ServeHTTP(responseRecorder, req)
+	mockBranchService.EXPECT().CreateReview(form, member).Return(exampleReview, nil)
 
-	defer responseRecorder.Result().Body.Close()
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
+
+	branchController.CreateReview(c)
 
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
 }
 
-func TestCreateReview400(t *testing.T) {
+func TestCreateReview4001(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().CreateReview(gomock.Any()).Times(0)
+	member := &models.Member{}
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches/reviews", http.NoBody)
-	req.Header.Set("Content-Type", "application/json")
-	router.ServeHTTP(responseRecorder, req)
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
 
-	defer responseRecorder.Result().Body.Close()
+	branchController.CreateReview(c)
+
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestCreateReview4002(t *testing.T) {
+	beforeEachBranch(t)
+
+	form := forms.ReviewCreationForm{
+		BranchReviewDecision: models.Approved,
+		BranchID:             1,
+	}
+	body, _ := json.Marshal(form)
+
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
+
+	branchController.CreateReview(c)
 
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
@@ -305,21 +351,21 @@ func TestCreateReview400(t *testing.T) {
 func TestCreateReview404(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().CreateReview(gomock.Any()).Return(exampleReview, errors.New("branch not found"))
-
 	form := forms.ReviewCreationForm{
 		BranchReviewDecision: models.Approved,
 		BranchID:             1,
-		ReviewingMemberID:    2,
 	}
-	body, err := json.Marshal(form)
-	assert.Nil(t, err)
+	body, _ := json.Marshal(form)
+	member := &models.Member{}
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches/reviews", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	router.ServeHTTP(responseRecorder, req)
+	mockBranchService.EXPECT().CreateReview(form, member).Return(exampleReview, errors.New("branch not found"))
 
-	defer responseRecorder.Result().Body.Close()
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
+
+	branchController.CreateReview(c)
 
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }

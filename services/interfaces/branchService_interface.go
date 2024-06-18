@@ -18,7 +18,7 @@ type BranchService interface {
 	// It assumes that a repository has already been created for this post.
 	// Error 1 404
 	// Error 2 500
-	CreateBranch(branchCreationForm *forms.BranchCreationForm) (models.Branch, error, error)
+	CreateBranch(branchCreationForm *forms.BranchCreationForm, member *models.Member) (models.Branch, error, error)
 
 	// DeleteBranch deletes an existing branch entity, as well as the branch in the vfs.
 	DeleteBranch(branchID uint) error
@@ -30,7 +30,7 @@ type BranchService interface {
 	GetReview(reviewID uint) (models.BranchReview, error)
 
 	// CreateReview creates a new branchreview and adds it to the branch.
-	CreateReview(reviewCreationForm forms.ReviewCreationForm) (models.BranchReview, error)
+	CreateReview(reviewCreationForm forms.ReviewCreationForm, reviewingMember *models.Member) (models.BranchReview, error)
 
 	// MemberCanReview checks whether a user is elligible to branchreview a branch, dpending on whether there is an overlap of the scientific fields.
 	MemberCanReview(branchID, memberID uint) (bool, error)

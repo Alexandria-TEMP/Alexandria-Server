@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"mime/multipart"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -44,7 +45,7 @@ func (branchService *BranchService) GetBranch(branchID uint) (models.Branch, err
 	return *branch, nil
 }
 
-func (branchService *BranchService) CreateBranch(branchCreationForm *forms.BranchCreationForm) (models.Branch, error, error) {
+func (branchService *BranchService) CreateBranch(branchCreationForm *forms.BranchCreationForm, member *models.Member) (models.Branch, error, error) {
 	var branch models.Branch
 
 	// verify parent project post exists
@@ -57,6 +58,11 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 	// check whether project post is still open. if so reject this branch creation
 	if projectPost.PostReviewStatus == models.Open {
 		return branch, fmt.Errorf("this project post is still open for review"), nil
+	}
+
+	// check if creating member is in collaborators or branch is anonymous
+	if !branchCreationForm.Anonymous && !slices.Contains(branchCreationForm.CollaboratingMemberIDs, member.ID) {
+		return branch, fmt.Errorf("the creating member is not in the list of collaborators. either add the member or set the branch to anonymous"), nil
 	}
 
 	// create and save discussion new container
@@ -169,7 +175,7 @@ func (branchService *BranchService) GetReview(reviewID uint) (models.BranchRevie
 	return *branchreview, nil
 }
 
-func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) (models.BranchReview, error) {
+func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm, reviewingMember *models.Member) (models.BranchReview, error) {
 	var branchreview models.BranchReview
 
 	// get branch
@@ -179,17 +185,10 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 		return branchreview, fmt.Errorf("failed to find branch with id %v: %w", form.BranchID, err)
 	}
 
-	// get member
-	member, err := branchService.MemberRepository.GetByID(form.ReviewingMemberID)
-
-	if err != nil {
-		return branchreview, fmt.Errorf("failed to find member with id %v: %w", form.ReviewingMemberID, err)
-	}
-
 	// make new branchreview
 	branchreview = models.BranchReview{
 		BranchID:             form.BranchID,
-		Member:               *member,
+		Member:               *reviewingMember,
 		BranchReviewDecision: form.BranchReviewDecision,
 		Feedback:             form.Feedback,
 	}

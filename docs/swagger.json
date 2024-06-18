@@ -3453,10 +3453,6 @@
                     "type": "boolean",
                     "example": false
                 },
-                "memberID": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "text": {
                     "type": "string",
                     "example": "Discussion content."
@@ -3641,10 +3637,6 @@
                 "feedback": {
                     "type": "string",
                     "example": "Fantastic work!"
-                },
-                "reviewingMemberID": {
-                    "type": "integer",
-                    "example": 1
                 }
             }
         },

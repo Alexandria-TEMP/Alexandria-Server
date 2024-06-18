@@ -111,7 +111,7 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 	mockPostRepository.EXPECT().Create(expectedPost).Return(nil)
 
 	// Function under test
-	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
+	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm, &memberA)
 	assert.Nil(t, err404)
 	assert.Nil(t, err500)
 
@@ -176,7 +176,7 @@ func TestCreateProjectPostDatabaseFailure(t *testing.T) {
 	mockPostRepository.EXPECT().Create(expectedPost).Return(nil)
 
 	// Function under test
-	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
+	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm, &memberA)
 
 	if createdProjectPost != nil {
 		t.Fatalf("project post should not have been created:\n%+v", createdProjectPost)
@@ -204,7 +204,7 @@ func TestCreateProjectPostCollaboratorsFail(t *testing.T) {
 	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{10, 15}, false, models.Author).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
-	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
+	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm, &models.Member{Model: gorm.Model{ID: 15}})
 
 	if createdProjectPost != nil {
 		t.Fatalf("project post should not have been created:\n%+v", createdProjectPost)
@@ -255,7 +255,7 @@ func TestCreateProjectBranchCollaboratorsFail(t *testing.T) {
 	mockPostRepository.EXPECT().Create(expectedPost).Return(nil)
 
 	// Function under test
-	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm)
+	createdProjectPost, err404, err500 := projectPostService.CreateProjectPost(&projectPostCreationForm, &memberA)
 
 	if createdProjectPost != nil {
 		t.Fatalf("project post should not have been created:\n%+v", createdProjectPost)

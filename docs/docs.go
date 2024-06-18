@@ -3459,10 +3459,6 @@ const docTemplate = `{
                     "type": "boolean",
                     "example": false
                 },
-                "memberID": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "text": {
                     "type": "string",
                     "example": "Discussion content."
@@ -3647,10 +3643,6 @@ const docTemplate = `{
                 "feedback": {
                     "type": "string",
                     "example": "Fantastic work!"
-                },
-                "reviewingMemberID": {
-                    "type": "integer",
-                    "example": 1
                 }
             }
         },

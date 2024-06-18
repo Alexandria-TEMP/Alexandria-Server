@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -82,7 +83,15 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 		return
 	}
 
-	projectPost, err404, err500 := projectPostController.ProjectPostService.CreateProjectPost(&form)
+	// get member
+	member, exists := c.Get("currentMember")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get logged in user"})
+
+		return
+	}
+
+	projectPost, err404, err500 := projectPostController.ProjectPostService.CreateProjectPost(&form, member.(*models.Member))
 
 	if err404 != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("not found: %v", err404.Error())})

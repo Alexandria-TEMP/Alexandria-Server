@@ -97,7 +97,6 @@ func TestCreateRootDiscussionGoodWeather(t *testing.T) {
 		ContainerID: discussionContainerA.ID,
 		DiscussionCreationForm: forms.DiscussionCreationForm{
 			Anonymous: false,
-			MemberID:  memberA.ID,
 			Text:      "lorem ipsum",
 		},
 	}
@@ -111,7 +110,7 @@ func TestCreateRootDiscussionGoodWeather(t *testing.T) {
 	}).Return(nil).Times(1)
 
 	// Function under test
-	createdDiscussion, err := discussionService.CreateRootDiscussion(&discussionCreationForm)
+	createdDiscussion, err := discussionService.CreateRootDiscussion(&discussionCreationForm, &memberA)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -139,7 +138,6 @@ func TestCreateRootDiscussionContainerDNE(t *testing.T) {
 		ContainerID: containerID,
 		DiscussionCreationForm: forms.DiscussionCreationForm{
 			Anonymous: false,
-			MemberID:  memberA.ID,
 			Text:      "lorem ipsum",
 		},
 	}
@@ -147,32 +145,7 @@ func TestCreateRootDiscussionContainerDNE(t *testing.T) {
 	mockDiscussionContainerRepository.EXPECT().GetByID(containerID).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
-	_, err := discussionService.CreateRootDiscussion(&discussionCreationForm)
-	if err == nil {
-		t.Fatal("creating discussion should have returned error")
-	}
-}
-
-func TestCreateRootDiscussionMemberDNE(t *testing.T) {
-	discussionServiceSetup(t)
-	t.Cleanup(discussionServiceTeardown)
-
-	// Use a different ID that doesn't have a mock return value set up!
-	memberID := memberA.ID + 5
-
-	discussionCreationForm := forms.RootDiscussionCreationForm{
-		ContainerID: discussionContainerA.ID,
-		DiscussionCreationForm: forms.DiscussionCreationForm{
-			Anonymous: false,
-			MemberID:  memberID,
-			Text:      "lorem ipsum",
-		},
-	}
-
-	mockMemberRepository.EXPECT().GetByID(memberID).Return(nil, fmt.Errorf("oh no")).Times(1)
-
-	// Function under test
-	_, err := discussionService.CreateRootDiscussion(&discussionCreationForm)
+	_, err := discussionService.CreateRootDiscussion(&discussionCreationForm, &memberA)
 	if err == nil {
 		t.Fatal("creating discussion should have returned error")
 	}
@@ -186,7 +159,6 @@ func TestCreateReplyDiscussionGoodWeather(t *testing.T) {
 		ParentID: discussionA.ID,
 		DiscussionCreationForm: forms.DiscussionCreationForm{
 			Anonymous: false,
-			MemberID:  memberA.ID,
 			Text:      "reply discussion",
 		},
 	}
@@ -201,7 +173,7 @@ func TestCreateReplyDiscussionGoodWeather(t *testing.T) {
 	}).Return(nil).Times(1)
 
 	// Function under test
-	createdDiscussion, err := discussionService.CreateReply(&replyDiscussionCreationForm)
+	createdDiscussion, err := discussionService.CreateReply(&replyDiscussionCreationForm, &memberA)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -229,7 +201,6 @@ func TestCreateReplyDiscussionParentDNE(t *testing.T) {
 		ParentID: parentID,
 		DiscussionCreationForm: forms.DiscussionCreationForm{
 			Anonymous: false,
-			MemberID:  memberA.ID,
 			Text:      "wahhh",
 		},
 	}
@@ -237,31 +208,7 @@ func TestCreateReplyDiscussionParentDNE(t *testing.T) {
 	mockDiscussionRepository.EXPECT().GetByID(parentID).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
-	_, err := discussionService.CreateReply(&replyDiscussionCreationForm)
-	if err == nil {
-		t.Fatal("creating reply should have returned err")
-	}
-}
-
-func TestCreateReplyDiscussionMemberDNE(t *testing.T) {
-	discussionServiceSetup(t)
-	t.Cleanup(discussionServiceTeardown)
-
-	memberID := memberA.ID + 5
-
-	replyDiscussionCreationForm := forms.ReplyDiscussionCreationForm{
-		ParentID: discussionA.ID,
-		DiscussionCreationForm: forms.DiscussionCreationForm{
-			Anonymous: false,
-			MemberID:  memberID,
-			Text:      "aaauu",
-		},
-	}
-
-	mockMemberRepository.EXPECT().GetByID(memberID).Return(nil, fmt.Errorf("oh no")).Times(1)
-
-	// Function under test
-	_, err := discussionService.CreateReply(&replyDiscussionCreationForm)
+	_, err := discussionService.CreateReply(&replyDiscussionCreationForm, &memberA)
 	if err == nil {
 		t.Fatal("creating reply should have returned err")
 	}

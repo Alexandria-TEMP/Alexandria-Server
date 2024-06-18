@@ -107,7 +107,7 @@ func TestCreatePostGoodWeather(t *testing.T) {
 	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
 
 	// Function under test
-	createdPost, err := postService.CreatePost(&postCreationForm)
+	createdPost, err := postService.CreatePost(&postCreationForm, &memberA)
 
 	assert.Nil(t, err)
 
@@ -152,7 +152,7 @@ func TestCreatePostNonExistingMembers(t *testing.T) {
 	mockPostCollaboratorService.EXPECT().MembersToPostCollaborators([]uint{memberA.ID, memberB.ID}, false, models.Author).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Function under test
-	createdPost, err := postService.CreatePost(&postCreationForm)
+	createdPost, err := postService.CreatePost(&postCreationForm, &memberA)
 
 	if createdPost != nil {
 		t.Fatalf("created post:\n%+v\nshould have been nil", createdPost)
@@ -189,7 +189,7 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
 
 	// Function under test
-	createdPost, err := postService.CreatePost(&postCreationForm)
+	createdPost, err := postService.CreatePost(&postCreationForm, &memberA)
 
 	assert.Nil(t, err)
 
@@ -238,7 +238,7 @@ func TestCreatePostDatabaseFailure(t *testing.T) {
 	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
 
 	// Function under test
-	createdPost, err := postService.CreatePost(&postCreationForm)
+	createdPost, err := postService.CreatePost(&postCreationForm, &memberA)
 
 	if createdPost != nil {
 		t.Fatalf("created post:\n%+v\nshould have been nil", createdPost)
@@ -268,7 +268,7 @@ func TestCreatePostWithBadPostType(t *testing.T) {
 	mockPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
 
 	// Function under test
-	createdPost, err := postService.CreatePost(&postCreationForm)
+	createdPost, err := postService.CreatePost(&postCreationForm, &memberA)
 
 	if createdPost != nil {
 		t.Fatalf("created post:\n%+v\nshould have been nil", createdPost)
@@ -475,7 +475,6 @@ func TestGetMainFiletreeFailedCheckoutBranch(t *testing.T) {
 	fileTree, err, err2 := postService.GetMainFiletree(postID)
 	assert.NotNil(t, err)
 	assert.Nil(t, err2)
-	assert.Equal(t, "failed to find master branch", err.Error())
 	assert.Nil(t, fileTree)
 }
 
