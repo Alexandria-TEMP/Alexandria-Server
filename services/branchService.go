@@ -34,53 +34,51 @@ type BranchService struct {
 	TagService                interfaces.TagService
 }
 
-func (branchService *BranchService) GetBranch(branchID uint) (models.Branch, error) {
+func (branchService *BranchService) GetBranch(branchID uint) (*models.Branch, error) {
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 
 	if err != nil {
-		return models.Branch{}, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
+		return nil, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
 	}
 
-	return *branch, nil
+	return branch, nil
 }
 
-func (branchService *BranchService) CreateBranch(branchCreationForm *forms.BranchCreationForm) (models.Branch, error, error) {
-	var branch models.Branch
-
+func (branchService *BranchService) CreateBranch(branchCreationForm *forms.BranchCreationForm) (*models.Branch, error, error) {
 	// verify parent project post exists
 	projectPost, err := branchService.ProjectPostRepository.GetByID(branchCreationForm.ProjectPostID)
 
 	if err != nil {
-		return branch, fmt.Errorf("failed to find project post with id %v: %w", branchCreationForm.ProjectPostID, err), nil
+		return nil, fmt.Errorf("failed to find project post with id %v: %w", branchCreationForm.ProjectPostID, err), nil
 	}
 
 	// check whether project post is still open. if so reject this branch creation
 	if projectPost.PostReviewStatus == models.Open {
-		return branch, fmt.Errorf("this project post is still open for review"), nil
+		return nil, fmt.Errorf("this project post is still open for review"), nil
 	}
 
 	// create and save discussion new container
 	// we shouldn't have to do this extra, it should be implicit but it isnt...
 	discussionContainer := models.DiscussionContainer{}
 	if err := branchService.DiscussionContainerRepository.Create(&discussionContainer); err != nil {
-		return branch, fmt.Errorf("failed to add discussion container to db: %w", err), nil
+		return nil, fmt.Errorf("failed to add discussion container to db: %w", err), nil
 	}
 
 	// get all collaborators from ids
 	collaborators, err := branchService.BranchCollaboratorService.MembersToBranchCollaborators(branchCreationForm.CollaboratingMemberIDs, branchCreationForm.Anonymous)
 	if err != nil {
-		return branch, fmt.Errorf("failed to convert member ids to branch collaborators: %w", err), nil
+		return nil, fmt.Errorf("failed to convert member ids to branch collaborators: %w", err), nil
 	}
 
 	// convert []uint to []*models.ScientificFieldTag
 	tags, err := branchService.TagService.GetTagsFromIDs(branchCreationForm.UpdatedScientificFieldIDs)
 
 	if err != nil {
-		return branch, fmt.Errorf("failed to get tags from ids: %w", err), nil
+		return nil, fmt.Errorf("failed to get tags from ids: %w", err), nil
 	}
 
 	// make new branch
-	branch = models.Branch{
+	branch := &models.Branch{
 		UpdatedPostTitle:                   branchCreationForm.UpdatedPostTitle,
 		UpdatedCompletionStatus:            branchCreationForm.UpdatedCompletionStatus,
 		UpdatedScientificFieldTagContainer: &models.ScientificFieldTagContainer{ScientificFieldTags: tags},
@@ -93,10 +91,10 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 	}
 
 	// save branch entity to open branches
-	projectPost.OpenBranches = append(projectPost.OpenBranches, &branch)
+	projectPost.OpenBranches = append(projectPost.OpenBranches, branch)
 
 	if _, err := branchService.ProjectPostRepository.Update(projectPost); err != nil {
-		return branch, nil, fmt.Errorf("failed to update project post with new branch: %w", err)
+		return nil, nil, fmt.Errorf("failed to update project post with new branch: %w", err)
 	}
 
 	// set vfs to repository according to the Post of the ProjectPost of the Branch entity
@@ -104,7 +102,7 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 
 	// create new branch in git repo with branch ID as its name
 	if err := branchService.Filesystem.CreateBranch(fmt.Sprintf("%v", branch.ID)); err != nil {
-		return branch, nil, fmt.Errorf("failed create branch: %w", err)
+		return nil, nil, fmt.Errorf("failed create branch: %w", err)
 	}
 
 	return branch, nil, nil
@@ -158,59 +156,57 @@ func (branchService *BranchService) GetAllBranchReviewStatuses(branchID uint) ([
 	return decisions, nil
 }
 
-func (branchService *BranchService) GetReview(reviewID uint) (models.BranchReview, error) {
+func (branchService *BranchService) GetReview(reviewID uint) (*models.BranchReview, error) {
 	// get branch
 	branchreview, err := branchService.ReviewRepository.GetByID(reviewID)
 
 	if err != nil {
-		return models.BranchReview{}, fmt.Errorf("failed to find branch with id %v: %w", reviewID, err)
+		return nil, fmt.Errorf("failed to find branch with id %v: %w", reviewID, err)
 	}
 
-	return *branchreview, nil
+	return branchreview, nil
 }
 
-func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) (models.BranchReview, error) {
-	var branchreview models.BranchReview
-
+func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) (*models.BranchReview, error) {
 	// get branch
 	branch, err := branchService.BranchRepository.GetByID(form.BranchID)
 
 	if err != nil {
-		return branchreview, fmt.Errorf("failed to find branch with id %v: %w", form.BranchID, err)
+		return nil, fmt.Errorf("failed to find branch with id %v: %w", form.BranchID, err)
 	}
 
 	// ensure the branch isn't already closed
 	if branch.BranchOverallReviewStatus != models.BranchOpenForReview {
-		return branchreview, fmt.Errorf("branch is already reviewed with status '%v'", branch.BranchOverallReviewStatus)
+		return nil, fmt.Errorf("branch is already reviewed with status '%v'", branch.BranchOverallReviewStatus)
 	}
 
 	// get member
 	member, err := branchService.MemberRepository.GetByID(form.ReviewingMemberID)
 
 	if err != nil {
-		return branchreview, fmt.Errorf("failed to find member with id %v: %w", form.ReviewingMemberID, err)
+		return nil, fmt.Errorf("failed to find member with id %v: %w", form.ReviewingMemberID, err)
 	}
 
 	// make new branchreview
-	branchreview = models.BranchReview{
+	branchreview := &models.BranchReview{
 		BranchID:             form.BranchID,
 		Member:               *member,
 		BranchReviewDecision: form.BranchReviewDecision,
 		Feedback:             form.Feedback,
 	}
 
-	if err := branchService.ReviewRepository.Create(&branchreview); err != nil {
-		return branchreview, fmt.Errorf("failed to add branch review to db: %w", err)
+	if err := branchService.ReviewRepository.Create(branchreview); err != nil {
+		return nil, fmt.Errorf("failed to add branch review to db: %w", err)
 	}
 
 	// update branch with new branchreview and update branchreview status accordingly
-	branch.Reviews = append(branch.Reviews, &branchreview)
+	branch.Reviews = append(branch.Reviews, branchreview)
 	branch.BranchOverallReviewStatus = branchService.updateReviewStatus(branch.Reviews)
 
 	// if approved or rejected we close the branch
 	if branch.BranchOverallReviewStatus == models.BranchPeerReviewed || branch.BranchOverallReviewStatus == models.BranchRejected {
 		if err := branchService.closeBranch(branch); err != nil {
-			return branchreview, fmt.Errorf("failed to close branch: %w", err)
+			return nil, fmt.Errorf("failed to close branch: %w", err)
 		}
 
 		return branchreview, nil
@@ -218,7 +214,7 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 
 	// save changes to branch
 	if _, err := branchService.BranchRepository.Update(branch); err != nil {
-		return branchreview, fmt.Errorf("failed to save branch branchreview: %w", err)
+		return nil, fmt.Errorf("failed to save branch branchreview: %w", err)
 	}
 
 	return branchreview, nil
