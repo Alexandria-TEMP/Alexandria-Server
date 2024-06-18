@@ -50,7 +50,7 @@ type Filesystem interface {
 	GetFileTree() (map[string]int64, error)
 
 	// RenderExists checks whether render exists as expected at GetCurrentRenderDirPath and returns filename
-	RenderExists() (bool, string)
+	RenderExists() (string, error)
 
 	// SaveZipFile saves a zip file from the gin context to GetCurrentZipFilePath
 	SaveZipFile(c *gin.Context, file *multipart.FileHeader) error

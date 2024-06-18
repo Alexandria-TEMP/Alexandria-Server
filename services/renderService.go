@@ -59,13 +59,12 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, error,
 	}
 
 	// verify render exists. if it doesn't set render status to failed
-	exists, fileName := renderService.Filesystem.RenderExists()
-
-	if !exists {
+	fileName, err := renderService.Filesystem.RenderExists()
+	if err != nil {
 		branch.RenderStatus = models.Failure
 		_, _ = renderService.BranchRepository.Update(branch)
 
-		return filePath, nil, fmt.Errorf("render has failed")
+		return filePath, nil, fmt.Errorf("render has failed: %w", err)
 	}
 
 	// set filepath to absolute path to render file
@@ -103,13 +102,12 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (string, erro
 	}
 
 	// verify render exists. if it doesn't set render status to failed
-	exists, fileName := renderService.Filesystem.RenderExists()
-
-	if !exists {
+	fileName, err := renderService.Filesystem.RenderExists()
+	if err != nil {
 		post.RenderStatus = models.Failure
 		_, _ = renderService.PostRepository.Update(post)
 
-		return filePath, nil, fmt.Errorf("render has failed")
+		return filePath, nil, fmt.Errorf("render has failed: %w", err)
 	}
 
 	// set filepath to absolute path to render file
@@ -161,7 +159,7 @@ func (renderService *RenderService) RenderPost(post *models.Post) {
 	}
 
 	// Verify that a render was produced in the form of a single file
-	if exists, _ := renderService.Filesystem.RenderExists(); !exists {
+	if _, err := renderService.Filesystem.RenderExists(); err != nil {
 		renderService.FailPost(post)
 
 		return
@@ -232,7 +230,7 @@ func (renderService *RenderService) RenderBranch(branch *models.Branch) {
 	}
 
 	// Verify that a render was produced in the form of a single file
-	if exists, _ := renderService.Filesystem.RenderExists(); !exists {
+	if _, err := renderService.Filesystem.RenderExists(); err != nil {
 		renderService.FailBranch(branch)
 
 		return

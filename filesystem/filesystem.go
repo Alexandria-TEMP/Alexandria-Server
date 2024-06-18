@@ -144,27 +144,27 @@ func (filesystem *Filesystem) DeleteRepository() error {
 }
 
 // RenderExists checks if the render exists and is a single html file
-// Returns a bool and the name of the file if it does exist
-func (filesystem *Filesystem) RenderExists() (exists bool, name string) {
+// Returns name of the file if it exists, error if not
+func (filesystem *Filesystem) RenderExists() (string, error) {
 	files, err := os.ReadDir(filesystem.CurrentRenderDirPath)
 
 	if err != nil {
-		return false, ""
+		return "", fmt.Errorf("failed to read directory: %w", err)
 	}
 
 	// Check directory contains 1 file exactly
 	if len(files) != 1 {
-		return false, ""
+		return "", fmt.Errorf("the directory does not contain exactly 1 file! found %d files", len(files))
 	}
 
 	// Get filename and check extension is html
 	fileName := files[0].Name()
 
 	if ext := path.Ext(fileName); ext != ".html" {
-		return false, ""
+		return "", fmt.Errorf("extension '%s' is not '.html'", ext)
 	}
 
-	return true, fileName
+	return fileName, nil
 }
 
 // GetFileTree returns a map of all filepaths in a quarto project and their size in bytes

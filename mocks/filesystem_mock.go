@@ -268,11 +268,11 @@ func (mr *MockFilesystemMockRecorder) Merge(toMerge, mergeInto any) *gomock.Call
 }
 
 // RenderExists mocks base method.
-func (m *MockFilesystem) RenderExists() (bool, string) {
+func (m *MockFilesystem) RenderExists() (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RenderExists")
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(string)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
