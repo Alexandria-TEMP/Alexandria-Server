@@ -23,8 +23,8 @@ type BranchService interface {
 	// DeleteBranch deletes an existing branch entity, as well as the branch in the vfs.
 	DeleteBranch(branchID uint) error
 
-	// GetReviewStatus gets the decisions for all reviews of a branch, given its ID,
-	GetReviewStatus(branchID uint) ([]models.BranchReviewDecision, error)
+	// GetAllBranchReviewStatuses gets the decisions for all reviews of a branch, given its ID,
+	GetAllBranchReviewStatuses(branchID uint) ([]models.BranchReviewDecision, error)
 
 	// GetReview gets an existing branchreview from the DB
 	GetReview(reviewID uint) (models.BranchReview, error)

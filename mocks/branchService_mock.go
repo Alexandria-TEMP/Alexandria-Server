@@ -87,6 +87,21 @@ func (mr *MockBranchServiceMockRecorder) DeleteBranch(branchID any) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBranch", reflect.TypeOf((*MockBranchService)(nil).DeleteBranch), branchID)
 }
 
+// GetAllBranchReviewStatuses mocks base method.
+func (m *MockBranchService) GetAllBranchReviewStatuses(branchID uint) ([]models.BranchReviewDecision, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllBranchReviewStatuses", branchID)
+	ret0, _ := ret[0].([]models.BranchReviewDecision)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllBranchReviewStatuses indicates an expected call of GetAllBranchReviewStatuses.
+func (mr *MockBranchServiceMockRecorder) GetAllBranchReviewStatuses(branchID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllBranchReviewStatuses", reflect.TypeOf((*MockBranchService)(nil).GetAllBranchReviewStatuses), branchID)
+}
+
 // GetBranch mocks base method.
 func (m *MockBranchService) GetBranch(branchID uint) (models.Branch, error) {
 	m.ctrl.T.Helper()
@@ -191,21 +206,6 @@ func (m *MockBranchService) GetReview(reviewID uint) (models.BranchReview, error
 func (mr *MockBranchServiceMockRecorder) GetReview(reviewID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReview", reflect.TypeOf((*MockBranchService)(nil).GetReview), reviewID)
-}
-
-// GetReviewStatus mocks base method.
-func (m *MockBranchService) GetReviewStatus(branchID uint) ([]models.BranchReviewDecision, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetReviewStatus", branchID)
-	ret0, _ := ret[0].([]models.BranchReviewDecision)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetReviewStatus indicates an expected call of GetReviewStatus.
-func (mr *MockBranchServiceMockRecorder) GetReviewStatus(branchID any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReviewStatus", reflect.TypeOf((*MockBranchService)(nil).GetReviewStatus), branchID)
 }
 
 // MemberCanReview mocks base method.

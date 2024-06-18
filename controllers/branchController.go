@@ -104,22 +104,6 @@ func (branchController *BranchController) CreateBranch(c *gin.Context) {
 	c.JSON(http.StatusOK, branch.IntoDTO())
 }
 
-// UpdateBranch godoc
-// @Summary 	Update branch
-// @Description Update any number of the aspects of a branch
-// @Tags 		branches
-// @Accept  	json
-// @Param 		Authorization header string true "Access Token"
-// @Param		branch	body		models.BranchDTO		true	"Updated Branch"
-// @Produce		json
-// @Success 	200
-// @Failure		400		{object} 	utils.HTTPError
-// @Failure		404		{object} 	utils.HTTPError
-// @Router 		/branches 		[put]
-func (branchController *BranchController) UpdateBranch(c *gin.Context) {
-	c.Status(http.StatusNotImplemented)
-}
-
 // DeleteBranch godoc
 // @Summary 	Delete a branch
 // @Description Delete a branch with given ID from database
@@ -154,7 +138,7 @@ func (branchController *BranchController) DeleteBranch(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// GetReviewStatus godoc
+// GetAllBranchReviewStatuses godoc
 // @Summary 	Returns status of all branch reviews
 // @Description Returns an array of the statuses of all the reviews of this branch
 // @Tags 		branches
@@ -165,7 +149,7 @@ func (branchController *BranchController) DeleteBranch(c *gin.Context) {
 // @Failure		400		{object} 	utils.HTTPError
 // @Failure		404		{object} 	utils.HTTPError
 // @Router 		/branches/{branchID}/review-statuses	[get]
-func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
+func (branchController *BranchController) GetAllBranchReviewStatuses(c *gin.Context) {
 	// extract branchID
 	branchIDStr := c.Param("branchID")
 	branchID, err := strconv.ParseInt(branchIDStr, 10, 64)
@@ -177,9 +161,7 @@ func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 	}
 
 	// Get statuses of a branch
-	statuses, err := branchController.BranchService.GetReviewStatus(uint(branchID))
-
-	// TODO this is incorrect, the endpoint should return statuses of the branch's reviews, not the status of the branch itself
+	statuses, err := branchController.BranchService.GetAllBranchReviewStatuses(uint(branchID))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -192,8 +174,8 @@ func (branchController *BranchController) GetReviewStatus(c *gin.Context) {
 }
 
 // GetReview godoc
-// @Summary 	Returns a branchreview
-// @Description Returns a branchreview with given ID
+// @Summary 	Returns a branch review
+// @Description Returns a branch review with given ID
 // @Tags 		branches
 // @Accept  	json
 // @Param		reviewID			path		string			true	"branchreview ID"

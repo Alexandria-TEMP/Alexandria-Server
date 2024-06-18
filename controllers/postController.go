@@ -96,46 +96,6 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 	c.JSON(http.StatusOK, &post)
 }
 
-// UpdatePost godoc
-// @Summary 	Update post
-// @Description Update any number of aspects of a question or discussion post
-// @Tags 		posts
-// @Accept  	json
-// @Param 		Authorization header string true "Access Token"
-// @Param		post	body		models.PostDTO		true	"Updated Post"
-// @Produce		json
-// @Success 	200
-// @Failure		400		{object} 	utils.HTTPError
-// @Failure		404		{object} 	utils.HTTPError
-// @Failure		500		{object} 	utils.HTTPError
-// @Router 		/posts 		[put]
-func (postController *PostController) UpdatePost(c *gin.Context) {
-	// extract post
-	updatedPost := models.Post{}
-	err := c.BindJSON(&updatedPost)
-
-	// TODO convert from Post DTO to updated Post data
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind updated Post from request body: %s", err)})
-
-		return
-	}
-
-	// Update and add post to database here. For now just do this to test.
-	err = postController.PostService.UpdatePost(&updatedPost)
-
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot update post because no post with this ID exists: %s", err)})
-
-		return
-	}
-
-	// response
-	c.Header("Content-Type", "application/json")
-	c.Status(http.StatusOK)
-}
-
 // DeletePost godoc
 // @Summary 	Delete a post
 // @Description Delete a post with given ID from database

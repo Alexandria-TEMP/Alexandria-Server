@@ -70,29 +70,6 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 	return accessToken, refreshToken, member, err
 }
 
-func (memberService *MemberService) UpdateMember(memberDTO *models.MemberDTO, userFields *models.ScientificFieldTagContainer) error {
-	oldMember, err := memberService.MemberRepository.GetByID(memberDTO.ID)
-	if err != nil {
-		return err
-	}
-
-	oldContainer := oldMember.ScientificFieldTagContainer
-	oldContainer.ScientificFieldTags = userFields.ScientificFieldTags
-
-	newMember := &models.Member{
-		FirstName:                   memberDTO.FirstName,
-		LastName:                    memberDTO.LastName,
-		Email:                       memberDTO.Email,
-		Institution:                 memberDTO.Institution,
-		ScientificFieldTagContainer: oldContainer,
-	}
-
-	newMember.ID = memberDTO.ID
-	_, err = memberService.MemberRepository.Update(newMember)
-
-	return err
-}
-
 func (memberService *MemberService) DeleteMember(memberID uint) error {
 	err := memberService.MemberRepository.Delete(memberID)
 	return err

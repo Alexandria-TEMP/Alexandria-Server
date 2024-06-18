@@ -118,12 +118,11 @@ func SetUpRouter() *gin.Engine {
 	branchRouter := router.Group("/api/v2/branches")
 	branchRouter.GET("/:branchID", branchController.GetBranch)
 	branchRouter.POST("", branchController.CreateBranch)
-	branchRouter.PUT("", branchController.UpdateBranch)
 	branchRouter.DELETE("/:branchID", branchController.DeleteBranch)
-	branchRouter.GET("/:branchID/branchreview-statuses", branchController.GetReviewStatus)
+	branchRouter.GET("/:branchID/review-statuses", branchController.GetAllBranchReviewStatuses)
 	branchRouter.GET("/reviews/:reviewID", branchController.GetReview)
 	branchRouter.POST("/reviews", branchController.CreateReview)
-	branchRouter.GET("/:branchID/can-branchreview/:memberID", branchController.MemberCanReview)
+	branchRouter.GET("/:branchID/can-review/:memberID", branchController.MemberCanReview)
 	branchRouter.GET("/collaborators/:collaboratorID", branchController.GetBranchCollaborator)
 	branchRouter.GET("/collaborators/all/:branchID", branchController.GetAllBranchCollaborators)
 	branchRouter.GET("/:branchID/render", branchController.GetRender)
@@ -138,9 +137,6 @@ func SetUpRouter() *gin.Engine {
 	})
 	router.POST("/api/v2/members", func(c *gin.Context) {
 		memberController.CreateMember(c)
-	})
-	router.PUT("/api/v2/members", func(c *gin.Context) {
-		memberController.UpdateMember(c)
 	})
 	router.DELETE("/api/v2/members/:memberID", func(c *gin.Context) {
 		memberController.DeleteMember(c)

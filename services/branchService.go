@@ -141,7 +141,7 @@ func (branchService *BranchService) DeleteBranch(branchID uint) error {
 	return nil
 }
 
-func (branchService *BranchService) GetReviewStatus(branchID uint) ([]models.BranchReviewDecision, error) {
+func (branchService *BranchService) GetAllBranchReviewStatuses(branchID uint) ([]models.BranchReviewDecision, error) {
 	// get branch
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 

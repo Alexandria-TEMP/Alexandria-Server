@@ -10,7 +10,6 @@ import (
 type ProjectPostService interface {
 	GetProjectPost(postID uint) (*models.ProjectPost, error)
 	CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error, error)
-	UpdateProjectPost(updatedPost *models.ProjectPost) error
 
 	// Return a filtered list of project post IDs
 	Filter(page, size int, form forms.ProjectPostFilterForm) ([]uint, error)

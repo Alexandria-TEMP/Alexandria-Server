@@ -334,7 +334,7 @@ func TestGetReviewStatusSuccess(t *testing.T) {
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	decisions, err := branchService.GetReviewStatus(uint(10))
+	decisions, err := branchService.GetAllBranchReviewStatuses(uint(10))
 	assert.Nil(t, err)
 	assert.Equal(t, []models.BranchReviewDecision{models.Approved, models.Rejected}, decisions)
 }
@@ -348,7 +348,7 @@ func TestGetReviewStatusFailedGetBranch(t *testing.T) {
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, errors.New("failed"))
 
-	_, err := branchService.GetReviewStatus(uint(10))
+	_, err := branchService.GetAllBranchReviewStatuses(uint(10))
 	assert.NotNil(t, err)
 }
 

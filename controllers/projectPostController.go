@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -100,45 +99,6 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 	// response
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, projectPost.IntoDTO())
-}
-
-// UpdateProjectPost godoc
-// @Summary 	Update project post
-// @Description Update any number of the aspects of a project post
-// @Tags 		project-posts
-// @Accept  	json
-// @Param 		Authorization header string true "Access Token"
-// @Param		post	body		models.ProjectPostDTO		true	"Updated Project Post"
-// @Produce		json
-// @Success 	200
-// @Failure		400		{object} 	utils.HTTPError
-// @Failure		404		{object} 	utils.HTTPError
-// @Router 		/project-posts 		[put]
-func (projectPostController *ProjectPostController) UpdateProjectPost(c *gin.Context) {
-	// extract post
-	updatedProjectPost := models.ProjectPost{}
-	err := c.BindJSON(&updatedProjectPost)
-
-	// TODO convert from project post DTO to updated project post
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot bind updated ProjectPost from request body: %s", err)})
-
-		return
-	}
-
-	// Update and add post to database here. For now just do this to test.
-	err = projectPostController.ProjectPostService.UpdateProjectPost(&updatedProjectPost)
-
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot update post: %s", err)})
-
-		return
-	}
-
-	// response
-	c.Header("Content-Type", "application/json")
-	c.Status(http.StatusOK)
 }
 
 // DeleteProjectPost godoc
