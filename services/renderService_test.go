@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -83,7 +84,7 @@ func testRenderSuccessTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(dirPath).AnyTimes()
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(renderDirPath).AnyTimes()
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
-	mockFilesystem.EXPECT().RenderExists().Return(true, "").Times(1)
+	mockFilesystem.EXPECT().RenderExists().Return("", nil).Times(1)
 	mockFilesystem.EXPECT().CreateCommit().Return(nil).Times(1)
 	mockBranchRepository.EXPECT().Update(successBranch).Return(successBranch, nil).Times(1)
 
@@ -131,7 +132,7 @@ func TestRenderExistsFailed(t *testing.T) {
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(dirPath).AnyTimes()
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(renderDirPath).AnyTimes()
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
-	mockFilesystem.EXPECT().RenderExists().Return(false, "").Times(1)
+	mockFilesystem.EXPECT().RenderExists().Return("", fmt.Errorf("oh no")).Times(1)
 	mockBranchRepository.EXPECT().Update(failedBranch).Return(failedBranch, nil).Times(1)
 
 	renderService.RenderBranch(pendingBranch)
@@ -186,7 +187,7 @@ func TestGetRenderFileSuccess(t *testing.T) {
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(100)).Times(1)
 	mockFilesystem.EXPECT().CheckoutBranch("0").Return(nil).Times(1)
-	mockFilesystem.EXPECT().RenderExists().Return(true, "").Times(1)
+	mockFilesystem.EXPECT().RenderExists().Return("", nil).Times(1)
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(renderFilePath)
 
 	returnedPath, err202, err404 := renderService.GetRenderFile(successBranch.ID)
@@ -298,7 +299,7 @@ func TestGetRenderDoesntExist(t *testing.T) {
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(100)).Times(1)
 	mockFilesystem.EXPECT().CheckoutBranch("0").Return(nil).Times(1)
-	mockFilesystem.EXPECT().RenderExists().Return(false, "").Times(1)
+	mockFilesystem.EXPECT().RenderExists().Return("", fmt.Errorf("oh no")).Times(1)
 	mockBranchRepository.EXPECT().Update(successBranch).Return(successBranch, nil)
 
 	_, err202, err404 := renderService.GetRenderFile(successBranch.ID)
