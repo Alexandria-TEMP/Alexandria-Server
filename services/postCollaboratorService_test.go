@@ -31,11 +31,13 @@ func postCollaboratorServiceSetup(t *testing.T) {
 	// Setup mocks
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 	mockPostCollaboratorRepository = mocks.NewMockModelRepositoryInterface[*models.PostCollaborator](mockCtrl)
+	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
 
 	// Setup SUT
 	postCollaboratorService = PostCollaboratorService{
-		MemberRepository:           mockMemberRepository,
 		PostCollaboratorRepository: mockPostCollaboratorRepository,
+		MemberRepository:           mockMemberRepository,
+		PostRepository:             mockPostRepository,
 	}
 }
 
@@ -179,6 +181,13 @@ func TestMergeContributors(t *testing.T) {
 	mockMemberRepository.EXPECT().GetByID(uint(1)).Return(&models.Member{Model: gorm.Model{ID: 1}}, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(2)).Return(&models.Member{Model: gorm.Model{ID: 2}}, nil)
 
+	mockPostRepository.EXPECT().GetByID(gomock.Any()).Return(&models.Post{
+		Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2},
+	}, nil).Times(1)
+	mockPostRepository.EXPECT().Update(&models.Post{
+		Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2, postCollaborator2again},
+	}).Return(nil, nil).Times(1)
+
 	assert.Nil(t, postCollaboratorService.MergeContributors(projectPostBefore, []*models.BranchCollaborator{branchCollaborator1, branchCollaborator2}))
 	assert.Equal(t, projectPostAfter, projectPostBefore)
 }
@@ -217,6 +226,13 @@ func TestMergeReviewers(t *testing.T) {
 			Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2, postCollaborator1again},
 		},
 	}
+
+	mockPostRepository.EXPECT().GetByID(gomock.Any()).Return(&models.Post{
+		Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2},
+	}, nil).Times(1)
+	mockPostRepository.EXPECT().Update(&models.Post{
+		Collaborators: []*models.PostCollaborator{postCollaborator1, postCollaborator2, postCollaborator1again},
+	}).Return(nil, nil).Times(1)
 
 	mockMemberRepository.EXPECT().GetByID(uint(1)).Return(&models.Member{Model: gorm.Model{ID: 1}}, nil)
 	mockMemberRepository.EXPECT().GetByID(uint(2)).Return(&models.Member{Model: gorm.Model{ID: 2}}, nil)
