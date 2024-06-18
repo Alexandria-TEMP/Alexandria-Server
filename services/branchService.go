@@ -179,6 +179,11 @@ func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm) 
 		return branchreview, fmt.Errorf("failed to find branch with id %v: %w", form.BranchID, err)
 	}
 
+	// ensure the branch isn't already closed
+	if branch.BranchOverallReviewStatus != models.BranchOpenForReview {
+		return branchreview, fmt.Errorf("branch is already reviewed with status '%v'", branch.BranchOverallReviewStatus)
+	}
+
 	// get member
 	member, err := branchService.MemberRepository.GetByID(form.ReviewingMemberID)
 
