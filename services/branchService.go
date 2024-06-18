@@ -81,6 +81,7 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 	branch := &models.Branch{
 		UpdatedPostTitle:                   branchCreationForm.UpdatedPostTitle,
 		UpdatedCompletionStatus:            branchCreationForm.UpdatedCompletionStatus,
+		UpdatedFeedbackPreferences:         branchCreationForm.UpdatedFeedbackPreferences,
 		UpdatedScientificFieldTagContainer: &models.ScientificFieldTagContainer{ScientificFieldTags: tags},
 		Collaborators:                      collaborators,
 		DiscussionContainer:                discussionContainer,
