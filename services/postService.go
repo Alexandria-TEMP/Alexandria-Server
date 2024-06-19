@@ -92,7 +92,7 @@ func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileH
 	post, err := postService.PostRepository.GetByID(postID)
 
 	if err != nil {
-		return fmt.Errorf("failed to find postID with id %v", postID)
+		return fmt.Errorf("failed to find postID with id %v: %w", postID, err)
 	}
 
 	// reject project posts
@@ -119,7 +119,7 @@ func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileH
 		_, _ = postService.PostRepository.Update(post)
 		_ = postService.Filesystem.Reset()
 
-		return fmt.Errorf("failed to save zip file")
+		return fmt.Errorf("failed to save zip file: %w", err)
 	}
 
 	// commit (or perhaps only commit after rendering?)
@@ -130,7 +130,7 @@ func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileH
 	// Set render status pending
 	post.RenderStatus = models.Pending
 	if _, err := postService.PostRepository.Update(post); err != nil {
-		return fmt.Errorf("failed to update post entity")
+		return fmt.Errorf("failed to update post entity: %w", err)
 	}
 
 	go postService.RenderService.RenderPost(post)
@@ -145,7 +145,7 @@ func (postService *PostService) GetMainProject(postID uint) (string, error) {
 	_, err := postService.PostRepository.GetByID(postID)
 
 	if err != nil {
-		return filePath, fmt.Errorf("failed to find post with id %v", postID)
+		return filePath, fmt.Errorf("failed to find post with id %v: %w", postID, err)
 	}
 
 	// select repository of the parent post
@@ -153,7 +153,7 @@ func (postService *PostService) GetMainProject(postID uint) (string, error) {
 
 	// checkout specified branch
 	if err := postService.Filesystem.CheckoutBranch("master"); err != nil {
-		return filePath, fmt.Errorf("failed to find master branch")
+		return filePath, fmt.Errorf("failed to find master branch: %w", err)
 	}
 
 	return postService.Filesystem.GetCurrentZipFilePath(), nil
@@ -164,7 +164,7 @@ func (postService *PostService) GetMainFiletree(postID uint) (map[string]int64, 
 	_, err := postService.PostRepository.GetByID(postID)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to find post with id %v", postID), nil
+		return nil, fmt.Errorf("failed to find post with id %v: %w", postID, err), nil
 	}
 
 	// select repository of the parent post
@@ -172,7 +172,7 @@ func (postService *PostService) GetMainFiletree(postID uint) (map[string]int64, 
 
 	// checkout specified branch
 	if err := postService.Filesystem.CheckoutBranch("master"); err != nil {
-		return nil, fmt.Errorf("failed to find master branch"), nil
+		return nil, fmt.Errorf("failed to find master branch: %w", err), nil
 	}
 
 	// get file tree
@@ -193,7 +193,7 @@ func (postService *PostService) GetMainFileFromProject(postID uint, relFilepath 
 	_, err := postService.PostRepository.GetByID(postID)
 
 	if err != nil {
-		return absFilepath, fmt.Errorf("failed to find post with id %v", postID)
+		return absFilepath, fmt.Errorf("failed to find post with id %v: %w", postID, err)
 	}
 
 	// select repository of the post
@@ -201,7 +201,7 @@ func (postService *PostService) GetMainFileFromProject(postID uint, relFilepath 
 
 	// checkout master
 	if err := postService.Filesystem.CheckoutBranch("master"); err != nil {
-		return absFilepath, fmt.Errorf("failed to find master branch")
+		return absFilepath, fmt.Errorf("failed to find master branch: %w", err)
 	}
 
 	absFilepath = filepath.Join(postService.Filesystem.GetCurrentQuartoDirPath(), relFilepath)
@@ -241,7 +241,7 @@ func (postService *PostService) Filter(page, size int, form forms.PostFilterForm
 func (postService *PostService) GetProjectPost(postID uint) (*models.ProjectPost, error) {
 	// Ensure the post itself exists
 	if _, err := postService.PostRepository.GetByID(postID); err != nil {
-		return nil, fmt.Errorf("failed to get post with ID %d", postID)
+		return nil, fmt.Errorf("failed to get post with ID %d: %w", postID, err)
 	}
 
 	// Query for a project post that has this post

@@ -3447,6 +3447,14 @@ const docTemplate = `{
                     ],
                     "example": "ongoing"
                 },
+                "updatedFeedbackPreferences": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                        }
+                    ],
+                    "example": "formal feedback"
+                },
                 "updatedPostTitle": {
                     "description": "MR's proposed changes",
                     "type": "string",
@@ -3638,6 +3646,10 @@ const docTemplate = `{
         "models.DiscussionDTO": {
             "type": "object",
             "properties": {
+                "createdAt": {
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
+                },
                 "id": {
                     "type": "integer",
                     "example": 1

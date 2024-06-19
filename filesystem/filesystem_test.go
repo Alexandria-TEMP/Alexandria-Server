@@ -279,8 +279,8 @@ func TestRenderExistsSuccess(t *testing.T) {
 
 	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup", "render")
 
-	exists, name := CurrentFilesystem.RenderExists()
-	assert.True(t, exists)
+	name, err := CurrentFilesystem.RenderExists()
+	assert.Nil(t, err)
 	assert.Equal(t, "1234.html", name)
 }
 
@@ -291,8 +291,8 @@ func TestRenderExistsNoFile(t *testing.T) {
 
 	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup", "badpath")
 
-	exists, _ := CurrentFilesystem.RenderExists()
-	assert.False(t, exists)
+	_, err := CurrentFilesystem.RenderExists()
+	assert.NotNil(t, err)
 }
 
 func TestRenderExistsMultipleFiles(t *testing.T) {
@@ -302,8 +302,8 @@ func TestRenderExistsMultipleFiles(t *testing.T) {
 
 	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_1")
 
-	exists, _ := CurrentFilesystem.RenderExists()
-	assert.False(t, exists)
+	_, err := CurrentFilesystem.RenderExists()
+	assert.NotNil(t, err)
 }
 
 func TestRenderExistsMultipleNotHtml(t *testing.T) {
@@ -313,8 +313,8 @@ func TestRenderExistsMultipleNotHtml(t *testing.T) {
 
 	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_2")
 
-	exists, _ := CurrentFilesystem.RenderExists()
-	assert.False(t, exists)
+	_, err := CurrentFilesystem.RenderExists()
+	assert.NotNil(t, err)
 }
 
 func TestGetFileTreeSuccess(t *testing.T) {

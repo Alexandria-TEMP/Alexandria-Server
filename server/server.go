@@ -83,6 +83,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 	postCollaboratorService := &services.PostCollaboratorService{
 		PostCollaboratorRepository: repositoryEnv.postCollaboratorRepository,
 		MemberRepository:           repositoryEnv.memberRepository,
+		PostRepository:             repositoryEnv.postRepository,
 	}
 	branchCollaboratorService := &services.BranchCollaboratorService{
 		BranchCollaboratorRepository: repositoryEnv.branchCollaboratorRepository,

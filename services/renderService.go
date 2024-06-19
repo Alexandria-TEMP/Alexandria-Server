@@ -1,7 +1,6 @@
 package services
 
 import (
-	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -38,7 +37,7 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, error,
 	projectPost, err := renderService.BranchService.GetBranchProjectPost(branch)
 
 	if err != nil {
-		return filePath, nil, fmt.Errorf("failed to find project post with id %v", branch.ProjectPostID)
+		return filePath, nil, fmt.Errorf("failed to find project post with id %v: %w", branch.ProjectPostID, err)
 	}
 
 	// if render is pending return 202
@@ -56,17 +55,16 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, error,
 
 	// checkout specified branch
 	if err := renderService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
-		return filePath, nil, fmt.Errorf("failed to find this git branch, with name %v", branchID)
+		return filePath, nil, fmt.Errorf("failed to find this git branch, with name %v: %w", branchID, err)
 	}
 
 	// verify render exists. if it doesn't set render status to failed
-	exists, fileName := renderService.Filesystem.RenderExists()
-
-	if !exists {
+	fileName, err := renderService.Filesystem.RenderExists()
+	if err != nil {
 		branch.RenderStatus = models.Failure
 		_, _ = renderService.BranchRepository.Update(branch)
 
-		return filePath, nil, fmt.Errorf("render has failed")
+		return filePath, nil, fmt.Errorf("render has failed: %w", err)
 	}
 
 	// set filepath to absolute path to render file
@@ -82,7 +80,7 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (string, erro
 	post, err := renderService.PostRepository.GetByID(postID)
 
 	if err != nil {
-		return filePath, nil, fmt.Errorf("failed to find post with id %v", postID)
+		return filePath, nil, fmt.Errorf("failed to find post with id %v: %w", postID, err)
 	}
 
 	// if render is pending return 202
@@ -100,17 +98,16 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (string, erro
 
 	// checkout master
 	if err := renderService.Filesystem.CheckoutBranch("master"); err != nil {
-		return filePath, nil, fmt.Errorf("failed to find master")
+		return filePath, nil, fmt.Errorf("failed to find master: %w", err)
 	}
 
 	// verify render exists. if it doesn't set render status to failed
-	exists, fileName := renderService.Filesystem.RenderExists()
-
-	if !exists {
+	fileName, err := renderService.Filesystem.RenderExists()
+	if err != nil {
 		post.RenderStatus = models.Failure
 		_, _ = renderService.PostRepository.Update(post)
 
-		return filePath, nil, fmt.Errorf("render has failed")
+		return filePath, nil, fmt.Errorf("render has failed: %w", err)
 	}
 
 	// set filepath to absolute path to render file
@@ -162,7 +159,7 @@ func (renderService *RenderService) RenderPost(post *models.Post) {
 	}
 
 	// Verify that a render was produced in the form of a single file
-	if exists, _ := renderService.Filesystem.RenderExists(); !exists {
+	if _, err := renderService.Filesystem.RenderExists(); err != nil {
 		renderService.FailPost(post)
 
 		return
@@ -233,7 +230,7 @@ func (renderService *RenderService) RenderBranch(branch *models.Branch) {
 	}
 
 	// Verify that a render was produced in the form of a single file
-	if exists, _ := renderService.Filesystem.RenderExists(); !exists {
+	if _, err := renderService.Filesystem.RenderExists(); err != nil {
 		renderService.FailBranch(branch)
 
 		return
@@ -290,7 +287,7 @@ func (renderService *RenderService) InstallRenderDependencies() error {
 		out, err := cmd.CombinedOutput()
 
 		if err != nil {
-			return errors.New(string(out))
+			return fmt.Errorf("%s: %w", string(out), err)
 		}
 	}
 
@@ -303,7 +300,7 @@ func (renderService *RenderService) InstallRenderDependencies() error {
 		out, err := cmd.CombinedOutput()
 
 		if err != nil {
-			return errors.New(string(out))
+			return fmt.Errorf("%s: %w", string(out), err)
 		}
 
 		// Install knitr
@@ -312,7 +309,7 @@ func (renderService *RenderService) InstallRenderDependencies() error {
 		out, err = cmd.CombinedOutput()
 
 		if err != nil {
-			return errors.New(string(out))
+			return fmt.Errorf("%s: %w", string(out), err)
 		}
 	}
 
@@ -334,27 +331,27 @@ func (renderService *RenderService) SetProjectConfig() error {
 	yamlFile, err := os.ReadFile(configFilepath)
 
 	if err != nil {
-		return fmt.Errorf("failed to open yaml config file")
+		return fmt.Errorf("failed to open yaml config file: %w", err)
 	}
 
 	err = yaml.Unmarshal(yamlFile, yamlObj)
 
 	if err != nil {
-		return fmt.Errorf("failed to unmarshal yaml config file")
+		return fmt.Errorf("failed to unmarshal yaml config file: %w", err)
 	}
 
 	yamlObj["format"] = map[string]interface{}{"html": map[string]interface{}{"page-layout": "custom"}}
 	yamlFile, err = yaml.Marshal(yamlObj)
 
 	if err != nil {
-		return fmt.Errorf("failed to marshal yaml config file")
+		return fmt.Errorf("failed to marshal yaml config file: %w", err)
 	}
 
 	var permMode fs.FileMode = 0o666
 	err = os.WriteFile(configFilepath, yamlFile, permMode)
 
 	if err != nil {
-		return fmt.Errorf("failed to write yaml config file back")
+		return fmt.Errorf("failed to write yaml config file back: %w", err)
 	}
 
 	return nil
@@ -379,7 +376,7 @@ func (renderService *RenderService) RunRender() error {
 	out, err := cmd.CombinedOutput()
 
 	if err != nil {
-		return fmt.Errorf("quarto failed to render:\n%v", out)
+		return fmt.Errorf("quarto failed to render:\n%v\nerror: %w", out, err)
 	}
 
 	return nil

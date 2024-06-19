@@ -230,6 +230,10 @@ definitions:
         allOf:
         - $ref: '#/definitions/models.ProjectCompletionStatus'
         example: ongoing
+      updatedFeedbackPreferences:
+        allOf:
+        - $ref: '#/definitions/models.ProjectFeedbackPreference'
+        example: formal feedback
       updatedPostTitle:
         description: MR's proposed changes
         example: Updated Project Post Title
@@ -361,6 +365,9 @@ definitions:
     type: object
   models.DiscussionDTO:
     properties:
+      createdAt:
+        example: "2024-06-16T16:00:43.234Z"
+        type: string
       id:
         example: 1
         type: integer
