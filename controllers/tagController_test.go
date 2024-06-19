@@ -171,3 +171,60 @@ func TestGetScientificFieldTagContainerGoodWeather(t *testing.T) {
 
 	assert.Equal(t, expectedScientificFieldTagContainerDTO, responseScientificFieldTagContainerDTO)
 }
+
+func TestGetCompletionStatusTags(t *testing.T) {
+	beforeEachTag(t)
+
+	// Construct request
+	req, err := http.NewRequest("GET", "/api/v2/tags/completion-status", http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check response
+	// We do NOT test the BODY return value of this endpoint - it's 100% hard-coded,
+	// and therefore testing it would only serve to make it brittle & resistant to change.
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+}
+
+func TestGetPostTypeTags(t *testing.T) {
+	beforeEachTag(t)
+
+	// Construct request
+	req, err := http.NewRequest("GET", "/api/v2/tags/post-type", http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check response
+	// We do NOT test the BODY return value of this endpoint - it's 100% hard-coded,
+	// and therefore testing it would only serve to make it brittle & resistant to change.
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+}
+
+func TestGetFeedbackPreferenceTags(t *testing.T) {
+	beforeEachTag(t)
+
+	// Construct request
+	req, err := http.NewRequest("GET", "/api/v2/tags/feedback-preference", http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check response
+	// We do NOT test the BODY return value of this endpoint - it's 100% hard-coded,
+	// and therefore testing it would only serve to make it brittle & resistant to change.
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+}

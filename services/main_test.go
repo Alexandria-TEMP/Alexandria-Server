@@ -31,7 +31,8 @@ var (
 	mockDiscussionContainerRepository         *mocks.MockModelRepositoryInterface[*models.DiscussionContainer]
 	mockDiscussionRepository                  *mocks.MockModelRepositoryInterface[*models.Discussion]
 	mockMemberRepository                      *mocks.MockModelRepositoryInterface[*models.Member]
-	mockScientificFieldTagContainerReposiotry *mocks.MockModelRepositoryInterface[*models.ScientificFieldTagContainer]
+	mockScientificFieldTagRepository          *mocks.MockModelRepositoryInterface[*models.ScientificFieldTag]
+	mockScientificFieldTagContainerRepository *mocks.MockModelRepositoryInterface[*models.ScientificFieldTagContainer]
 
 	mockFilesystem *mocks.MockFilesystem
 

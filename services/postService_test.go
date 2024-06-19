@@ -28,7 +28,7 @@ func postServiceSetup(t *testing.T) {
 	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
 	mockProjectPostRepository = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
-	mockScientificFieldTagContainerReposiotry = mocks.NewMockModelRepositoryInterface[*models.ScientificFieldTagContainer](mockCtrl)
+	mockScientificFieldTagContainerRepository = mocks.NewMockModelRepositoryInterface[*models.ScientificFieldTagContainer](mockCtrl)
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
 	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
 	mockRenderService = mocks.NewMockRenderService(mockCtrl)
@@ -39,7 +39,7 @@ func postServiceSetup(t *testing.T) {
 		PostRepository:                        mockPostRepository,
 		ProjectPostRepository:                 mockProjectPostRepository,
 		MemberRepository:                      mockMemberRepository,
-		ScientificFieldTagContainerRepository: mockScientificFieldTagContainerReposiotry,
+		ScientificFieldTagContainerRepository: mockScientificFieldTagContainerRepository,
 		Filesystem:                            mockFilesystem,
 		PostCollaboratorService:               mockPostCollaboratorService,
 		RenderService:                         mockRenderService,
@@ -104,7 +104,7 @@ func TestCreatePostGoodWeather(t *testing.T) {
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
 	mockFilesystem.EXPECT().CreateRepository().Return(nil)
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
-	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
+	mockScientificFieldTagContainerRepository.EXPECT().Create(emptyTagContainer).Return(nil)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)
@@ -186,7 +186,7 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
 	mockFilesystem.EXPECT().CreateRepository().Return(nil)
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
-	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
+	mockScientificFieldTagContainerRepository.EXPECT().Create(emptyTagContainer).Return(nil)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)
@@ -235,7 +235,7 @@ func TestCreatePostDatabaseFailure(t *testing.T) {
 		},
 	}, nil)
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
-	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
+	mockScientificFieldTagContainerRepository.EXPECT().Create(emptyTagContainer).Return(nil)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm)

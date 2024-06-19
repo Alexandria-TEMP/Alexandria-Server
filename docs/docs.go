@@ -1248,73 +1248,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/filter/project-posts": {
-            "get": {
-                "description": "Returns all project post IDs that meet the requirements in the form\nEndpoint is offset-paginated",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "filtering"
-                ],
-                "summary": "Filters all project posts",
-                "parameters": [
-                    {
-                        "description": "Project post filter form",
-                        "name": "form",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/forms.ProjectPostFilterForm"
-                        }
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "size",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
         "/members": {
             "get": {
                 "description": "Get the ID of every member in the database.",
@@ -3372,9 +3305,6 @@ const docTemplate = `{
                     "example": "Project Post Title"
                 }
             }
-        },
-        "forms.ProjectPostFilterForm": {
-            "type": "object"
         },
         "forms.ReplyDiscussionCreationForm": {
             "type": "object",
