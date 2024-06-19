@@ -263,7 +263,7 @@ func (branchService *BranchService) closeBranch(branch *models.Branch) error {
 
 	// remove branch from open branches
 	if _, err := branchService.BranchRepository.Update(branch); err != nil {
-		return fmt.Errorf("failed to update branch")
+		return fmt.Errorf("failed to update branch: %w", err)
 	}
 
 	newOpenBranches := []*models.Branch{}
@@ -278,7 +278,7 @@ func (branchService *BranchService) closeBranch(branch *models.Branch) error {
 
 	// save changes to project post and branch
 	if _, err := branchService.ProjectPostRepository.Update(projectPost); err != nil {
-		return fmt.Errorf("failed to save project post and branch")
+		return fmt.Errorf("failed to save project post and branch: %w", err)
 	}
 
 	return nil
@@ -301,7 +301,7 @@ func (branchService *BranchService) merge(branch *models.Branch, closedBranch *m
 	})
 
 	if err != nil {
-		return fmt.Errorf("failed to find merged branches in ClosedBranchRepository")
+		return fmt.Errorf("failed to find merged branches in ClosedBranchRepository: %w", err)
 	}
 
 	if len(mergedBranches) >= 1 {
@@ -382,7 +382,7 @@ func (branchService *BranchService) GetProject(branchID uint) (string, error) {
 
 	// checkout specified branch
 	if err := branchService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
-		return filePath, fmt.Errorf("failed to find this git branch, with name %v", branchID)
+		return filePath, fmt.Errorf("failed to find this git branch, with name %v: %w", branchID, err)
 	}
 
 	return branchService.Filesystem.GetCurrentZipFilePath(), nil
@@ -423,7 +423,7 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 		_, _ = branchService.BranchRepository.Update(branch)
 		_ = branchService.Filesystem.Reset()
 
-		return fmt.Errorf("failed to save zip file")
+		return fmt.Errorf("failed to save zip file: %w", err)
 	}
 
 	// commit
@@ -434,7 +434,7 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 	// Set render status pending
 	branch.RenderStatus = models.Pending
 	if _, err := branchService.BranchRepository.Update(branch); err != nil {
-		return fmt.Errorf("failed to update branch entity")
+		return fmt.Errorf("failed to update branch entity: %w", err)
 	}
 
 	go branchService.RenderService.RenderBranch(branch)
@@ -477,7 +477,7 @@ func (branchService *BranchService) GetBranchProjectPost(branch *models.Branch) 
 	if branch.ProjectPostID == nil {
 		closedBranches, err := branchService.ClosedBranchRepository.Query(&models.ClosedBranch{BranchID: branch.ID})
 		if err != nil || len(closedBranches) == 0 {
-			return nil, fmt.Errorf("failed to find the closed branch for branch with id %v", branch.ID)
+			return nil, fmt.Errorf("failed to find the closed branch for branch with id %v: %w", branch.ID, err)
 		}
 
 		projectPostID = closedBranches[0].ProjectPostID
@@ -488,14 +488,14 @@ func (branchService *BranchService) GetBranchProjectPost(branch *models.Branch) 
 	projectPost, err := branchService.ProjectPostRepository.GetByID(projectPostID)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to get project post with id %v", projectPostID)
+		return nil, fmt.Errorf("failed to get project post with id %v: %w", projectPostID, err)
 	}
 
 	// set discussion container (isn't preloaded properly)
 	discussionContainer, err := branchService.DiscussionContainerRepository.GetByID(projectPost.Post.DiscussionContainerID)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to get discussion container")
+		return nil, fmt.Errorf("failed to get discussion container: %w", err)
 	}
 
 	projectPost.Post.DiscussionContainer = *discussionContainer
@@ -504,7 +504,7 @@ func (branchService *BranchService) GetBranchProjectPost(branch *models.Branch) 
 	projectPost.ClosedBranches, err = branchService.ClosedBranchRepository.Query(&models.ClosedBranch{ProjectPostID: projectPost.ID})
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to get closed branches for project post")
+		return nil, fmt.Errorf("failed to get closed branches for project post: %w", err)
 	}
 
 	return projectPost, nil
@@ -537,7 +537,7 @@ func (branchService *BranchService) GetFileFromProject(branchID uint, relFilepat
 
 	// checkout specified branch
 	if err := branchService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
-		return absFilepath, fmt.Errorf("failed to find this git branch, with name %v", branchID)
+		return absFilepath, fmt.Errorf("failed to find this git branch, with name %v: %w", branchID, err)
 	}
 
 	absFilepath = filepath.Join(branchService.Filesystem.GetCurrentQuartoDirPath(), relFilepath)
@@ -554,7 +554,7 @@ func (branchService *BranchService) GetClosedBranch(closedBranchID uint) (*model
 	closedBranch, err := branchService.ClosedBranchRepository.GetByID(closedBranchID)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to find closed branch with id %v", closedBranchID)
+		return nil, fmt.Errorf("failed to find closed branch with id %v: %w", closedBranchID, err)
 	}
 
 	return closedBranch, nil

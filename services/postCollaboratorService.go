@@ -76,7 +76,7 @@ func (postCollaboratorService *PostCollaboratorService) MergeReviewers(projectPo
 		// otherwise we add this post collaborator
 		reviewMember, err := postCollaboratorService.MemberRepository.GetByID(review.MemberID)
 		if err != nil {
-			return fmt.Errorf("failed to get reviewing member from db")
+			return fmt.Errorf("failed to get reviewing member from db: %w", err)
 		}
 
 		asPostCollaborator := &models.PostCollaborator{
@@ -126,7 +126,7 @@ func (postCollaboratorService *PostCollaboratorService) MergeContributors(projec
 		// otherwise we add this post collaborator
 		branchCollaboratorMember, err := postCollaboratorService.MemberRepository.GetByID(branchCollaborator.MemberID)
 		if err != nil {
-			return fmt.Errorf("failed to get contributing member from db")
+			return fmt.Errorf("failed to get contributing member from db: %w", err)
 		}
 
 		asPostCollaborator := &models.PostCollaborator{

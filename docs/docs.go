@@ -3517,6 +3517,14 @@ const docTemplate = `{
                     ],
                     "example": "ongoing"
                 },
+                "updatedFeedbackPreferences": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                        }
+                    ],
+                    "example": "formal feedback"
+                },
                 "updatedPostTitle": {
                     "description": "MR's proposed changes",
                     "type": "string",
