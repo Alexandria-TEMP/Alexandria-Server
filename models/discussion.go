@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -24,10 +25,11 @@ type Discussion struct {
 }
 
 type DiscussionDTO struct {
-	ID       uint   `json:"id" example:"1"`
-	MemberID *uint  `json:"memberID" example:"1"`
-	ReplyIDs []uint `json:"replyIDs" example:"2"`
-	Text     string `json:"text" example:"Discussion content."`
+	ID        uint      `json:"id" example:"1"`
+	MemberID  *uint     `json:"memberID" example:"1"`
+	ReplyIDs  []uint    `json:"replyIDs" example:"2"`
+	Text      string    `json:"text" example:"Discussion content."`
+	CreatedAt time.Time `json:"createdAt" example:"2024-06-16T16:00:43.234Z"`
 }
 
 func (model *Discussion) GetID() uint {
@@ -40,6 +42,7 @@ func (model *Discussion) IntoDTO() DiscussionDTO {
 		model.MemberID,
 		discussionsIntoIDs(model.Replies),
 		model.Text,
+		model.CreatedAt,
 	}
 }
 
