@@ -367,6 +367,9 @@ definitions:
     type: object
   models.DiscussionDTO:
     properties:
+      createdAt:
+        example: "2024-06-16T16:00:43.234Z"
+        type: string
       id:
         example: 1
         type: integer

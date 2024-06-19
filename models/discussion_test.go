@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"testing"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -13,9 +14,11 @@ func TestDiscussionJSONMarshaling(t *testing.T) {
 
 	var memberID uint = 28
 
+	createdAt := time.Now().UTC()
+
 	// This model...
 	model := Discussion{
-		Model:    gorm.Model{ID: 100},
+		Model:    gorm.Model{ID: 100, CreatedAt: createdAt},
 		Member:   &Member{},
 		MemberID: &memberID,
 		Replies: []*Discussion{
@@ -32,10 +35,11 @@ func TestDiscussionJSONMarshaling(t *testing.T) {
 
 	// should equal this DTO!
 	targetDTO := DiscussionDTO{
-		ID:       100,
-		MemberID: &memberID,
-		ReplyIDs: []uint{50, 88},
-		Text:     "Test!",
+		ID:        100,
+		MemberID:  &memberID,
+		ReplyIDs:  []uint{50, 88},
+		Text:      "Test!",
+		CreatedAt: createdAt,
 	}
 
 	dto := DiscussionDTO{}

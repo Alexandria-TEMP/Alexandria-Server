@@ -3716,6 +3716,10 @@ const docTemplate = `{
         "models.DiscussionDTO": {
             "type": "object",
             "properties": {
+                "createdAt": {
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
+                },
                 "id": {
                     "type": "integer",
                     "example": 1
