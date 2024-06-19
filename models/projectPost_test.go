@@ -6,8 +6,30 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
+
+func TestProjectCompletionStatusIsValid(t *testing.T) {
+	var good, bad ProjectCompletionStatus = Idea, ""
+
+	assert.True(t, good.IsValid())
+	assert.False(t, bad.IsValid())
+}
+
+func TestProjectFeedbackPreference(t *testing.T) {
+	var good, bad ProjectFeedbackPreference = DiscussionFeedback, ""
+
+	assert.True(t, good.IsValid())
+	assert.False(t, bad.IsValid())
+}
+
+func TestProjectReviewStatusIsValid(t *testing.T) {
+	var good, bad ProjectReviewStatus = RevisionNeeded, ""
+
+	assert.True(t, good.IsValid())
+	assert.False(t, bad.IsValid())
+}
 
 func TestProjectPostJSONMarshaling(t *testing.T) {
 	// This model...

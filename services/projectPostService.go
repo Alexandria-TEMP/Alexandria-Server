@@ -147,22 +147,6 @@ func (projectPostService *ProjectPostService) createPostForProjectPost(form *for
 	return post, nil
 }
 
-func (projectPostService *ProjectPostService) Filter(page, size int, _ forms.ProjectPostFilterForm) ([]uint, error) {
-	// TODO construct query based off filter form
-	posts, err := projectPostService.ProjectPostRepository.QueryPaginated(page, size)
-	if err != nil {
-		return nil, err
-	}
-
-	// Extract IDs from the list of posts
-	ids := make([]uint, len(posts))
-	for i, post := range posts {
-		ids[i] = post.ID
-	}
-
-	return ids, nil
-}
-
 func (projectPostService *ProjectPostService) GetBranchesGroupedByReviewStatus(projectPostID uint) (*models.BranchesGroupedByReviewStatusDTO, error) {
 	// Get the project post
 	projectPost, err := projectPostService.ProjectPostRepository.GetByID(projectPostID)

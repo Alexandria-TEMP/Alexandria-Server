@@ -1311,73 +1311,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/filter/project-posts": {
-            "get": {
-                "description": "Returns all project post IDs that meet the requirements in the form\nEndpoint is offset-paginated",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "filtering"
-                ],
-                "summary": "Filters all project posts",
-                "parameters": [
-                    {
-                        "description": "Project post filter form",
-                        "name": "form",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/forms.ProjectPostFilterForm"
-                        }
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page query",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "size",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.HTTPError"
-                        }
-                    }
-                }
-            }
-        },
         "/members": {
             "get": {
                 "description": "Get the ID of every member in the database.",
@@ -3606,9 +3539,6 @@ const docTemplate = `{
                 }
             }
         },
-        "forms.ProjectPostFilterForm": {
-            "type": "object"
-        },
         "forms.ReplyDiscussionCreationForm": {
             "type": "object",
             "properties": {
@@ -3753,6 +3683,14 @@ const docTemplate = `{
                         }
                     ],
                     "example": "ongoing"
+                },
+                "updatedFeedbackPreferences": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ProjectFeedbackPreference"
+                        }
+                    ],
+                    "example": "formal feedback"
                 },
                 "updatedPostTitle": {
                     "description": "MR's proposed changes",
@@ -3945,6 +3883,10 @@ const docTemplate = `{
         "models.DiscussionDTO": {
             "type": "object",
             "properties": {
+                "createdAt": {
+                    "type": "string",
+                    "example": "2024-06-16T16:00:43.234Z"
+                },
                 "id": {
                     "type": "integer",
                     "example": 1
@@ -4326,7 +4268,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "2.0",
 	Host:             "localhost:8080",
 	BasePath:         "/api/v2",
-	Schemes:          []string{},
+	Schemes:          []string{"http"},
 	Title:            "Alexandria API",
 	Description:      "This is the API of Alexandria.",
 	InfoInstanceName: "swagger",

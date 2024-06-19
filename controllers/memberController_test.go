@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -26,7 +27,7 @@ func beforeEachMember(t *testing.T) {
 
 	mockMemberService = mock_interfaces.NewMockMemberService(mockCtrl)
 	mockTagService = mock_interfaces.NewMockTagService(mockCtrl)
-	memberController = &MemberController{MemberService: mockMemberService, TagService: mockTagService}
+	memberController = MemberController{MemberService: mockMemberService, TagService: mockTagService}
 }
 
 func TestGetMember200(t *testing.T) {
@@ -143,49 +144,6 @@ func TestDeleteMember404(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
 
-// func TestUpdateMember200(t *testing.T) {
-// 	beforeEachMember(t)
-
-// 	mockMemberService.EXPECT().UpdateMember(&exampleMemberDTO, gomock.Any()).Return(nil).Times(1)
-// 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
-
-// 	exampleMemberDTOJSON, _ := json.Marshal(exampleMemberDTO)
-// 	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(exampleMemberDTOJSON))
-// 	router.ServeHTTP(responseRecorder, req)
-
-// 	defer responseRecorder.Result().Body.Close()
-
-// 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
-// }
-
-// func TestUpdateMember400(t *testing.T) {
-// 	beforeEachMember(t)
-
-// 	mockMemberService.EXPECT().UpdateMember(gomock.Any(), gomock.Any()).Return(nil).Times(0)
-
-// 	badMemberFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
-// 	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(badMemberFormJSON))
-// 	router.ServeHTTP(responseRecorder, req)
-
-// 	defer responseRecorder.Result().Body.Close()
-
-// 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-// }
-// func TestUpdateMember404(t *testing.T) {
-// 	beforeEachMember(t)
-
-// 	mockMemberService.EXPECT().UpdateMember(gomock.Any(), gomock.Any()).Return(errors.New("some error")).Times(1)
-// 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
-
-// 	exampleMemberDTOJSON, _ := json.Marshal(exampleMemberDTO)
-// 	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(exampleMemberDTOJSON))
-// 	router.ServeHTTP(responseRecorder, req)
-
-// 	defer responseRecorder.Result().Body.Close()
-
-// 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
-// }
-
 func TestGetAllMembers200(t *testing.T) {
 	beforeEachMember(t)
 	mockMemberService.EXPECT().GetAllMembers().Return([]*models.MemberShortFormDTO{
@@ -224,7 +182,7 @@ func TestGetAllMembers404(t *testing.T) {
 func TestLoginMember200(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(&exampleMemberLoggedInDTO, nil)
+	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(&exampleMember, "access", "refresh", nil)
 
 	exampleMemberAuthFormJSON, _ := json.Marshal(exampleMemberAuthForm)
 	req, _ := http.NewRequest("GET", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
@@ -349,4 +307,72 @@ func TestRefreshToken401(t *testing.T) {
 	_ = json.Unmarshal(responseJSON, &responsemember)
 
 	assert.Equal(t, http.StatusUnauthorized, responseRecorder.Result().StatusCode)
+}
+
+func TestCreateMemberFormValidationFailed(t *testing.T) {
+	beforeEachMember(t)
+
+	form := forms.MemberCreationForm{
+		FirstName:             "",
+		LastName:              "",
+		Email:                 "",
+		Password:              "",
+		Institution:           "",
+		ScientificFieldTagIDs: []uint{},
+	}
+
+	// Marshal form
+	body, err := json.Marshal(form)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Construct request
+	req, err := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestCreateMemberDatabaseFailed(t *testing.T) {
+	beforeEachMember(t)
+
+	form := forms.MemberCreationForm{
+		FirstName:             "John",
+		LastName:              "Doe",
+		Email:                 "todo@todo.todo",
+		Password:              "password",
+		Institution:           "TU delft",
+		ScientificFieldTagIDs: []uint{},
+	}
+
+	// Marshal form
+	body, err := json.Marshal(form)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Setup mocks
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
+	mockMemberService.EXPECT().CreateMember(&form, gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
+
+	// Construct request
+	req, err := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Result().StatusCode)
 }

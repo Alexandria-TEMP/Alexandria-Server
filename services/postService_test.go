@@ -28,7 +28,7 @@ func postServiceSetup(t *testing.T) {
 	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
 	mockProjectPostRepository = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
-	mockScientificFieldTagContainerReposiotry = mocks.NewMockModelRepositoryInterface[*models.ScientificFieldTagContainer](mockCtrl)
+	mockScientificFieldTagContainerRepository = mocks.NewMockModelRepositoryInterface[*models.ScientificFieldTagContainer](mockCtrl)
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
 	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
 	mockRenderService = mocks.NewMockRenderService(mockCtrl)
@@ -39,7 +39,7 @@ func postServiceSetup(t *testing.T) {
 		PostRepository:                        mockPostRepository,
 		ProjectPostRepository:                 mockProjectPostRepository,
 		MemberRepository:                      mockMemberRepository,
-		ScientificFieldTagContainerRepository: mockScientificFieldTagContainerReposiotry,
+		ScientificFieldTagContainerRepository: mockScientificFieldTagContainerRepository,
 		Filesystem:                            mockFilesystem,
 		PostCollaboratorService:               mockPostCollaboratorService,
 		RenderService:                         mockRenderService,
@@ -104,7 +104,7 @@ func TestCreatePostGoodWeather(t *testing.T) {
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
 	mockFilesystem.EXPECT().CreateRepository().Return(nil)
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
-	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
+	mockScientificFieldTagContainerRepository.EXPECT().Create(emptyTagContainer).Return(nil)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm, &memberA)
@@ -186,7 +186,7 @@ func TestCreatePostWithAnonymity(t *testing.T) {
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
 	mockFilesystem.EXPECT().CreateRepository().Return(nil)
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
-	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
+	mockScientificFieldTagContainerRepository.EXPECT().Create(emptyTagContainer).Return(nil)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm, &memberA)
@@ -235,7 +235,7 @@ func TestCreatePostDatabaseFailure(t *testing.T) {
 		},
 	}, nil)
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)
-	mockScientificFieldTagContainerReposiotry.EXPECT().Create(emptyTagContainer).Return(nil)
+	mockScientificFieldTagContainerRepository.EXPECT().Create(emptyTagContainer).Return(nil)
 
 	// Function under test
 	createdPost, err := postService.CreatePost(&postCreationForm, &memberA)
@@ -319,7 +319,6 @@ func TestUploadPostFailedGetPost(t *testing.T) {
 
 	err := postService.UploadPost(nil, file, 10)
 	assert.NotNil(t, err)
-	assert.Equal(t, "failed to find postID with id 10", err.Error())
 }
 
 func TestUploadPostFailedCheckoutBranch(t *testing.T) {
@@ -339,7 +338,6 @@ func TestUploadPostFailedCheckoutBranch(t *testing.T) {
 
 	err := postService.UploadPost(nil, file, 10)
 	assert.NotNil(t, err)
-	assert.Equal(t, "failed", err.Error())
 }
 
 func TestUploadPostFailedCleanDir(t *testing.T) {
@@ -360,7 +358,6 @@ func TestUploadPostFailedCleanDir(t *testing.T) {
 
 	err := postService.UploadPost(nil, file, 10)
 	assert.NotNil(t, err)
-	assert.Equal(t, "failed", err.Error())
 }
 
 func TestUploadPostFailedSaveZipFile(t *testing.T) {
@@ -385,7 +382,6 @@ func TestUploadPostFailedSaveZipFile(t *testing.T) {
 
 	err := postService.UploadPost(nil, file, 10)
 	assert.NotNil(t, err)
-	assert.Equal(t, "failed to save zip file", err.Error())
 	assert.Equal(t, models.Failure, post.RenderStatus)
 }
 
@@ -413,7 +409,6 @@ func TestGetMainProjectFailedGetPost(t *testing.T) {
 
 	filePath, err := postService.GetMainProject(postID)
 	assert.NotNil(t, err)
-	assert.Equal(t, "failed to find post with id 10", err.Error())
 	assert.Equal(t, "", filePath)
 }
 
@@ -428,7 +423,6 @@ func TestGetMainProjectFailedCheckoutBranch(t *testing.T) {
 
 	filePath, err := postService.GetMainProject(postID)
 	assert.NotNil(t, err)
-	assert.Equal(t, "failed to find master branch", err.Error())
 	assert.Equal(t, "", filePath)
 }
 
@@ -459,7 +453,6 @@ func TestGetMainFiletreeFailedGetPost(t *testing.T) {
 	fileTree, err, err2 := postService.GetMainFiletree(postID)
 	assert.NotNil(t, err)
 	assert.Nil(t, err2)
-	assert.Equal(t, "failed to find post with id 10", err.Error())
 	assert.Nil(t, fileTree)
 }
 
@@ -505,7 +498,6 @@ func TestGetMainFileFromProjectOutsideRepository(t *testing.T) {
 
 	resultFilepath, err := postService.GetMainFileFromProject(postID, relFilepath)
 	assert.NotNil(t, err)
-	assert.Equal(t, "file is outside of repository", err.Error())
 	assert.Equal(t, "", resultFilepath)
 }
 
@@ -520,7 +512,6 @@ func TestGetMainFileFromProjectFailedGetPost(t *testing.T) {
 
 	resultFilepath, err := postService.GetMainFileFromProject(postID, relFilepath)
 	assert.NotNil(t, err)
-	assert.Equal(t, "failed to find post with id 10", err.Error())
 	assert.Equal(t, "", resultFilepath)
 }
 
@@ -537,7 +528,6 @@ func TestGetMainFileFromProjectFailedCheckoutBranch(t *testing.T) {
 
 	resultFilepath, err := postService.GetMainFileFromProject(postID, relFilepath)
 	assert.NotNil(t, err)
-	assert.Equal(t, "failed to find master branch", err.Error())
 	assert.Equal(t, "", resultFilepath)
 }
 

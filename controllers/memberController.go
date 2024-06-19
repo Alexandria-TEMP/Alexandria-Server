@@ -223,11 +223,17 @@ func (memberController *MemberController) LoginMember(c *gin.Context) {
 		return
 	}
 
-	loggedInMember, err := memberController.MemberService.LogInMember(form)
+	member, at, rt, err := memberController.MemberService.LogInMember(form)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("failed to log in: %s", err.Error())})
 
 		return
+	}
+
+	loggedInMember := models.LoggedInMemberDTO{
+		Member:       member.IntoDTO(),
+		AccessToken:  at,
+		RefreshToken: rt,
 	}
 
 	c.JSON(http.StatusOK, loggedInMember)

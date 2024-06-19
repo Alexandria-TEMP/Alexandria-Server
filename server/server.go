@@ -106,19 +106,20 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, sec
 		MemberRepository: repositoryEnv.memberRepository,
 	}
 	branchService := &services.BranchService{
-		BranchRepository:              repositoryEnv.branchRepository,
-		ClosedBranchRepository:        repositoryEnv.closedBranchRepository,
-		PostRepository:                repositoryEnv.postRepository,
-		ProjectPostRepository:         repositoryEnv.projectPostRepository,
-		ReviewRepository:              repositoryEnv.reviewRepository,
-		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
-		DiscussionRepository:          repositoryEnv.discussionRepository,
-		MemberRepository:              repositoryEnv.memberRepository,
-		Filesystem:                    fs,
-		RenderService:                 renderService,
-		BranchCollaboratorService:     branchCollaboratorService,
-		PostCollaboratorService:       postCollaboratorService,
-		TagService:                    tagService,
+		BranchRepository:                      repositoryEnv.branchRepository,
+		ClosedBranchRepository:                repositoryEnv.closedBranchRepository,
+		PostRepository:                        repositoryEnv.postRepository,
+		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
+		ReviewRepository:                      repositoryEnv.reviewRepository,
+		DiscussionContainerRepository:         repositoryEnv.discussionContainerRepository,
+		DiscussionRepository:                  repositoryEnv.discussionRepository,
+		MemberRepository:                      repositoryEnv.memberRepository,
+		Filesystem:                            fs,
+		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
+		RenderService:                         renderService,
+		BranchCollaboratorService:             branchCollaboratorService,
+		PostCollaboratorService:               postCollaboratorService,
+		TagService:                            tagService,
 	}
 	projectPostService := &services.ProjectPostService{
 		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
@@ -185,8 +186,7 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 			DiscussionContainerService: serviceEnv.discussionContainerService,
 		},
 		filterController: &controllers.FilterController{
-			PostService:        serviceEnv.postService,
-			ProjectPostService: serviceEnv.projectPostService,
+			PostService: serviceEnv.postService,
 		},
 		branchController: &controllers.BranchController{
 			BranchService:             serviceEnv.branchService,

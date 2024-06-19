@@ -566,7 +566,7 @@ func TestUploadProject200(t *testing.T) {
 
 	writer.Close()
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches/1", body)
+	req, _ := http.NewRequest("POST", "/api/v2/branches/1/upload", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	router.ServeHTTP(responseRecorder, req)
 
@@ -580,7 +580,7 @@ func TestUploadProject400NoFile(t *testing.T) {
 
 	mockBranchService.EXPECT().UploadProject(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches/1", http.NoBody)
+	req, _ := http.NewRequest("POST", "/api/v2/branches/1/upload", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
 	defer responseRecorder.Result().Body.Close()
@@ -600,7 +600,7 @@ func TestUploadProject400InvalidID(t *testing.T) {
 
 	writer.Close()
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches/bad", body)
+	req, _ := http.NewRequest("POST", "/api/v2/branches/bad/upload", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	router.ServeHTTP(responseRecorder, req)
 
@@ -621,7 +621,7 @@ func TestUploadProject500(t *testing.T) {
 
 	writer.Close()
 
-	req, _ := http.NewRequest("POST", "/api/v2/branches/1", body)
+	req, _ := http.NewRequest("POST", "/api/v2/branches/1/upload", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	router.ServeHTTP(responseRecorder, req)
 
@@ -856,4 +856,100 @@ func TestGetReviewStatusBranchDNE(t *testing.T) {
 
 	// Check status
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}
+
+func TestGetClosedBranch(t *testing.T) {
+	beforeEachBranch(t)
+
+	// Setup data
+	branchID := uint(8)
+	closedBranchID := uint(5)
+	supercededBranchID := uint(10)
+	projectPostID := uint(2)
+
+	closedBranch := &models.ClosedBranch{
+		Model:                gorm.Model{ID: closedBranchID},
+		Branch:               models.Branch{},
+		BranchID:             branchID,
+		SupercededBranch:     &models.Branch{},
+		SupercededBranchID:   &supercededBranchID,
+		ProjectPostID:        projectPostID,
+		BranchReviewDecision: models.Approved,
+	}
+
+	// Setup mocks
+	mockBranchService.EXPECT().GetClosedBranch(closedBranchID).Return(closedBranch, nil).Times(1)
+
+	// Construct request
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/branches/closed/%d", closedBranchID), http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+
+	// Decode body
+	responseClosedBranchDTO := &models.ClosedBranchDTO{}
+	if err := json.NewDecoder(responseRecorder.Result().Body).Decode(responseClosedBranchDTO); err != nil {
+		t.Fatal(err)
+	}
+
+	expectedClosedBranchDTO := &models.ClosedBranchDTO{
+		ID:                   closedBranchID,
+		BranchID:             branchID,
+		SupercededBranchID:   &supercededBranchID,
+		ProjectPostID:        projectPostID,
+		BranchReviewDecision: models.Approved,
+	}
+
+	// Check body
+	assert.Equal(t, expectedClosedBranchDTO, responseClosedBranchDTO)
+}
+
+func TestGetClosedBranchDNE(t *testing.T) {
+	beforeEachBranch(t)
+
+	// Setup data
+	closedBranchID := uint(10)
+
+	// Setup mocks
+	mockBranchService.EXPECT().GetClosedBranch(closedBranchID).Return(nil, fmt.Errorf("oh no")).Times(1)
+
+	// Construct request
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/branches/closed/%d", closedBranchID), http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}
+
+func TestGetClosedBranchInvalidID(t *testing.T) {
+	beforeEachBranch(t)
+
+	// Setup data
+	closedBranchID := "Bad!!!"
+
+	// Construct request
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/branches/closed/%s", closedBranchID), http.NoBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }

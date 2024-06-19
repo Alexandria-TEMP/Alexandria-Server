@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"mime/multipart"
 	"path/filepath"
 	"testing"
@@ -1127,5 +1128,47 @@ func TestCreateReviewFailsWhenAlreadyReviewed(t *testing.T) {
 
 	// Function under test
 	_, err := branchService.CreateReview(reviewCreationForm, &models.Member{})
+	assert.NotNil(t, err)
+}
+
+func TestGetReviewGoodWeather(t *testing.T) {
+	beforeEachBranch(t)
+
+	// Setup data
+	reviewID := uint(5)
+
+	expectedBranchReview := &models.BranchReview{
+		Model:                gorm.Model{ID: reviewID},
+		BranchID:             10,
+		Member:               models.Member{Model: gorm.Model{ID: 9}},
+		MemberID:             9,
+		BranchReviewDecision: models.Approved,
+		Feedback:             "nice job mate",
+	}
+
+	// Setup mocks
+	mockBranchReviewRepository.EXPECT().GetByID(reviewID).Return(expectedBranchReview, nil).Times(1)
+
+	// Function under test
+	actualBranchReview, err := branchService.GetReview(reviewID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, expectedBranchReview, actualBranchReview)
+}
+
+func TestGetReviewNotFound(t *testing.T) {
+	beforeEachBranch(t)
+
+	// Setup data
+	reviewID := uint(9)
+
+	// Setup mocks
+	mockBranchReviewRepository.EXPECT().GetByID(reviewID).Return(nil, fmt.Errorf("oh no")).Times(1)
+
+	// Function under test
+	_, err := branchService.GetReview(reviewID)
+
 	assert.NotNil(t, err)
 }

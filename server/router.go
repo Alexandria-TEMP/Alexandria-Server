@@ -61,7 +61,6 @@ func SetUpRouter(controllers *ControllerEnv, secret string) *gin.Engine {
 func filterRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {
 	filterRouter := v2.Group("/filter")
 	filterRouter.GET("/posts", pagination.Default(), controllers.filterController.FilterPosts)
-	filterRouter.GET("/project-posts", pagination.Default(), controllers.filterController.FilterProjectPosts)
 }
 
 func tagRouter(v2 *gin.RouterGroup, controllers *ControllerEnv) {

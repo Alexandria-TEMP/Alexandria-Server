@@ -9,6 +9,20 @@ import (
 	"gorm.io/gorm"
 )
 
+func TestRenderStatusIsValid(t *testing.T) {
+	var good, bad RenderStatus = Pending, ""
+
+	assert.True(t, good.IsValid())
+	assert.False(t, bad.IsValid())
+}
+
+func TestBranchOverallReviewStatusIsValid(t *testing.T) {
+	var good, bad BranchOverallReviewStatus = BranchOpenForReview, ""
+
+	assert.True(t, good.IsValid())
+	assert.False(t, bad.IsValid())
+}
+
 func TestBranchJSONMarshaling(t *testing.T) {
 	projectPostID := uint(45)
 	updatedPostTitle := "Updated Post Title"

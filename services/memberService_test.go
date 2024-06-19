@@ -10,6 +10,7 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	gomock "go.uber.org/mock/gomock"
+	"gorm.io/gorm"
 )
 
 func beforeEachMember(t *testing.T) {
@@ -273,4 +274,46 @@ func TestRefreshTokenFailureCantParse(t *testing.T) {
 
 	_, err := memberService.RefreshToken(&validForm)
 	assert.NotNil(t, err)
+}
+
+func TestGetAllMembersGoodWeather(t *testing.T) {
+	beforeEachMember(t)
+
+	// Setup data
+	members := []*models.Member{
+		{
+			Model:     gorm.Model{ID: 5},
+			FirstName: "John",
+			LastName:  "Doe",
+		},
+		{
+			Model:     gorm.Model{ID: 10},
+			FirstName: "Jane",
+			LastName:  "Doe",
+		},
+	}
+
+	// Setup mocks
+	mockMemberRepository.EXPECT().Query(gomock.Any()).Return(members, nil).Times(1)
+
+	// Function under test
+	actualShortFormMemberDTOs, err := memberService.GetAllMembers()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedShortFormMemberDTOs := []*models.MemberShortFormDTO{
+		{
+			ID:        5,
+			FirstName: "John",
+			LastName:  "Doe",
+		},
+		{
+			ID:        10,
+			FirstName: "Jane",
+			LastName:  "Doe",
+		},
+	}
+
+	assert.Equal(t, expectedShortFormMemberDTOs, actualShortFormMemberDTOs)
 }

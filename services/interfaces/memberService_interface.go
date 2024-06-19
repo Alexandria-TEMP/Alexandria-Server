@@ -12,6 +12,6 @@ type MemberService interface {
 	CreateMember(memberForm *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (string, string, *models.Member, error)
 	DeleteMember(memberID uint) error
 	GetAllMembers() ([]*models.MemberShortFormDTO, error)
-	LogInMember(memberAuthForm *forms.MemberAuthForm) (*models.LoggedInMemberDTO, error)
+	LogInMember(memberAuthForm *forms.MemberAuthForm) (*models.Member, string, string, error)
 	RefreshToken(form *forms.TokenRefreshForm) (*models.TokenPairDTO, error)
 }
