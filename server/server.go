@@ -100,19 +100,20 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 		TagService:                            tagService,
 	}
 	branchService := &services.BranchService{
-		BranchRepository:              repositoryEnv.branchRepository,
-		ClosedBranchRepository:        repositoryEnv.closedBranchRepository,
-		PostRepository:                repositoryEnv.postRepository,
-		ProjectPostRepository:         repositoryEnv.projectPostRepository,
-		ReviewRepository:              repositoryEnv.reviewRepository,
-		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
-		DiscussionRepository:          repositoryEnv.discussionRepository,
-		MemberRepository:              repositoryEnv.memberRepository,
-		Filesystem:                    fs,
-		RenderService:                 renderService,
-		BranchCollaboratorService:     branchCollaboratorService,
-		PostCollaboratorService:       postCollaboratorService,
-		TagService:                    tagService,
+		BranchRepository:                      repositoryEnv.branchRepository,
+		ClosedBranchRepository:                repositoryEnv.closedBranchRepository,
+		PostRepository:                        repositoryEnv.postRepository,
+		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
+		ReviewRepository:                      repositoryEnv.reviewRepository,
+		DiscussionContainerRepository:         repositoryEnv.discussionContainerRepository,
+		DiscussionRepository:                  repositoryEnv.discussionRepository,
+		MemberRepository:                      repositoryEnv.memberRepository,
+		Filesystem:                            fs,
+		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
+		RenderService:                         renderService,
+		BranchCollaboratorService:             branchCollaboratorService,
+		PostCollaboratorService:               postCollaboratorService,
+		TagService:                            tagService,
 	}
 	projectPostService := &services.ProjectPostService{
 		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
@@ -135,10 +136,8 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 
 	// TODO we really need an automated DI solution..
 	return ServiceEnv{
-		postService: postService,
-		memberService: &services.MemberService{
-			MemberRepository: repositoryEnv.memberRepository,
-		},
+		postService:               postService,
+		memberService:             &services.MemberService{MemberRepository: repositoryEnv.memberRepository},
 		branchService:             branchService,
 		renderService:             renderService,
 		projectPostService:        projectPostService,
