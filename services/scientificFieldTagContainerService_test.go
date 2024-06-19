@@ -20,11 +20,11 @@ func setupScientificFieldTagContainer(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	// Setup mocks
-	mockScientificFieldTagContainerReposiotry = mocks.NewMockModelRepositoryInterface[*models.ScientificFieldTagContainer](mockCtrl)
+	mockScientificFieldTagContainerRepository = mocks.NewMockModelRepositoryInterface[*models.ScientificFieldTagContainer](mockCtrl)
 
 	// Setup SUT
 	scientificFieldTagContainerService = &ScientificFieldTagContainerService{
-		ContainerRepository: mockScientificFieldTagContainerReposiotry,
+		ContainerRepository: mockScientificFieldTagContainerRepository,
 	}
 }
 
@@ -52,7 +52,7 @@ func TestGetScientificFieldTagContainer(t *testing.T) {
 		},
 	}
 
-	mockScientificFieldTagContainerReposiotry.EXPECT().GetByID(containerID).Return(databaseContainer, nil).Times(1)
+	mockScientificFieldTagContainerRepository.EXPECT().GetByID(containerID).Return(databaseContainer, nil).Times(1)
 
 	// Function under test
 	fetchedContainer, err := scientificFieldTagContainerService.GetScientificFieldTagContainer(containerID)
