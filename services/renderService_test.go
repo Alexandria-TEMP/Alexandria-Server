@@ -11,6 +11,7 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"go.uber.org/mock/gomock"
+	"gorm.io/gorm"
 )
 
 func beforeEachRender(t *testing.T) {
@@ -29,10 +30,12 @@ func beforeEachRender(t *testing.T) {
 	mockProjectPostRepository = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
 	mockBranchService = mocks.NewMockBranchService(mockCtrl)
+	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
 
 	// Create render service
 	renderService = RenderService{
 		BranchRepository:      mockBranchRepository,
+		PostRepository:        mockPostRepository,
 		ProjectPostRepository: mockProjectPostRepository,
 		Filesystem:            mockFilesystem,
 		BranchService:         mockBranchService,
@@ -306,4 +309,82 @@ func TestGetRenderDoesntExist(t *testing.T) {
 
 	assert.Nil(t, err202)
 	assert.NotNil(t, err404)
+}
+
+func TestGetMainRenderFileGoodWeather(t *testing.T) {
+	beforeEachRender(t)
+	defer cleanup(t)
+
+	// Setup data
+	postID := uint(10)
+
+	post := &models.Post{
+		Model:        gorm.Model{ID: postID},
+		RenderStatus: models.Success,
+	}
+
+	// Setup mocks
+	mockPostRepository.EXPECT().GetByID(postID).Return(post, nil)
+	mockFilesystem.EXPECT().CheckoutDirectory(postID)
+
+	// Checking out master branch will succeed
+	mockFilesystem.EXPECT().CheckoutBranch("master").Return(nil)
+
+	// The render will always exist
+	mockFilesystem.EXPECT().RenderExists().Return("render_filename", nil)
+	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("path")
+
+	// Function under test
+	actualPath, err1, err2 := renderService.GetMainRenderFile(postID)
+	if err1 != nil || err2 != nil {
+		t.Fatal(err1, err2)
+	}
+
+	expectedPath := "path/render_filename"
+
+	assert.Equal(t, expectedPath, actualPath)
+}
+
+func TestGetMainRenderStillPending(t *testing.T) {
+	beforeEachRender(t)
+	defer cleanup(t)
+
+	// Setup data
+	postID := uint(10)
+
+	post := &models.Post{
+		Model:        gorm.Model{ID: postID},
+		RenderStatus: models.Pending,
+	}
+
+	// Setup mocks
+	mockPostRepository.EXPECT().GetByID(postID).Return(post, nil)
+
+	// Function under test
+	_, err1, err2 := renderService.GetMainRenderFile(postID)
+
+	assert.NotNil(t, err1)
+	assert.Nil(t, err2)
+}
+
+func TestGetMainRenderFailed(t *testing.T) {
+	beforeEachRender(t)
+	defer cleanup(t)
+
+	// Setup data
+	postID := uint(10)
+
+	post := &models.Post{
+		Model:        gorm.Model{ID: postID},
+		RenderStatus: models.Failure,
+	}
+
+	// Setup mocks
+	mockPostRepository.EXPECT().GetByID(postID).Return(post, nil)
+
+	// Function under test
+	_, err1, err2 := renderService.GetMainRenderFile(postID)
+
+	assert.Nil(t, err1)
+	assert.NotNil(t, err2)
 }
