@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"io/fs"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -55,7 +56,7 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, *flock
 	// unlock upon error or after controller has read file
 	lock, err := renderService.Filesystem.LockDirectory(projectPost.PostID)
 	if err != nil {
-		return filePath, nil, nil, fmt.Errorf("failed to aquire lock for directory %v: %w", projectPost.PostID, err)
+		return filePath, nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
 
 	// select repository of the parent post
@@ -63,7 +64,10 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, *flock
 
 	// checkout specified branch
 	if err := renderService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
-		lock.Unlock()
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+
 		return filePath, nil, nil, fmt.Errorf("failed to find this git branch, with name %v: %w", branchID, err)
 	}
 
@@ -72,7 +76,10 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, *flock
 	if err != nil {
 		branch.RenderStatus = models.Failure
 		_, _ = renderService.BranchRepository.Update(branch)
-		lock.Unlock()
+
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
 
 		return filePath, nil, nil, fmt.Errorf("render has failed: %w", err)
 	}
@@ -107,7 +114,7 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (string, *flo
 	// unlock upon error or after controller has read file
 	lock, err := renderService.Filesystem.LockDirectory(postID)
 	if err != nil {
-		return filePath, nil, nil, fmt.Errorf("failed to aquire lock for directory %v: %w", postID, err)
+		return filePath, nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", postID, err)
 	}
 
 	// select repository of the post
@@ -115,7 +122,10 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (string, *flo
 
 	// checkout master
 	if err := renderService.Filesystem.CheckoutBranch("master"); err != nil {
-		lock.Unlock()
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+
 		return filePath, nil, nil, fmt.Errorf("failed to find master: %w", err)
 	}
 
@@ -124,7 +134,10 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (string, *flo
 	if err != nil {
 		post.RenderStatus = models.Failure
 		_, _ = renderService.PostRepository.Update(post)
-		lock.Unlock()
+
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
 
 		return filePath, nil, nil, fmt.Errorf("render has failed: %w", err)
 	}
@@ -137,7 +150,11 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (string, *flo
 
 func (renderService *RenderService) RenderPost(post *models.Post, lock *flock.Flock) {
 	// defer unlocking repo
-	defer lock.Unlock()
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// Checkout master
 	if err := renderService.Filesystem.CheckoutBranch("master"); err != nil {
@@ -205,7 +222,11 @@ func (renderService *RenderService) RenderPost(post *models.Post, lock *flock.Fl
 
 func (renderService *RenderService) RenderBranch(branch *models.Branch, lock *flock.Flock) {
 	// defer unlocking the repository
-	defer lock.Unlock()
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// Checkout the branch
 	if err := renderService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branch.ID)); err != nil {

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -240,7 +241,7 @@ func (postController *PostController) UploadPost(c *gin.Context) {
 	postID, err := strconv.ParseUint(postIDStr, 10, 64)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", postIDStr, err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid post ID '%s', cannot interpret as integer: %s", postIDStr, err)})
 
 		return
 	}
@@ -298,7 +299,11 @@ func (postController *PostController) GetMainRender(c *gin.Context) {
 	}
 
 	// defer unlocking of repo
-	defer lock.Unlock()
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// Set the headers for the file transfer and return the file
 	c.Header("Content-Description", "File Transfer")
@@ -306,6 +311,7 @@ func (postController *PostController) GetMainRender(c *gin.Context) {
 	c.Header("Content-Disposition", "attachment; filename=render.html")
 	c.Header("Content-Type", "text/html")
 	c.File(filePath)
+	c.Status(http.StatusOK)
 }
 
 // GetMainProject godoc specs are subject to change
@@ -339,7 +345,11 @@ func (postController *PostController) GetMainProject(c *gin.Context) {
 	}
 
 	// unlock repo after reading file
-	defer lock.Unlock()
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// Set the headers for the file transfer and return the file
 	c.Header("Content-Description", "File Transfer")
@@ -423,7 +433,11 @@ func (postController *PostController) GetMainFileFromProject(c *gin.Context) {
 	}
 
 	// defer unlocking repo
-	defer lock.Unlock()
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// get the file info
 	fileContentType, err1 := mimetype.DetectFile(absFilepath)

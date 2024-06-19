@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -370,7 +371,11 @@ func (branchController *BranchController) GetRender(c *gin.Context) {
 	}
 
 	// defer unlocking repo
-	defer lock.Unlock()
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// Set the headers for the file transfer and return the file
 	c.Header("Content-Description", "File Transfer")
@@ -411,7 +416,11 @@ func (branchController *BranchController) GetProject(c *gin.Context) {
 	}
 
 	// unlock repo after reading file
-	defer lock.Unlock()
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// Set the headers for the file transfer and return the file
 	c.Header("Content-Description", "File Transfer")
@@ -541,7 +550,11 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 	}
 
 	// defer unlocking repo after file has been read
-	defer lock.Unlock()
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// get the file info
 	fileContentType, err1 := mimetype.DetectFile(absFilepath)

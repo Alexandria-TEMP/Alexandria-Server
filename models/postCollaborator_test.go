@@ -4,8 +4,16 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
+
+func TestCollaborationTypeIsValid(t *testing.T) {
+	var good, bad CollaborationType = Author, ""
+
+	assert.True(t, good.IsValid())
+	assert.False(t, bad.IsValid())
+}
 
 func TestPostCollaboratorJSONMarshaling(t *testing.T) {
 	// This model...

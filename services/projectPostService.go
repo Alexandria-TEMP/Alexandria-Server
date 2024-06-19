@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"log"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
@@ -81,10 +82,14 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 	// lock directory and defer unlocking it
 	lock, err := projectPostService.Filesystem.LockDirectory(projectPost.PostID)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to aquire lock for directory %v: %w", projectPost.PostID, err)
+		return nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
 
-	defer lock.Unlock()
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// Checkout directory where project post will store it's files
 	projectPostService.Filesystem.CheckoutDirectory(projectPost.PostID)
@@ -147,22 +152,6 @@ func (projectPostService *ProjectPostService) createPostForProjectPost(form *for
 	}
 
 	return post, nil
-}
-
-func (projectPostService *ProjectPostService) Filter(page, size int, _ forms.ProjectPostFilterForm) ([]uint, error) {
-	// TODO construct query based off filter form
-	posts, err := projectPostService.ProjectPostRepository.QueryPaginated(page, size)
-	if err != nil {
-		return nil, err
-	}
-
-	// Extract IDs from the list of posts
-	ids := make([]uint, len(posts))
-	for i, post := range posts {
-		ids[i] = post.ID
-	}
-
-	return ids, nil
 }
 
 func (projectPostService *ProjectPostService) GetBranchesGroupedByReviewStatus(projectPostID uint) (*models.BranchesGroupedByReviewStatusDTO, error) {

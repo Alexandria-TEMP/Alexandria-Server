@@ -11,12 +11,14 @@ import (
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"go.uber.org/mock/gomock"
+	"gorm.io/gorm"
 )
 
 func beforeEachRender(t *testing.T) {
 	t.Helper()
 
 	// setup models
+	lock.Lock()
 	pendingBranch = &models.Branch{RenderStatus: models.Pending}
 	successBranch = &models.Branch{RenderStatus: models.Success}
 	failedBranch = &models.Branch{RenderStatus: models.Failure}
@@ -29,10 +31,12 @@ func beforeEachRender(t *testing.T) {
 	mockProjectPostRepository = mocks.NewMockModelRepositoryInterface[*models.ProjectPost](mockCtrl)
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
 	mockBranchService = mocks.NewMockBranchService(mockCtrl)
+	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
 
 	// Create render service
 	renderService = RenderService{
 		BranchRepository:      mockBranchRepository,
+		PostRepository:        mockPostRepository,
 		ProjectPostRepository: mockProjectPostRepository,
 		Filesystem:            mockFilesystem,
 		BranchService:         mockBranchService,
@@ -42,6 +46,7 @@ func beforeEachRender(t *testing.T) {
 func cleanup(t *testing.T) {
 	t.Helper()
 
+	lock.Unlock()
 	os.RemoveAll(filepath.Join(cwd, "render"))
 }
 
@@ -92,6 +97,7 @@ func testRenderSuccessTemplate(t *testing.T, dirName string) {
 
 	_, err := os.Stat(renderDirPath)
 	assert.Nil(t, err)
+	assert.False(t, lock.Locked())
 }
 
 func TestRenderUnzipFailed(t *testing.T) {
@@ -112,6 +118,7 @@ func TestRenderUnzipFailed(t *testing.T) {
 
 	_, err := os.Stat(renderDirPath)
 	assert.NotNil(t, err)
+	assert.False(t, lock.Locked())
 }
 
 func TestRenderExistsFailed(t *testing.T) {
@@ -136,6 +143,7 @@ func TestRenderExistsFailed(t *testing.T) {
 	mockBranchRepository.EXPECT().Update(failedBranch).Return(failedBranch, nil).Times(1)
 
 	renderService.RenderBranch(pendingBranch, lock)
+	assert.False(t, lock.Locked())
 }
 
 func TestIsValidProjectNoYamlorYml(t *testing.T) {
@@ -197,6 +205,7 @@ func TestGetRenderFileSuccess(t *testing.T) {
 	assert.Nil(t, err404)
 	assert.Equal(t, renderFilePath, returnedPath)
 	assert.Equal(t, lock, outputLock)
+	assert.True(t, lock.Locked())
 }
 
 func TestGetRenderFileNoBranch(t *testing.T) {
@@ -205,11 +214,10 @@ func TestGetRenderFileNoBranch(t *testing.T) {
 
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(successBranch, errors.New("failed")).Times(1)
 
-	_, outputLock, err202, err404 := renderService.GetRenderFile(successBranch.ID)
+	_, _, err202, err404 := renderService.GetRenderFile(successBranch.ID)
 
 	assert.Nil(t, err202)
 	assert.NotNil(t, err404)
-	assert.Equal(t, lock, outputLock)
 }
 
 func TestGetRenderFileNoProjectPost(t *testing.T) {
@@ -223,11 +231,10 @@ func TestGetRenderFileNoProjectPost(t *testing.T) {
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(successBranch, nil).Times(1)
 	mockBranchService.EXPECT().GetBranchProjectPost(successBranch).Return(projectPost, errors.New("failed"))
 
-	_, outputLock, err202, err404 := renderService.GetRenderFile(successBranch.ID)
+	_, _, err202, err404 := renderService.GetRenderFile(successBranch.ID)
 
 	assert.Nil(t, err202)
 	assert.NotNil(t, err404)
-	assert.Equal(t, lock, outputLock)
 }
 
 func TestGetRenderFilePending(t *testing.T) {
@@ -242,11 +249,10 @@ func TestGetRenderFilePending(t *testing.T) {
 	mockBranchService.EXPECT().GetBranchProjectPost(pendingBranch).Return(projectPost, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
 
-	_, outputLock, err202, err404 := renderService.GetRenderFile(pendingBranch.ID)
+	_, _, err202, err404 := renderService.GetRenderFile(pendingBranch.ID)
 
 	assert.NotNil(t, err202)
 	assert.Nil(t, err404)
-	assert.Equal(t, lock, outputLock)
 }
 
 func TestGetRenderFileFailed(t *testing.T) {
@@ -261,14 +267,13 @@ func TestGetRenderFileFailed(t *testing.T) {
 	mockBranchService.EXPECT().GetBranchProjectPost(failedBranch).Return(projectPost, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
 
-	_, outputLock, err202, err404 := renderService.GetRenderFile(failedBranch.ID)
+	_, _, err202, err404 := renderService.GetRenderFile(failedBranch.ID)
 
 	assert.Nil(t, err202)
 	assert.NotNil(t, err404)
-	assert.Equal(t, lock, outputLock)
 }
 
-func TestGetRenderNoGitBranch(t *testing.T) {
+func TestGetRenderFileNoGitBranch(t *testing.T) {
 	beforeEachRender(t)
 	defer cleanup(t)
 
@@ -285,11 +290,11 @@ func TestGetRenderNoGitBranch(t *testing.T) {
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(100)).Times(1)
 	mockFilesystem.EXPECT().CheckoutBranch("0").Return(errors.New("failed")).Times(1)
 
-	_, outputLock, err202, err404 := renderService.GetRenderFile(successBranch.ID)
+	_, _, err202, err404 := renderService.GetRenderFile(successBranch.ID)
 
 	assert.Nil(t, err202)
 	assert.NotNil(t, err404)
-	assert.Equal(t, lock, outputLock)
+	assert.False(t, lock.Locked())
 }
 
 func TestGetRenderDoesntExist(t *testing.T) {
@@ -311,9 +316,90 @@ func TestGetRenderDoesntExist(t *testing.T) {
 	mockFilesystem.EXPECT().RenderExists().Return("", fmt.Errorf("oh no")).Times(1)
 	mockBranchRepository.EXPECT().Update(successBranch).Return(successBranch, nil)
 
-	_, outputLock, err202, err404 := renderService.GetRenderFile(successBranch.ID)
+	_, _, err202, err404 := renderService.GetRenderFile(successBranch.ID)
 
 	assert.Nil(t, err202)
 	assert.NotNil(t, err404)
+	assert.False(t, lock.Locked())
+}
+
+func TestGetMainRenderFileGoodWeather(t *testing.T) {
+	beforeEachRender(t)
+	defer cleanup(t)
+
+	// Setup data
+	postID := uint(10)
+
+	post := &models.Post{
+		Model:        gorm.Model{ID: postID},
+		RenderStatus: models.Success,
+	}
+
+	// Setup mocks
+	mockPostRepository.EXPECT().GetByID(postID).Return(post, nil)
+	mockFilesystem.EXPECT().LockDirectory(uint(10)).Return(lock, nil)
+	mockFilesystem.EXPECT().CheckoutDirectory(postID)
+
+	// Checking out master branch will succeed
+	mockFilesystem.EXPECT().CheckoutBranch("master").Return(nil)
+
+	// The render will always exist
+	mockFilesystem.EXPECT().RenderExists().Return("render_filename", nil)
+	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return("path")
+
+	// Function under test
+	actualPath, outputLock, err1, err2 := renderService.GetMainRenderFile(postID)
+	if err1 != nil || err2 != nil {
+		t.Fatal(err1, err2)
+	}
+
+	expectedPath := "path/render_filename"
+
+	assert.Equal(t, expectedPath, actualPath)
 	assert.Equal(t, lock, outputLock)
+	assert.True(t, lock.Locked())
+}
+
+func TestGetMainRenderStillPending(t *testing.T) {
+	beforeEachRender(t)
+	defer cleanup(t)
+
+	// Setup data
+	postID := uint(10)
+
+	post := &models.Post{
+		Model:        gorm.Model{ID: postID},
+		RenderStatus: models.Pending,
+	}
+
+	// Setup mocks
+	mockPostRepository.EXPECT().GetByID(postID).Return(post, nil)
+
+	// Function under test
+	_, _, err1, err2 := renderService.GetMainRenderFile(postID)
+
+	assert.NotNil(t, err1)
+	assert.Nil(t, err2)
+}
+
+func TestGetMainRenderFailed(t *testing.T) {
+	beforeEachRender(t)
+	defer cleanup(t)
+
+	// Setup data
+	postID := uint(10)
+
+	post := &models.Post{
+		Model:        gorm.Model{ID: postID},
+		RenderStatus: models.Failure,
+	}
+
+	// Setup mocks
+	mockPostRepository.EXPECT().GetByID(postID).Return(post, nil)
+
+	// Function under test
+	_, _, err1, err2 := renderService.GetMainRenderFile(postID)
+
+	assert.Nil(t, err1)
+	assert.NotNil(t, err2)
 }

@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gofrs/flock"
+	pagination "github.com/webstradev/gin-pagination"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
@@ -16,10 +18,14 @@ var (
 	router           *gin.Engine
 	responseRecorder *httptest.ResponseRecorder
 
-	branchController BranchController
-	postController   PostController
-	memberController *MemberController
-	tagController    TagController
+	branchController              BranchController
+	postController                PostController
+	projectPostController         ProjectPostController
+	memberController              MemberController
+	tagController                 TagController
+	discussionContainerController DiscussionContainerController
+	filterController              FilterController
+	discussionController          DiscussionController
 
 	mockBranchService                      *mocks.MockBranchService
 	mockRenderService                      *mocks.MockRenderService
@@ -29,6 +35,9 @@ var (
 	mockScientificFieldTagContainerService *mocks.MockScientificFieldTagContainerService
 	mockPostCollaboratorService            *mocks.MockPostCollaboratorService
 	mockPostService                        *mocks.MockPostService
+	mockProjectPostService                 *mocks.MockProjectPostService
+	mockDiscussionService                  *mocks.MockDiscussionService
+	mockDiscussionContainerService         *mocks.MockDiscussionContainerService
 
 	exampleBranch       models.Branch
 	exampleReview       models.BranchReview
@@ -39,10 +48,13 @@ var (
 	exampleSTag1        *models.ScientificFieldTag
 	exampleSTag2        *models.ScientificFieldTag
 	exampleSTag1DTO     models.ScientificFieldTagDTO
+
+	lock *flock.Flock
 )
 
 // TestMain is a keyword function, this is run by the testing package before other tests
 func TestMain(m *testing.M) {
+	lock = flock.New("../utils/template_repo/alexandria.lock")
 	exampleSTag1 = &models.ScientificFieldTag{
 		ScientificField: "Mathematics",
 		Subtags:         []*models.ScientificFieldTag{},
@@ -91,51 +103,116 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// TODO this duplicates a LOT of server logic and so is a pain to maintain...
-// TODO could we call the actual server routing function (in router.go) instead?
 func SetUpRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router = gin.Default()
 
-	branchRouter := router.Group("/api/v2/branches")
-	branchRouter.GET("/:branchID", branchController.GetBranch)
-	branchRouter.POST("", branchController.CreateBranch)
-	branchRouter.DELETE("/:branchID", branchController.DeleteBranch)
-	branchRouter.GET("/:branchID/review-statuses", branchController.GetAllBranchReviewStatuses)
-	branchRouter.GET("/reviews/:reviewID", branchController.GetReview)
-	branchRouter.POST("/reviews", branchController.CreateReview)
-	branchRouter.GET("/:branchID/can-review/:memberID", branchController.MemberCanReview)
-	branchRouter.GET("/collaborators/:collaboratorID", branchController.GetBranchCollaborator)
-	branchRouter.GET("/collaborators/all/:branchID", branchController.GetAllBranchCollaborators)
-	branchRouter.GET("/:branchID/render", branchController.GetRender)
-	branchRouter.GET("/:branchID/repository", branchController.GetProject)
-	branchRouter.POST("/:branchID", branchController.UploadProject)
-	branchRouter.GET("/:branchID/tree", branchController.GetFiletree)
-	branchRouter.GET("/:branchID/file/*filepath", branchController.GetFileFromProject)
-	branchRouter.GET("/:branchID/discussions", branchController.GetDiscussions)
+	v2 := router.Group("/api/v2")
 
-	router.GET("/api/v2/members/:memberID", func(c *gin.Context) {
-		memberController.GetMember(c)
-	})
-	router.POST("/api/v2/members", func(c *gin.Context) {
-		memberController.CreateMember(c)
-	})
-	router.DELETE("/api/v2/members/:memberID", func(c *gin.Context) {
-		memberController.DeleteMember(c)
-	})
-	router.GET("/api/v2/members", func(c *gin.Context) {
-		memberController.GetAllMembers(c)
-	})
-	router.GET("/api/v2/tags/scientific", func(c *gin.Context) {
-		tagController.GetScientificTags(c)
-	})
-	router.GET("/api/v2/tags/scientific/:tagID", func(c *gin.Context) {
-		tagController.GetScientificFieldTag(c)
-	})
-	router.GET("/api/v2/tags/scientific/containers/:containerID", tagController.GetScientificFieldTagContainer)
-
-	postRouter := router.Group("/api/v2/posts")
-	postRouter.GET("/collaborators/all/:postID", postController.GetAllPostCollaborators)
+	postRouter(v2, &postController)
+	projectPostRouter(v2, &projectPostController)
+	memberRouter(v2, &memberController)
+	branchRouter(v2, &branchController)
+	filterRouter(v2, &filterController)
+	tagRouter(v2, &tagController)
+	discussionRouter(v2, &discussionController)
+	discussionContainerRouter(v2, &discussionContainerController)
 
 	return router
+}
+
+func filterRouter(v2 *gin.RouterGroup, controller *FilterController) {
+	filterRouter := v2.Group("/filter")
+	filterRouter.GET("/posts", pagination.Default(), controller.FilterPosts)
+}
+
+func tagRouter(v2 *gin.RouterGroup, controller *TagController) {
+	tagRouter := v2.Group("/tags")
+	tagRouter.GET("/scientific", controller.GetScientificTags)
+	tagRouter.GET("/scientific/:tagID", controller.GetScientificFieldTag)
+	tagRouter.GET("/scientific/containers/:containerID", controller.GetScientificFieldTagContainer)
+	tagRouter.GET("/completion-status", controller.GetCompletionStatusTags)
+	tagRouter.GET("/post-type", controller.GetPostTypeTags)
+	tagRouter.GET("/feedback-preference", controller.GetFeedbackPreferenceTags)
+}
+
+func discussionRouter(v2 *gin.RouterGroup, controller *DiscussionController) {
+	discussionRouter := v2.Group("/discussions")
+	discussionRouter.GET("/:discussionID", controller.GetDiscussion)
+	discussionRouter.POST("/roots", controller.CreateRootDiscussion)
+	discussionRouter.POST("/replies", controller.CreateReplyDiscussion)
+	discussionRouter.DELETE("/:discussionID", controller.DeleteDiscussion)
+	discussionRouter.POST("/:discussionID/reports", controller.AddDiscussionReport)
+	discussionRouter.GET("/:discussionID/reports", controller.GetDiscussionReports)
+	discussionRouter.GET("/reports/:reportID", controller.GetDiscussionReport)
+}
+
+func branchRouter(v2 *gin.RouterGroup, controller *BranchController) {
+	branchRouter := v2.Group("/branches")
+	branchRouter.GET("/:branchID", controller.GetBranch)
+	branchRouter.POST("", controller.CreateBranch)
+	branchRouter.DELETE("/:branchID", controller.DeleteBranch)
+	branchRouter.GET("/:branchID/review-statuses", controller.GetAllBranchReviewStatuses)
+	branchRouter.GET("/reviews/:reviewID", controller.GetReview)
+	branchRouter.POST("/reviews", controller.CreateReview)
+	branchRouter.GET("/:branchID/can-review/:memberID", controller.MemberCanReview)
+	branchRouter.GET("/collaborators/:collaboratorID", controller.GetBranchCollaborator)
+	branchRouter.GET("/collaborators/all/:branchID", controller.GetAllBranchCollaborators)
+	branchRouter.GET("/:branchID/render", controller.GetRender)
+	branchRouter.GET("/:branchID/repository", controller.GetProject)
+	branchRouter.POST("/:branchID/upload", controller.UploadProject)
+	branchRouter.GET("/:branchID/tree", controller.GetFiletree)
+	branchRouter.GET("/:branchID/file/*filepath", controller.GetFileFromProject)
+	branchRouter.GET("/:branchID/discussions", controller.GetDiscussions)
+	branchRouter.GET("/closed/:closedBranchID", controller.GetClosedBranch)
+}
+
+func memberRouter(v2 *gin.RouterGroup, controller *MemberController) {
+	memberRouter := v2.Group("/members")
+	memberRouter.GET("/:memberID", controller.GetMember)
+	memberRouter.POST("", controller.CreateMember)
+	memberRouter.DELETE("/:memberID", controller.DeleteMember)
+	memberRouter.GET("", controller.GetAllMembers)
+	memberRouter.GET("/:memberID/posts", controller.GetMemberPosts)
+	memberRouter.GET("/:memberID/project-posts", controller.GetMemberProjectPosts)
+	memberRouter.GET("/:memberID/branches", controller.GetMemberBranches)
+	memberRouter.GET("/:memberID/discussions", controller.GetMemberDiscussions)
+	memberRouter.POST("/:memberID/saved-posts", controller.AddMemberSavedPost)
+	memberRouter.POST("/:memberID/saved-project-posts", controller.AddMemberSavedProjectPost)
+	memberRouter.GET("/:memberID/saved-posts", controller.GetMemberSavedPosts)
+	memberRouter.GET("/:memberID/saved-project-posts", controller.GetMemberSavedProjectPosts)
+}
+
+func projectPostRouter(v2 *gin.RouterGroup, controller *ProjectPostController) {
+	projectPostRouter := v2.Group("/project-posts")
+	projectPostRouter.GET("/:projectPostID", controller.GetProjectPost)
+	projectPostRouter.POST("", controller.CreateProjectPost)
+	projectPostRouter.DELETE("/:projectPostID", controller.DeleteProjectPost)
+	projectPostRouter.POST("/from-github", controller.CreateProjectPostFromGithub)
+	projectPostRouter.GET("/:projectPostID/all-discussion-containers", controller.GetProjectPostDiscussionContainers)
+	projectPostRouter.GET("/:projectPostID/branches-by-status", controller.GetProjectPostBranchesByStatus)
+}
+
+func postRouter(v2 *gin.RouterGroup, controller *PostController) {
+	postRouter := v2.Group("/posts")
+	postRouter.GET("/:postID", controller.GetPost)
+	postRouter.POST("", controller.CreatePost)
+	postRouter.DELETE("/:postID", controller.DeletePost)
+	postRouter.POST("/from-github", controller.CreatePostFromGithub)
+	postRouter.POST("/:postID/reports", controller.AddPostReport)
+	postRouter.GET("/:postID/reports", controller.GetPostReports)
+	postRouter.GET("/reports/:reportID", controller.GetPostReport)
+	postRouter.GET("/collaborators/:collaboratorID", controller.GetPostCollaborator)
+	postRouter.GET("/collaborators/all/:postID", controller.GetAllPostCollaborators)
+	postRouter.POST("/:postID/upload", controller.UploadPost)
+	postRouter.GET("/:postID/render", controller.GetMainRender)
+	postRouter.GET("/:postID/repository", controller.GetMainProject)
+	postRouter.GET("/:postID/tree", controller.GetMainFiletree)
+	postRouter.GET("/:postID/file/*filepath", controller.GetMainFileFromProject)
+	postRouter.GET("/:postID/project-post", controller.GetProjectPostIfExists)
+}
+
+func discussionContainerRouter(v2 *gin.RouterGroup, controller *DiscussionContainerController) {
+	discussionContainerRouter := v2.Group("/discussion-containers")
+	discussionContainerRouter.GET("/:discussionContainerID", controller.GetDiscussionContainer)
 }

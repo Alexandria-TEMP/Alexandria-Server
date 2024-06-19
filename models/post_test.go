@@ -6,8 +6,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
+
+func TestPostTypeIsValid(t *testing.T) {
+	var good, bad PostType = Question, ""
+
+	assert.True(t, good.IsValid())
+	assert.False(t, bad.IsValid())
+}
 
 func TestPostJSONMarshaling(t *testing.T) {
 	createdAt := time.Now().Add(time.Minute).UTC()

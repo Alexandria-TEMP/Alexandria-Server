@@ -1,15 +1,10 @@
 package filesystem
 
 import (
-	"errors"
 	"fmt"
-	"io/fs"
 	"os"
 	"os/exec"
-	"path/filepath"
-	"strconv"
 
-	"github.com/gofrs/flock"
 	cp "github.com/otiai10/copy"
 
 	"github.com/go-git/go-git/v5"
@@ -284,38 +279,4 @@ func (filesystem *Filesystem) CleanDir() error {
 	}
 
 	return nil
-}
-
-func (filesystem *Filesystem) LockDirectory(postID uint) (*flock.Flock, error) {
-	// get filepath to lock file
-	lockDirPath := filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10))
-	lockFilePath := filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), "alexandria.lock")
-
-	// check if the directory to lock exists
-	if _, err := os.Stat(lockDirPath); errors.Is(err, os.ErrNotExist) {
-		// create lock dir if doesn't exist
-		if err := os.Mkdir(lockDirPath, fs.ModePerm); err != nil {
-			return nil, fmt.Errorf("failed to create lockdir: %w", err)
-		}
-	} else if err != nil {
-		return nil, fmt.Errorf("failed to check if directory to lock exists: %w", err)
-	}
-
-	// check if the lockfile exists
-	if _, err := os.Stat(lockFilePath); errors.Is(err, os.ErrNotExist) {
-		// create lock file if doesn't exist
-		if _, err := os.Create(lockFilePath); err != nil {
-			return nil, fmt.Errorf("failed to create lockfile: %w", err)
-		}
-	} else if err != nil {
-		return nil, fmt.Errorf("failed to check if lockfile exists: %w", err)
-	}
-
-	lock := flock.New(lockFilePath)
-
-	if err := lock.Lock(); err != nil {
-		return nil, fmt.Errorf("failed to acquire lock: %w", err)
-	}
-
-	return lock, nil
 }

@@ -179,8 +179,7 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 			DiscussionContainerService: serviceEnv.discussionContainerService,
 		},
 		filterController: &controllers.FilterController{
-			PostService:        serviceEnv.postService,
-			ProjectPostService: serviceEnv.projectPostService,
+			PostService: serviceEnv.postService,
 		},
 		branchController: &controllers.BranchController{
 			BranchService:             serviceEnv.branchService,

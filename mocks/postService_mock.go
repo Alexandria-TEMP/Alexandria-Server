@@ -90,9 +90,9 @@ func (mr *MockPostServiceMockRecorder) GetMainFileFromProject(postID, relFilepat
 }
 
 // GetMainFiletree mocks base method.
-func (m *MockPostService) GetMainFiletree(branchID uint) (map[string]int64, error, error) {
+func (m *MockPostService) GetMainFiletree(postID uint) (map[string]int64, error, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMainFiletree", branchID)
+	ret := m.ctrl.Call(m, "GetMainFiletree", postID)
 	ret0, _ := ret[0].(map[string]int64)
 	ret1, _ := ret[1].(error)
 	ret2, _ := ret[2].(error)
@@ -100,9 +100,9 @@ func (m *MockPostService) GetMainFiletree(branchID uint) (map[string]int64, erro
 }
 
 // GetMainFiletree indicates an expected call of GetMainFiletree.
-func (mr *MockPostServiceMockRecorder) GetMainFiletree(branchID any) *gomock.Call {
+func (mr *MockPostServiceMockRecorder) GetMainFiletree(postID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMainFiletree", reflect.TypeOf((*MockPostService)(nil).GetMainFiletree), branchID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMainFiletree", reflect.TypeOf((*MockPostService)(nil).GetMainFiletree), postID)
 }
 
 // GetMainProject mocks base method.

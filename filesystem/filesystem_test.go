@@ -45,10 +45,10 @@ func TestInitsystem(t *testing.T) {
 
 	CurrentFilesystem.CheckoutDirectory(1)
 
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1"), CurrentFilesystem.CurrentDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "quarto_project"), CurrentFilesystem.CurrentQuartoDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "render"), CurrentFilesystem.CurrentRenderDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "quarto_project.zip"), CurrentFilesystem.CurrentZipFilePath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository"), CurrentFilesystem.CurrentDirPath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository", "quarto_project"), CurrentFilesystem.CurrentQuartoDirPath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository", "render"), CurrentFilesystem.CurrentRenderDirPath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository", "quarto_project.zip"), CurrentFilesystem.CurrentZipFilePath)
 	assert.Nil(t, CurrentFilesystem.CurrentRepository)
 }
 
