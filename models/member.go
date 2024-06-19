@@ -32,12 +32,16 @@ type MemberDTO struct {
 type LoggedInMemberDTO struct {
 	Member       MemberDTO `json:"member"`
 	AccessToken  string    `json:"accessToken"`
+	AccessExp    int64     `json:"accessExp"`
 	RefreshToken string    `json:"refreshToken"`
+	RefreshExp   int64     `json:"refreshExp"`
 }
 
 type TokenPairDTO struct {
 	AccessToken  string `json:"accessToken"`
+	AccessExp    int64  `json:"accessExp"`
 	RefreshToken string `json:"refreshToken"`
+	RefreshExp   int64  `json:"refreshExp"`
 }
 
 type MemberShortFormDTO struct {

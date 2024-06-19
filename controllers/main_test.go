@@ -87,7 +87,9 @@ func TestMain(m *testing.M) {
 	exampleMemberLoggedInDTO = models.LoggedInMemberDTO{
 		Member:       exampleMemberDTO,
 		AccessToken:  "access",
+		AccessExp:    1,
 		RefreshToken: "refresh",
+		RefreshExp:   2,
 	}
 	exampleMemberAuthForm = forms.MemberAuthForm{
 		Email:    "john.smith@gmail.com",
@@ -106,7 +108,9 @@ func TestMain(m *testing.M) {
 	}
 	exampleTokenPairDTO = models.TokenPairDTO{
 		AccessToken:  "5678",
-		RefreshToken: "9102",
+		AccessExp:    1,
+		RefreshToken: "9012",
+		RefreshExp:   2,
 	}
 
 	// Setup test router, to test controller endpoints through http
@@ -191,10 +195,12 @@ func memberRouter(v2 *gin.RouterGroup, controller *MemberController) {
 	memberRouter.GET("/:memberID/project-posts", controller.GetMemberProjectPosts)
 	memberRouter.GET("/:memberID/branches", controller.GetMemberBranches)
 	memberRouter.GET("/:memberID/discussions", controller.GetMemberDiscussions)
-	memberRouter.POST("/:memberID/saved-posts", controller.AddMemberSavedPost)
-	memberRouter.POST("/:memberID/saved-project-posts", controller.AddMemberSavedProjectPost)
+	memberRouter.POST("/saved-posts", controller.AddMemberSavedPost)
+	memberRouter.POST("/saved-project-posts", controller.AddMemberSavedProjectPost)
 	memberRouter.GET("/:memberID/saved-posts", controller.GetMemberSavedPosts)
 	memberRouter.GET("/:memberID/saved-project-posts", controller.GetMemberSavedProjectPosts)
+	memberRouter.POST("/login", controller.LoginMember)
+	memberRouter.POST("/token", controller.RefreshToken)
 }
 
 func projectPostRouter(v2 *gin.RouterGroup, controller *ProjectPostController) {

@@ -392,10 +392,14 @@ definitions:
     type: object
   models.LoggedInMemberDTO:
     properties:
+      accessExp:
+        type: integer
       accessToken:
         type: string
       member:
         $ref: '#/definitions/models.MemberDTO'
+      refreshExp:
+        type: integer
       refreshToken:
         type: string
     type: object
@@ -604,8 +608,12 @@ definitions:
     type: object
   models.TokenPairDTO:
     properties:
+      accessExp:
+        type: integer
       accessToken:
         type: string
+      refreshExp:
+        type: integer
       refreshToken:
         type: string
     type: object

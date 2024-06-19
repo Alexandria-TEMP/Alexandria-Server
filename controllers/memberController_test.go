@@ -76,7 +76,7 @@ func TestGetMember404(t *testing.T) {
 func TestCreateMember200(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().CreateMember(&exampleMemberForm, gomock.Any()).Return("access", "refresh", &exampleMember, nil).Times(1)
+	mockMemberService.EXPECT().CreateMember(&exampleMemberForm, gomock.Any()).Return("access", int64(1), "refresh", int64(2), &exampleMember, nil).Times(1)
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
 
 	exampleMemberFormJSON, _ := json.Marshal(exampleMemberForm)
@@ -94,7 +94,7 @@ func TestCreateMember200(t *testing.T) {
 func TestCreateMember400(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Return("", "", nil, errors.New("some error")).Times(0)
+	mockMemberService.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Return("", int64(0), "", int64(0), nil, errors.New("some error")).Times(0)
 
 	badMemberFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
 	req, _ := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(badMemberFormJSON))
@@ -182,10 +182,10 @@ func TestGetAllMembers404(t *testing.T) {
 func TestLoginMember200(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(&exampleMember, "access", "refresh", nil)
+	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(&exampleMember, "access", int64(1), "refresh", int64(2), nil)
 
 	exampleMemberAuthFormJSON, _ := json.Marshal(exampleMemberAuthForm)
-	req, _ := http.NewRequest("GET", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
+	req, _ := http.NewRequest("POST", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
 	router.ServeHTTP(responseRecorder, req)
 
 	var responsemember models.LoggedInMemberDTO
@@ -201,7 +201,7 @@ func TestLoginMember4001(t *testing.T) {
 	beforeEachMember(t)
 
 	exampleMemberAuthFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
-	req, _ := http.NewRequest("GET", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
+	req, _ := http.NewRequest("POST", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
 	router.ServeHTTP(responseRecorder, req)
 
 	var responsemember models.LoggedInMemberDTO
@@ -216,7 +216,7 @@ func TestLoginMember4002(t *testing.T) {
 	beforeEachMember(t)
 
 	exampleMemberAuthFormJSON, _ := json.Marshal(models.LoggedInMemberDTO{})
-	req, _ := http.NewRequest("GET", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
+	req, _ := http.NewRequest("POST", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
 	router.ServeHTTP(responseRecorder, req)
 
 	var responsemember models.LoggedInMemberDTO
@@ -230,10 +230,10 @@ func TestLoginMember4002(t *testing.T) {
 func TestLoginMember401(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(nil, errors.New("failed"))
+	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(&exampleMember, "access", int64(1), "refresh", int64(2), errors.New("failed"))
 
 	exampleMemberAuthFormJSON, _ := json.Marshal(exampleMemberAuthForm)
-	req, _ := http.NewRequest("GET", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
+	req, _ := http.NewRequest("POST", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
 	router.ServeHTTP(responseRecorder, req)
 
 	var responsemember models.LoggedInMemberDTO
@@ -247,10 +247,10 @@ func TestLoginMember401(t *testing.T) {
 func TestRefreshToken200(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().RefreshToken(&exampleTokenRefreshForm).Return(&exampleTokenPairDTO, nil)
+	mockMemberService.EXPECT().RefreshToken(&exampleTokenRefreshForm).Return("5678", int64(1), "9012", int64(2), nil)
 
 	exampleTokenRefreshFormJSON, _ := json.Marshal(exampleTokenRefreshForm)
-	req, _ := http.NewRequest("GET", "/api/v2/members/refresh", bytes.NewBuffer(exampleTokenRefreshFormJSON))
+	req, _ := http.NewRequest("POST", "/api/v2/members/token", bytes.NewBuffer(exampleTokenRefreshFormJSON))
 	router.ServeHTTP(responseRecorder, req)
 
 	var responsemember models.TokenPairDTO
@@ -266,7 +266,7 @@ func TestRefreshToken4001(t *testing.T) {
 	beforeEachMember(t)
 
 	exampleTokenRefreshFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
-	req, _ := http.NewRequest("GET", "/api/v2/members/refresh", bytes.NewBuffer(exampleTokenRefreshFormJSON))
+	req, _ := http.NewRequest("POST", "/api/v2/members/token", bytes.NewBuffer(exampleTokenRefreshFormJSON))
 	router.ServeHTTP(responseRecorder, req)
 
 	var responsemember models.TokenPairDTO
@@ -281,7 +281,7 @@ func TestRefreshToken4002(t *testing.T) {
 	beforeEachMember(t)
 
 	exampleTokenRefreshFormJSON, _ := json.Marshal(forms.TokenRefreshForm{})
-	req, _ := http.NewRequest("GET", "/api/v2/members/refresh", bytes.NewBuffer(exampleTokenRefreshFormJSON))
+	req, _ := http.NewRequest("POST", "/api/v2/members/token", bytes.NewBuffer(exampleTokenRefreshFormJSON))
 	router.ServeHTTP(responseRecorder, req)
 
 	var responsemember models.TokenPairDTO
@@ -295,10 +295,10 @@ func TestRefreshToken4002(t *testing.T) {
 func TestRefreshToken401(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().RefreshToken(&exampleTokenRefreshForm).Return(nil, errors.New("failed"))
+	mockMemberService.EXPECT().RefreshToken(&exampleTokenRefreshForm).Return("5678", int64(1), "9012", int64(2), errors.New("failed"))
 
 	exampleTokenRefreshFormJSON, _ := json.Marshal(exampleTokenRefreshForm)
-	req, _ := http.NewRequest("GET", "/api/v2/members/refresh", bytes.NewBuffer(exampleTokenRefreshFormJSON))
+	req, _ := http.NewRequest("POST", "/api/v2/members/token", bytes.NewBuffer(exampleTokenRefreshFormJSON))
 	router.ServeHTTP(responseRecorder, req)
 
 	var responsemember models.TokenPairDTO
@@ -361,7 +361,7 @@ func TestCreateMemberDatabaseFailed(t *testing.T) {
 
 	// Setup mocks
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
-	mockMemberService.EXPECT().CreateMember(&form, gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
+	mockMemberService.EXPECT().CreateMember(&form, gomock.Any()).Return("access", int64(1), "refresh", int64(2), &exampleMember, fmt.Errorf("oh no")).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(body))

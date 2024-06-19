@@ -3910,11 +3910,17 @@
         "models.LoggedInMemberDTO": {
             "type": "object",
             "properties": {
+                "accessExp": {
+                    "type": "integer"
+                },
                 "accessToken": {
                     "type": "string"
                 },
                 "member": {
                     "$ref": "#/definitions/models.MemberDTO"
+                },
+                "refreshExp": {
+                    "type": "integer"
                 },
                 "refreshToken": {
                     "type": "string"
@@ -4222,8 +4228,14 @@
         "models.TokenPairDTO": {
             "type": "object",
             "properties": {
+                "accessExp": {
+                    "type": "integer"
+                },
                 "accessToken": {
                     "type": "string"
+                },
+                "refreshExp": {
+                    "type": "integer"
                 },
                 "refreshToken": {
                     "type": "string"

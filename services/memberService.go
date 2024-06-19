@@ -27,26 +27,26 @@ func (memberService *MemberService) GetMember(memberID uint) (*models.Member, er
 	return member, err
 }
 
-func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (accessToken, refreshToken string, member *models.Member, err error) {
+func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (string, int64, string, int64, *models.Member, error) {
 	// check if user with this email already exists
 	duplicateMember, err := memberService.MemberRepository.Query(&models.Member{Email: form.Email})
 	if err != nil {
-		return accessToken, refreshToken, member, fmt.Errorf("failed to find all existing member with email %s", form.Email)
+		return "", 0, "", 0, nil, fmt.Errorf("failed to find all existing member with email %s", form.Email)
 	}
 
 	if len(duplicateMember) != 0 {
-		return accessToken, refreshToken, member, fmt.Errorf("a user with the email %s already exists", form.Email)
+		return "", 0, "", 0, nil, fmt.Errorf("a user with the email %s already exists", form.Email)
 	}
 
 	// hash password
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return accessToken, refreshToken, member, fmt.Errorf("failed to hash password: %w", err)
+		return "", 0, "", 0, nil, fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	// create member
 	// for now no input sanitization for the strings - so first name, last name, email, institution, etc.
-	member = &models.Member{
+	member := &models.Member{
 		FirstName:                   form.FirstName,
 		LastName:                    form.LastName,
 		Email:                       form.Email,
@@ -58,16 +58,16 @@ func (memberService *MemberService) CreateMember(form *forms.MemberCreationForm,
 	// save member to db
 	err = memberService.MemberRepository.Create(member)
 	if err != nil {
-		return accessToken, refreshToken, member, err
+		return "", 0, "", 0, nil, err
 	}
 
 	// generate tokens
-	accessToken, refreshToken, err = memberService.generateTokenPair(member.ID)
+	accessToken, aExp, refreshToken, rExp, err := memberService.generateTokenPair(member.ID)
 	if err != nil {
-		return accessToken, refreshToken, member, fmt.Errorf("failed to generate token pair: %w", err)
+		return "", 0, "", 0, nil, fmt.Errorf("failed to generate token pair: %w", err)
 	}
 
-	return accessToken, refreshToken, member, err
+	return accessToken, aExp, refreshToken, rExp, member, nil
 }
 
 func (memberService *MemberService) DeleteMember(memberID uint) error {
@@ -90,42 +90,35 @@ func (memberService *MemberService) GetAllMembers() ([]*models.MemberShortFormDT
 	return shortFormDTOs, err
 }
 
-func (memberService *MemberService) LogInMember(form *forms.MemberAuthForm) (*models.LoggedInMemberDTO, error) {
+func (memberService *MemberService) LogInMember(form *forms.MemberAuthForm) (*models.Member, string, int64, string, int64, error) {
 	// get member
 	members, err := memberService.MemberRepository.Query(&models.Member{Email: form.Email})
 	if err != nil {
-		return nil, fmt.Errorf("failed to query members with email %s: %w", form.Email, err)
+		return nil, "", 0, "", 0, fmt.Errorf("failed to query members with email %s: %w", form.Email, err)
 	}
 
 	if len(members) == 0 {
-		return nil, fmt.Errorf("no members with email %s found", form.Email)
+		return nil, "", 0, "", 0, fmt.Errorf("no members with email %s found", form.Email)
 	}
 
 	member := members[0]
 
 	// compare passwords
 	if err := bcrypt.CompareHashAndPassword([]byte(member.Password), []byte(form.Password)); err != nil {
-		return nil, fmt.Errorf("invalid password")
+		return nil, "", 0, "", 0, fmt.Errorf("invalid password")
 	}
 
 	// generate tokens
-	accessToken, RefreshToken, err := memberService.generateTokenPair(member.ID)
+	accessToken, aExp, RefreshToken, rExp, err := memberService.generateTokenPair(member.ID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate token pair: %w", err)
+		return nil, "", 0, "", 0, fmt.Errorf("failed to generate token pair: %w", err)
 	}
 
-	// create logged in member dto
-	loggedInMember := &models.LoggedInMemberDTO{
-		Member:       member.IntoDTO(),
-		AccessToken:  accessToken,
-		RefreshToken: RefreshToken,
-	}
-
-	return loggedInMember, nil
+	return member, accessToken, aExp, RefreshToken, rExp, nil
 }
 
 // Credit: https://github.com/war1oc/jwt-auth/blob/master/handler.go
-func (memberService *MemberService) RefreshToken(form *forms.TokenRefreshForm) (*models.TokenPairDTO, error) {
+func (memberService *MemberService) RefreshToken(form *forms.TokenRefreshForm) (string, int64, string, int64, error) {
 	// get token
 	token, err := jwt.Parse(form.RefreshToken, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
@@ -138,12 +131,12 @@ func (memberService *MemberService) RefreshToken(form *forms.TokenRefreshForm) (
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse token: %w", err)
+		return "", 0, "", 0, fmt.Errorf("failed to parse token: %w", err)
 	}
 
 	// verify that the typ is refresh
 	if token.Header["typ"] != "refresh" {
-		return nil, fmt.Errorf("this token is not a refresh token")
+		return "", 0, "", 0, fmt.Errorf("this token is not a refresh token")
 	}
 
 	// validate token
@@ -151,30 +144,26 @@ func (memberService *MemberService) RefreshToken(form *forms.TokenRefreshForm) (
 		// verify that user exists
 		memberID := uint(claims["sub"].(float64))
 		if _, err := memberService.MemberRepository.GetByID(memberID); err != nil {
-			return nil, fmt.Errorf("the member associated with this token with id=%v doesnt exist: %w", memberID, err)
+			return "", 0, "", 0, fmt.Errorf("the member associated with this token with id=%v doesnt exist: %w", memberID, err)
 		}
 
 		// create new access and refresh tokens
-		accessToken, refreshToken, err := memberService.generateTokenPair(memberID)
+		accessToken, aExp, refreshToken, rExp, err := memberService.generateTokenPair(memberID)
 		if err != nil {
-			return nil, fmt.Errorf("failed to generate token pair: %w", err)
+			return "", 0, "", 0, fmt.Errorf("failed to generate token pair: %w", err)
 		}
 
-		// return tokens
-		return &models.TokenPairDTO{
-			AccessToken:  accessToken,
-			RefreshToken: refreshToken,
-		}, nil
+		return accessToken, aExp, refreshToken, rExp, nil
 	}
 
-	return nil, fmt.Errorf("invalid token")
+	return "", 0, "", 0, fmt.Errorf("invalid token")
 }
 
 // generateTokenPair generates an access token and a refresh token for a member (assumes member is valid and exists)
 // The access token is short lived (15 mins), but the refresh token has a long expiration time (3 days).
 // When the access token expires, the refresh token can be used to generate a new pair of tokens.
 // Credit: https://medium.com/monstar-lab-bangladesh-engineering/jwt-auth-in-go-dde432440924
-func (memberService *MemberService) generateTokenPair(memberID uint) (t, rt string, err error) {
+func (memberService *MemberService) generateTokenPair(memberID uint) (at string, aexp int64, rt string, rexp int64, err error) {
 	// CREATE ACCESS TOKEN
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Header["typ"] = "access"
@@ -182,11 +171,12 @@ func (memberService *MemberService) generateTokenPair(memberID uint) (t, rt stri
 	// Set claims
 	claims, _ := token.Claims.(jwt.MapClaims)
 	claims["sub"] = memberID
-	claims["exp"] = time.Now().Add(time.Minute * time.Duration(AccessTokenDuration)).Unix() // 15 min timout
+	aexp = time.Now().Add(time.Minute * time.Duration(AccessTokenDuration)).Unix() // 15 min timout
+	claims["exp"] = aexp
 
-	t, err = token.SignedString([]byte(memberService.Secret))
+	at, err = token.SignedString([]byte(memberService.Secret))
 	if err != nil {
-		return "", "", err
+		return "", 0, "", 0, err
 	}
 
 	// CREATE REFRESH TOKEN
@@ -196,12 +186,13 @@ func (memberService *MemberService) generateTokenPair(memberID uint) (t, rt stri
 	// Set claims
 	rtClaims, _ := refreshToken.Claims.(jwt.MapClaims)
 	rtClaims["sub"] = memberID
-	rtClaims["exp"] = time.Now().Add(time.Hour * time.Duration(RefreshTokenDuration)).Unix() // 3 day timout
+	rexp = time.Now().Add(time.Hour * time.Duration(RefreshTokenDuration)).Unix() // 3 day timout
+	rtClaims["exp"] = rexp
 
 	rt, err = refreshToken.SignedString([]byte(memberService.Secret))
 	if err != nil {
-		return "", "", err
+		return "", 0, "", 0, err
 	}
 
-	return t, rt, nil
+	return at, aexp, rt, rexp, nil
 }

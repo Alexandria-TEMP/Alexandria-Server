@@ -3913,11 +3913,17 @@ const docTemplate = `{
         "models.LoggedInMemberDTO": {
             "type": "object",
             "properties": {
+                "accessExp": {
+                    "type": "integer"
+                },
                 "accessToken": {
                     "type": "string"
                 },
                 "member": {
                     "$ref": "#/definitions/models.MemberDTO"
+                },
+                "refreshExp": {
+                    "type": "integer"
                 },
                 "refreshToken": {
                     "type": "string"
@@ -4225,8 +4231,14 @@ const docTemplate = `{
         "models.TokenPairDTO": {
             "type": "object",
             "properties": {
+                "accessExp": {
+                    "type": "integer"
+                },
                 "accessToken": {
                     "type": "string"
+                },
+                "refreshExp": {
+                    "type": "integer"
                 },
                 "refreshToken": {
                     "type": "string"
