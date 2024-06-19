@@ -8,6 +8,7 @@ import "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/a
 
 // @host      localhost:8080
 // @BasePath  /api/v2
+// @schemes   http
 
 func main() {
 	server.Init()
