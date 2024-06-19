@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"io/fs"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -119,12 +120,14 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (string, erro
 func (renderService *RenderService) RenderPost(post *models.Post) {
 	// Checkout master
 	if err := renderService.Filesystem.CheckoutBranch("master"); err != nil {
+		log.Printf("POST RENDER ERROR: failed to checkout master: %s", err)
 		renderService.FailPost(post)
 
 		return
 	}
 	// Unzip saved file
 	if err := renderService.Filesystem.Unzip(); err != nil {
+		log.Printf("POST RENDER ERROR: failed to unzip: %s", err)
 		renderService.FailPost(post)
 
 		return
@@ -132,6 +135,7 @@ func (renderService *RenderService) RenderPost(post *models.Post) {
 
 	// Validate project
 	if valid := renderService.IsValidProject(); !valid {
+		log.Printf("POST RENDER ERROR: invalid project")
 		renderService.FailPost(post)
 
 		return
@@ -139,6 +143,7 @@ func (renderService *RenderService) RenderPost(post *models.Post) {
 
 	// Install dependencies
 	if err := renderService.InstallRenderDependencies(); err != nil {
+		log.Printf("POST RENDER ERROR: failed to install dependencies: %s", err)
 		renderService.FailPost(post)
 
 		return
@@ -146,6 +151,7 @@ func (renderService *RenderService) RenderPost(post *models.Post) {
 
 	// Set custom render config in yaml
 	if err := renderService.SetProjectConfig(); err != nil {
+		log.Printf("POST RENDER ERROR: failed to set project config: %s", err)
 		renderService.FailPost(post)
 
 		return
@@ -153,6 +159,7 @@ func (renderService *RenderService) RenderPost(post *models.Post) {
 
 	// Render quarto project
 	if err := renderService.RunRender(); err != nil {
+		log.Printf("POST RENDER ERROR: failed to run render: %s", err)
 		renderService.FailPost(post)
 
 		return
@@ -160,6 +167,7 @@ func (renderService *RenderService) RenderPost(post *models.Post) {
 
 	// Verify that a render was produced in the form of a single file
 	if _, err := renderService.Filesystem.RenderExists(); err != nil {
+		log.Printf("POST RENDER ERROR: render does not exist: %s", err)
 		renderService.FailPost(post)
 
 		return
@@ -167,6 +175,7 @@ func (renderService *RenderService) RenderPost(post *models.Post) {
 
 	// Commit
 	if err := renderService.Filesystem.CreateCommit(); err != nil {
+		log.Printf("POST RENDER ERROR: failed to create commit: %s", err)
 		renderService.FailPost(post)
 
 		return
@@ -175,6 +184,7 @@ func (renderService *RenderService) RenderPost(post *models.Post) {
 	// Update post render status
 	post.RenderStatus = models.Success
 	if _, err := renderService.PostRepository.Update(post); err != nil {
+		log.Printf("POST RENDER ERROR: failed to update post render status: %s", err)
 		renderService.FailPost(post)
 
 		return
@@ -187,6 +197,8 @@ func (renderService *RenderService) RenderBranch(branch *models.Branch) {
 		renderService.FailBranch(branch)
 		_ = renderService.Filesystem.Reset()
 
+		log.Printf("BRANCH RENDER ERROR: failed to checkout branch: %s", err)
+
 		return
 	}
 
@@ -194,6 +206,8 @@ func (renderService *RenderService) RenderBranch(branch *models.Branch) {
 	if err := renderService.Filesystem.Unzip(); err != nil {
 		renderService.FailBranch(branch)
 		_ = renderService.Filesystem.Reset()
+
+		log.Printf("BRANCH RENDER ERROR: failed to unzip: %s", err)
 
 		return
 	}
@@ -203,6 +217,8 @@ func (renderService *RenderService) RenderBranch(branch *models.Branch) {
 		renderService.FailBranch(branch)
 		_ = renderService.Filesystem.Reset()
 
+		log.Printf("BRANCH RENDER ERROR: invalid project")
+
 		return
 	}
 
@@ -210,6 +226,8 @@ func (renderService *RenderService) RenderBranch(branch *models.Branch) {
 	if err := renderService.InstallRenderDependencies(); err != nil {
 		renderService.FailBranch(branch)
 		_ = renderService.Filesystem.Reset()
+
+		log.Printf("BRANCH RENDER ERROR: failed to install dependencies: %s", err)
 
 		return
 	}
@@ -219,12 +237,15 @@ func (renderService *RenderService) RenderBranch(branch *models.Branch) {
 		renderService.FailBranch(branch)
 		_ = renderService.Filesystem.Reset()
 
+		log.Printf("BRANCH RENDER ERROR: failed to set project config: %s", err)
+
 		return
 	}
 
 	// Render quarto project
 	if err := renderService.RunRender(); err != nil {
 		renderService.FailBranch(branch)
+		log.Printf("BRANCH RENDER ERROR: failed to run render: %s", err)
 
 		return
 	}
@@ -232,6 +253,7 @@ func (renderService *RenderService) RenderBranch(branch *models.Branch) {
 	// Verify that a render was produced in the form of a single file
 	if _, err := renderService.Filesystem.RenderExists(); err != nil {
 		renderService.FailBranch(branch)
+		log.Printf("BRANCH RENDER ERROR: render does not exist: %s", err)
 
 		return
 	}
@@ -239,6 +261,7 @@ func (renderService *RenderService) RenderBranch(branch *models.Branch) {
 	// Commit
 	if err := renderService.Filesystem.CreateCommit(); err != nil {
 		renderService.FailBranch(branch)
+		log.Printf("BRANCH RENDER ERROR: failed to create commit: %s", err)
 
 		return
 	}
@@ -247,6 +270,7 @@ func (renderService *RenderService) RenderBranch(branch *models.Branch) {
 	branch.RenderStatus = models.Success
 	if _, err := renderService.BranchRepository.Update(branch); err != nil {
 		renderService.FailBranch(branch)
+		log.Printf("BRANCH RENDER ERROR: failed to update branch render status: %s", err)
 
 		return
 	}
