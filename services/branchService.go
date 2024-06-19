@@ -18,15 +18,16 @@ import (
 const approvalsToMerge = 2 // 0 indexed
 
 type BranchService struct {
-	BranchRepository              database.ModelRepositoryInterface[*models.Branch]
-	ClosedBranchRepository        database.ModelRepositoryInterface[*models.ClosedBranch]
-	PostRepository                database.ModelRepositoryInterface[*models.Post]
-	ProjectPostRepository         database.ModelRepositoryInterface[*models.ProjectPost]
-	ReviewRepository              database.ModelRepositoryInterface[*models.BranchReview]
-	DiscussionContainerRepository database.ModelRepositoryInterface[*models.DiscussionContainer]
-	DiscussionRepository          database.ModelRepositoryInterface[*models.Discussion]
-	MemberRepository              database.ModelRepositoryInterface[*models.Member]
-	Filesystem                    filesystemInterfaces.Filesystem
+	BranchRepository                      database.ModelRepositoryInterface[*models.Branch]
+	ClosedBranchRepository                database.ModelRepositoryInterface[*models.ClosedBranch]
+	PostRepository                        database.ModelRepositoryInterface[*models.Post]
+	ProjectPostRepository                 database.ModelRepositoryInterface[*models.ProjectPost]
+	ReviewRepository                      database.ModelRepositoryInterface[*models.BranchReview]
+	DiscussionContainerRepository         database.ModelRepositoryInterface[*models.DiscussionContainer]
+	DiscussionRepository                  database.ModelRepositoryInterface[*models.Discussion]
+	MemberRepository                      database.ModelRepositoryInterface[*models.Member]
+	Filesystem                            filesystemInterfaces.Filesystem
+	ScientificFieldTagContainerRepository database.ModelRepositoryInterface[*models.ScientificFieldTagContainer]
 
 	RenderService             interfaces.RenderService
 	BranchCollaboratorService interfaces.BranchCollaboratorService
@@ -318,7 +319,12 @@ func (branchService *BranchService) merge(branch *models.Branch, closedBranch *m
 	}
 
 	if branch.UpdatedScientificFieldTagContainer != nil {
-		projectPost.Post.ScientificFieldTagContainer = *branch.UpdatedScientificFieldTagContainer
+		container, err := branchService.ScientificFieldTagContainerRepository.GetByID(*branch.UpdatedScientificFieldTagContainerID)
+		if err != nil {
+			return fmt.Errorf("could not get scientific field tag container during merge: %w", err)
+		}
+
+		projectPost.Post.ScientificFieldTagContainer = *container
 	}
 
 	if branch.UpdatedFeedbackPreferences != nil {
@@ -333,6 +339,11 @@ func (branchService *BranchService) merge(branch *models.Branch, closedBranch *m
 	// update project post reviewers
 	if err := branchService.PostCollaboratorService.MergeReviewers(projectPost, branch.Reviews); err != nil {
 		return err
+	}
+
+	// update the post itself
+	if _, err := branchService.PostRepository.Update(&projectPost.Post); err != nil {
+		return fmt.Errorf("could not update post: %w", err)
 	}
 
 	return nil
