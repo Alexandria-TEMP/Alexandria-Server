@@ -4076,7 +4076,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "2.0",
 	Host:             "localhost:8080",
 	BasePath:         "/api/v2",
-	Schemes:          []string{},
+	Schemes:          []string{"http"},
 	Title:            "Alexandria API",
 	Description:      "This is the API of Alexandria.",
 	InfoInstanceName: "swagger",

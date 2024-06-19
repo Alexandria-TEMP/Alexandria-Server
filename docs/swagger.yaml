@@ -2730,4 +2730,6 @@ paths:
       summary: Get scientific tag container
       tags:
       - tags
+schemes:
+- http
 swagger: "2.0"
