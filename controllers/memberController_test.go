@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	mock_interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	gomock "go.uber.org/mock/gomock"
@@ -142,49 +144,6 @@ func TestDeleteMember404(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
 
-// func TestUpdateMember200(t *testing.T) {
-// 	beforeEachMember(t)
-
-// 	mockMemberService.EXPECT().UpdateMember(&exampleMemberDTO, gomock.Any()).Return(nil).Times(1)
-// 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
-
-// 	exampleMemberDTOJSON, _ := json.Marshal(exampleMemberDTO)
-// 	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(exampleMemberDTOJSON))
-// 	router.ServeHTTP(responseRecorder, req)
-
-// 	defer responseRecorder.Result().Body.Close()
-
-// 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
-// }
-
-// func TestUpdateMember400(t *testing.T) {
-// 	beforeEachMember(t)
-
-// 	mockMemberService.EXPECT().UpdateMember(gomock.Any(), gomock.Any()).Return(nil).Times(0)
-
-// 	badMemberFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
-// 	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(badMemberFormJSON))
-// 	router.ServeHTTP(responseRecorder, req)
-
-// 	defer responseRecorder.Result().Body.Close()
-
-// 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-// }
-// func TestUpdateMember404(t *testing.T) {
-// 	beforeEachMember(t)
-
-// 	mockMemberService.EXPECT().UpdateMember(gomock.Any(), gomock.Any()).Return(errors.New("some error")).Times(1)
-// 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
-
-// 	exampleMemberDTOJSON, _ := json.Marshal(exampleMemberDTO)
-// 	req, _ := http.NewRequest("PUT", "/api/v2/members", bytes.NewBuffer(exampleMemberDTOJSON))
-// 	router.ServeHTTP(responseRecorder, req)
-
-// 	defer responseRecorder.Result().Body.Close()
-
-// 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
-// }
-
 func TestGetAllMembers200(t *testing.T) {
 	beforeEachMember(t)
 	mockMemberService.EXPECT().GetAllMembers().Return([]*models.MemberShortFormDTO{
@@ -218,4 +177,72 @@ func TestGetAllMembers404(t *testing.T) {
 	defer responseRecorder.Result().Body.Close()
 
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}
+
+func TestCreateMemberFormValidationFailed(t *testing.T) {
+	beforeEachMember(t)
+
+	form := forms.MemberCreationForm{
+		FirstName:             "",
+		LastName:              "",
+		Email:                 "",
+		Password:              "",
+		Institution:           "",
+		ScientificFieldTagIDs: []uint{},
+	}
+
+	// Marshal form
+	body, err := json.Marshal(form)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Construct request
+	req, err := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
+}
+
+func TestCreateMemberDatabaseFailed(t *testing.T) {
+	beforeEachMember(t)
+
+	form := forms.MemberCreationForm{
+		FirstName:             "John",
+		LastName:              "Doe",
+		Email:                 "todo@todo.todo",
+		Password:              "password",
+		Institution:           "TU delft",
+		ScientificFieldTagIDs: []uint{},
+	}
+
+	// Marshal form
+	body, err := json.Marshal(form)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Setup mocks
+	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
+	mockMemberService.EXPECT().CreateMember(&form, gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
+
+	// Construct request
+	req, err := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Send request
+	router.ServeHTTP(responseRecorder, req)
+	defer responseRecorder.Result().Body.Close()
+
+	// Check status
+	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Result().StatusCode)
 }
