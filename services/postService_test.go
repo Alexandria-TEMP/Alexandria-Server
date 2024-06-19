@@ -294,14 +294,15 @@ func TestUploadPostSuccess(t *testing.T) {
 		Filename: "test.zip",
 	}
 
-	mockPostRepository.EXPECT().GetByID(uint(10)).Return(post, nil)
+	mockPostRepository.EXPECT().GetByID(uint(10)).Return(post, lock)
+	mockFilesystem.EXPECT().LockDirectory(post.ID).Return(lock, nil)
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(10))
 	mockFilesystem.EXPECT().CheckoutBranch("master").Return(nil)
 	mockFilesystem.EXPECT().CleanDir().Return(nil)
 	mockFilesystem.EXPECT().SaveZipFile(gomock.Any(), file).Return(nil)
 	mockFilesystem.EXPECT().CreateCommit()
 	mockPostRepository.EXPECT().Update(pendingPost).Return(pendingPost, nil)
-	mockRenderService.EXPECT().RenderPost(post)
+	mockRenderService.EXPECT().RenderPost(post, lock)
 
 	err := postService.UploadPost(nil, file, 10)
 	assert.Nil(t, err)
@@ -391,13 +392,15 @@ func TestGetMainProjectSuccess(t *testing.T) {
 
 	postID := uint(10)
 	mockPostRepository.EXPECT().GetByID(postID).Return(&models.Post{Model: gorm.Model{ID: postID}}, nil)
+	mockFilesystem.EXPECT().LockDirectory(postID).Return(lock, nil)
 	mockFilesystem.EXPECT().CheckoutDirectory(postID)
 	mockFilesystem.EXPECT().CheckoutBranch("master").Return(nil)
 	mockFilesystem.EXPECT().GetCurrentZipFilePath().Return("../utils/test_files/good_repository_setup/quarto_project.zip")
 
-	filePath, err := postService.GetMainProject(postID)
+	filePath, outputLock, err := postService.GetMainProject(postID)
 	assert.Nil(t, err)
 	assert.Equal(t, "../utils/test_files/good_repository_setup/quarto_project.zip", filePath)
+	assert.Equal(t, lock, outputLock)
 }
 
 func TestGetMainProjectFailedGetPost(t *testing.T) {
@@ -407,8 +410,9 @@ func TestGetMainProjectFailedGetPost(t *testing.T) {
 	postID := uint(10)
 	mockPostRepository.EXPECT().GetByID(postID).Return(nil, errors.New("failed"))
 
-	filePath, err := postService.GetMainProject(postID)
+	filePath, lock, err := postService.GetMainProject(postID)
 	assert.NotNil(t, err)
+	assert.Nil(t, lock)
 	assert.Equal(t, "", filePath)
 }
 
@@ -418,12 +422,14 @@ func TestGetMainProjectFailedCheckoutBranch(t *testing.T) {
 
 	postID := uint(10)
 	mockPostRepository.EXPECT().GetByID(postID).Return(&models.Post{Model: gorm.Model{ID: postID}}, nil)
+	mockFilesystem.EXPECT().LockDirectory(postID).Return(lock, nil)
 	mockFilesystem.EXPECT().CheckoutDirectory(postID)
 	mockFilesystem.EXPECT().CheckoutBranch("master").Return(errors.New("failed"))
 
-	filePath, err := postService.GetMainProject(postID)
+	filePath, outputLock, err := postService.GetMainProject(postID)
 	assert.NotNil(t, err)
 	assert.Equal(t, "", filePath)
+	assert.Equal(t, lock, outputLock)
 }
 
 func TestGetMainFiletreeSuccess(t *testing.T) {
@@ -480,13 +486,15 @@ func TestGetMainFileFromProjectSuccess(t *testing.T) {
 	absFilepath := "../utils/test_files/file_tree/child_dir/test.txt"
 
 	mockPostRepository.EXPECT().GetByID(postID).Return(&models.Post{Model: gorm.Model{ID: postID}}, nil)
+	mockFilesystem.EXPECT().LockDirectory(postID).Return(lock, nil)
 	mockFilesystem.EXPECT().CheckoutDirectory(postID)
 	mockFilesystem.EXPECT().CheckoutBranch("master").Return(nil)
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return("../utils/test_files/file_tree")
 
-	resultFilepath, err := postService.GetMainFileFromProject(postID, relFilepath)
+	resultFilepath, outputLock, err := postService.GetMainFileFromProject(postID, relFilepath)
 	assert.Nil(t, err)
 	assert.Equal(t, absFilepath, resultFilepath)
+	assert.Equal(t, outputLock, lock)
 }
 
 func TestGetMainFileFromProjectOutsideRepository(t *testing.T) {
@@ -496,9 +504,10 @@ func TestGetMainFileFromProjectOutsideRepository(t *testing.T) {
 	postID := uint(10)
 	relFilepath := "../outside.txt"
 
-	resultFilepath, err := postService.GetMainFileFromProject(postID, relFilepath)
+	resultFilepath, outputLock, err := postService.GetMainFileFromProject(postID, relFilepath)
 	assert.NotNil(t, err)
 	assert.Equal(t, "", resultFilepath)
+	assert.Equal(t, lock, outputLock)
 }
 
 func TestGetMainFileFromProjectFailedGetPost(t *testing.T) {
@@ -510,9 +519,10 @@ func TestGetMainFileFromProjectFailedGetPost(t *testing.T) {
 
 	mockPostRepository.EXPECT().GetByID(postID).Return(nil, errors.New("failed"))
 
-	resultFilepath, err := postService.GetMainFileFromProject(postID, relFilepath)
+	resultFilepath, outputLock, err := postService.GetMainFileFromProject(postID, relFilepath)
 	assert.NotNil(t, err)
 	assert.Equal(t, "", resultFilepath)
+	assert.Equal(t, outputLock, lock)
 }
 
 func TestGetMainFileFromProjectFailedCheckoutBranch(t *testing.T) {
@@ -523,12 +533,14 @@ func TestGetMainFileFromProjectFailedCheckoutBranch(t *testing.T) {
 	relFilepath := "test.txt"
 
 	mockPostRepository.EXPECT().GetByID(postID).Return(&models.Post{Model: gorm.Model{ID: postID}}, nil)
+	mockFilesystem.EXPECT().LockDirectory(postID).Return(lock, nil)
 	mockFilesystem.EXPECT().CheckoutDirectory(postID)
 	mockFilesystem.EXPECT().CheckoutBranch("master").Return(errors.New("failed"))
 
-	resultFilepath, err := postService.GetMainFileFromProject(postID, relFilepath)
+	resultFilepath, outputLock, err := postService.GetMainFileFromProject(postID, relFilepath)
 	assert.NotNil(t, err)
 	assert.Equal(t, "", resultFilepath)
+	assert.Equal(t, outputLock, lock)
 }
 
 func TestGetMainFileFromProjectFileNotExist(t *testing.T) {
@@ -539,11 +551,12 @@ func TestGetMainFileFromProjectFileNotExist(t *testing.T) {
 	relFilepath := "child_dir/notreal.txt"
 
 	mockPostRepository.EXPECT().GetByID(postID).Return(&models.Post{Model: gorm.Model{ID: postID}}, nil)
+	mockFilesystem.EXPECT().LockDirectory(postID).Return(lock, nil)
 	mockFilesystem.EXPECT().CheckoutDirectory(postID)
 	mockFilesystem.EXPECT().CheckoutBranch("master").Return(nil)
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return("../utils/test_files/file_tree")
 
-	_, err := postService.GetMainFileFromProject(postID, relFilepath)
+	_, _, err := postService.GetMainFileFromProject(postID, relFilepath)
 	assert.NotNil(t, err)
 }
 

@@ -70,7 +70,8 @@ func (filesystem *Filesystem) CheckoutDirectory(postID uint) {
 	filesystem.CurrentZipFilePath = filepath.Join(filesystem.CurrentDirPath, filesystem.zipName)
 	filesystem.CurrentRenderDirPath = filepath.Join(filesystem.CurrentDirPath, "render")
 
-	// try to open repository if it exists
+	// try to open repository if it exists.
+	// we ignore the error to be flexible: if the repo already exists check it out, if not thats also ok.
 	filesystem.CurrentRepository, _ = filesystem.CheckoutRepository()
 }
 

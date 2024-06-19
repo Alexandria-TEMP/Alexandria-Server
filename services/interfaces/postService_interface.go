@@ -4,6 +4,7 @@ import (
 	"mime/multipart"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gofrs/flock"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 )
@@ -17,9 +18,9 @@ type PostService interface {
 	// UploadPost saves a zipped quarto project to master and initiates the render pipeline.
 	// It the renders the project in a goroutine.
 	UploadPost(c *gin.Context, file *multipart.FileHeader, postID uint) error
-	GetMainProject(postID uint) (string, error)
+	GetMainProject(postID uint) (string, *flock.Flock, error)
 	GetMainFiletree(branchID uint) (map[string]int64, error, error)
-	GetMainFileFromProject(postID uint, relFilepath string) (string, error)
+	GetMainFileFromProject(postID uint, relFilepath string) (string, *flock.Flock, error)
 
 	// Return a filtered list of post IDs
 	Filter(page, size int, form forms.PostFilterForm) ([]uint, error)

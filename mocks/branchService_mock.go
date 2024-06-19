@@ -14,6 +14,7 @@ import (
 	reflect "reflect"
 
 	gin "github.com/gin-gonic/gin"
+	flock "github.com/gofrs/flock"
 	forms "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	models "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	gomock "go.uber.org/mock/gomock"
@@ -148,12 +149,13 @@ func (mr *MockBranchServiceMockRecorder) GetClosedBranch(closedBranchID any) *go
 }
 
 // GetFileFromProject mocks base method.
-func (m *MockBranchService) GetFileFromProject(branchID uint, relFilepath string) (string, error) {
+func (m *MockBranchService) GetFileFromProject(branchID uint, relFilepath string) (string, *flock.Flock, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFileFromProject", branchID, relFilepath)
 	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(*flock.Flock)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // GetFileFromProject indicates an expected call of GetFileFromProject.
@@ -179,12 +181,13 @@ func (mr *MockBranchServiceMockRecorder) GetFiletree(branchID any) *gomock.Call 
 }
 
 // GetProject mocks base method.
-func (m *MockBranchService) GetProject(branchID uint) (string, error) {
+func (m *MockBranchService) GetProject(branchID uint) (string, *flock.Flock, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetProject", branchID)
 	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(*flock.Flock)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // GetProject indicates an expected call of GetProject.

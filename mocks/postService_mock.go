@@ -14,6 +14,7 @@ import (
 	reflect "reflect"
 
 	gin "github.com/gin-gonic/gin"
+	flock "github.com/gofrs/flock"
 	forms "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	models "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	gomock "go.uber.org/mock/gomock"
@@ -73,12 +74,13 @@ func (mr *MockPostServiceMockRecorder) Filter(page, size, form any) *gomock.Call
 }
 
 // GetMainFileFromProject mocks base method.
-func (m *MockPostService) GetMainFileFromProject(postID uint, relFilepath string) (string, error) {
+func (m *MockPostService) GetMainFileFromProject(postID uint, relFilepath string) (string, *flock.Flock, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMainFileFromProject", postID, relFilepath)
 	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(*flock.Flock)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // GetMainFileFromProject indicates an expected call of GetMainFileFromProject.
@@ -104,12 +106,13 @@ func (mr *MockPostServiceMockRecorder) GetMainFiletree(branchID any) *gomock.Cal
 }
 
 // GetMainProject mocks base method.
-func (m *MockPostService) GetMainProject(postID uint) (string, error) {
+func (m *MockPostService) GetMainProject(postID uint) (string, *flock.Flock, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMainProject", postID)
 	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(*flock.Flock)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // GetMainProject indicates an expected call of GetMainProject.

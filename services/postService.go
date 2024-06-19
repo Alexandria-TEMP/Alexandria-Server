@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gofrs/flock"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
@@ -76,6 +77,14 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 		return nil, fmt.Errorf("could not create post: %w", err)
 	}
 
+	// lock directory and defer unlocking it
+	lock, err := postService.Filesystem.LockDirectory(post.ID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to aquire lock for directory %v: %w", post.ID, err)
+	}
+
+	defer lock.Unlock()
+
 	// Checkout directory where post will store it's files
 	postService.Filesystem.CheckoutDirectory(post.ID)
 
@@ -100,15 +109,24 @@ func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileH
 		return fmt.Errorf("this post is a project post and cannot be directly changed. instead propose a change using a branch")
 	}
 
+	// lock directory
+	// we unlock it upon error or after finishing render pipeline
+	lock, err := postService.Filesystem.LockDirectory(post.ID)
+	if err != nil {
+		return fmt.Errorf("failed to aquire lock for directory %v: %w", post.ID, err)
+	}
+
 	// select repository of the post and checkout master
 	postService.Filesystem.CheckoutDirectory(postID)
 
 	if err := postService.Filesystem.CheckoutBranch("master"); err != nil {
+		lock.Unlock()
 		return err
 	}
 
 	// clean directory to remove all files
 	if err := postService.Filesystem.CleanDir(); err != nil {
+		lock.Unlock()
 		return err
 	}
 
@@ -118,34 +136,44 @@ func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileH
 		post.RenderStatus = models.Failure
 		_, _ = postService.PostRepository.Update(post)
 		_ = postService.Filesystem.Reset()
+		lock.Unlock()
 
 		return fmt.Errorf("failed to save zip file: %w", err)
 	}
 
 	// commit (or perhaps only commit after rendering?)
 	if err := postService.Filesystem.CreateCommit(); err != nil {
+		lock.Unlock()
 		return err
 	}
 
 	// Set render status pending
 	post.RenderStatus = models.Pending
 	if _, err := postService.PostRepository.Update(post); err != nil {
+		lock.Unlock()
 		return fmt.Errorf("failed to update post entity: %w", err)
 	}
 
-	go postService.RenderService.RenderPost(post)
+	go postService.RenderService.RenderPost(post, lock)
 
 	return nil
 }
 
-func (postService *PostService) GetMainProject(postID uint) (string, error) {
+func (postService *PostService) GetMainProject(postID uint) (string, *flock.Flock, error) {
 	var filePath string
 
 	// check post exists
 	_, err := postService.PostRepository.GetByID(postID)
 
 	if err != nil {
-		return filePath, fmt.Errorf("failed to find post with id %v: %w", postID, err)
+		return filePath, nil, fmt.Errorf("failed to find post with id %v: %w", postID, err)
+	}
+
+	// lock directory
+	// unlock upon error or after the controller has read the zip contents
+	lock, err := postService.Filesystem.LockDirectory(postID)
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to aquire lock for directory %v: %w", postID, err)
 	}
 
 	// select repository of the parent post
@@ -153,10 +181,11 @@ func (postService *PostService) GetMainProject(postID uint) (string, error) {
 
 	// checkout specified branch
 	if err := postService.Filesystem.CheckoutBranch("master"); err != nil {
-		return filePath, fmt.Errorf("failed to find master branch: %w", err)
+		lock.Unlock()
+		return filePath, nil, fmt.Errorf("failed to find master branch: %w", err)
 	}
 
-	return postService.Filesystem.GetCurrentZipFilePath(), nil
+	return postService.Filesystem.GetCurrentZipFilePath(), lock, nil
 }
 
 func (postService *PostService) GetMainFiletree(postID uint) (map[string]int64, error, error) {
@@ -166,6 +195,14 @@ func (postService *PostService) GetMainFiletree(postID uint) (map[string]int64, 
 	if err != nil {
 		return nil, fmt.Errorf("failed to find post with id %v: %w", postID, err), nil
 	}
+
+	// lock directory and defer unlock
+	lock, err := postService.Filesystem.LockDirectory(postID)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to aquire lock for directory %v: %w", postID, err)
+	}
+
+	defer lock.Unlock()
 
 	// select repository of the parent post
 	postService.Filesystem.CheckoutDirectory(postID)
@@ -181,19 +218,26 @@ func (postService *PostService) GetMainFiletree(postID uint) (map[string]int64, 
 	return fileTree, nil, err
 }
 
-func (postService *PostService) GetMainFileFromProject(postID uint, relFilepath string) (string, error) {
+func (postService *PostService) GetMainFileFromProject(postID uint, relFilepath string) (string, *flock.Flock, error) {
 	var absFilepath string
 
 	// validate file path is inside of repository
 	if strings.Contains(relFilepath, "..") {
-		return absFilepath, fmt.Errorf("file is outside of repository")
+		return absFilepath, nil, fmt.Errorf("file is outside of repository")
 	}
 
 	// check post exists
 	_, err := postService.PostRepository.GetByID(postID)
 
 	if err != nil {
-		return absFilepath, fmt.Errorf("failed to find post with id %v: %w", postID, err)
+		return absFilepath, nil, fmt.Errorf("failed to find post with id %v: %w", postID, err)
+	}
+
+	// lock directory
+	// unlock upon error or after controller has read file
+	lock, err := postService.Filesystem.LockDirectory(postID)
+	if err != nil {
+		return absFilepath, nil, fmt.Errorf("failed to aquire lock for directory %v: %w", postID, err)
 	}
 
 	// select repository of the post
@@ -201,17 +245,19 @@ func (postService *PostService) GetMainFileFromProject(postID uint, relFilepath 
 
 	// checkout master
 	if err := postService.Filesystem.CheckoutBranch("master"); err != nil {
-		return absFilepath, fmt.Errorf("failed to find master branch: %w", err)
+		lock.Unlock()
+		return absFilepath, nil, fmt.Errorf("failed to find master branch: %w", err)
 	}
 
 	absFilepath = filepath.Join(postService.Filesystem.GetCurrentQuartoDirPath(), relFilepath)
 
 	// Check that file exists, if not return 404
 	if exists := utils.FileExists(absFilepath); !exists {
-		return "", fmt.Errorf("no such file exists")
+		lock.Unlock()
+		return "", nil, fmt.Errorf("no such file exists")
 	}
 
-	return absFilepath, nil
+	return absFilepath, lock, nil
 }
 
 func (postService *PostService) Filter(page, size int, form forms.PostFilterForm) ([]uint, error) {

@@ -78,6 +78,14 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 		return nil, nil, fmt.Errorf("unable to create project post: %w", err)
 	}
 
+	// lock directory and defer unlocking it
+	lock, err := projectPostService.Filesystem.LockDirectory(projectPost.PostID)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to aquire lock for directory %v: %w", projectPost.PostID, err)
+	}
+
+	defer lock.Unlock()
+
 	// Checkout directory where project post will store it's files
 	projectPostService.Filesystem.CheckoutDirectory(projectPost.PostID)
 
