@@ -136,10 +136,8 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem) Ser
 
 	// TODO we really need an automated DI solution..
 	return ServiceEnv{
-		postService: postService,
-		memberService: &services.MemberService{
-			MemberRepository: repositoryEnv.memberRepository,
-		},
+		postService:               postService,
+		memberService:             &services.MemberService{MemberRepository: repositoryEnv.memberRepository},
 		branchService:             branchService,
 		renderService:             renderService,
 		projectPostService:        projectPostService,
