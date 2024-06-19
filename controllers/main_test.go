@@ -34,6 +34,7 @@ var (
 	mockScientificFieldTagContainerService *mocks.MockScientificFieldTagContainerService
 	mockPostCollaboratorService            *mocks.MockPostCollaboratorService
 	mockPostService                        *mocks.MockPostService
+	mockProjectPostService                 *mocks.MockProjectPostService
 	mockDiscussionService                  *mocks.MockDiscussionService
 	mockDiscussionContainerService         *mocks.MockDiscussionContainerService
 

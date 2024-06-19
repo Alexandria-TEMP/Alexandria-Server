@@ -72,31 +72,31 @@ func (mr *MockProjectPostServiceMockRecorder) GetBranchesGroupedByReviewStatus(p
 }
 
 // GetDiscussionContainersFromMergeHistory mocks base method.
-func (m *MockProjectPostService) GetDiscussionContainersFromMergeHistory(postID uint) (*models.DiscussionContainerProjectHistoryDTO, error) {
+func (m *MockProjectPostService) GetDiscussionContainersFromMergeHistory(projectPostID uint) (*models.DiscussionContainerProjectHistoryDTO, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDiscussionContainersFromMergeHistory", postID)
+	ret := m.ctrl.Call(m, "GetDiscussionContainersFromMergeHistory", projectPostID)
 	ret0, _ := ret[0].(*models.DiscussionContainerProjectHistoryDTO)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetDiscussionContainersFromMergeHistory indicates an expected call of GetDiscussionContainersFromMergeHistory.
-func (mr *MockProjectPostServiceMockRecorder) GetDiscussionContainersFromMergeHistory(postID any) *gomock.Call {
+func (mr *MockProjectPostServiceMockRecorder) GetDiscussionContainersFromMergeHistory(projectPostID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDiscussionContainersFromMergeHistory", reflect.TypeOf((*MockProjectPostService)(nil).GetDiscussionContainersFromMergeHistory), postID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDiscussionContainersFromMergeHistory", reflect.TypeOf((*MockProjectPostService)(nil).GetDiscussionContainersFromMergeHistory), projectPostID)
 }
 
 // GetProjectPost mocks base method.
-func (m *MockProjectPostService) GetProjectPost(postID uint) (*models.ProjectPost, error) {
+func (m *MockProjectPostService) GetProjectPost(projectPostID uint) (*models.ProjectPost, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProjectPost", postID)
+	ret := m.ctrl.Call(m, "GetProjectPost", projectPostID)
 	ret0, _ := ret[0].(*models.ProjectPost)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetProjectPost indicates an expected call of GetProjectPost.
-func (mr *MockProjectPostServiceMockRecorder) GetProjectPost(postID any) *gomock.Call {
+func (mr *MockProjectPostServiceMockRecorder) GetProjectPost(projectPostID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectPost", reflect.TypeOf((*MockProjectPostService)(nil).GetProjectPost), postID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProjectPost", reflect.TypeOf((*MockProjectPostService)(nil).GetProjectPost), projectPostID)
 }

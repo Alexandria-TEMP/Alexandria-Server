@@ -84,7 +84,7 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 	projectPost, err404, err500 := projectPostController.ProjectPostService.CreateProjectPost(&form)
 
 	if err404 != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("not found: %v", err404.Error())})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("not found: %v", err404.Error())})
 
 		return
 	}
