@@ -47,7 +47,7 @@ func postServiceSetup(t *testing.T) {
 	}
 
 	// Setup members in the repository
-	lock.Lock()
+	_ = lock.Lock()
 	memberA = models.Member{
 		Model: gorm.Model{ID: 5},
 	}
@@ -71,7 +71,7 @@ func postServiceSetup(t *testing.T) {
 }
 
 func postServiceTeardown() {
-	lock.Unlock()
+	_ = lock.Unlock()
 }
 
 func TestCreatePostGoodWeather(t *testing.T) {

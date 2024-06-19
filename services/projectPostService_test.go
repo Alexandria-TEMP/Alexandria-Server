@@ -19,8 +19,9 @@ var projectPostService ProjectPostService
 func projectPostServiceSetup(t *testing.T) {
 	t.Helper()
 
-	lock.Lock()
+	_ = lock.Lock()
 	mockCtrl := gomock.NewController(t)
+
 	defer mockCtrl.Finish()
 
 	memberA = models.Member{
@@ -59,7 +60,7 @@ func projectPostServiceSetup(t *testing.T) {
 }
 
 func projectPostServiceTeardown() {
-	lock.Unlock()
+	_ = lock.Unlock()
 }
 
 func TestCreateProjectPostGoodWeather(t *testing.T) {

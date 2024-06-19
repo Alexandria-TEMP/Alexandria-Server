@@ -18,7 +18,7 @@ func beforeEachRender(t *testing.T) {
 	t.Helper()
 
 	// setup models
-	lock.Lock()
+	_ = lock.Lock()
 	pendingBranch = &models.Branch{RenderStatus: models.Pending}
 	successBranch = &models.Branch{RenderStatus: models.Success}
 	failedBranch = &models.Branch{RenderStatus: models.Failure}
@@ -46,8 +46,9 @@ func beforeEachRender(t *testing.T) {
 func cleanup(t *testing.T) {
 	t.Helper()
 
-	lock.Unlock()
-	os.RemoveAll(filepath.Join(cwd, "render"))
+	_ = lock.Unlock()
+
+	_ = os.RemoveAll(filepath.Join(cwd, "render"))
 }
 
 func TestRenderSuccess1(t *testing.T) {

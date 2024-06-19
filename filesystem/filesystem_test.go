@@ -345,6 +345,21 @@ func TestGetFileTreeFailure(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+func TestLockDirectory(t *testing.T) {
+	// Lock post 0
+	CurrentFilesystem.CurrentDirPath = filepath.Join(cwd, "vfs")
+	lockFilePath := filepath.Join(cwd, "vfs", "0", "alexandria.lock")
+
+	lock, err := CurrentFilesystem.LockDirectory(0)
+	assert.Nil(t, err)
+
+	assert.True(t, lock.Locked())
+	assert.Equal(t, lockFilePath, lock.Path())
+
+	// Cleanup
+	os.RemoveAll(CurrentFilesystem.CurrentDirPath)
+}
+
 // Readln returns a single line (without the ending \n)
 // from the input buffered reader.
 func Readln(r *bufio.Reader) (string, error) {
