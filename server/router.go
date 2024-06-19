@@ -12,7 +12,12 @@ import (
 func SetUpRouter(controllers *ControllerEnv, secret string) *gin.Engine {
 	// Get router
 	router := gin.Default()
-	router.Use(cors.Default())
+	// TODO this should not allow all requests, but disabling CORS is the easy way to make frontend work
+	router.Use(cors.New(cors.Config{
+        AllowAllOrigins: true,
+        AllowCredentials: true,
+        AllowHeaders: []string{"Authorization", "authorization"},
+    }))
 	router.RedirectTrailingSlash = false
 	router.RedirectFixedPath = false
 
