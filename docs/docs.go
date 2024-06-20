@@ -396,9 +396,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/branches/{branchID}/can-review/{memberID}": {
+        "/branches/{branchID}/can-review": {
             "get": {
-                "description": "Returns true if the user fulfills the requirements to branchreview the branch\nReturns false if user is unauthorized to branchreview the branch",
+                "description": "Returns true if the user fulfills the requirements to branchreview the branch.\nReturns false if user is unauthorized to branchreview the branch.\nThe member in question is inferred based on the access token.",
                 "consumes": [
                     "application/json"
                 ],
@@ -421,13 +421,6 @@ const docTemplate = `{
                         "type": "string",
                         "description": "branch ID",
                         "name": "branchID",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "member ID",
-                        "name": "memberID",
                         "in": "path",
                         "required": true
                     }

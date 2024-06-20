@@ -93,7 +93,7 @@ func branchRouter(v2 *gin.RouterGroup, controllers *ControllerEnv, middleware Mi
 	branchRouter.GET("/:branchID/review-statuses", controllers.branchController.GetAllBranchReviewStatuses)
 	branchRouter.GET("/reviews/:reviewID", controllers.branchController.GetReview)
 	branchRouter.POST("/reviews", middleware.CheckAuth, controllers.branchController.CreateReview)
-	branchRouter.GET("/:branchID/can-review/:memberID", middleware.CheckAuth, controllers.branchController.MemberCanReview)
+	branchRouter.GET("/:branchID/can-review", middleware.CheckAuth, controllers.branchController.MemberCanReview)
 	branchRouter.GET("/collaborators/:collaboratorID", controllers.branchController.GetBranchCollaborator)
 	branchRouter.GET("/collaborators/all/:branchID", controllers.branchController.GetAllBranchCollaborators)
 	branchRouter.GET("/:branchID/render", controllers.branchController.GetRender)

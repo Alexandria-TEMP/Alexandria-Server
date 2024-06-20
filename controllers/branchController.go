@@ -304,10 +304,10 @@ func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 	}
 
 	// create branchreview and add to branch
-	canReview, err := branchController.BranchService.MemberCanReview(uint(branchID), member.(*models.Member))
+	canReview, _, err404 := branchController.BranchService.MemberCanReview(uint(branchID), member.(*models.Member))
 
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+	if err404 != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err404.Error()})
 
 		return
 	}

@@ -743,13 +743,14 @@ paths:
       summary: Get branch
       tags:
       - branches
-  /branches/{branchID}/can-review/{memberID}:
+  /branches/{branchID}/can-review:
     get:
       consumes:
       - application/json
       description: |-
-        Returns true if the user fulfills the requirements to branchreview the branch
-        Returns false if user is unauthorized to branchreview the branch
+        Returns true if the user fulfills the requirements to branchreview the branch.
+        Returns false if user is unauthorized to branchreview the branch.
+        The member in question is inferred based on the access token.
       parameters:
       - description: Access Token
         in: header
@@ -759,11 +760,6 @@ paths:
       - description: branch ID
         in: path
         name: branchID
-        required: true
-        type: string
-      - description: member ID
-        in: path
-        name: memberID
         required: true
         type: string
       produces:

@@ -212,12 +212,13 @@ func (mr *MockBranchServiceMockRecorder) GetReview(reviewID any) *gomock.Call {
 }
 
 // MemberCanReview mocks base method.
-func (m *MockBranchService) MemberCanReview(branchID uint, member *models.Member) (bool, error) {
+func (m *MockBranchService) MemberCanReview(branchID uint, member *models.Member) (bool, error, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MemberCanReview", branchID, member)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // MemberCanReview indicates an expected call of MemberCanReview.

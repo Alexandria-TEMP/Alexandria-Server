@@ -203,8 +203,10 @@ func (branchService *BranchService) GetReview(reviewID uint) (*models.BranchRevi
 }
 
 func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm, member *models.Member) (*models.BranchReview, error) {
-	if canReview, err := branchService.MemberCanReview(form.BranchID, member); !canReview {
-		return nil, fmt.Errorf("this member cannot review this branch: %w", err)
+	if canReview, err401, err404 := branchService.MemberCanReview(form.BranchID, member); !canReview {
+		return nil, fmt.Errorf("this member cannot review this branch: %w", err401)
+	} else if err404 != nil {
+		return nil, fmt.Errorf("failed to check whether this member can review the branch: %w", err404)
 	}
 
 	// get branch
@@ -409,16 +411,16 @@ func (branchService *BranchService) updateReviewStatus(reviews []*models.BranchR
 	return models.BranchOpenForReview
 }
 
-func (branchService *BranchService) MemberCanReview(branchID uint, member *models.Member) (bool, error) {
+func (branchService *BranchService) MemberCanReview(branchID uint, member *models.Member) (bool, error, error) {
 	// get branch
 	branch, err := branchService.BranchRepository.GetByID(branchID)
 	if err != nil {
-		return false, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
+		return false, nil, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
 	}
 
 	// check if branch is open for review
 	if branch.BranchOverallReviewStatus != models.BranchOpenForReview {
-		return false, fmt.Errorf("this branch has been closed and cannot be reviewed")
+		return false, fmt.Errorf("this branch has been closed and cannot be reviewed"), nil
 	}
 
 	// check if member is contributor to branch
@@ -428,7 +430,7 @@ func (branchService *BranchService) MemberCanReview(branchID uint, member *model
 	}
 
 	if slices.Contains(branchCollaboratorMemberIDs, member.ID) {
-		return false, fmt.Errorf("this member has contributed to the branch, so they cannot review it")
+		return false, fmt.Errorf("this member has contributed to the branch, so they cannot review it"), nil
 	}
 
 	// check if member has already reviewed branch
@@ -438,25 +440,25 @@ func (branchService *BranchService) MemberCanReview(branchID uint, member *model
 	}
 
 	if slices.Contains(reviewMemberIDs, member.ID) {
-		return false, fmt.Errorf("this member has already reviewed this branch, so they cannot review it")
+		return false, fmt.Errorf("this member has already reviewed this branch, so they cannot review it"), nil
 	}
 
 	// get the tag ids of the branch.
 	branchTagIDs, err := branchService.getBranchTagIDs(branch)
 
 	if err != nil {
-		return false, fmt.Errorf("failed to find branch tags: %w", err)
+		return false, nil, fmt.Errorf("failed to find branch tags: %w", err)
 	}
 
 	// if not tags then always true
 	if len(branchTagIDs) == 0 {
-		return true, nil
+		return true, nil, nil
 	}
 
 	// get scientific field tags of member
 	memberTagsContainer, err := branchService.ScientificFieldTagContainerService.GetScientificFieldTagContainer(member.ScientificFieldTagContainerID)
 	if err != nil {
-		return false, fmt.Errorf("failed to find scientific field tag container of member: %w", err)
+		return false, nil, fmt.Errorf("failed to find scientific field tag container of member: %w", err)
 	}
 
 	memberTagIDs := models.ScientificFieldTagIntoIDs(memberTagsContainer.ScientificFieldTags)
@@ -464,12 +466,12 @@ func (branchService *BranchService) MemberCanReview(branchID uint, member *model
 	// iterate over each member tag to see if there is an intersection with branch tags
 	for _, memberTagID := range memberTagIDs {
 		if slices.Contains(branchTagIDs, memberTagID) {
-			return true, nil
+			return true, nil, nil
 		}
 	}
 
 	// if no intersection is found we return false
-	return false, nil
+	return false, fmt.Errorf("this member is not qualified to review this branch"), nil
 }
 
 func (branchService *BranchService) getBranchTagIDs(branch *models.Branch) ([]uint, error) {

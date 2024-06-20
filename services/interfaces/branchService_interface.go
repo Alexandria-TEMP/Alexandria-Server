@@ -34,10 +34,11 @@ type BranchService interface {
 	CreateReview(reviewCreationForm forms.ReviewCreationForm, reviewingMember *models.Member) (*models.BranchReview, error)
 
 	// MemberCanReview checks whether a user is elligible to branchreview a branch, dpending on whether there is an overlap of the scientific fields.
-	MemberCanReview(branchID uint, member *models.Member) (bool, error)
+	MemberCanReview(branchID uint, member *models.Member) (bool, error, error)
 
 	// GetProjectFile returns filepath of zipped repository.
-	// Error is for status 404.
+	// Error 1 is for unauthorized and carries the reason for this.
+	// Error 2 is for status 404.
 	GetProject(branchID uint) (string, *flock.Flock, error)
 
 	// UploadProject saves a zipped quarto project to its branch and starts the render pipeline.
