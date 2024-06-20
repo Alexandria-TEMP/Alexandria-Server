@@ -25,9 +25,23 @@ type MemberDTO struct {
 	FirstName                     string `json:"firstName" example:"John"`
 	LastName                      string `json:"lastName" example:"Doe"`
 	Email                         string `json:"email" example:"example@example.example"`
-	Password                      string `json:"password" example:"password"`
 	Institution                   string `json:"institution" example:"Example University"`
 	ScientificFieldTagContainerID uint   `json:"scientificFieldTagContainerID" example:"1"`
+}
+
+type LoggedInMemberDTO struct {
+	Member       MemberDTO `json:"member"`
+	AccessToken  string    `json:"accessToken"`
+	AccessExp    int64     `json:"accessExp"`
+	RefreshToken string    `json:"refreshToken"`
+	RefreshExp   int64     `json:"refreshExp"`
+}
+
+type TokenPairDTO struct {
+	AccessToken  string `json:"accessToken"`
+	AccessExp    int64  `json:"accessExp"`
+	RefreshToken string `json:"refreshToken"`
+	RefreshExp   int64  `json:"refreshExp"`
 }
 
 type MemberShortFormDTO struct {
@@ -46,7 +60,6 @@ func (model *Member) IntoDTO() MemberDTO {
 		model.FirstName,
 		model.LastName,
 		model.Email,
-		model.Password,
 		model.Institution,
 		model.ScientificFieldTagContainerID,
 	}

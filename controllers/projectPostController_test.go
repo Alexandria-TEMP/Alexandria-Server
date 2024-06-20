@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
@@ -155,13 +157,15 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 
 	// Setup data
 	form := &forms.ProjectPostCreationForm{
-		AuthorMemberIDs:           []uint{},
+		AuthorMemberIDs:           []uint{0},
 		Title:                     "my cool project post",
 		Anonymous:                 true,
 		ScientificFieldTagIDs:     []uint{1},
 		ProjectCompletionStatus:   models.Ongoing,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
 	}
+	body, _ := json.Marshal(form)
+	member := &models.Member{}
 
 	projectPostID := uint(10)
 	postID := uint(5)
@@ -182,23 +186,14 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 	}
 
 	// Setup mocks
-	mockProjectPostService.EXPECT().CreateProjectPost(form).Return(projectPost, nil, nil)
+	mockProjectPostService.EXPECT().CreateProjectPost(form, member).Return(projectPost, nil, nil)
 
-	// Marshal form
-	body, err := json.Marshal(form)
-	if err != nil {
-		t.Fatal(err)
-	}
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
 
-	// Construct request
-	req, err := http.NewRequest("POST", "/api/v2/project-posts", bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Send request
-	router.ServeHTTP(responseRecorder, req)
-	defer responseRecorder.Result().Body.Close()
+	projectPostController.CreateProjectPost(c)
 
 	// Check status
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
@@ -270,26 +265,18 @@ func TestCreateProjectPostSomethingNotFound(t *testing.T) {
 		ProjectCompletionStatus:   models.Ongoing,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
 	}
+	body, _ := json.Marshal(form)
+	member := &models.Member{Model: gorm.Model{ID: 1}}
 
 	// Setup mocks
-	mockProjectPostService.EXPECT().CreateProjectPost(form).Return(nil, fmt.Errorf("oh no"), nil).Times(1)
+	mockProjectPostService.EXPECT().CreateProjectPost(form, member).Return(nil, fmt.Errorf("oh no"), nil).Times(1)
 
-	// Marshal form
-	body, err := json.Marshal(form)
-	if err != nil {
-		t.Fatal(err)
-	}
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
 
-	// Construct request
-	req, err := http.NewRequest("POST", "/api/v2/project-posts", bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Send request
-	router.ServeHTTP(responseRecorder, req)
-	defer responseRecorder.Result().Body.Close()
-
+	projectPostController.CreateProjectPost(c)
 	// Check status
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }
@@ -306,25 +293,18 @@ func TestCreateProjectPostDatabaseFailure(t *testing.T) {
 		ProjectCompletionStatus:   models.Ongoing,
 		ProjectFeedbackPreference: models.DiscussionFeedback,
 	}
+	body, _ := json.Marshal(form)
+	member := &models.Member{Model: gorm.Model{ID: 1}}
 
 	// Setup mocks
-	mockProjectPostService.EXPECT().CreateProjectPost(form).Return(nil, nil, fmt.Errorf("oh no")).Times(1)
+	mockProjectPostService.EXPECT().CreateProjectPost(form, member).Return(nil, nil, fmt.Errorf("oh no")).Times(1)
 
-	// Marshal form
-	body, err := json.Marshal(form)
-	if err != nil {
-		t.Fatal(err)
-	}
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
 
-	// Construct request
-	req, err := http.NewRequest("POST", "/api/v2/project-posts", bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Send request
-	router.ServeHTTP(responseRecorder, req)
-	defer responseRecorder.Result().Body.Close()
+	projectPostController.CreateProjectPost(c)
 
 	// Check status
 	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Result().StatusCode)

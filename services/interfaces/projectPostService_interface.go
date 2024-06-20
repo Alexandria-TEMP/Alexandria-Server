@@ -8,8 +8,8 @@ import (
 //go:generate mockgen -package=mocks -source=./projectPostService_interface.go -destination=../../mocks/projectPostService_mock.go
 
 type ProjectPostService interface {
-	GetProjectPost(projectPostID uint) (*models.ProjectPost, error)
-	CreateProjectPost(form *forms.ProjectPostCreationForm) (*models.ProjectPost, error, error)
+	GetProjectPost(postID uint) (*models.ProjectPost, error)
+	CreateProjectPost(form *forms.ProjectPostCreationForm, member *models.Member) (*models.ProjectPost, error, error)
 
 	// GetBranchesGroupedByReviewStatus returns branch IDs grouped by their branch review status
 	GetBranchesGroupedByReviewStatus(projectPostID uint) (*models.BranchesGroupedByReviewStatusDTO, error)

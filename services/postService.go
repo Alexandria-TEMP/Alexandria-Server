@@ -5,6 +5,7 @@ import (
 	"log"
 	"mime/multipart"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +34,7 @@ func (postService *PostService) GetPost(id uint) (*models.Post, error) {
 	return postService.PostRepository.GetByID(id)
 }
 
-func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*models.Post, error) {
+func (postService *PostService) CreatePost(form *forms.PostCreationForm, member *models.Member) (*models.Post, error) {
 	// Posts created via this function may not be project posts
 	// (those must use ProjectPostCreationForms)
 	if form.PostType == models.Project {
@@ -43,6 +44,11 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm) (*model
 	postCollaborators, err := postService.PostCollaboratorService.MembersToPostCollaborators(form.AuthorMemberIDs, form.Anonymous, models.Author)
 	if err != nil {
 		return nil, fmt.Errorf("could not create post: %w", err)
+	}
+
+	// check if creating member is in authors or post is anonymous
+	if !form.Anonymous && !slices.Contains(form.AuthorMemberIDs, member.ID) {
+		return nil, fmt.Errorf("the creating member is not in the list of authors. either add the member or set the post to anonymous")
 	}
 
 	// convert []uint to []*models.ScientificFieldTag

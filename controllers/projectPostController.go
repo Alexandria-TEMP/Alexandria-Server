@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -59,6 +60,7 @@ func (projectPostController *ProjectPostController) GetProjectPost(c *gin.Contex
 // @Description Create a new project post with a single open branch. Upload to this branch in order to have your post reviewed.
 // @Tags 		project-posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body		forms.ProjectPostCreationForm	true	"Project Post Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.ProjectPostDTO
@@ -81,7 +83,15 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 		return
 	}
 
-	projectPost, err404, err500 := projectPostController.ProjectPostService.CreateProjectPost(&form)
+	// get member
+	member, exists := c.Get("currentMember")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get logged in user"})
+
+		return
+	}
+
+	projectPost, err404, err500 := projectPostController.ProjectPostService.CreateProjectPost(&form, member.(*models.Member))
 
 	if err404 != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("not found: %v", err404.Error())})
@@ -105,6 +115,7 @@ func (projectPostController *ProjectPostController) CreateProjectPost(c *gin.Con
 // @Description Delete a project post with given ID from database
 // @Tags 		project-posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		projectPostID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
@@ -123,6 +134,7 @@ func (projectPostController *ProjectPostController) DeleteProjectPost(c *gin.Con
 // @Description However, the post files are imported from the given Github repository
 // @Tags 		project-posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.ProjectPostCreationForm	true	"Post Creation Form"
 // @Param		url		query	string							true	"Github repository url"
 // @Produce		json

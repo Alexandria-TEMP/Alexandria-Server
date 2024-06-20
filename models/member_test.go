@@ -27,7 +27,6 @@ func TestMemberJSONMarshaling(t *testing.T) {
 		FirstName:                     "first name",
 		LastName:                      "last name",
 		Email:                         "email",
-		Password:                      "password",
 		Institution:                   "institution",
 		ScientificFieldTagContainerID: 20,
 	}

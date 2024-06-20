@@ -39,15 +39,19 @@ var (
 	mockDiscussionService                  *mocks.MockDiscussionService
 	mockDiscussionContainerService         *mocks.MockDiscussionContainerService
 
-	exampleBranch       models.Branch
-	exampleReview       models.BranchReview
-	exampleCollaborator models.BranchCollaborator
-	exampleMember       models.Member
-	exampleMemberDTO    models.MemberDTO
-	exampleMemberForm   forms.MemberCreationForm
-	exampleSTag1        *models.ScientificFieldTag
-	exampleSTag2        *models.ScientificFieldTag
-	exampleSTag1DTO     models.ScientificFieldTagDTO
+	exampleBranch            models.Branch
+	exampleReview            models.BranchReview
+	exampleCollaborator      models.BranchCollaborator
+	exampleMemberAuthForm    forms.MemberAuthForm
+	exampleMember            models.Member
+	exampleMemberDTO         models.MemberDTO
+	exampleMemberLoggedInDTO *models.LoggedInMemberDTO
+	exampleMemberForm        forms.MemberCreationForm
+	exampleTokenRefreshForm  forms.TokenRefreshForm
+	exampleTokenPairDTO      *models.TokenPairDTO
+	exampleSTag1             *models.ScientificFieldTag
+	exampleSTag2             *models.ScientificFieldTag
+	exampleSTag1DTO          models.ScientificFieldTagDTO
 
 	lock *flock.Flock
 )
@@ -81,11 +85,20 @@ func TestMain(m *testing.M) {
 		FirstName:                     "John",
 		LastName:                      "Smith",
 		Email:                         "john.smith@gmail.com",
-		Password:                      "password",
 		Institution:                   "TU Delft",
 		ScientificFieldTagContainerID: 0,
 	}
-
+	exampleMemberLoggedInDTO = &models.LoggedInMemberDTO{
+		Member:       exampleMemberDTO,
+		AccessToken:  "access",
+		AccessExp:    1,
+		RefreshToken: "refresh",
+		RefreshExp:   2,
+	}
+	exampleMemberAuthForm = forms.MemberAuthForm{
+		Email:    "john.smith@gmail.com",
+		Password: "password",
+	}
 	exampleMemberForm = forms.MemberCreationForm{
 		FirstName:             "John",
 		LastName:              "Smith",
@@ -93,6 +106,15 @@ func TestMain(m *testing.M) {
 		Password:              "password",
 		Institution:           "TU Delft",
 		ScientificFieldTagIDs: []uint{},
+	}
+	exampleTokenRefreshForm = forms.TokenRefreshForm{
+		RefreshToken: "1234",
+	}
+	exampleTokenPairDTO = &models.TokenPairDTO{
+		AccessToken:  "5678",
+		AccessExp:    1,
+		RefreshToken: "9012",
+		RefreshExp:   2,
 	}
 
 	// Setup test router, to test controller endpoints through http
@@ -177,10 +199,12 @@ func memberRouter(v2 *gin.RouterGroup, controller *MemberController) {
 	memberRouter.GET("/:memberID/project-posts", controller.GetMemberProjectPosts)
 	memberRouter.GET("/:memberID/branches", controller.GetMemberBranches)
 	memberRouter.GET("/:memberID/discussions", controller.GetMemberDiscussions)
-	memberRouter.POST("/:memberID/saved-posts", controller.AddMemberSavedPost)
-	memberRouter.POST("/:memberID/saved-project-posts", controller.AddMemberSavedProjectPost)
+	memberRouter.POST("/saved-posts", controller.AddMemberSavedPost)
+	memberRouter.POST("/saved-project-posts", controller.AddMemberSavedProjectPost)
 	memberRouter.GET("/:memberID/saved-posts", controller.GetMemberSavedPosts)
 	memberRouter.GET("/:memberID/saved-project-posts", controller.GetMemberSavedProjectPosts)
+	memberRouter.POST("/login", controller.LoginMember)
+	memberRouter.POST("/token", controller.RefreshToken)
 }
 
 func projectPostRouter(v2 *gin.RouterGroup, controller *ProjectPostController) {

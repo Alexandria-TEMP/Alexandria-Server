@@ -118,7 +118,7 @@ func TestCreateBranchSuccess(t *testing.T) {
 		CollaboratingMemberIDs:    []uint{12},
 		ProjectPostID:             10,
 		UpdatedScientificFieldIDs: []uint{},
-	})
+	}, &models.Member{Model: gorm.Model{ID: 12}})
 
 	assert.Nil(t, err404)
 	assert.Nil(t, err500)
@@ -134,7 +134,7 @@ func TestCreateBranchNoProjectPost(t *testing.T) {
 	_, err404, err500 := branchService.CreateBranch(&forms.BranchCreationForm{
 		CollaboratingMemberIDs: []uint{12, 11},
 		ProjectPostID:          10,
-	})
+	}, &models.Member{Model: gorm.Model{ID: 12}})
 
 	assert.NotNil(t, err404)
 	assert.Nil(t, err500)
@@ -174,7 +174,7 @@ func TestCreateBranchFailedUpdateProjectPost(t *testing.T) {
 		CollaboratingMemberIDs:    []uint{12, 11},
 		ProjectPostID:             10,
 		UpdatedScientificFieldIDs: []uint{},
-	})
+	}, &models.Member{Model: gorm.Model{ID: 12}})
 
 	assert.Nil(t, err404)
 	assert.NotNil(t, err500)
@@ -220,7 +220,7 @@ func TestCreateBranchFailedGit(t *testing.T) {
 		CollaboratingMemberIDs:    []uint{12, 11},
 		ProjectPostID:             10,
 		UpdatedScientificFieldIDs: []uint{},
-	})
+	}, &models.Member{Model: gorm.Model{ID: 12}})
 
 	assert.Nil(t, err404)
 	assert.NotNil(t, err500)
@@ -386,7 +386,6 @@ func TestCreateReviewSuccess(t *testing.T) {
 	}
 	form := forms.ReviewCreationForm{
 		BranchID:             10,
-		ReviewingMemberID:    11,
 		BranchReviewDecision: models.Approved,
 	}
 	expected := &models.BranchReview{
@@ -410,7 +409,7 @@ func TestCreateReviewSuccess(t *testing.T) {
 	mockBranchReviewRepository.EXPECT().Create(expected).Return(nil)
 	mockBranchRepository.EXPECT().Update(newBranch).Return(newBranch, nil)
 
-	branchreview, err := branchService.CreateReview(form)
+	branchreview, err := branchService.CreateReview(form, &models.Member{Model: gorm.Model{ID: 11}})
 	assert.Nil(t, err)
 	assert.Equal(t, expected, branchreview)
 
@@ -426,7 +425,6 @@ func TestCreateReviewSuccessMergeDoesntSupercede(t *testing.T) {
 	}
 	form := forms.ReviewCreationForm{
 		BranchID:             10,
-		ReviewingMemberID:    11,
 		BranchReviewDecision: models.Approved,
 	}
 	expected := &models.BranchReview{
@@ -481,7 +479,7 @@ func TestCreateReviewSuccessMergeDoesntSupercede(t *testing.T) {
 	mockBranchRepository.EXPECT().Update(newBranch).Return(newBranch, nil)
 	mockPostRepository.EXPECT().Update(&models.Post{DiscussionContainer: *discussions}).Return(&models.Post{DiscussionContainer: *discussions}, nil)
 
-	branchreview, err := branchService.CreateReview(form)
+	branchreview, err := branchService.CreateReview(form, &models.Member{Model: gorm.Model{ID: 11}})
 	assert.Nil(t, err)
 	assert.Equal(t, expected, branchreview)
 	assert.Equal(t, models.BranchPeerReviewed, branch.BranchOverallReviewStatus)
@@ -495,7 +493,6 @@ func TestCreateReviewSuccessMergeSupercedes(t *testing.T) {
 	projectPostID := uint(8)
 	form := forms.ReviewCreationForm{
 		BranchID:             10,
-		ReviewingMemberID:    11,
 		BranchReviewDecision: models.Approved,
 	}
 	expectedReview := &models.BranchReview{
@@ -564,7 +561,7 @@ func TestCreateReviewSuccessMergeSupercedes(t *testing.T) {
 	mockProjectPostRepository.EXPECT().Update(expectedProjectPost).Return(expectedProjectPost, nil)
 	mockPostRepository.EXPECT().Update(&models.Post{DiscussionContainer: *discussions}).Return(&models.Post{DiscussionContainer: *discussions}, nil)
 
-	_, _ = branchService.CreateReview(form)
+	_, _ = branchService.CreateReview(form, &models.Member{Model: gorm.Model{ID: 11}})
 
 	assert.Equal(t, expectedProjectPost, initialProjectPost)
 	assert.False(t, lock.Locked())
@@ -578,37 +575,12 @@ func TestCreateReviewFailedGetBranch(t *testing.T) {
 	}
 	form := forms.ReviewCreationForm{
 		BranchID:             10,
-		ReviewingMemberID:    11,
 		BranchReviewDecision: models.Approved,
 	}
 
 	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, errors.New("failed"))
 
-	_, err := branchService.CreateReview(form)
-	assert.NotNil(t, err)
-
-	afterEachBranch(t)
-}
-
-func TestCreateReviewFailedGetMember(t *testing.T) {
-	beforeEachBranch(t)
-
-	branch := &models.Branch{
-		Model: gorm.Model{ID: 10},
-	}
-	member := &models.Member{
-		Model: gorm.Model{ID: 11},
-	}
-	form := forms.ReviewCreationForm{
-		BranchID:             10,
-		ReviewingMemberID:    11,
-		BranchReviewDecision: models.Approved,
-	}
-
-	mockBranchRepository.EXPECT().GetByID(uint(10)).Return(branch, nil)
-	mockMemberRepository.EXPECT().GetByID(uint(11)).Return(member, errors.New("failed"))
-
-	_, err := branchService.CreateReview(form)
+	_, err := branchService.CreateReview(form, &models.Member{Model: gorm.Model{ID: 11}})
 	assert.NotNil(t, err)
 
 	afterEachBranch(t)
@@ -622,7 +594,6 @@ func TestCreateReviewFailedUpdateBranch(t *testing.T) {
 	}
 	form := forms.ReviewCreationForm{
 		BranchID:             10,
-		ReviewingMemberID:    11,
 		BranchReviewDecision: models.Approved,
 	}
 	expected := &models.BranchReview{
@@ -646,7 +617,7 @@ func TestCreateReviewFailedUpdateBranch(t *testing.T) {
 	mockBranchReviewRepository.EXPECT().Create(expected).Return(nil)
 	mockBranchRepository.EXPECT().Update(newBranch).Return(newBranch, errors.New("failed"))
 
-	_, err := branchService.CreateReview(form)
+	_, err := branchService.CreateReview(form, &models.Member{Model: gorm.Model{ID: 11}})
 	assert.NotNil(t, err)
 
 	afterEachBranch(t)
@@ -1147,7 +1118,6 @@ func TestCloseBranchButDontMarkProjectPostAsRevisionNeeded(t *testing.T) {
 
 	reviewCreationForm := forms.ReviewCreationForm{
 		BranchID:             branchID,
-		ReviewingMemberID:    reviewingMemberID,
 		BranchReviewDecision: "rejected",
 		Feedback:             "ur grammar is bad",
 	}
@@ -1174,7 +1144,7 @@ func TestCloseBranchButDontMarkProjectPostAsRevisionNeeded(t *testing.T) {
 	})
 
 	// Function under test
-	_, err := branchService.CreateReview(reviewCreationForm)
+	_, err := branchService.CreateReview(reviewCreationForm, &models.Member{Model: gorm.Model{ID: reviewingMemberID}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1199,7 +1169,7 @@ func TestCreateReviewFailsWhenAlreadyReviewed(t *testing.T) {
 	}
 
 	// Function under test
-	_, err := branchService.CreateReview(reviewCreationForm)
+	_, err := branchService.CreateReview(reviewCreationForm, &models.Member{})
 	assert.NotNil(t, err)
 }
 

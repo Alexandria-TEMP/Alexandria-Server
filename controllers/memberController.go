@@ -55,12 +55,15 @@ func (memberController *MemberController) GetMember(c *gin.Context) {
 	}
 
 	// if correct response send the member back
-	c.JSON(http.StatusOK, member)
+	c.JSON(http.StatusOK, member.IntoDTO())
 }
 
 // CreateMember godoc
 // @Summary 	Create a new member
-// @Description Create a new member from the given fields
+// @Description Create a new member from the given fields.
+// @Description The member must have a unique email address, which isn't associated with any other accounts.
+// @Description They are automatically logged in, and an access + refresh token pair is returned alongside the member.
+// @Description	The access-token is valid for 15 minutes and the refresh token is valid for 3 days.
 // @Tags 		members
 // @Accept  	json
 // @Param		form	body	forms.MemberCreationForm	true	"Member Creation Form"
@@ -93,10 +96,6 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	// getting the tags from tag service
 	tagArray, err := memberController.TagService.GetTagsFromIDs(tagIDs)
 
-	tagContainer := models.ScientificFieldTagContainer{
-		ScientificFieldTags: tagArray,
-	}
-
 	// if there is an error, return a 404 not found status
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("cannot bind tag ids from request body: %s", err)})
@@ -104,17 +103,22 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 		return
 	}
 
+	tagContainer := models.ScientificFieldTagContainer{
+		ScientificFieldTags: tagArray,
+	}
+
 	// create and add to database through the memberService
-	member, err := memberController.MemberService.CreateMember(&form, &tagContainer)
+	loggedInMemberDTO, err := memberController.MemberService.CreateMember(&form, &tagContainer)
+
+	// if the member service throws an error, return a 400 Bad request status
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create member: %s", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to create member: %s", err)})
 
 		return
 	}
 
 	// send back a positive response 200 status with the created member
-	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, member)
+	c.JSON(http.StatusOK, loggedInMemberDTO)
 }
 
 // DeleteMember godoc
@@ -122,6 +126,7 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 // @Description Delete a member with given ID from database
 // @Tags 		members
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200
@@ -155,7 +160,6 @@ func (memberController *MemberController) DeleteMember(c *gin.Context) {
 	}
 
 	// if correct response send the member back
-	c.Header("Content-Type", "application/json")
 	// TODO: should this return the deleted member?
 	c.JSON(http.StatusOK, nil)
 }
@@ -171,7 +175,7 @@ func (memberController *MemberController) DeleteMember(c *gin.Context) {
 // @Failure		500		{object} 	utils.HTTPError
 // @Router		/members	[get]
 func (memberController *MemberController) GetAllMembers(c *gin.Context) {
-	members, err := memberController.MemberService.GetAllMembers()
+	memberShortDTOs, err := memberController.MemberService.GetAllMembers()
 
 	// if there was an error, print it and return status 404: not found
 	if err != nil {
@@ -181,8 +185,87 @@ func (memberController *MemberController) GetAllMembers(c *gin.Context) {
 	}
 
 	// if correct response send the member ids and names back
-	c.Header("Content-Type", "application/json")
-	c.JSON(http.StatusOK, &members)
+	c.JSON(http.StatusOK, &memberShortDTOs)
+}
+
+// LoginMember godoc
+// @Summary		Logs a member in
+// @Description	Logs a member in based on email and password and returns an access and refresh token.
+// @Description	The access-token is valid for 15 minutes and the refresh token is valid for 3 days.
+// @Tags 		members
+// @Accept 		json
+// @Param		member	body		forms.MemberAuthForm		true	"Member Authentication Form"
+// @Produce		json
+// @Success 	200		{object}	models.LoggedInMemberDTO
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router 		/members/login 		[post]
+func (memberController *MemberController) LoginMember(c *gin.Context) {
+	form := &forms.MemberAuthForm{}
+	// bind the fields of the param to the JSON of the model
+	err := c.BindJSON(form)
+
+	// if there is an error, return a 400 bad request status
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind MemberAuthForm from request body"})
+
+		return
+	}
+
+	if !form.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "form fails validation"})
+		return
+	}
+
+	loggedInMemberDTO, err := memberController.MemberService.LogInMember(form)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("failed to log in: %s", err.Error())})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, loggedInMemberDTO)
+}
+
+// RefreshToken godoc
+// @Summary		Refreshes the access token.
+// @Description	Refreshes the access token with a refresh token.
+// @Description	The access-token is valid for 15 minutes and the refresh token is valid for 3 days.
+// @Tags 		members
+// @Accept 		json
+// @Param		member	body		forms.TokenRefreshForm		true	"Token Refresh Form"
+// @Produce		json
+// @Success 	200		{object}	models.TokenPairDTO
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router 		/members/token	[post]
+func (memberController *MemberController) RefreshToken(c *gin.Context) {
+	form := &forms.TokenRefreshForm{}
+	// bind the fields of the param to the JSON of the model
+	err := c.BindJSON(form)
+
+	// if there is an error, return a 400 bad request status
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot bind TokenRefreshForm from request body"})
+
+		return
+	}
+
+	if !form.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "form fails validation"})
+		return
+	}
+
+	tokenPairDTO, err := memberController.MemberService.RefreshToken(form)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("failed to refresh access token: %s", err.Error())})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, tokenPairDTO)
 }
 
 // GetMemberPosts godoc
@@ -254,6 +337,7 @@ func (memberController *MemberController) GetMemberDiscussions(c *gin.Context) {
 // @Description Adds a post to the saved posts of a member
 // @Tags 		members
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		memberID		path		string			true	"member ID"
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
@@ -270,6 +354,7 @@ func (memberController *MemberController) AddMemberSavedPost(c *gin.Context) {
 // @Description Adds a project post to the saved project posts of a member
 // @Tags 		members
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		memberID		path		string			true	"member ID"
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json

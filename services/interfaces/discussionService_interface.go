@@ -12,8 +12,8 @@ type DiscussionService interface {
 	GetDiscussion(id uint) (*models.Discussion, error)
 
 	// CreateRootDiscussion adds a discussion to a discussion container of a post, branch, etc.
-	CreateRootDiscussion(form *forms.RootDiscussionCreationForm) (*models.Discussion, error)
+	CreateRootDiscussion(form *forms.RootDiscussionCreationForm, member *models.Member) (*models.Discussion, error)
 
 	// CreateReply adds a discussion as a reply to another discussion
-	CreateReply(form *forms.ReplyDiscussionCreationForm) (*models.Discussion, error)
+	CreateReply(form *forms.ReplyDiscussionCreationForm, member *models.Member) (*models.Discussion, error)
 }

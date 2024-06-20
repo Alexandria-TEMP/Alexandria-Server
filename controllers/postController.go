@@ -63,6 +63,7 @@ func (postController *PostController) GetPost(c *gin.Context) {
 // @Description Create a new question or discussion post. Cannot be a project post.
 // @Tags 		posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.PostDTO
@@ -85,7 +86,15 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 		return
 	}
 
-	post, err := postController.PostService.CreatePost(&form)
+	// get member
+	member, exists := c.Get("currentMember")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get logged in user"})
+
+		return
+	}
+
+	post, err := postController.PostService.CreatePost(&form, member.(*models.Member))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create post: %s", err)})
 
@@ -101,6 +110,7 @@ func (postController *PostController) CreatePost(c *gin.Context) {
 // @Description Delete a post with given ID from database
 // @Tags 		posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		postID		path		string			true	"post ID"
 // @Produce		json
 // @Success 	200
@@ -119,6 +129,7 @@ func (postController *PostController) DeletePost(c *gin.Context) {
 // @Description However, the post files are imported from the given Github repository
 // @Tags 		posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.PostCreationForm	true	"Post Creation Form"
 // @Param		url		query	string					true	"Github repository url"
 // @Produce		json
@@ -136,6 +147,7 @@ func (postController *PostController) CreatePostFromGithub(c *gin.Context) {
 // @Description Create a new report for a post
 // @Tags 		posts
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.ReportCreationForm	true	"Report Creation Form"
 // @Param		postID	path	string						true	"Post ID"
 // @Produce		json
@@ -219,6 +231,7 @@ func (postController *PostController) GetPostReport(c *gin.Context) {
 // @Description Specifically, this zip should contain all of the contents of the project at its root, not in a subdirectory.
 // @Tags 		posts
 // @Accept  	multipart/form-data
+// @Param 		Authorization header string true "Access Token"
 // @Param		postID			path		string			true	"Post ID"
 // @Param		file			formData	file			true	"Repository to create"
 // @Produce		application/json

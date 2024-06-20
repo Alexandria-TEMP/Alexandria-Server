@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -55,6 +56,7 @@ func (discussionController *DiscussionController) GetDiscussion(c *gin.Context) 
 // @Description Create a new root-level discussion, meaning a discussion that is not a reply.
 // @Tags 		discussions
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.RootDiscussionCreationForm	true	"Root Discussion Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.DiscussionDTO
@@ -77,8 +79,16 @@ func (discussionController *DiscussionController) CreateRootDiscussion(c *gin.Co
 		return
 	}
 
+	// get member
+	member, exists := c.Get("currentMember")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get logged in user"})
+
+		return
+	}
+
 	// Create discussion in the database
-	createdDiscussion, err := discussionController.DiscussionService.CreateRootDiscussion(&discussionCreationForm)
+	createdDiscussion, err := discussionController.DiscussionService.CreateRootDiscussion(&discussionCreationForm, member.(*models.Member))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create root discussion: %v", err.Error())})
 
@@ -93,6 +103,7 @@ func (discussionController *DiscussionController) CreateRootDiscussion(c *gin.Co
 // @Description Create a new reply-type discussion, so a discussion that is a child of another discussion.
 // @Tags 		discussions
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.ReplyDiscussionCreationForm	true	"Reply Discussion Creation Form"
 // @Produce		json
 // @Success 	200 	{object} 	models.DiscussionDTO
@@ -115,8 +126,16 @@ func (discussionController *DiscussionController) CreateReplyDiscussion(c *gin.C
 		return
 	}
 
+	// get member
+	member, exists := c.Get("currentMember")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to get logged in user"})
+
+		return
+	}
+
 	// Create discussion in the database
-	createdDiscussion, err := discussionController.DiscussionService.CreateReply(&discussionCreationForm)
+	createdDiscussion, err := discussionController.DiscussionService.CreateReply(&discussionCreationForm, member.(*models.Member))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create reply discussion: %v", err.Error())})
 
@@ -131,6 +150,7 @@ func (discussionController *DiscussionController) CreateReplyDiscussion(c *gin.C
 // @Description Delete a discussion with given ID from database
 // @Tags 		discussions
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		discussionID		path		string			true	"discussion ID"
 // @Produce		json
 // @Success 	200
@@ -147,6 +167,7 @@ func (discussionController *DiscussionController) DeleteDiscussion(c *gin.Contex
 // @Description Create a new report for a discussion
 // @Tags 		discussions
 // @Accept  	json
+// @Param 		Authorization header string true "Access Token"
 // @Param		form	body	forms.ReportCreationForm	true	"Report Creation Form"
 // @Param		discussionID		path		string			true	"Discussion ID"
 // @Produce		json

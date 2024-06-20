@@ -44,9 +44,9 @@ func (m *MockBranchService) EXPECT() *MockBranchServiceMockRecorder {
 }
 
 // CreateBranch mocks base method.
-func (m *MockBranchService) CreateBranch(branchCreationForm *forms.BranchCreationForm) (*models.Branch, error, error) {
+func (m *MockBranchService) CreateBranch(branchCreationForm *forms.BranchCreationForm, member *models.Member) (*models.Branch, error, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateBranch", branchCreationForm)
+	ret := m.ctrl.Call(m, "CreateBranch", branchCreationForm, member)
 	ret0, _ := ret[0].(*models.Branch)
 	ret1, _ := ret[1].(error)
 	ret2, _ := ret[2].(error)
@@ -54,24 +54,24 @@ func (m *MockBranchService) CreateBranch(branchCreationForm *forms.BranchCreatio
 }
 
 // CreateBranch indicates an expected call of CreateBranch.
-func (mr *MockBranchServiceMockRecorder) CreateBranch(branchCreationForm any) *gomock.Call {
+func (mr *MockBranchServiceMockRecorder) CreateBranch(branchCreationForm, member any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBranch", reflect.TypeOf((*MockBranchService)(nil).CreateBranch), branchCreationForm)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateBranch", reflect.TypeOf((*MockBranchService)(nil).CreateBranch), branchCreationForm, member)
 }
 
 // CreateReview mocks base method.
-func (m *MockBranchService) CreateReview(reviewCreationForm forms.ReviewCreationForm) (*models.BranchReview, error) {
+func (m *MockBranchService) CreateReview(reviewCreationForm forms.ReviewCreationForm, reviewingMember *models.Member) (*models.BranchReview, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateReview", reviewCreationForm)
+	ret := m.ctrl.Call(m, "CreateReview", reviewCreationForm, reviewingMember)
 	ret0, _ := ret[0].(*models.BranchReview)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateReview indicates an expected call of CreateReview.
-func (mr *MockBranchServiceMockRecorder) CreateReview(reviewCreationForm any) *gomock.Call {
+func (mr *MockBranchServiceMockRecorder) CreateReview(reviewCreationForm, reviewingMember any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateReview", reflect.TypeOf((*MockBranchService)(nil).CreateReview), reviewCreationForm)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateReview", reflect.TypeOf((*MockBranchService)(nil).CreateReview), reviewCreationForm, reviewingMember)
 }
 
 // DeleteBranch mocks base method.

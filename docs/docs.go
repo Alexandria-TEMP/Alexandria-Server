@@ -30,6 +30,13 @@ const docTemplate = `{
                 "summary": "Create new branch",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Branch Creation Form",
                         "name": "form",
                         "in": "body",
@@ -205,6 +212,13 @@ const docTemplate = `{
                 "summary": "Adds a branchreview to a branch",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "branchreview creation form",
                         "name": "form",
                         "in": "body",
@@ -244,7 +258,7 @@ const docTemplate = `{
         },
         "/branches/reviews/{reviewID}": {
             "get": {
-                "description": "Returns a branchreview with given ID",
+                "description": "Returns a branch review with given ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -254,7 +268,7 @@ const docTemplate = `{
                 "tags": [
                     "branches"
                 ],
-                "summary": "Returns a branchreview",
+                "summary": "Returns a branch review",
                 "parameters": [
                     {
                         "type": "string",
@@ -344,6 +358,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "branch ID",
                         "name": "branchID",
                         "in": "path",
@@ -389,6 +410,13 @@ const docTemplate = `{
                 ],
                 "summary": "Returns whether the user is allowed to branchreview this branch",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "branch ID",
@@ -764,6 +792,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Branch ID",
                         "name": "branchID",
                         "in": "path",
@@ -861,6 +896,13 @@ const docTemplate = `{
                 "summary": "Create new reply discussion",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Reply Discussion Creation Form",
                         "name": "form",
                         "in": "body",
@@ -953,6 +995,13 @@ const docTemplate = `{
                 ],
                 "summary": "Create new root discussion",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Root Discussion Creation Form",
                         "name": "form",
@@ -1047,6 +1096,13 @@ const docTemplate = `{
                 ],
                 "summary": "Delete a discussion",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "discussion ID",
@@ -1145,6 +1201,13 @@ const docTemplate = `{
                 ],
                 "summary": "Add a new report to a discussion",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Report Creation Form",
                         "name": "form",
@@ -1292,7 +1355,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create a new member from the given fields",
+                "description": "Create a new member from the given fields.\nThe member must have a unique email address, which isn't associated with any other accounts.\nThey are automatically logged in, and an access + refresh token pair is returned alongside the member.\nThe access-token is valid for 15 minutes and the refresh token is valid for 3 days.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1332,6 +1395,92 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/utils.HTTPError"
                         }
+                    }
+                }
+            }
+        },
+        "/members/login": {
+            "post": {
+                "description": "Logs a member in based on email and password and returns an access and refresh token.\nThe access-token is valid for 15 minutes and the refresh token is valid for 3 days.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "members"
+                ],
+                "summary": "Logs a member in",
+                "parameters": [
+                    {
+                        "description": "Member Authentication Form",
+                        "name": "member",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.MemberAuthForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.LoggedInMemberDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/members/token": {
+            "post": {
+                "description": "Refreshes the access token with a refresh token.\nThe access-token is valid for 15 minutes and the refresh token is valid for 3 days.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "members"
+                ],
+                "summary": "Refreshes the access token.",
+                "parameters": [
+                    {
+                        "description": "Token Refresh Form",
+                        "name": "member",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forms.TokenRefreshForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TokenPairDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1398,6 +1547,13 @@ const docTemplate = `{
                 ],
                 "summary": "Delete a member",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "member ID",
@@ -1712,6 +1868,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "member ID",
                         "name": "memberID",
                         "in": "path",
@@ -1813,6 +1976,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "member ID",
                         "name": "memberID",
                         "in": "path",
@@ -1859,6 +2029,13 @@ const docTemplate = `{
                 ],
                 "summary": "Create new post",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Post Creation Form",
                         "name": "form",
@@ -1999,6 +2176,13 @@ const docTemplate = `{
                 ],
                 "summary": "Create new post with the version imported from github",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Post Creation Form",
                         "name": "form",
@@ -2153,6 +2337,13 @@ const docTemplate = `{
                 ],
                 "summary": "Delete a post",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "post ID",
@@ -2406,6 +2597,13 @@ const docTemplate = `{
                 "summary": "Add a new report to a post",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Report Creation Form",
                         "name": "form",
                         "in": "body",
@@ -2560,6 +2758,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "Post ID",
                         "name": "postID",
                         "in": "path",
@@ -2607,6 +2812,13 @@ const docTemplate = `{
                 "summary": "Create new project post",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "Project Post Creation Form",
                         "name": "form",
                         "in": "body",
@@ -2652,6 +2864,13 @@ const docTemplate = `{
                 ],
                 "summary": "Create new project post with the version imported from github",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "description": "Post Creation Form",
                         "name": "form",
@@ -2753,6 +2972,13 @@ const docTemplate = `{
                 ],
                 "summary": "Delete a project post",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "post ID",
@@ -3184,13 +3410,20 @@ const docTemplate = `{
                     "type": "boolean",
                     "example": false
                 },
-                "memberID": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "text": {
                     "type": "string",
                     "example": "Discussion content."
+                }
+            }
+        },
+        "forms.MemberAuthForm": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
                 }
             }
         },
@@ -3358,10 +3591,6 @@ const docTemplate = `{
                 "feedback": {
                     "type": "string",
                     "example": "Fantastic work!"
-                },
-                "reviewingMemberID": {
-                    "type": "integer",
-                    "example": 1
                 }
             }
         },
@@ -3375,6 +3604,14 @@ const docTemplate = `{
                 },
                 "discussion": {
                     "$ref": "#/definitions/forms.DiscussionCreationForm"
+                }
+            }
+        },
+        "forms.TokenRefreshForm": {
+            "type": "object",
+            "properties": {
+                "refreshToken": {
+                    "type": "string"
                 }
             }
         },
@@ -3691,6 +3928,26 @@ const docTemplate = `{
                 }
             }
         },
+        "models.LoggedInMemberDTO": {
+            "type": "object",
+            "properties": {
+                "accessExp": {
+                    "type": "integer"
+                },
+                "accessToken": {
+                    "type": "string"
+                },
+                "member": {
+                    "$ref": "#/definitions/models.MemberDTO"
+                },
+                "refreshExp": {
+                    "type": "integer"
+                },
+                "refreshToken": {
+                    "type": "string"
+                }
+            }
+        },
         "models.MemberDTO": {
             "type": "object",
             "properties": {
@@ -3713,10 +3970,6 @@ const docTemplate = `{
                 "lastName": {
                     "type": "string",
                     "example": "Doe"
-                },
-                "password": {
-                    "type": "string",
-                    "example": "password"
                 },
                 "scientificFieldTagContainerID": {
                     "type": "integer",
@@ -3990,6 +4243,23 @@ const docTemplate = `{
                     "example": [
                         2
                     ]
+                }
+            }
+        },
+        "models.TokenPairDTO": {
+            "type": "object",
+            "properties": {
+                "accessExp": {
+                    "type": "integer"
+                },
+                "accessToken": {
+                    "type": "string"
+                },
+                "refreshExp": {
+                    "type": "integer"
+                },
+                "refreshToken": {
+                    "type": "string"
                 }
             }
         },

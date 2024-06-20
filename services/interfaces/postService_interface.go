@@ -13,7 +13,7 @@ import (
 
 type PostService interface {
 	GetPost(postID uint) (*models.Post, error)
-	CreatePost(form *forms.PostCreationForm) (*models.Post, error)
+	CreatePost(form *forms.PostCreationForm, member *models.Member) (*models.Post, error)
 
 	// UploadPost saves a zipped quarto project to master and initiates the render pipeline.
 	// It the renders the project in a goroutine.

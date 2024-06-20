@@ -2,10 +2,8 @@ package forms
 
 type DiscussionCreationForm struct {
 	// If anonymous, the discussion will ignore member ID
-	Anonymous bool `json:"anonymous" example:"false"`
-	MemberID  uint `json:"memberID" example:"1"`
-
-	Text string `json:"text" example:"Discussion content."`
+	Anonymous bool   `json:"anonymous" example:"false"`
+	Text      string `json:"text" example:"Discussion content."`
 }
 
 // Whether the form itself contains valid data. Should NOT contain business logic (such as "if Foo > 0, Bar may not be 1")

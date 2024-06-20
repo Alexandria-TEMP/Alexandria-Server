@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
@@ -159,37 +161,29 @@ func TestCreateRootDiscussionGoodWeather(t *testing.T) {
 		ContainerID: containerID,
 		DiscussionCreationForm: forms.DiscussionCreationForm{
 			Anonymous: false,
-			MemberID:  memberID,
 			Text:      "my root discussion",
 		},
 	}
+	body, _ := json.Marshal(rootDiscussionCreationForm)
+	member := &models.Member{Model: gorm.Model{ID: memberID}}
 
 	// Setup mocks
-	mockDiscussionService.EXPECT().CreateRootDiscussion(&rootDiscussionCreationForm).Return(&models.Discussion{
+	mockDiscussionService.EXPECT().CreateRootDiscussion(&rootDiscussionCreationForm, member).Return(&models.Discussion{
 		Model:       gorm.Model{ID: 5},
 		ContainerID: containerID,
-		Member:      &models.Member{},
+		Member:      member,
 		MemberID:    &memberID,
 		Replies:     []*models.Discussion{},
 		ParentID:    nil,
 		Text:        "my root discussion",
 	}, nil).Times(1)
 
-	// Marshal form
-	body, err := json.Marshal(rootDiscussionCreationForm)
-	if err != nil {
-		t.Fatal(err)
-	}
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
 
-	// Construct request
-	req, err := http.NewRequest("POST", "/api/v2/discussions/roots", bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Send request
-	router.ServeHTTP(responseRecorder, req)
-	defer responseRecorder.Result().Body.Close()
+	discussionController.CreateRootDiscussion(c)
 
 	// Check status
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
@@ -220,7 +214,6 @@ func TestCreateRootDiscussionInvalidForm(t *testing.T) {
 		ContainerID: 0,
 		DiscussionCreationForm: forms.DiscussionCreationForm{
 			Anonymous: false,
-			MemberID:  0,
 			Text:      "", // An empty discussion will fail validation
 		},
 	}
@@ -254,29 +247,21 @@ func TestCreateRootDiscussionDatabaseFailure(t *testing.T) {
 		ContainerID: 0,
 		DiscussionCreationForm: forms.DiscussionCreationForm{
 			Anonymous: false,
-			MemberID:  0,
 			Text:      "my discussion",
 		},
 	}
+	body, _ := json.Marshal(rootDiscussionCreationForm)
+	member := &models.Member{}
 
 	// Setup mocks
-	mockDiscussionService.EXPECT().CreateRootDiscussion(rootDiscussionCreationForm).Return(nil, fmt.Errorf("oh no")).Times(1)
+	mockDiscussionService.EXPECT().CreateRootDiscussion(rootDiscussionCreationForm, member).Return(nil, fmt.Errorf("oh no")).Times(1)
 
-	// Marshal form
-	body, err := json.Marshal(rootDiscussionCreationForm)
-	if err != nil {
-		t.Fatal(err)
-	}
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
 
-	// Construct request
-	req, err := http.NewRequest("POST", "/api/v2/discussions/roots", bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Send request
-	router.ServeHTTP(responseRecorder, req)
-	defer responseRecorder.Result().Body.Close()
+	discussionController.CreateRootDiscussion(c)
 
 	// Check status
 	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Result().StatusCode)
@@ -295,13 +280,14 @@ func TestCreateReplyDiscussionGoodWeather(t *testing.T) {
 		ParentID: parentID,
 		DiscussionCreationForm: forms.DiscussionCreationForm{
 			Anonymous: false,
-			MemberID:  memberID,
 			Text:      "my reply discussion",
 		},
 	}
+	body, _ := json.Marshal(replyDiscussionCreationForm)
+	member := &models.Member{Model: gorm.Model{ID: memberID}}
 
 	// Setup mocks
-	mockDiscussionService.EXPECT().CreateReply(&replyDiscussionCreationForm).Return(&models.Discussion{
+	mockDiscussionService.EXPECT().CreateReply(&replyDiscussionCreationForm, member).Return(&models.Discussion{
 		Model:       gorm.Model{ID: 5},
 		ContainerID: containerID,
 		Member:      &models.Member{},
@@ -311,21 +297,12 @@ func TestCreateReplyDiscussionGoodWeather(t *testing.T) {
 		Text:        "my reply discussion",
 	}, nil).Times(1)
 
-	// Marshal form
-	body, err := json.Marshal(replyDiscussionCreationForm)
-	if err != nil {
-		t.Fatal(err)
-	}
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
 
-	// Construct request
-	req, err := http.NewRequest("POST", "/api/v2/discussions/replies", bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Send request
-	router.ServeHTTP(responseRecorder, req)
-	defer responseRecorder.Result().Body.Close()
+	discussionController.CreateReplyDiscussion(c)
 
 	// Check status
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
@@ -356,26 +333,18 @@ func TestCreateReplyDiscussionInvalidForm(t *testing.T) {
 		ParentID: 0,
 		DiscussionCreationForm: forms.DiscussionCreationForm{
 			Anonymous: false,
-			MemberID:  0,
 			Text:      "", // An empty discussion will fail validation
 		},
 	}
+	body, _ := json.Marshal(replyDiscussionCreationForm)
+	member := &models.Member{}
 
-	// Marshal form
-	body, err := json.Marshal(replyDiscussionCreationForm)
-	if err != nil {
-		t.Fatal(err)
-	}
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
 
-	// Construct request
-	req, err := http.NewRequest("POST", "/api/v2/discussions/replies", bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Send request
-	router.ServeHTTP(responseRecorder, req)
-	defer responseRecorder.Result().Body.Close()
+	discussionController.CreateReplyDiscussion(c)
 
 	// Check status
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
@@ -390,29 +359,22 @@ func TestCreateReplyDiscussionDatabaseFailure(t *testing.T) {
 		ParentID: 0,
 		DiscussionCreationForm: forms.DiscussionCreationForm{
 			Anonymous: false,
-			MemberID:  0,
 			Text:      "my discussion",
 		},
 	}
+	body, _ := json.Marshal(replyDiscussionCreationForm)
+	member := &models.Member{}
 
 	// Setup mocks
-	mockDiscussionService.EXPECT().CreateReply(replyDiscussionCreationForm).Return(nil, fmt.Errorf("oh no")).Times(1)
+	mockDiscussionService.EXPECT().CreateReply(replyDiscussionCreationForm, member).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Marshal form
-	body, err := json.Marshal(replyDiscussionCreationForm)
-	if err != nil {
-		t.Fatal(err)
-	}
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
 
-	// Construct request
-	req, err := http.NewRequest("POST", "/api/v2/discussions/replies", bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Send request
-	router.ServeHTTP(responseRecorder, req)
-	defer responseRecorder.Result().Body.Close()
+	discussionController.CreateReplyDiscussion(c)
 
 	// Check status
 	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Result().StatusCode)

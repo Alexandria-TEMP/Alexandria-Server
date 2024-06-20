@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/flock"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 )
@@ -46,10 +47,12 @@ var (
 	discussionA          models.Discussion
 	discussionContainerA models.DiscussionContainer
 
-	exampleMember    models.Member
-	exampleMemberDTO models.MemberDTO
-	exampleSTag1     *models.ScientificFieldTag
-	exampleSTag2     *models.ScientificFieldTag
+	exampleMember             models.Member
+	exampleMemberWithPassword models.Member
+	exampleMemberDTO          models.MemberDTO
+	exampleMemberAuthForm     forms.MemberAuthForm
+	exampleSTag1              *models.ScientificFieldTag
+	exampleSTag2              *models.ScientificFieldTag
 
 	projectPost *models.ProjectPost
 
@@ -84,19 +87,28 @@ func TestMain(m *testing.M) {
 		FirstName:   "John",
 		LastName:    "Smith",
 		Email:       "john.smith@gmail.com",
-		Password:    "password",
 		Institution: "TU Delft",
 		ScientificFieldTagContainer: models.ScientificFieldTagContainer{
 			ScientificFieldTags: scientificFieldTagArray,
 		},
 	}
+	exampleMemberWithPassword = models.Member{
+		FirstName:   "John",
+		LastName:    "Smith",
+		Email:       "john.smith@gmail.com",
+		Institution: "TU Delft",
+		Password:    "$2a$10$2pDWbDrNIg2E497oZuy1wultNyt/VNQLZMSZUyaRnNFsRaNzd24Z6",
+	}
 	exampleMemberDTO = models.MemberDTO{
 		FirstName:                     "John",
 		LastName:                      "Smith",
 		Email:                         "john.smith@gmail.com",
-		Password:                      "password",
 		Institution:                   "TU Delft",
 		ScientificFieldTagContainerID: 0,
+	}
+	exampleMemberAuthForm = forms.MemberAuthForm{
+		Email:    "john.smith@gmail.com",
+		Password: "password",
 	}
 
 	cwd, _ = os.Getwd()

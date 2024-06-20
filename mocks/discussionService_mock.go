@@ -41,33 +41,33 @@ func (m *MockDiscussionService) EXPECT() *MockDiscussionServiceMockRecorder {
 }
 
 // CreateReply mocks base method.
-func (m *MockDiscussionService) CreateReply(form *forms.ReplyDiscussionCreationForm) (*models.Discussion, error) {
+func (m *MockDiscussionService) CreateReply(form *forms.ReplyDiscussionCreationForm, member *models.Member) (*models.Discussion, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateReply", form)
+	ret := m.ctrl.Call(m, "CreateReply", form, member)
 	ret0, _ := ret[0].(*models.Discussion)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateReply indicates an expected call of CreateReply.
-func (mr *MockDiscussionServiceMockRecorder) CreateReply(form any) *gomock.Call {
+func (mr *MockDiscussionServiceMockRecorder) CreateReply(form, member any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateReply", reflect.TypeOf((*MockDiscussionService)(nil).CreateReply), form)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateReply", reflect.TypeOf((*MockDiscussionService)(nil).CreateReply), form, member)
 }
 
 // CreateRootDiscussion mocks base method.
-func (m *MockDiscussionService) CreateRootDiscussion(form *forms.RootDiscussionCreationForm) (*models.Discussion, error) {
+func (m *MockDiscussionService) CreateRootDiscussion(form *forms.RootDiscussionCreationForm, member *models.Member) (*models.Discussion, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateRootDiscussion", form)
+	ret := m.ctrl.Call(m, "CreateRootDiscussion", form, member)
 	ret0, _ := ret[0].(*models.Discussion)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateRootDiscussion indicates an expected call of CreateRootDiscussion.
-func (mr *MockDiscussionServiceMockRecorder) CreateRootDiscussion(form any) *gomock.Call {
+func (mr *MockDiscussionServiceMockRecorder) CreateRootDiscussion(form, member any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRootDiscussion", reflect.TypeOf((*MockDiscussionService)(nil).CreateRootDiscussion), form)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateRootDiscussion", reflect.TypeOf((*MockDiscussionService)(nil).CreateRootDiscussion), form, member)
 }
 
 // GetDiscussion mocks base method.
