@@ -177,7 +177,7 @@ func branchRouter(v2 *gin.RouterGroup, controller *BranchController) {
 	branchRouter.GET("/:branchID/review-statuses", controller.GetAllBranchReviewStatuses)
 	branchRouter.GET("/reviews/:reviewID", controller.GetReview)
 	branchRouter.POST("/reviews", controller.CreateReview)
-	branchRouter.GET("/:branchID/can-review/:memberID", controller.MemberCanReview)
+	branchRouter.GET("/:branchID/can-review", controller.MemberCanReview)
 	branchRouter.GET("/collaborators/:collaboratorID", controller.GetBranchCollaborator)
 	branchRouter.GET("/collaborators/all/:branchID", controller.GetAllBranchCollaborators)
 	branchRouter.GET("/:branchID/render", controller.GetRender)

@@ -306,6 +306,7 @@ func TestCreateReview200(t *testing.T) {
 	body, _ := json.Marshal(form)
 	member := &models.Member{}
 
+	mockBranchService.EXPECT().MemberCanReview(uint(1), member).Return(true, nil, nil)
 	mockBranchService.EXPECT().CreateReview(form, member).Return(&exampleReview, nil)
 
 	c, _ := gin.CreateTestContext(responseRecorder)
@@ -316,6 +317,28 @@ func TestCreateReview200(t *testing.T) {
 	branchController.CreateReview(c)
 
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+}
+
+func TestCreateReview401(t *testing.T) {
+	beforeEachBranch(t)
+
+	form := forms.ReviewCreationForm{
+		BranchReviewDecision: models.Approved,
+		BranchID:             1,
+	}
+	body, _ := json.Marshal(form)
+	member := &models.Member{}
+
+	mockBranchService.EXPECT().MemberCanReview(uint(1), member).Return(false, fmt.Errorf("failed"), nil)
+
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
+
+	branchController.CreateReview(c)
+
+	assert.Equal(t, http.StatusUnauthorized, responseRecorder.Result().StatusCode)
 }
 
 func TestCreateReview4001(t *testing.T) {
@@ -349,7 +372,7 @@ func TestCreateReview4002(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
 
-func TestCreateReview404(t *testing.T) {
+func TestCreateReview4041(t *testing.T) {
 	beforeEachBranch(t)
 
 	form := forms.ReviewCreationForm{
@@ -359,7 +382,30 @@ func TestCreateReview404(t *testing.T) {
 	body, _ := json.Marshal(form)
 	member := &models.Member{}
 
+	mockBranchService.EXPECT().MemberCanReview(uint(1), member).Return(true, nil, nil)
 	mockBranchService.EXPECT().CreateReview(form, member).Return(&exampleReview, errors.New("branch not found"))
+
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
+
+	branchController.CreateReview(c)
+
+	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+}
+
+func TestCreateReview4042(t *testing.T) {
+	beforeEachBranch(t)
+
+	form := forms.ReviewCreationForm{
+		BranchReviewDecision: models.Approved,
+		BranchID:             1,
+	}
+	body, _ := json.Marshal(form)
+	member := &models.Member{}
+
+	mockBranchService.EXPECT().MemberCanReview(uint(1), member).Return(false, nil, fmt.Errorf("failed"))
 
 	c, _ := gin.CreateTestContext(responseRecorder)
 	c.Set("currentMember", member)
@@ -374,12 +420,33 @@ func TestCreateReview404(t *testing.T) {
 func TestMemberCanReview200(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().MemberCanReview(uint(1), uint(1)).Return(true, nil)
+	member := &models.Member{}
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/can-review/1", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
+	mockBranchService.EXPECT().MemberCanReview(uint(1), member).Return(true, nil, nil)
 
-	defer responseRecorder.Result().Body.Close()
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Params = append(c.Params, gin.Param{Key: "branchID", Value: "1"})
+	c.Request = &http.Request{}
+
+	branchController.MemberCanReview(c)
+
+	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+}
+
+func TestMemberCantReview200(t *testing.T) {
+	beforeEachBranch(t)
+
+	member := &models.Member{}
+
+	mockBranchService.EXPECT().MemberCanReview(uint(1), member).Return(false, errors.New("cant review"), nil)
+
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Params = append(c.Params, gin.Param{Key: "branchID", Value: "1"})
+	c.Request = &http.Request{}
+
+	branchController.MemberCanReview(c)
 
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
 }
@@ -387,25 +454,14 @@ func TestMemberCanReview200(t *testing.T) {
 func TestMemberCanReview400BranchID(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().MemberCanReview(gomock.Any(), gomock.Any()).Times(0)
+	member := &models.Member{}
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/bad/can-review/1", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Params = append(c.Params, gin.Param{Key: "branchID", Value: "bad"})
+	c.Request = &http.Request{}
 
-	defer responseRecorder.Result().Body.Close()
-
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
-}
-
-func TestMemberCanReview400MemberID(t *testing.T) {
-	beforeEachBranch(t)
-
-	mockBranchService.EXPECT().MemberCanReview(gomock.Any(), gomock.Any()).Times(0)
-
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/can-review/bad", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
-
-	defer responseRecorder.Result().Body.Close()
+	branchController.MemberCanReview(c)
 
 	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
@@ -413,12 +469,16 @@ func TestMemberCanReview400MemberID(t *testing.T) {
 func TestMemberCanReview404(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().MemberCanReview(uint(1), uint(1)).Return(false, errors.New("branch or member not found"))
+	member := &models.Member{}
 
-	req, _ := http.NewRequest("GET", "/api/v2/branches/1/members/1/can-review", http.NoBody)
-	router.ServeHTTP(responseRecorder, req)
+	mockBranchService.EXPECT().MemberCanReview(uint(1), member).Return(false, nil, errors.New("branch or member not found"))
 
-	defer responseRecorder.Result().Body.Close()
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Params = append(c.Params, gin.Param{Key: "branchID", Value: "1"})
+	c.Request = &http.Request{}
+
+	branchController.MemberCanReview(c)
 
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
 }

@@ -203,22 +203,11 @@ func (branchService *BranchService) GetReview(reviewID uint) (*models.BranchRevi
 }
 
 func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm, member *models.Member) (*models.BranchReview, error) {
-	if canReview, err401, err404 := branchService.MemberCanReview(form.BranchID, member); !canReview {
-		return nil, fmt.Errorf("this member cannot review this branch: %w", err401)
-	} else if err404 != nil {
-		return nil, fmt.Errorf("failed to check whether this member can review the branch: %w", err404)
-	}
-
 	// get branch
 	branch, err := branchService.BranchRepository.GetByID(form.BranchID)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to find branch with id %v: %w", form.BranchID, err)
-	}
-
-	// ensure the branch isn't already closed
-	if branch.BranchOverallReviewStatus != models.BranchOpenForReview {
-		return nil, fmt.Errorf("branch is already reviewed with status '%v'", branch.BranchOverallReviewStatus)
 	}
 
 	// make new branchreview

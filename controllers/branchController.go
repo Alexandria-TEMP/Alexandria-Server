@@ -255,6 +255,17 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 		return
 	}
 
+	// check that member can review branch
+	if canReview, err401, err404 := branchController.BranchService.MemberCanReview(form.BranchID, reviewingMember.(*models.Member)); err404 != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("failed to validate whether member can review this branch: %v", err404)})
+
+		return
+	} else if !canReview {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("this member cannot review this branch: %v", err401)})
+
+		return
+	}
+
 	// create branchreview and add to branch
 	branchreview, err := branchController.BranchService.CreateReview(form, reviewingMember.(*models.Member))
 
