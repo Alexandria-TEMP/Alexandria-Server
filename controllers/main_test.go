@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gofrs/flock"
 	pagination "github.com/webstradev/gin-pagination"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
@@ -44,17 +45,20 @@ var (
 	exampleMemberAuthForm    forms.MemberAuthForm
 	exampleMember            models.Member
 	exampleMemberDTO         models.MemberDTO
-	exampleMemberLoggedInDTO models.LoggedInMemberDTO
+	exampleMemberLoggedInDTO *models.LoggedInMemberDTO
 	exampleMemberForm        forms.MemberCreationForm
 	exampleTokenRefreshForm  forms.TokenRefreshForm
-	exampleTokenPairDTO      models.TokenPairDTO
+	exampleTokenPairDTO      *models.TokenPairDTO
 	exampleSTag1             *models.ScientificFieldTag
 	exampleSTag2             *models.ScientificFieldTag
 	exampleSTag1DTO          models.ScientificFieldTagDTO
+
+	lock *flock.Flock
 )
 
 // TestMain is a keyword function, this is run by the testing package before other tests
 func TestMain(m *testing.M) {
+	lock = flock.New("../utils/template_repo/alexandria.lock")
 	exampleSTag1 = &models.ScientificFieldTag{
 		ScientificField: "Mathematics",
 		Subtags:         []*models.ScientificFieldTag{},
@@ -84,7 +88,7 @@ func TestMain(m *testing.M) {
 		Institution:                   "TU Delft",
 		ScientificFieldTagContainerID: 0,
 	}
-	exampleMemberLoggedInDTO = models.LoggedInMemberDTO{
+	exampleMemberLoggedInDTO = &models.LoggedInMemberDTO{
 		Member:       exampleMemberDTO,
 		AccessToken:  "access",
 		AccessExp:    1,
@@ -106,7 +110,7 @@ func TestMain(m *testing.M) {
 	exampleTokenRefreshForm = forms.TokenRefreshForm{
 		RefreshToken: "1234",
 	}
-	exampleTokenPairDTO = models.TokenPairDTO{
+	exampleTokenPairDTO = &models.TokenPairDTO{
 		AccessToken:  "5678",
 		AccessExp:    1,
 		RefreshToken: "9012",

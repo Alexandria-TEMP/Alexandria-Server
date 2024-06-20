@@ -41,16 +41,12 @@ func (m *MockMemberService) EXPECT() *MockMemberServiceMockRecorder {
 }
 
 // CreateMember mocks base method.
-func (m *MockMemberService) CreateMember(memberForm *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (string, int64, string, int64, *models.Member, error) {
+func (m *MockMemberService) CreateMember(memberForm *forms.MemberCreationForm, userFields *models.ScientificFieldTagContainer) (*models.LoggedInMemberDTO, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateMember", memberForm, userFields)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(int64)
-	ret2, _ := ret[2].(string)
-	ret3, _ := ret[3].(int64)
-	ret4, _ := ret[4].(*models.Member)
-	ret5, _ := ret[5].(error)
-	return ret0, ret1, ret2, ret3, ret4, ret5
+	ret0, _ := ret[0].(*models.LoggedInMemberDTO)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CreateMember indicates an expected call of CreateMember.
@@ -104,16 +100,12 @@ func (mr *MockMemberServiceMockRecorder) GetMember(memberID any) *gomock.Call {
 }
 
 // LogInMember mocks base method.
-func (m *MockMemberService) LogInMember(memberAuthForm *forms.MemberAuthForm) (*models.Member, string, int64, string, int64, error) {
+func (m *MockMemberService) LogInMember(memberAuthForm *forms.MemberAuthForm) (*models.LoggedInMemberDTO, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LogInMember", memberAuthForm)
-	ret0, _ := ret[0].(*models.Member)
-	ret1, _ := ret[1].(string)
-	ret2, _ := ret[2].(int64)
-	ret3, _ := ret[3].(string)
-	ret4, _ := ret[4].(int64)
-	ret5, _ := ret[5].(error)
-	return ret0, ret1, ret2, ret3, ret4, ret5
+	ret0, _ := ret[0].(*models.LoggedInMemberDTO)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // LogInMember indicates an expected call of LogInMember.
@@ -123,15 +115,12 @@ func (mr *MockMemberServiceMockRecorder) LogInMember(memberAuthForm any) *gomock
 }
 
 // RefreshToken mocks base method.
-func (m *MockMemberService) RefreshToken(form *forms.TokenRefreshForm) (string, int64, string, int64, error) {
+func (m *MockMemberService) RefreshToken(form *forms.TokenRefreshForm) (*models.TokenPairDTO, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RefreshToken", form)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(int64)
-	ret2, _ := ret[2].(string)
-	ret3, _ := ret[3].(int64)
-	ret4, _ := ret[4].(error)
-	return ret0, ret1, ret2, ret3, ret4
+	ret0, _ := ret[0].(*models.TokenPairDTO)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // RefreshToken indicates an expected call of RefreshToken.

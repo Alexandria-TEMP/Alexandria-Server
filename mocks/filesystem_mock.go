@@ -16,6 +16,7 @@ import (
 	gin "github.com/gin-gonic/gin"
 	git "github.com/go-git/go-git/v5"
 	plumbing "github.com/go-git/go-git/v5/plumbing"
+	flock "github.com/gofrs/flock"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -251,6 +252,21 @@ func (m *MockFilesystem) GetLastCommit(branchName string) (*plumbing.Reference, 
 func (mr *MockFilesystemMockRecorder) GetLastCommit(branchName any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastCommit", reflect.TypeOf((*MockFilesystem)(nil).GetLastCommit), branchName)
+}
+
+// LockDirectory mocks base method.
+func (m *MockFilesystem) LockDirectory(postID uint) (*flock.Flock, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LockDirectory", postID)
+	ret0, _ := ret[0].(*flock.Flock)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LockDirectory indicates an expected call of LockDirectory.
+func (mr *MockFilesystemMockRecorder) LockDirectory(postID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LockDirectory", reflect.TypeOf((*MockFilesystem)(nil).LockDirectory), postID)
 }
 
 // Merge mocks base method.

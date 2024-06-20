@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
@@ -26,6 +27,7 @@ func setupPostController(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	// Setup mocks
+	_ = lock.Lock()
 	mockPostService = mocks.NewMockPostService(mockCtrl)
 	mockRenderService = mocks.NewMockRenderService(mockCtrl)
 	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
@@ -42,7 +44,7 @@ func setupPostController(t *testing.T) {
 }
 
 func teardownPostController() {
-
+	_ = lock.Unlock()
 }
 
 // Helper function that creates a multi-part form data body to send in a HTTP request
@@ -308,6 +310,7 @@ func TestCreatePostGoodWeather(t *testing.T) {
 		PostType:              models.Question,
 		ScientificFieldTagIDs: []uint{},
 	}
+	body, _ := json.Marshal(form)
 	member := &models.Member{}
 
 	postID := uint(5)
@@ -335,21 +338,12 @@ func TestCreatePostGoodWeather(t *testing.T) {
 		RenderStatus:          models.Pending,
 	}, nil).Times(1)
 
-	// Marshal form
-	body, err := json.Marshal(form)
-	if err != nil {
-		t.Fatal(err)
-	}
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
 
-	// Construct request
-	req, err := http.NewRequest("POST", "/api/v2/posts", bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Send request
-	router.ServeHTTP(responseRecorder, req)
-	defer responseRecorder.Result().Body.Close()
+	postController.CreatePost(c)
 
 	// Check status
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
@@ -421,26 +415,18 @@ func TestCreatePostDatabaseCreationFailed(t *testing.T) {
 		PostType:              models.Question,
 		ScientificFieldTagIDs: []uint{1},
 	}
+	body, _ := json.Marshal(form)
 	member := &models.Member{Model: gorm.Model{ID: 1}}
 
 	// Setup mocks
 	mockPostService.EXPECT().CreatePost(&form, member).Return(nil, fmt.Errorf("oh no")).Times(1)
 
-	// Marshal form
-	body, err := json.Marshal(form)
-	if err != nil {
-		t.Fatal(err)
-	}
+	c, _ := gin.CreateTestContext(responseRecorder)
+	c.Set("currentMember", member)
+	c.Request = &http.Request{}
+	c.Request.Body = io.NopCloser(bytes.NewReader(body))
 
-	// Construct request
-	req, err := http.NewRequest("POST", "/api/v2/posts", bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Send request
-	router.ServeHTTP(responseRecorder, req)
-	defer responseRecorder.Result().Body.Close()
+	postController.CreatePost(c)
 
 	// Check status
 	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Result().StatusCode)
@@ -670,7 +656,7 @@ func TestGetMainRenderGoodWeather(t *testing.T) {
 	filePath := "../utils/test_files/good_repository_setup/render/1234.html"
 
 	// Setup mocks
-	mockRenderService.EXPECT().GetMainRenderFile(postID).Return(filePath, nil, nil).Times(1)
+	mockRenderService.EXPECT().GetMainRenderFile(postID).Return(filePath, lock, nil, nil).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/posts/%d/render", postID), http.NoBody)
@@ -685,6 +671,7 @@ func TestGetMainRenderGoodWeather(t *testing.T) {
 	// Check status
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
 	assert.Equal(t, "text/html", responseRecorder.Header().Get("Content-Type"))
+	assert.False(t, lock.Locked())
 }
 
 func TestGetMainRenderInvalidPostID(t *testing.T) {
@@ -716,7 +703,7 @@ func TestGetMainRenderPending(t *testing.T) {
 	postID := uint(10)
 
 	// Setup mocks
-	mockRenderService.EXPECT().GetMainRenderFile(postID).Return("", fmt.Errorf("oh no"), nil).Times(1)
+	mockRenderService.EXPECT().GetMainRenderFile(postID).Return("", nil, fmt.Errorf("oh no"), nil).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/posts/%d/render", postID), http.NoBody)
@@ -740,7 +727,7 @@ func TestGetMainRenderFailed(t *testing.T) {
 	postID := uint(10)
 
 	// Setup mocks
-	mockRenderService.EXPECT().GetMainRenderFile(postID).Return("", nil, fmt.Errorf("oh no")).Times(1)
+	mockRenderService.EXPECT().GetMainRenderFile(postID).Return("", nil, nil, fmt.Errorf("oh no")).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/posts/%d/render", postID), http.NoBody)
@@ -944,7 +931,7 @@ func TestGetMainFileFromProject(t *testing.T) {
 	absoluteFilePath := "../utils/test_files/good_repository_setup/render/1234.html"
 
 	// Setup mocks
-	mockPostService.EXPECT().GetMainFileFromProject(postID, gomock.Any()).Return(absoluteFilePath, nil).Times(1)
+	mockPostService.EXPECT().GetMainFileFromProject(postID, gomock.Any()).Return(absoluteFilePath, lock, nil).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/posts/%d/file/%s", postID, relativeFilePath), http.NoBody)
@@ -958,4 +945,5 @@ func TestGetMainFileFromProject(t *testing.T) {
 
 	// Check status
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+	assert.False(t, lock.Locked())
 }

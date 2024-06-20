@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -294,7 +295,7 @@ func (postController *PostController) GetMainRender(c *gin.Context) {
 	}
 
 	// get render filepath
-	filePath, err202, err404 := postController.RenderService.GetMainRenderFile(uint(postID))
+	filePath, lock, err202, err404 := postController.RenderService.GetMainRenderFile(uint(postID))
 
 	// if render is pending return 202 accepted
 	if err202 != nil {
@@ -309,6 +310,13 @@ func (postController *PostController) GetMainRender(c *gin.Context) {
 
 		return
 	}
+
+	// defer unlocking of repo
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// Set the headers for the file transfer and return the file
 	c.Header("Content-Description", "File Transfer")
@@ -341,13 +349,20 @@ func (postController *PostController) GetMainProject(c *gin.Context) {
 	}
 
 	// get repository filepath
-	filePath, err := postController.PostService.GetMainProject(uint(postID))
+	filePath, lock, err := postController.PostService.GetMainProject(uint(postID))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 
 		return
 	}
+
+	// unlock repo after reading file
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// Set the headers for the file transfer and return the file
 	c.Header("Content-Description", "File Transfer")
@@ -421,7 +436,7 @@ func (postController *PostController) GetMainFileFromProject(c *gin.Context) {
 	}
 
 	relFilepath := c.Param("filepath")
-	absFilepath, err := postController.PostService.GetMainFileFromProject(uint(postID), relFilepath)
+	absFilepath, lock, err := postController.PostService.GetMainFileFromProject(uint(postID), relFilepath)
 
 	// if files doesnt exist return 404 not found
 	if err != nil {
@@ -429,6 +444,13 @@ func (postController *PostController) GetMainFileFromProject(c *gin.Context) {
 
 		return
 	}
+
+	// defer unlocking repo
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// get the file info
 	fileContentType, err1 := mimetype.DetectFile(absFilepath)

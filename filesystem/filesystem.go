@@ -2,8 +2,10 @@ package filesystem
 
 import (
 	"archive/zip"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"mime/multipart"
 	"os"
 	"path"
@@ -12,6 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-git/go-git/v5"
+	"github.com/gofrs/flock"
 )
 
 type Filesystem struct {
@@ -65,12 +68,13 @@ func (filesystem *Filesystem) GetCurrentRenderDirPath() string {
 }
 
 func (filesystem *Filesystem) CheckoutDirectory(postID uint) {
-	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10))
+	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), "repository")
 	filesystem.CurrentQuartoDirPath = filepath.Join(filesystem.CurrentDirPath, filesystem.quartoDirectoryName)
 	filesystem.CurrentZipFilePath = filepath.Join(filesystem.CurrentDirPath, filesystem.zipName)
 	filesystem.CurrentRenderDirPath = filepath.Join(filesystem.CurrentDirPath, "render")
 
-	// try to open repository if it exists
+	// try to open repository if it exists.
+	// we ignore the error to be flexible: if the repo already exists check it out, if not thats also ok.
 	filesystem.CurrentRepository, _ = filesystem.CheckoutRepository()
 }
 
@@ -200,4 +204,38 @@ func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
 	}
 
 	return fileTree, nil
+}
+
+func (filesystem *Filesystem) LockDirectory(postID uint) (*flock.Flock, error) {
+	// get filepath to lock file
+	lockDirPath := filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10))
+	lockFilePath := filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), "alexandria.lock")
+
+	// check if the directory to lock exists
+	if _, err := os.Stat(lockDirPath); errors.Is(err, os.ErrNotExist) {
+		// create lock dir if doesn't exist
+		if err := os.Mkdir(lockDirPath, fs.ModePerm); err != nil {
+			return nil, fmt.Errorf("failed to create lockdir: %w", err)
+		}
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to check if directory to lock exists: %w", err)
+	}
+
+	// check if the lockfile exists
+	if _, err := os.Stat(lockFilePath); errors.Is(err, os.ErrNotExist) {
+		// create lock file if doesn't exist
+		if _, err := os.Create(lockFilePath); err != nil {
+			return nil, fmt.Errorf("failed to create lockfile: %w", err)
+		}
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to check if lockfile exists: %w", err)
+	}
+
+	lock := flock.New(lockFilePath)
+
+	if err := lock.Lock(); err != nil {
+		return nil, fmt.Errorf("failed to acquire lock: %w", err)
+	}
+
+	return lock, nil
 }

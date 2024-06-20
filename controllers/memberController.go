@@ -108,25 +108,17 @@ func (memberController *MemberController) CreateMember(c *gin.Context) {
 	}
 
 	// create and add to database through the memberService
-	accessToken, accessExp, refreshToken, refreshExp, member, err := memberController.MemberService.CreateMember(&form, &tagContainer)
+	loggedInMemberDTO, err := memberController.MemberService.CreateMember(&form, &tagContainer)
 
 	// if the member service throws an error, return a 400 Bad request status
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create member: %s", err)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to create member: %s", err)})
 
 		return
 	}
 
-	loggedInMember := models.LoggedInMemberDTO{
-		Member:       member.IntoDTO(),
-		AccessToken:  accessToken,
-		AccessExp:    accessExp,
-		RefreshToken: refreshToken,
-		RefreshExp:   refreshExp,
-	}
-
 	// send back a positive response 200 status with the created member
-	c.JSON(http.StatusOK, loggedInMember)
+	c.JSON(http.StatusOK, loggedInMemberDTO)
 }
 
 // DeleteMember godoc
@@ -226,22 +218,14 @@ func (memberController *MemberController) LoginMember(c *gin.Context) {
 		return
 	}
 
-	member, at, aexp, rt, rexp, err := memberController.MemberService.LogInMember(form)
+	loggedInMemberDTO, err := memberController.MemberService.LogInMember(form)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("failed to log in: %s", err.Error())})
 
 		return
 	}
 
-	loggedInMember := models.LoggedInMemberDTO{
-		Member:       member.IntoDTO(),
-		AccessToken:  at,
-		AccessExp:    aexp,
-		RefreshToken: rt,
-		RefreshExp:   rexp,
-	}
-
-	c.JSON(http.StatusOK, loggedInMember)
+	c.JSON(http.StatusOK, loggedInMemberDTO)
 }
 
 // RefreshToken godoc
@@ -274,21 +258,14 @@ func (memberController *MemberController) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	at, aexp, rt, rexp, err := memberController.MemberService.RefreshToken(form)
+	tokenPairDTO, err := memberController.MemberService.RefreshToken(form)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("failed to refresh access token: %s", err.Error())})
 
 		return
 	}
 
-	tokenPair := models.TokenPairDTO{
-		AccessToken:  at,
-		AccessExp:    aexp,
-		RefreshToken: rt,
-		RefreshExp:   rexp,
-	}
-
-	c.JSON(http.StatusOK, tokenPair)
+	c.JSON(http.StatusOK, tokenPairDTO)
 }
 
 // GetMemberPosts godoc

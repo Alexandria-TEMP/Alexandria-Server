@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -373,7 +374,7 @@ func (branchController *BranchController) GetRender(c *gin.Context) {
 	}
 
 	// get render filepath
-	filePath, err202, err404 := branchController.RenderService.GetRenderFile(uint(branchID))
+	filePath, lock, err202, err404 := branchController.RenderService.GetRenderFile(uint(branchID))
 
 	// if render is pending return 202 accepted
 	if err202 != nil {
@@ -388,6 +389,13 @@ func (branchController *BranchController) GetRender(c *gin.Context) {
 
 		return
 	}
+
+	// defer unlocking repo
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// Set the headers for the file transfer and return the file
 	c.Header("Content-Description", "File Transfer")
@@ -419,13 +427,20 @@ func (branchController *BranchController) GetProject(c *gin.Context) {
 	}
 
 	// get repository filepath
-	filePath, err := branchController.BranchService.GetProject(uint(branchID))
+	filePath, lock, err := branchController.BranchService.GetProject(uint(branchID))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 
 		return
 	}
+
+	// unlock repo after reading file
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// Set the headers for the file transfer and return the file
 	c.Header("Content-Description", "File Transfer")
@@ -546,7 +561,7 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 	}
 
 	relFilepath := c.Param("filepath")
-	absFilepath, err := branchController.BranchService.GetFileFromProject(uint(branchID), relFilepath)
+	absFilepath, lock, err := branchController.BranchService.GetFileFromProject(uint(branchID), relFilepath)
 
 	// if files doesnt exist return 404 not found
 	if err != nil {
@@ -554,6 +569,13 @@ func (branchController *BranchController) GetFileFromProject(c *gin.Context) {
 
 		return
 	}
+
+	// defer unlocking repo after file has been read
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// get the file info
 	fileContentType, err1 := mimetype.DetectFile(absFilepath)

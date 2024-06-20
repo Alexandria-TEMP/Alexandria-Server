@@ -80,13 +80,13 @@ func TestCreateMemberSuccessful(t *testing.T) {
 		ScientificFieldTags: []*models.ScientificFieldTag{exampleSTag1, exampleSTag2},
 	}
 	// call service method under test
-	_, _, member, err := memberService.CreateMember(&memberForm, &userTags)
+	loggedInMemberDTO, err := memberService.CreateMember(&memberForm, &userTags)
 
 	// verify that the member object was created correctly
-	assert.Equal(t, exampleMember.FirstName, member.FirstName)
-	assert.Equal(t, exampleMember.LastName, member.LastName)
-	assert.Equal(t, exampleMember.Email, member.Email)
-	assert.Equal(t, exampleMember.Institution, member.Institution)
+	assert.Equal(t, exampleMember.FirstName, loggedInMemberDTO.Member.FirstName)
+	assert.Equal(t, exampleMember.LastName, loggedInMemberDTO.Member.LastName)
+	assert.Equal(t, exampleMember.Email, loggedInMemberDTO.Member.Email)
+	assert.Equal(t, exampleMember.Institution, loggedInMemberDTO.Member.Institution)
 
 	// verify that there was no error
 	assert.Nil(t, err)
@@ -116,7 +116,7 @@ func TestCreateMemberUnsuccessful(t *testing.T) {
 	}
 
 	// call service method under test
-	_, _, _, err := memberService.CreateMember(&memberForm, &userTags)
+	_, err := memberService.CreateMember(&memberForm, &userTags)
 
 	// verify the error was returned correctly
 	assert.Equal(t, expectedErr, err)
@@ -146,7 +146,7 @@ func TestCreateMemberDuplicateEmail(t *testing.T) {
 	}
 
 	// call service method under test
-	_, _, _, err := memberService.CreateMember(&memberForm, &userTags)
+	_, err := memberService.CreateMember(&memberForm, &userTags)
 
 	// verify the error was returned correctly
 	assert.NotNil(t, err)
@@ -187,9 +187,9 @@ func TestLoginMemberValidSuccessful(t *testing.T) {
 
 	mockMemberRepository.EXPECT().Query(&models.Member{Email: exampleMemberAuthForm.Email}).Return([]*models.Member{&exampleMemberWithPassword}, nil)
 
-	loggedInMember, err := memberService.LogInMember(&exampleMemberAuthForm)
+	loggedInMemberDTO, err := memberService.LogInMember(&exampleMemberAuthForm)
 	assert.Nil(t, err)
-	assert.Equal(t, exampleMemberDTO, loggedInMember.Member)
+	assert.Equal(t, exampleMemberDTO, loggedInMemberDTO.Member)
 }
 
 func TestLoginMemberInvalidSuccessful(t *testing.T) {
@@ -226,24 +226,26 @@ func TestRefreshTokenSuccess(t *testing.T) {
 	beforeEachMember(t)
 
 	// generate valid refresh token
-	_, refreshToken, err := memberService.generateTokenPair(uint(1))
+	_, _, refreshToken, _, err := memberService.generateTokenPair(uint(1))
 	assert.Nil(t, err)
 
 	mockMemberRepository.EXPECT().GetByID(uint(1)).Return(nil, nil)
 
 	validForm := forms.TokenRefreshForm{RefreshToken: refreshToken}
 
-	tokenPair, err := memberService.RefreshToken(&validForm)
+	tokenPairDTO, err := memberService.RefreshToken(&validForm)
 	assert.Nil(t, err)
-	assert.NotNil(t, tokenPair.AccessToken)
-	assert.NotNil(t, tokenPair.RefreshToken)
+	assert.NotNil(t, tokenPairDTO.AccessToken)
+	assert.NotNil(t, tokenPairDTO.AccessExp)
+	assert.NotNil(t, tokenPairDTO.RefreshToken)
+	assert.NotNil(t, tokenPairDTO.RefreshExp)
 }
 
 func TestRefreshTokenFailureWrongTyp(t *testing.T) {
 	beforeEachMember(t)
 
 	// generate valid refresh token
-	accessToken, _, err := memberService.generateTokenPair(uint(1))
+	accessToken, _, _, _, err := memberService.generateTokenPair(uint(1))
 	assert.Nil(t, err)
 
 	mockMemberRepository.EXPECT().GetByID(uint(1))

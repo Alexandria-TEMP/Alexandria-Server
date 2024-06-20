@@ -45,10 +45,10 @@ func TestInitsystem(t *testing.T) {
 
 	CurrentFilesystem.CheckoutDirectory(1)
 
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1"), CurrentFilesystem.CurrentDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "quarto_project"), CurrentFilesystem.CurrentQuartoDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "render"), CurrentFilesystem.CurrentRenderDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "quarto_project.zip"), CurrentFilesystem.CurrentZipFilePath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository"), CurrentFilesystem.CurrentDirPath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository", "quarto_project"), CurrentFilesystem.CurrentQuartoDirPath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository", "render"), CurrentFilesystem.CurrentRenderDirPath)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository", "quarto_project.zip"), CurrentFilesystem.CurrentZipFilePath)
 	assert.Nil(t, CurrentFilesystem.CurrentRepository)
 }
 
@@ -343,6 +343,25 @@ func TestGetFileTreeFailure(t *testing.T) {
 	_, err := CurrentFilesystem.GetFileTree()
 
 	assert.NotNil(t, err)
+}
+
+func TestLockDirectory(t *testing.T) {
+	// Set paths
+	CurrentFilesystem.CurrentDirPath = filepath.Join(cwd, "vfs")
+	lockFilePath := filepath.Join(cwd, "vfs", "0", "alexandria.lock")
+
+	// Create vfs dir
+	_ = os.Mkdir(CurrentFilesystem.CurrentDirPath, fs.ModePerm)
+
+	// Lock post 0
+	lock, err := CurrentFilesystem.LockDirectory(0)
+	assert.Nil(t, err)
+
+	assert.True(t, lock.Locked())
+	assert.Equal(t, lockFilePath, lock.Path())
+
+	// Cleanup
+	os.RemoveAll(CurrentFilesystem.CurrentDirPath)
 }
 
 // Readln returns a single line (without the ending \n)

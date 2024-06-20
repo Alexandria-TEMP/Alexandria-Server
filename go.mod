@@ -6,6 +6,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.4
 	github.com/gin-contrib/cors v1.7.2
 	github.com/go-git/go-git/v5 v5.12.0
+	github.com/gofrs/flock v0.8.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/joho/godotenv v1.5.1
 	github.com/otiai10/copy v1.14.0

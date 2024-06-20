@@ -76,7 +76,7 @@ func TestGetMember404(t *testing.T) {
 func TestCreateMember200(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().CreateMember(&exampleMemberForm, gomock.Any()).Return("access", int64(1), "refresh", int64(2), &exampleMember, nil).Times(1)
+	mockMemberService.EXPECT().CreateMember(&exampleMemberForm, gomock.Any()).Return(exampleMemberLoggedInDTO, nil).Times(1)
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
 
 	exampleMemberFormJSON, _ := json.Marshal(exampleMemberForm)
@@ -88,13 +88,13 @@ func TestCreateMember200(t *testing.T) {
 	responseJSON, _ := io.ReadAll(responseRecorder.Body)
 	_ = json.Unmarshal(responseJSON, &responsemember)
 
-	assert.Equal(t, exampleMemberLoggedInDTO, responsemember)
+	assert.Equal(t, *exampleMemberLoggedInDTO, responsemember)
 }
 
 func TestCreateMember400(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Return("", int64(0), "", int64(0), nil, errors.New("some error")).Times(0)
+	mockMemberService.EXPECT().CreateMember(gomock.Any(), gomock.Any()).Return(nil, errors.New("some error")).Times(0)
 
 	badMemberFormJSON := []byte(`jgdfskljglkdjlmdflkgmlksdfglksdlfgdsfgsdg`)
 	req, _ := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(badMemberFormJSON))
@@ -182,7 +182,7 @@ func TestGetAllMembers404(t *testing.T) {
 func TestLoginMember200(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(&exampleMember, "access", int64(1), "refresh", int64(2), nil)
+	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(exampleMemberLoggedInDTO, nil)
 
 	exampleMemberAuthFormJSON, _ := json.Marshal(exampleMemberAuthForm)
 	req, _ := http.NewRequest("POST", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
@@ -194,7 +194,7 @@ func TestLoginMember200(t *testing.T) {
 	_ = json.Unmarshal(responseJSON, &responsemember)
 
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
-	assert.Equal(t, exampleMemberLoggedInDTO, responsemember)
+	assert.Equal(t, *exampleMemberLoggedInDTO, responsemember)
 }
 
 func TestLoginMember4001(t *testing.T) {
@@ -230,7 +230,7 @@ func TestLoginMember4002(t *testing.T) {
 func TestLoginMember401(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(&exampleMember, "access", int64(1), "refresh", int64(2), errors.New("failed"))
+	mockMemberService.EXPECT().LogInMember(&exampleMemberAuthForm).Return(nil, errors.New("failed"))
 
 	exampleMemberAuthFormJSON, _ := json.Marshal(exampleMemberAuthForm)
 	req, _ := http.NewRequest("POST", "/api/v2/members/login", bytes.NewBuffer(exampleMemberAuthFormJSON))
@@ -247,7 +247,7 @@ func TestLoginMember401(t *testing.T) {
 func TestRefreshToken200(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().RefreshToken(&exampleTokenRefreshForm).Return("5678", int64(1), "9012", int64(2), nil)
+	mockMemberService.EXPECT().RefreshToken(&exampleTokenRefreshForm).Return(exampleTokenPairDTO, nil)
 
 	exampleTokenRefreshFormJSON, _ := json.Marshal(exampleTokenRefreshForm)
 	req, _ := http.NewRequest("POST", "/api/v2/members/token", bytes.NewBuffer(exampleTokenRefreshFormJSON))
@@ -259,7 +259,7 @@ func TestRefreshToken200(t *testing.T) {
 	_ = json.Unmarshal(responseJSON, &responsemember)
 
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
-	assert.Equal(t, exampleTokenPairDTO, responsemember)
+	assert.Equal(t, *exampleTokenPairDTO, responsemember)
 }
 
 func TestRefreshToken4001(t *testing.T) {
@@ -295,7 +295,7 @@ func TestRefreshToken4002(t *testing.T) {
 func TestRefreshToken401(t *testing.T) {
 	beforeEachMember(t)
 
-	mockMemberService.EXPECT().RefreshToken(&exampleTokenRefreshForm).Return("5678", int64(1), "9012", int64(2), errors.New("failed"))
+	mockMemberService.EXPECT().RefreshToken(&exampleTokenRefreshForm).Return(nil, errors.New("failed"))
 
 	exampleTokenRefreshFormJSON, _ := json.Marshal(exampleTokenRefreshForm)
 	req, _ := http.NewRequest("POST", "/api/v2/members/token", bytes.NewBuffer(exampleTokenRefreshFormJSON))
@@ -361,7 +361,7 @@ func TestCreateMemberDatabaseFailed(t *testing.T) {
 
 	// Setup mocks
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil).Times(1)
-	mockMemberService.EXPECT().CreateMember(&form, gomock.Any()).Return("access", int64(1), "refresh", int64(2), &exampleMember, fmt.Errorf("oh no")).Times(1)
+	mockMemberService.EXPECT().CreateMember(&form, gomock.Any()).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("POST", "/api/v2/members", bytes.NewBuffer(body))
