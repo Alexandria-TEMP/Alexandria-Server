@@ -268,21 +268,21 @@ func (branchController *BranchController) CreateReview(c *gin.Context) {
 	c.JSON(http.StatusOK, branchreview.IntoDTO())
 }
 
-// UserCanReview godoc
+// MemberCanReview godoc
 // @Summary 	Returns whether the user is allowed to branchreview this branch
-// @Description Returns true if the user fulfills the requirements to branchreview the branch
-// @Description Returns false if user is unauthorized to branchreview the branch
+// @Description Returns true if the user fulfills the requirements to branchreview the branch.
+// @Description Returns false if user is unauthorized to branchreview the branch.
+// @Description The member in question is inferred based on the access token.
 // @Tags 		branches
 // @Accept  	json
 // @Param 		Authorization header string true "Access Token"
 // @Param		branchID		path		string			true	"branch ID"
-// @Param		memberID		path		string			true	"member ID"
 // @Produce		json
 // @Success 	200		{object}		boolean
 // @Failure		400		{object} 	utils.HTTPError
 // @Failure		404		{object} 	utils.HTTPError
 // @Failure		500		{object} 	utils.HTTPError
-// @Router 		/branches/{branchID}/can-review/{memberID}		[get]
+// @Router 		/branches/{branchID}/can-review		[get]
 func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 	// extract branchID
 	branchIDStr := c.Param("branchID")
@@ -294,18 +294,17 @@ func (branchController *BranchController) MemberCanReview(c *gin.Context) {
 		return
 	}
 
-	// extract memberID
-	memberIDStr := c.Param("memberID")
-	memberID, err := strconv.ParseInt(memberIDStr, 10, 64)
+	// get current member from auth
+	member, exists := c.Get("currentMember")
 
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("invalid branch ID '%s', cannot interpret as integer: %s", memberIDStr, err)})
+	if !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "failed to get current member from access token"})
 
 		return
 	}
 
 	// create branchreview and add to branch
-	canReview, err := branchController.BranchService.MemberCanReview(uint(branchID), uint(memberID))
+	canReview, err := branchController.BranchService.MemberCanReview(uint(branchID), member.(*models.Member))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})

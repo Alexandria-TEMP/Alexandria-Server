@@ -34,7 +34,7 @@ type BranchService interface {
 	CreateReview(reviewCreationForm forms.ReviewCreationForm, reviewingMember *models.Member) (*models.BranchReview, error)
 
 	// MemberCanReview checks whether a user is elligible to branchreview a branch, dpending on whether there is an overlap of the scientific fields.
-	MemberCanReview(branchID, memberID uint) (bool, error)
+	MemberCanReview(branchID uint, member *models.Member) (bool, error)
 
 	// GetProjectFile returns filepath of zipped repository.
 	// Error is for status 404.

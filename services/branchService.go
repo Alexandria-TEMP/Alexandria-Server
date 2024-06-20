@@ -21,16 +21,17 @@ import (
 const approvalsToMerge = 2 // 0 indexed
 
 type BranchService struct {
-	BranchRepository                      database.ModelRepositoryInterface[*models.Branch]
-	ClosedBranchRepository                database.ModelRepositoryInterface[*models.ClosedBranch]
-	PostRepository                        database.ModelRepositoryInterface[*models.Post]
-	ProjectPostRepository                 database.ModelRepositoryInterface[*models.ProjectPost]
-	ReviewRepository                      database.ModelRepositoryInterface[*models.BranchReview]
-	DiscussionContainerRepository         database.ModelRepositoryInterface[*models.DiscussionContainer]
-	DiscussionRepository                  database.ModelRepositoryInterface[*models.Discussion]
-	MemberRepository                      database.ModelRepositoryInterface[*models.Member]
-	Filesystem                            filesystemInterfaces.Filesystem
-	ScientificFieldTagContainerRepository database.ModelRepositoryInterface[*models.ScientificFieldTagContainer]
+	BranchRepository                   database.ModelRepositoryInterface[*models.Branch]
+	ClosedBranchRepository             database.ModelRepositoryInterface[*models.ClosedBranch]
+	PostRepository                     database.ModelRepositoryInterface[*models.Post]
+	ProjectPostRepository              database.ModelRepositoryInterface[*models.ProjectPost]
+	ReviewRepository                   database.ModelRepositoryInterface[*models.BranchReview]
+	DiscussionContainerRepository      database.ModelRepositoryInterface[*models.DiscussionContainer]
+	DiscussionRepository               database.ModelRepositoryInterface[*models.Discussion]
+	MemberRepository                   database.ModelRepositoryInterface[*models.Member]
+	ScientificFieldTagRepository       database.ModelRepositoryInterface[*models.ScientificFieldTag]
+	Filesystem                         filesystemInterfaces.Filesystem
+	ScientificFieldTagContainerService interfaces.ScientificFieldTagContainerService
 
 	RenderService             interfaces.RenderService
 	BranchCollaboratorService interfaces.BranchCollaboratorService
@@ -202,6 +203,10 @@ func (branchService *BranchService) GetReview(reviewID uint) (*models.BranchRevi
 }
 
 func (branchService *BranchService) CreateReview(form forms.ReviewCreationForm, member *models.Member) (*models.BranchReview, error) {
+	if canReview, err := branchService.MemberCanReview(form.BranchID, member); !canReview {
+		return nil, fmt.Errorf("this member cannot review this branch: %w", err)
+	}
+
 	// get branch
 	branch, err := branchService.BranchRepository.GetByID(form.BranchID)
 
@@ -356,7 +361,7 @@ func (branchService *BranchService) merge(branch *models.Branch, closedBranch *m
 	}
 
 	if branch.UpdatedScientificFieldTagContainer != nil {
-		container, err := branchService.ScientificFieldTagContainerRepository.GetByID(*branch.UpdatedScientificFieldTagContainerID)
+		container, err := branchService.ScientificFieldTagContainerService.GetScientificFieldTagContainer(*branch.UpdatedScientificFieldTagContainerID)
 		if err != nil {
 			return fmt.Errorf("could not get scientific field tag container during merge: %w", err)
 		}
@@ -404,8 +409,113 @@ func (branchService *BranchService) updateReviewStatus(reviews []*models.BranchR
 	return models.BranchOpenForReview
 }
 
-func (branchService *BranchService) MemberCanReview(_, _ uint) (bool, error) {
-	return true, nil
+func (branchService *BranchService) MemberCanReview(branchID uint, member *models.Member) (bool, error) {
+	// get branch
+	branch, err := branchService.BranchRepository.GetByID(branchID)
+	if err != nil {
+		return false, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
+	}
+
+	// check if branch is open for review
+	if branch.BranchOverallReviewStatus != models.BranchOpenForReview {
+		return false, fmt.Errorf("this branch has been closed and cannot be reviewed")
+	}
+
+	// check if member is contributor to branch
+	branchCollaboratorMemberIDs := make([]uint, 0)
+	for _, branchCollaborator := range branch.Collaborators {
+		branchCollaboratorMemberIDs = append(branchCollaboratorMemberIDs, branchCollaborator.MemberID)
+	}
+
+	if slices.Contains(branchCollaboratorMemberIDs, member.ID) {
+		return false, fmt.Errorf("this member has contributed to the branch, so they cannot review it")
+	}
+
+	// check if member has already reviewed branch
+	reviewMemberIDs := make([]uint, 0)
+	for _, review := range branch.Reviews {
+		reviewMemberIDs = append(reviewMemberIDs, review.MemberID)
+	}
+
+	if slices.Contains(reviewMemberIDs, member.ID) {
+		return false, fmt.Errorf("this member has already reviewed this branch, so they cannot review it")
+	}
+
+	// get the tag ids of the branch.
+	branchTagIDs, err := branchService.getBranchTagIDs(branch)
+
+	if err != nil {
+		return false, fmt.Errorf("failed to find branch tags: %w", err)
+	}
+
+	// if not tags then always true
+	if len(branchTagIDs) == 0 {
+		return true, nil
+	}
+
+	// get scientific field tags of member
+	memberTagsContainer, err := branchService.ScientificFieldTagContainerService.GetScientificFieldTagContainer(member.ScientificFieldTagContainerID)
+	if err != nil {
+		return false, fmt.Errorf("failed to find scientific field tag container of member: %w", err)
+	}
+
+	memberTagIDs := models.ScientificFieldTagIntoIDs(memberTagsContainer.ScientificFieldTags)
+
+	// iterate over each member tag to see if there is an intersection with branch tags
+	for _, memberTagID := range memberTagIDs {
+		if slices.Contains(branchTagIDs, memberTagID) {
+			return true, nil
+		}
+	}
+
+	// if no intersection is found we return false
+	return false, nil
+}
+
+func (branchService *BranchService) getBranchTagIDs(branch *models.Branch) ([]uint, error) {
+	// if the branch has updated the tags, we use those, if the branch has not then we use the posts tags.
+	var branchTags []*models.ScientificFieldTag
+
+	if branch.UpdatedScientificFieldTagContainerID != nil {
+		container, err := branchService.ScientificFieldTagContainerService.GetScientificFieldTagContainer(*branch.UpdatedScientificFieldTagContainerID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find scientific field tag container of branch: %w", err)
+		}
+
+		branchTags = container.ScientificFieldTags
+	} else {
+		projectPost, err := branchService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find project post of branch: %w", err)
+		}
+
+		container, err := branchService.ScientificFieldTagContainerService.GetScientificFieldTagContainer(projectPost.Post.ScientificFieldTagContainerID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find scientific field tag container of post: %w", err)
+		}
+
+		branchTags = container.ScientificFieldTags
+	}
+
+	// recursively add all of the parents of the tags to the list of branchTags
+	// because if a member is qualified in a field that subsumes a branchTag, they should be able to review it.
+	for i := 0; i < len(branchTags); i++ {
+		branchTag := branchTags[i]
+
+		if branchTag.ParentID == nil {
+			continue
+		}
+
+		parentTag, err := branchService.ScientificFieldTagRepository.GetByID(*branchTag.ParentID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find parent scientific field tag: %w", err)
+		} else if !slices.Contains(branchTags, parentTag) {
+			branchTags = append(branchTags, parentTag)
+		}
+	}
+
+	// map all the branch tags to their IDs
+	return models.ScientificFieldTagIntoIDs(branchTags), nil
 }
 
 func (branchService *BranchService) GetProject(branchID uint) (string, *flock.Flock, error) {
