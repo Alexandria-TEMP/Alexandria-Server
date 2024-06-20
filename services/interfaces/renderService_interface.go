@@ -11,12 +11,12 @@ type RenderService interface {
 	// GetRender returns filepath of rendered repository ON A NON-MASTER BRANCH.
 	// Error 1 is for status 202.
 	// Error 2 is for status 404.
-	GetRenderFile(branchID uint) (string, *flock.Flock, error, error)
+	GetRenderFile(branchID uint) (string, *flock.Flock, error, error, error)
 
 	// GetRender returns filepath of rendered repository ON MAIN.
 	// Error 1 is for status 202.
 	// Error 2 is for status 404.
-	GetMainRenderFile(postID uint) (string, *flock.Flock, error, error)
+	GetMainRenderFile(postID uint) (string, *flock.Flock, error, error, error)
 
 	// RenderBranch first unzips a zipped project, validates it, configures it to render well, renders it, and checks it rendered well.
 	// We are handed a locked lock from the previous step in the render pipeline. It must be unlocked after rendering.

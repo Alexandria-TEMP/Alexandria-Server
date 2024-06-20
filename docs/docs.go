@@ -611,6 +611,15 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -2491,6 +2500,15 @@ const docTemplate = `{
                     },
                     "202": {
                         "description": "Accepted",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
                         "schema": {
                             "type": "array",
                             "items": {

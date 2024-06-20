@@ -890,6 +890,12 @@ paths:
             items:
               type: integer
             type: array
+        "204":
+          description: No Content
+          schema:
+            items:
+              type: integer
+            type: array
         "400":
           description: Bad Request
           schema:
@@ -2170,6 +2176,12 @@ paths:
             type: array
         "202":
           description: Accepted
+          schema:
+            items:
+              type: integer
+            type: array
+        "204":
+          description: No Content
           schema:
             items:
               type: integer
