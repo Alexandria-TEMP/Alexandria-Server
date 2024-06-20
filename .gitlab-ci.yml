@@ -74,7 +74,7 @@ test_pkg_services:
   variables:
     PKG: services
 
-test_pkg_server:
+test_pkg_middleware:
   extends: .package_tests
   variables:
-    PKG: server
+    PKG: middleware
