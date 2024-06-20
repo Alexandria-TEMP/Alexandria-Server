@@ -346,10 +346,11 @@ func TestGetFileTreeFailure(t *testing.T) {
 }
 
 func TestLockDirectory(t *testing.T) {
-	// Lock post 0
 	CurrentFilesystem.CurrentDirPath = filepath.Join(cwd, "vfs")
 	lockFilePath := filepath.Join(cwd, "vfs", "0", "alexandria.lock")
+	_ = os.Mkdir(CurrentFilesystem.CurrentDirPath, fs.ModePerm)
 
+	// Lock post 0
 	lock, err := CurrentFilesystem.LockDirectory(0)
 	assert.Nil(t, err)
 

@@ -669,7 +669,7 @@ func TestGetMainRenderGoodWeather(t *testing.T) {
 	filePath := "../utils/test_files/good_repository_setup/render/1234.html"
 
 	// Setup mocks
-	mockRenderService.EXPECT().GetMainRenderFile(postID).Return(filePath, lock, nil, nil).Times(1)
+	mockRenderService.EXPECT().GetMainRenderFile(postID).Return(filePath, lock, nil, nil, nil).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/posts/%d/render", postID), http.NoBody)
@@ -716,7 +716,7 @@ func TestGetMainRenderPending(t *testing.T) {
 	postID := uint(10)
 
 	// Setup mocks
-	mockRenderService.EXPECT().GetMainRenderFile(postID).Return("", nil, fmt.Errorf("oh no"), nil).Times(1)
+	mockRenderService.EXPECT().GetMainRenderFile(postID).Return("", nil, fmt.Errorf("oh no"), nil, nil).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/posts/%d/render", postID), http.NoBody)
@@ -740,7 +740,7 @@ func TestGetMainRenderFailed(t *testing.T) {
 	postID := uint(10)
 
 	// Setup mocks
-	mockRenderService.EXPECT().GetMainRenderFile(postID).Return("", nil, nil, fmt.Errorf("oh no")).Times(1)
+	mockRenderService.EXPECT().GetMainRenderFile(postID).Return("", nil, nil, fmt.Errorf("oh no"), nil).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/posts/%d/render", postID), http.NoBody)
@@ -753,7 +753,7 @@ func TestGetMainRenderFailed(t *testing.T) {
 	defer responseRecorder.Result().Body.Close()
 
 	// Check status
-	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode)
+	assert.Equal(t, http.StatusNoContent, responseRecorder.Result().StatusCode)
 }
 
 func TestGetMainFiletreeGoodWeather(t *testing.T) {
