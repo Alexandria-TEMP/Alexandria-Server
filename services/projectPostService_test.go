@@ -19,7 +19,9 @@ var projectPostService ProjectPostService
 func projectPostServiceSetup(t *testing.T) {
 	t.Helper()
 
+	_ = lock.Lock()
 	mockCtrl := gomock.NewController(t)
+
 	defer mockCtrl.Finish()
 
 	memberA = models.Member{
@@ -58,7 +60,7 @@ func projectPostServiceSetup(t *testing.T) {
 }
 
 func projectPostServiceTeardown() {
-
+	_ = lock.Unlock()
 }
 
 func TestCreateProjectPostGoodWeather(t *testing.T) {
@@ -103,6 +105,7 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 	}, nil).Times(1)
 
 	mockProjectPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
+	mockFilesystem.EXPECT().LockDirectory(uint(0)).Return(lock, nil)
 	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
 	mockFilesystem.EXPECT().CreateRepository().Return(nil)
 	mockFilesystem.EXPECT().CreateBranch("0").Return(nil)
@@ -138,6 +141,7 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 	}
 
 	assert.Equal(t, expectedProjectPost, createdProjectPost)
+	assert.False(t, lock.Locked())
 }
 
 // When database creation fails, project post creation should fail.

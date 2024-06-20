@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gofrs/flock"
 	pagination "github.com/webstradev/gin-pagination"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
@@ -47,10 +48,13 @@ var (
 	exampleSTag1        *models.ScientificFieldTag
 	exampleSTag2        *models.ScientificFieldTag
 	exampleSTag1DTO     models.ScientificFieldTagDTO
+
+	lock *flock.Flock
 )
 
 // TestMain is a keyword function, this is run by the testing package before other tests
 func TestMain(m *testing.M) {
+	lock = flock.New("../utils/template_repo/alexandria.lock")
 	exampleSTag1 = &models.ScientificFieldTag{
 		ScientificField: "Mathematics",
 		Subtags:         []*models.ScientificFieldTag{},

@@ -4,6 +4,7 @@ import (
 	"mime/multipart"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gofrs/flock"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 )
@@ -37,7 +38,7 @@ type BranchService interface {
 
 	// GetProjectFile returns filepath of zipped repository.
 	// Error is for status 404.
-	GetProject(branchID uint) (string, error)
+	GetProject(branchID uint) (string, *flock.Flock, error)
 
 	// UploadProject saves a zipped quarto project to its branch and starts the render pipeline.
 	// It renders the project in a goroutine.
@@ -50,7 +51,7 @@ type BranchService interface {
 
 	// GetFileFromRepository returns absolute filepath of file.
 	// Error is for status 404.
-	GetFileFromProject(branchID uint, relFilepath string) (string, error)
+	GetFileFromProject(branchID uint, relFilepath string) (string, *flock.Flock, error)
 
 	// GetBranchProjectPost returns a deeply preloaded project post for a branch.
 	GetBranchProjectPost(branch *models.Branch) (*models.ProjectPost, error)

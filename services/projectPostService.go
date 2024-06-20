@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"log"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
@@ -77,6 +78,18 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 	if err := projectPostService.ProjectPostRepository.Create(&projectPost); err != nil {
 		return nil, nil, fmt.Errorf("unable to create project post: %w", err)
 	}
+
+	// lock directory and defer unlocking it
+	lock, err := projectPostService.Filesystem.LockDirectory(projectPost.PostID)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
+	}
+
+	defer func() {
+		if err := lock.Unlock(); err != nil {
+			log.Printf("Failed to unlock %s", lock.Path())
+		}
+	}()
 
 	// Checkout directory where project post will store it's files
 	projectPostService.Filesystem.CheckoutDirectory(projectPost.PostID)

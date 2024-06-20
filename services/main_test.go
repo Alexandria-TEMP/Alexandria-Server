@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gofrs/flock"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/mocks"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 )
@@ -52,6 +53,8 @@ var (
 
 	projectPost *models.ProjectPost
 
+	lock *flock.Flock
+
 	c   *gin.Context
 	cwd string
 )
@@ -63,6 +66,7 @@ func teardownTestSuite() {
 }
 
 func TestMain(m *testing.M) {
+	lock = flock.New("../utils/template_repo/alexandria.lock")
 	tag1 := models.ScientificFieldTag{
 		ScientificField: "Mathematics",
 		Subtags:         []*models.ScientificFieldTag{},

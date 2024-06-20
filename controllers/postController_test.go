@@ -26,6 +26,7 @@ func setupPostController(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	// Setup mocks
+	_ = lock.Lock()
 	mockPostService = mocks.NewMockPostService(mockCtrl)
 	mockRenderService = mocks.NewMockRenderService(mockCtrl)
 	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
@@ -42,7 +43,7 @@ func setupPostController(t *testing.T) {
 }
 
 func teardownPostController() {
-
+	_ = lock.Unlock()
 }
 
 // Helper function that creates a multi-part form data body to send in a HTTP request
@@ -668,7 +669,7 @@ func TestGetMainRenderGoodWeather(t *testing.T) {
 	filePath := "../utils/test_files/good_repository_setup/render/1234.html"
 
 	// Setup mocks
-	mockRenderService.EXPECT().GetMainRenderFile(postID).Return(filePath, nil, nil).Times(1)
+	mockRenderService.EXPECT().GetMainRenderFile(postID).Return(filePath, lock, nil, nil).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/posts/%d/render", postID), http.NoBody)
@@ -683,6 +684,7 @@ func TestGetMainRenderGoodWeather(t *testing.T) {
 	// Check status
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
 	assert.Equal(t, "text/html", responseRecorder.Header().Get("Content-Type"))
+	assert.False(t, lock.Locked())
 }
 
 func TestGetMainRenderInvalidPostID(t *testing.T) {
@@ -714,7 +716,7 @@ func TestGetMainRenderPending(t *testing.T) {
 	postID := uint(10)
 
 	// Setup mocks
-	mockRenderService.EXPECT().GetMainRenderFile(postID).Return("", fmt.Errorf("oh no"), nil).Times(1)
+	mockRenderService.EXPECT().GetMainRenderFile(postID).Return("", nil, fmt.Errorf("oh no"), nil).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/posts/%d/render", postID), http.NoBody)
@@ -738,7 +740,7 @@ func TestGetMainRenderFailed(t *testing.T) {
 	postID := uint(10)
 
 	// Setup mocks
-	mockRenderService.EXPECT().GetMainRenderFile(postID).Return("", nil, fmt.Errorf("oh no")).Times(1)
+	mockRenderService.EXPECT().GetMainRenderFile(postID).Return("", nil, nil, fmt.Errorf("oh no")).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/posts/%d/render", postID), http.NoBody)
@@ -942,7 +944,7 @@ func TestGetMainFileFromProject(t *testing.T) {
 	absoluteFilePath := "../utils/test_files/good_repository_setup/render/1234.html"
 
 	// Setup mocks
-	mockPostService.EXPECT().GetMainFileFromProject(postID, gomock.Any()).Return(absoluteFilePath, nil).Times(1)
+	mockPostService.EXPECT().GetMainFileFromProject(postID, gomock.Any()).Return(absoluteFilePath, lock, nil).Times(1)
 
 	// Construct request
 	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/posts/%d/file/%s", postID, relativeFilePath), http.NoBody)
@@ -956,4 +958,5 @@ func TestGetMainFileFromProject(t *testing.T) {
 
 	// Check status
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
+	assert.False(t, lock.Locked())
 }

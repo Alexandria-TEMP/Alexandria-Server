@@ -22,6 +22,7 @@ import (
 func beforeEachBranch(t *testing.T) {
 	t.Helper()
 
+	_ = lock.Lock()
 	exampleBranch = models.Branch{
 		Model: gorm.Model{ID: 1},
 	}
@@ -418,7 +419,7 @@ func TestGetBranchCollaborator404(t *testing.T) {
 func TestGetRender200(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("../utils/test_files/good_repository_setup/render/1234.html", nil, nil)
+	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("../utils/test_files/good_repository_setup/render/1234.html", lock, nil, nil)
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/1/render", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -427,12 +428,13 @@ func TestGetRender200(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
 	assert.Equal(t, "text/html", responseRecorder.Header().Get("Content-Type"))
+	assert.False(t, lock.Locked())
 }
 
 func TestGetRender202(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("", errors.New("pending"), nil)
+	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("", nil, errors.New("pending"), nil)
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/1/render", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -445,8 +447,6 @@ func TestGetRender202(t *testing.T) {
 func TestGetRender400(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockRenderService.EXPECT().GetRenderFile(gomock.Any()).Times(0)
-
 	req, _ := http.NewRequest("GET", "/api/v2/branches/bad/render", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
 
@@ -458,7 +458,7 @@ func TestGetRender400(t *testing.T) {
 func TestGetRender404(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("", nil, errors.New("render not found"))
+	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("", nil, nil, errors.New("render not found"))
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/1/render", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -471,7 +471,7 @@ func TestGetRender404(t *testing.T) {
 func TestGetProject200(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().GetProject(uint(1)).Return("../utils/test_files/good_repository_setup/quarto_project.zip", nil)
+	mockBranchService.EXPECT().GetProject(uint(1)).Return("../utils/test_files/good_repository_setup/quarto_project.zip", lock, nil)
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/1/repository", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -480,12 +480,11 @@ func TestGetProject200(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, responseRecorder.Result().StatusCode)
 	assert.Equal(t, "application/zip", responseRecorder.Header().Get("Content-Type"))
+	assert.False(t, lock.Locked())
 }
 
 func TestGetProject400(t *testing.T) {
 	beforeEachBranch(t)
-
-	mockBranchService.EXPECT().GetProject(gomock.Any()).Times(0)
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/bad/repository", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -498,7 +497,7 @@ func TestGetProject400(t *testing.T) {
 func TestGetProject404(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockBranchService.EXPECT().GetProject(uint(1)).Return("", errors.New("project not found"))
+	mockBranchService.EXPECT().GetProject(uint(1)).Return("", nil, errors.New("project not found"))
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/1/repository", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
