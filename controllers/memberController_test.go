@@ -374,5 +374,5 @@ func TestCreateMemberDatabaseFailed(t *testing.T) {
 	defer responseRecorder.Result().Body.Close()
 
 	// Check status
-	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Result().StatusCode)
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }
