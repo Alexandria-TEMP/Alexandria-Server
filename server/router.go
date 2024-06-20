@@ -16,7 +16,7 @@ func SetUpRouter(controllers *ControllerEnv, secret string) *gin.Engine {
 	router.Use(cors.New(cors.Config{
 		AllowAllOrigins:  true,
 		AllowCredentials: true,
-		AllowHeaders:     []string{"Authorization", "authorization"},
+		AllowHeaders:     []string{"Authorization", "authorization", "content-type", "Content-Type"},
 	}))
 
 	router.RedirectTrailingSlash = false
