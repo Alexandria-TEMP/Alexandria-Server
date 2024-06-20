@@ -41,14 +41,15 @@ func (m *MockRenderService) EXPECT() *MockRenderServiceMockRecorder {
 }
 
 // GetMainRenderFile mocks base method.
-func (m *MockRenderService) GetMainRenderFile(postID uint) (string, *flock.Flock, error, error) {
+func (m *MockRenderService) GetMainRenderFile(postID uint) (string, *flock.Flock, error, error, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetMainRenderFile", postID)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(*flock.Flock)
 	ret2, _ := ret[2].(error)
 	ret3, _ := ret[3].(error)
-	return ret0, ret1, ret2, ret3
+	ret4, _ := ret[4].(error)
+	return ret0, ret1, ret2, ret3, ret4
 }
 
 // GetMainRenderFile indicates an expected call of GetMainRenderFile.
@@ -58,14 +59,15 @@ func (mr *MockRenderServiceMockRecorder) GetMainRenderFile(postID any) *gomock.C
 }
 
 // GetRenderFile mocks base method.
-func (m *MockRenderService) GetRenderFile(branchID uint) (string, *flock.Flock, error, error) {
+func (m *MockRenderService) GetRenderFile(branchID uint) (string, *flock.Flock, error, error, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRenderFile", branchID)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(*flock.Flock)
 	ret2, _ := ret[2].(error)
 	ret3, _ := ret[3].(error)
-	return ret0, ret1, ret2, ret3
+	ret4, _ := ret[4].(error)
+	return ret0, ret1, ret2, ret3, ret4
 }
 
 // GetRenderFile indicates an expected call of GetRenderFile.
