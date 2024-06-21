@@ -17,11 +17,12 @@ var (
 	branchService BranchService
 	memberService MemberService
 
-	mockRenderService             *mocks.MockRenderService
-	mockPostCollaboratorService   *mocks.MockPostCollaboratorService
-	mockBranchCollaboratorService *mocks.MockBranchCollaboratorService
-	mockBranchService             *mocks.MockBranchService
-	mockTagService                *mocks.MockTagService
+	mockRenderService                      *mocks.MockRenderService
+	mockPostCollaboratorService            *mocks.MockPostCollaboratorService
+	mockBranchCollaboratorService          *mocks.MockBranchCollaboratorService
+	mockBranchService                      *mocks.MockBranchService
+	mockTagService                         *mocks.MockTagService
+	mockScientificFieldTagContainerService *mocks.MockScientificFieldTagContainerService
 
 	mockBranchRepository                      *mocks.MockModelRepositoryInterface[*models.Branch]
 	mockClosedBranchRepository                *mocks.MockModelRepositoryInterface[*models.ClosedBranch]
