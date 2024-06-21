@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/gofrs/flock"
 )
 
 //go:generate mockgen -package=mocks -source=./filesystem_interface.go -destination=../../mocks/filesystem_mock.go
@@ -18,11 +17,11 @@ type Filesystem interface {
 	// CurrentQuartoDirPath = <cwd>/vfs/<postID>/quarto_project
 	// CurrentZipFilePath = <cwd>/vfs/<postID>/quarto_project.zip
 	// CurrentRenderDirPath = <cwd>/vfs/<postID>/render/<some_html_file>
-	CheckoutDirectory(postID uint) Filesystem
+	// CheckoutDirectory(postID uint) Filesystem
 
 	// LockDirectory locks the directory associated with the post.
 	// It returns a lock, which must be unlocked after changes are done.
-	LockDirectory(postID uint) (*flock.Flock, error)
+	// LockDirectory(postID uint) (*flock.Flock, error)
 
 	// CreateRepository create git repository at CurrentDirPath
 	CreateRepository() error

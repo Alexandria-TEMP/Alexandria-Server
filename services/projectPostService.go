@@ -6,7 +6,7 @@ import (
 	"slices"
 
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
-	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
@@ -18,7 +18,6 @@ type ProjectPostService struct {
 	ProjectPostRepository                 database.ModelRepositoryInterface[*models.ProjectPost]
 	MemberRepository                      database.ModelRepositoryInterface[*models.Member]
 	ScientificFieldTagContainerRepository database.ModelRepositoryInterface[*models.ScientificFieldTagContainer]
-	Filesystem                            filesystemInterfaces.Filesystem
 
 	PostCollaboratorService   interfaces.PostCollaboratorService
 	BranchCollaboratorService interfaces.BranchCollaboratorService
@@ -86,7 +85,7 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 	}
 
 	// lock directory and defer unlocking it
-	lock, err := projectPostService.Filesystem.LockDirectory(projectPost.PostID)
+	lock, err := filesystem.LockDirectory(projectPost.PostID)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
@@ -98,7 +97,7 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 	}()
 
 	// Checkout directory where project post will store it's files
-	directoryFilesystem := projectPostService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// Create a new git repo there
 	if err := directoryFilesystem.CreateRepository(); err != nil {

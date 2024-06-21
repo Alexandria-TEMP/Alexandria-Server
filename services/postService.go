@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/flock"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
-	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
@@ -23,7 +23,6 @@ type PostService struct {
 	ProjectPostRepository                 database.ModelRepositoryInterface[*models.ProjectPost]
 	MemberRepository                      database.ModelRepositoryInterface[*models.Member]
 	ScientificFieldTagContainerRepository database.ModelRepositoryInterface[*models.ScientificFieldTagContainer]
-	Filesystem                            filesystemInterfaces.Filesystem
 
 	PostCollaboratorService interfaces.PostCollaboratorService
 	RenderService           interfaces.RenderService
@@ -85,7 +84,7 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm, member 
 	}
 
 	// lock directory and defer unlocking it
-	lock, err := postService.Filesystem.LockDirectory(post.ID)
+	lock, err := filesystem.LockDirectory(post.ID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to acquire lock for directory %v: %w", post.ID, err)
 	}
@@ -97,7 +96,7 @@ func (postService *PostService) CreatePost(form *forms.PostCreationForm, member 
 	}()
 
 	// Checkout directory where post will store it's files
-	directoryFilesystem := postService.Filesystem.CheckoutDirectory(post.ID)
+	directoryFilesystem := filesystem.CheckoutDirectory(post.ID)
 
 	// Create a new git repo there
 	if err := directoryFilesystem.CreateRepository(); err != nil {
@@ -122,13 +121,13 @@ func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileH
 
 	// lock directory
 	// we unlock it upon error or after finishing render pipeline
-	lock, err := postService.Filesystem.LockDirectory(post.ID)
+	lock, err := filesystem.LockDirectory(post.ID)
 	if err != nil {
 		return fmt.Errorf("failed to acquire lock for directory %v: %w", post.ID, err)
 	}
 
 	// select repository of the post and checkout master
-	directoryFilesystem := postService.Filesystem.CheckoutDirectory(postID)
+	directoryFilesystem := filesystem.CheckoutDirectory(postID)
 
 	if err := directoryFilesystem.CheckoutBranch("master"); err != nil {
 		if err := lock.Unlock(); err != nil {
@@ -197,13 +196,13 @@ func (postService *PostService) GetMainProject(postID uint) (string, *flock.Floc
 
 	// lock directory
 	// unlock upon error or after the controller has read the zip contents
-	lock, err := postService.Filesystem.LockDirectory(postID)
+	lock, err := filesystem.LockDirectory(postID)
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to acquire lock for directory %v: %w", postID, err)
 	}
 
 	// select repository of the parent post
-	directoryFilesystem := postService.Filesystem.CheckoutDirectory(postID)
+	directoryFilesystem := filesystem.CheckoutDirectory(postID)
 
 	// checkout specified branch
 	if err := directoryFilesystem.CheckoutBranch("master"); err != nil {
@@ -226,7 +225,7 @@ func (postService *PostService) GetMainFiletree(postID uint) (map[string]int64, 
 	}
 
 	// lock directory and defer unlock
-	lock, err := postService.Filesystem.LockDirectory(postID)
+	lock, err := filesystem.LockDirectory(postID)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", postID, err)
 	}
@@ -238,7 +237,7 @@ func (postService *PostService) GetMainFiletree(postID uint) (map[string]int64, 
 	}()
 
 	// select repository of the parent post
-	directoryFilesystem := postService.Filesystem.CheckoutDirectory(postID)
+	directoryFilesystem := filesystem.CheckoutDirectory(postID)
 
 	// checkout specified branch
 	if err := directoryFilesystem.CheckoutBranch("master"); err != nil {
@@ -268,13 +267,13 @@ func (postService *PostService) GetMainFileFromProject(postID uint, relFilepath 
 
 	// lock directory
 	// unlock upon error or after controller has read file
-	lock, err := postService.Filesystem.LockDirectory(postID)
+	lock, err := filesystem.LockDirectory(postID)
 	if err != nil {
 		return absFilepath, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", postID, err)
 	}
 
 	// select repository of the post
-	directoryFilesystem := postService.Filesystem.CheckoutDirectory(postID)
+	directoryFilesystem := filesystem.CheckoutDirectory(postID)
 
 	// checkout master
 	if err := directoryFilesystem.CheckoutBranch("master"); err != nil {

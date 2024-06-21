@@ -7,7 +7,6 @@ import (
 	"github.com/joho/godotenv"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
@@ -71,7 +70,7 @@ func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
 	}
 }
 
-func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, secret string) ServiceEnv {
+func initServiceEnv(repositoryEnv *RepositoryEnv, secret string) ServiceEnv {
 	tagService := &services.TagService{
 		TagRepository: repositoryEnv.scientificFieldTagRepository,
 	}
@@ -79,7 +78,6 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, sec
 		BranchRepository:      repositoryEnv.branchRepository,
 		PostRepository:        repositoryEnv.postRepository,
 		ProjectPostRepository: repositoryEnv.projectPostRepository,
-		Filesystem:            fs,
 		BranchService:         nil, // Circular dependency filled in later...
 	}
 	postCollaboratorService := &services.PostCollaboratorService{
@@ -96,7 +94,6 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, sec
 		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
 		MemberRepository:                      repositoryEnv.memberRepository,
 		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
-		Filesystem:                            fs,
 		PostCollaboratorService:               postCollaboratorService,
 		RenderService:                         renderService,
 		TagService:                            tagService,
@@ -114,7 +111,6 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, sec
 		DiscussionContainerRepository:         repositoryEnv.discussionContainerRepository,
 		DiscussionRepository:                  repositoryEnv.discussionRepository,
 		MemberRepository:                      repositoryEnv.memberRepository,
-		Filesystem:                            fs,
 		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
 		RenderService:                         renderService,
 		BranchCollaboratorService:             branchCollaboratorService,
@@ -127,7 +123,6 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, sec
 		ClosedBranchRepository:                repositoryEnv.closedBranchRepository,
 		PostRepository:                        repositoryEnv.postRepository,
 		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
-		Filesystem:                            renderService.Filesystem,
 		PostCollaboratorService:               postCollaboratorService,
 		BranchCollaboratorService:             branchCollaboratorService,
 		BranchService:                         branchService,
@@ -215,15 +210,13 @@ func Init() {
 		log.Fatal(err)
 	}
 
-	fs := filesystem.NewFilesystem()
-
 	secret, err := loadSecret()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	repositoryEnv := initRepositoryEnv(db)
-	serviceEnv := initServiceEnv(repositoryEnv, fs, secret)
+	serviceEnv := initServiceEnv(repositoryEnv, secret)
 	controllerEnv := initControllerEnv(&serviceEnv)
 
 	router := SetUpRouter(&controllerEnv, secret)

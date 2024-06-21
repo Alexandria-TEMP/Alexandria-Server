@@ -19,33 +19,11 @@ import (
 )
 
 type Filesystem struct {
-	rootPath             string
-	zipName              string
-	quartoDirectoryName  string
 	CurrentDirPath       string
 	CurrentQuartoDirPath string
 	CurrentZipFilePath   string
 	CurrentRenderDirPath string
 	CurrentRepository    *git.Repository
-}
-
-// NewFilesystem initializes a new filesystem by setting the root to the current working directory and assigning default values.
-func NewFilesystem() *Filesystem {
-	cwd, _ := os.Getwd()
-	defaultRootPath := filepath.Clean(filepath.Join(cwd, "vfs"))
-
-	filesystem := &Filesystem{
-		rootPath:            defaultRootPath,
-		zipName:             "quarto_project.zip",
-		quartoDirectoryName: "quarto_project",
-	}
-
-	err := os.MkdirAll(filesystem.rootPath, os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-
-	return filesystem
 }
 
 func (filesystem *Filesystem) GetCurrentDirPath() string {
@@ -80,19 +58,22 @@ func (filesystem *Filesystem) SetCurrentRenderDirPath(path string) {
 	filesystem.CurrentDirPath = path
 }
 
-func (filesystem *Filesystem) CheckoutDirectory(postID uint) interfaces.Filesystem {
-	dirPath := filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), "repository")
+func CheckoutDirectory(postID uint) interfaces.Filesystem {
+	// get filepath to lock file
+	cwd, _ := os.Getwd()
+	rootDir := filepath.Join(cwd, "vfs")
+	dirPath := filepath.Join(rootDir, strconv.FormatUint(uint64(postID), 10), "repository")
 
 	directoryFilesystem := &Filesystem{
 		CurrentDirPath:       dirPath,
-		CurrentQuartoDirPath: filepath.Join(dirPath, filesystem.quartoDirectoryName),
-		CurrentZipFilePath:   filepath.Join(dirPath, filesystem.zipName),
+		CurrentQuartoDirPath: filepath.Join(dirPath, "quarto_project"),
+		CurrentZipFilePath:   filepath.Join(dirPath, "quarto_project.zip"),
 		CurrentRenderDirPath: filepath.Join(dirPath, "render"),
 	}
 
 	// try to open repository if it exists.
 	// we ignore the error to be flexible: if the repo already exists check it out, if not thats also ok.
-	repo, _ := filesystem.CheckoutRepository()
+	repo, _ := directoryFilesystem.CheckoutRepository()
 	directoryFilesystem.CurrentRepository = repo
 
 	return directoryFilesystem
@@ -226,10 +207,11 @@ func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
 	return fileTree, nil
 }
 
-func (filesystem *Filesystem) LockDirectory(postID uint) (*flock.Flock, error) {
+func LockDirectory(postID uint) (*flock.Flock, error) {
 	// get filepath to lock file
-	lockDirPath := filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10))
-	lockFilePath := filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), "alexandria.lock")
+	cwd, _ := os.Getwd()
+	lockDirPath := filepath.Join(cwd, "vfs", strconv.FormatUint(uint64(postID), 10))
+	lockFilePath := filepath.Join(cwd, "vfs", strconv.FormatUint(uint64(postID), 10), "alexandria.lock")
 
 	// check if the directory to lock exists
 	if _, err := os.Stat(lockDirPath); errors.Is(err, os.ErrNotExist) {

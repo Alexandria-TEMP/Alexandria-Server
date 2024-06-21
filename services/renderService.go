@@ -10,6 +10,7 @@ import (
 
 	"github.com/gofrs/flock"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
@@ -21,7 +22,6 @@ type RenderService struct {
 	BranchRepository      database.ModelRepositoryInterface[*models.Branch]
 	PostRepository        database.ModelRepositoryInterface[*models.Post]
 	ProjectPostRepository database.ModelRepositoryInterface[*models.ProjectPost]
-	Filesystem            filesystemInterfaces.Filesystem
 	BranchService         interfaces.BranchService
 }
 
@@ -53,13 +53,13 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (filePath strin
 
 	// lock directory
 	// unlock upon error or after controller has read file
-	lock, err = renderService.Filesystem.LockDirectory(projectPost.PostID)
+	lock, err = filesystem.LockDirectory(projectPost.PostID)
 	if err != nil {
 		return filePath, nil, nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
 
 	// select repository of the parent post
-	directoryFilesystem := renderService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// checkout specified branch
 	if err := directoryFilesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
@@ -110,13 +110,13 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (filePath str
 
 	// lock directory
 	// unlock upon error or after controller has read file
-	lock, err = renderService.Filesystem.LockDirectory(postID)
+	lock, err = filesystem.LockDirectory(postID)
 	if err != nil {
 		return filePath, nil, nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", postID, err)
 	}
 
 	// select repository of the post
-	directoryFilesystem := renderService.Filesystem.CheckoutDirectory(postID)
+	directoryFilesystem := filesystem.CheckoutDirectory(postID)
 
 	// checkout master
 	if err := directoryFilesystem.CheckoutBranch("master"); err != nil {

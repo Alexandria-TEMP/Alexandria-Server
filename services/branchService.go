@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/flock"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
-	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
@@ -29,7 +29,6 @@ type BranchService struct {
 	DiscussionContainerRepository         database.ModelRepositoryInterface[*models.DiscussionContainer]
 	DiscussionRepository                  database.ModelRepositoryInterface[*models.Discussion]
 	MemberRepository                      database.ModelRepositoryInterface[*models.Member]
-	Filesystem                            filesystemInterfaces.Filesystem
 	ScientificFieldTagContainerRepository database.ModelRepositoryInterface[*models.ScientificFieldTagContainer]
 
 	RenderService             interfaces.RenderService
@@ -108,7 +107,7 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 	}
 
 	// lock directory and defer unlocking it
-	lock, err := branchService.Filesystem.LockDirectory(projectPost.PostID)
+	lock, err := filesystem.LockDirectory(projectPost.PostID)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
@@ -120,7 +119,7 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 	}()
 
 	// set vfs to repository according to the Post of the ProjectPost of the Branch entity
-	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// create new branch in git repo with branch ID as its name
 	if err := directoryFilesystem.CreateBranch(fmt.Sprintf("%v", branch.ID)); err != nil {
@@ -146,7 +145,7 @@ func (branchService *BranchService) DeleteBranch(branchID uint) error {
 	}
 
 	// lock directory and defer unlocking it
-	lock, err := branchService.Filesystem.LockDirectory(projectPost.PostID)
+	lock, err := filesystem.LockDirectory(projectPost.PostID)
 	if err != nil {
 		return fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
@@ -158,7 +157,7 @@ func (branchService *BranchService) DeleteBranch(branchID uint) error {
 	}()
 
 	// checkout repository
-	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// delete branch
 	if err := directoryFilesystem.DeleteBranch(fmt.Sprintf("%v", branchID)); err != nil {
@@ -314,7 +313,7 @@ func (branchService *BranchService) merge(branch *models.Branch, closedBranch *m
 	closedBranch.BranchReviewDecision = models.Approved
 
 	// lock directory and defer unlocking it
-	lock, err := branchService.Filesystem.LockDirectory(projectPost.PostID)
+	lock, err := filesystem.LockDirectory(projectPost.PostID)
 	if err != nil {
 		return fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
@@ -326,7 +325,7 @@ func (branchService *BranchService) merge(branch *models.Branch, closedBranch *m
 	}()
 
 	// checkout repo and then merge
-	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := filesystem.CheckoutDirectory(projectPost.PostID)
 
 	if err := directoryFilesystem.Merge(fmt.Sprintf("%v", branch.ID), "master"); err != nil {
 		return err
@@ -427,13 +426,13 @@ func (branchService *BranchService) GetProject(branchID uint) (string, *flock.Fl
 
 	// lock directory.
 	// we unlock in the controller once the project file has been read or if we error.
-	lock, err := branchService.Filesystem.LockDirectory(projectPost.PostID)
+	lock, err := filesystem.LockDirectory(projectPost.PostID)
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
 
 	// select repository of the parent post
-	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// checkout specified branch
 	if err := directoryFilesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
@@ -464,13 +463,13 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 
 	// lock directory
 	// if there is an error we will unlock, otherwise we unlock at the end of the render pipeline
-	lock, err := branchService.Filesystem.LockDirectory(projectPost.PostID)
+	lock, err := filesystem.LockDirectory(projectPost.PostID)
 	if err != nil {
 		return fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
 
 	// select repository of the parent post
-	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// checkout specified branch
 	if err := directoryFilesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
@@ -544,7 +543,7 @@ func (branchService *BranchService) GetFiletree(branchID uint) (map[string]int64
 	}
 
 	// lock directory and defer unlocking it
-	lock, err := branchService.Filesystem.LockDirectory(projectPost.PostID)
+	lock, err := filesystem.LockDirectory(projectPost.PostID)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
@@ -556,7 +555,7 @@ func (branchService *BranchService) GetFiletree(branchID uint) (map[string]int64
 	}()
 
 	// select repository of the parent post
-	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// checkout specified branch
 	if err := directoryFilesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
@@ -632,13 +631,13 @@ func (branchService *BranchService) GetFileFromProject(branchID uint, relFilepat
 
 	// lock directory
 	// we unlock in the controller after the file has been read from the reposioptory or if there is an error
-	lock, err := branchService.Filesystem.LockDirectory(projectPost.PostID)
+	lock, err := filesystem.LockDirectory(projectPost.PostID)
 	if err != nil {
 		return "", nil, fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
 
 	// select repository of the parent post
-	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// checkout specified branch
 	if err := directoryFilesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
