@@ -58,6 +58,14 @@ func (filesystem *Filesystem) SetCurrentRenderDirPath(path string) {
 	filesystem.CurrentDirPath = path
 }
 
+func InitializeFilesystem() {
+	cwd, _ := os.Getwd()
+
+	if os.Mkdir(filepath.Join(cwd, "vfs"), fs.ModePerm) != nil {
+		panic("FAILED TO INITIALIZE VFS")
+	}
+}
+
 func CheckoutDirectory(postID uint) interfaces.Filesystem {
 	// get filepath to lock file
 	cwd, _ := os.Getwd()

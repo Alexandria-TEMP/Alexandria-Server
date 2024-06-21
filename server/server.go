@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
@@ -205,11 +206,16 @@ func loadSecret() (string, error) {
 }
 
 func Init() {
+	// VFS
+	filesystem.InitializeFilesystem()
+
+	// DB
 	db, err := database.InitializeDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// HASHING
 	secret, err := loadSecret()
 	if err != nil {
 		log.Fatal(err)
