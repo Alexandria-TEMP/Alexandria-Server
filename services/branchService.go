@@ -120,10 +120,10 @@ func (branchService *BranchService) CreateBranch(branchCreationForm *forms.Branc
 	}()
 
 	// set vfs to repository according to the Post of the ProjectPost of the Branch entity
-	branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// create new branch in git repo with branch ID as its name
-	if err := branchService.Filesystem.CreateBranch(fmt.Sprintf("%v", branch.ID)); err != nil {
+	if err := directoryFilesystem.CreateBranch(fmt.Sprintf("%v", branch.ID)); err != nil {
 		return nil, nil, fmt.Errorf("failed create branch: %w", err)
 	}
 
@@ -158,10 +158,10 @@ func (branchService *BranchService) DeleteBranch(branchID uint) error {
 	}()
 
 	// checkout repository
-	branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// delete branch
-	if err := branchService.Filesystem.DeleteBranch(fmt.Sprintf("%v", branchID)); err != nil {
+	if err := directoryFilesystem.DeleteBranch(fmt.Sprintf("%v", branchID)); err != nil {
 		return fmt.Errorf("failed to delete branch from vfs with id %v: %w", branchID, err)
 	}
 
@@ -326,9 +326,9 @@ func (branchService *BranchService) merge(branch *models.Branch, closedBranch *m
 	}()
 
 	// checkout repo and then merge
-	branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
 
-	if err := branchService.Filesystem.Merge(fmt.Sprintf("%v", branch.ID), "master"); err != nil {
+	if err := directoryFilesystem.Merge(fmt.Sprintf("%v", branch.ID), "master"); err != nil {
 		return err
 	}
 
@@ -433,10 +433,10 @@ func (branchService *BranchService) GetProject(branchID uint) (string, *flock.Fl
 	}
 
 	// select repository of the parent post
-	branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// checkout specified branch
-	if err := branchService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
+	if err := directoryFilesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
 		if err := lock.Unlock(); err != nil {
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
@@ -444,7 +444,7 @@ func (branchService *BranchService) GetProject(branchID uint) (string, *flock.Fl
 		return filePath, nil, fmt.Errorf("failed to find this git branch, with name %v: %w", branchID, err)
 	}
 
-	return branchService.Filesystem.GetCurrentZipFilePath(), lock, nil
+	return directoryFilesystem.GetCurrentZipFilePath(), lock, nil
 }
 
 func (branchService *BranchService) UploadProject(c *gin.Context, file *multipart.FileHeader, branchID uint) error {
@@ -470,32 +470,32 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 	}
 
 	// select repository of the parent post
-	branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// checkout specified branch
-	if err := branchService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
+	if err := directoryFilesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
 		if err := lock.Unlock(); err != nil {
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
 
-		return err
+		return fmt.Errorf("failed to checkout branch %v: %w", branchID, err)
 	}
 
 	// clean directory to remove all files
-	if err := branchService.Filesystem.CleanDir(); err != nil {
+	if err := directoryFilesystem.CleanDir(); err != nil {
 		if err := lock.Unlock(); err != nil {
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
 
-		return err
+		return fmt.Errorf("failed to clean cwd: %w", err)
 	}
 
 	// save zipped project
-	if err := branchService.Filesystem.SaveZipFile(c, file); err != nil {
+	if err := directoryFilesystem.SaveZipFile(c, file); err != nil {
 		// it fails so we set render status to failed and reset the branch
 		branch.RenderStatus = models.Failure
 		_, _ = branchService.BranchRepository.Update(branch)
-		_ = branchService.Filesystem.Reset()
+		_ = directoryFilesystem.Reset()
 
 		if err := lock.Unlock(); err != nil {
 			log.Printf("Failed to unlock %s", lock.Path())
@@ -505,7 +505,7 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 	}
 
 	// commit
-	if err := branchService.Filesystem.CreateCommit(); err != nil {
+	if err := directoryFilesystem.CreateCommit(); err != nil {
 		if err := lock.Unlock(); err != nil {
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
@@ -556,15 +556,15 @@ func (branchService *BranchService) GetFiletree(branchID uint) (map[string]int64
 	}()
 
 	// select repository of the parent post
-	branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// checkout specified branch
-	if err := branchService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
+	if err := directoryFilesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
 		return nil, fmt.Errorf("failed to find this git branch, with name %v", branchID), nil
 	}
 
 	// get file tree
-	fileTree, err := branchService.Filesystem.GetFileTree()
+	fileTree, err := directoryFilesystem.GetFileTree()
 
 	return fileTree, nil, err
 }
@@ -638,10 +638,10 @@ func (branchService *BranchService) GetFileFromProject(branchID uint, relFilepat
 	}
 
 	// select repository of the parent post
-	branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := branchService.Filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// checkout specified branch
-	if err := branchService.Filesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
+	if err := directoryFilesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
 		if err := lock.Unlock(); err != nil {
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
@@ -649,7 +649,7 @@ func (branchService *BranchService) GetFileFromProject(branchID uint, relFilepat
 		return absFilepath, nil, fmt.Errorf("failed to find this git branch, with name %v: %w", branchID, err)
 	}
 
-	absFilepath = filepath.Join(branchService.Filesystem.GetCurrentQuartoDirPath(), relFilepath)
+	absFilepath = filepath.Join(directoryFilesystem.GetCurrentQuartoDirPath(), relFilepath)
 
 	// Check that file exists, if not return 404
 	if exists := utils.FileExists(absFilepath); !exists {

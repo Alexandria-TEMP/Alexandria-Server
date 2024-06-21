@@ -98,16 +98,16 @@ func (projectPostService *ProjectPostService) CreateProjectPost(form *forms.Proj
 	}()
 
 	// Checkout directory where project post will store it's files
-	projectPostService.Filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := projectPostService.Filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// Create a new git repo there
-	if err := projectPostService.Filesystem.CreateRepository(); err != nil {
+	if err := directoryFilesystem.CreateRepository(); err != nil {
 		return nil, nil, err
 	}
 
 	// Create initial branch in git repo
 	branch := projectPost.OpenBranches[0]
-	if err := projectPostService.Filesystem.CreateBranch(fmt.Sprintf("%v", branch.ID)); err != nil {
+	if err := directoryFilesystem.CreateBranch(fmt.Sprintf("%v", branch.ID)); err != nil {
 		return nil, nil, err
 	}
 

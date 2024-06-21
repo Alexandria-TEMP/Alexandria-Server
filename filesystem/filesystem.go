@@ -15,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-git/go-git/v5"
 	"github.com/gofrs/flock"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 )
 
 type Filesystem struct {
@@ -67,15 +68,18 @@ func (filesystem *Filesystem) GetCurrentRenderDirPath() string {
 	return filesystem.CurrentRenderDirPath
 }
 
-func (filesystem *Filesystem) CheckoutDirectory(postID uint) {
-	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), "repository")
-	filesystem.CurrentQuartoDirPath = filepath.Join(filesystem.CurrentDirPath, filesystem.quartoDirectoryName)
-	filesystem.CurrentZipFilePath = filepath.Join(filesystem.CurrentDirPath, filesystem.zipName)
-	filesystem.CurrentRenderDirPath = filepath.Join(filesystem.CurrentDirPath, "render")
-
+func (filesystem *Filesystem) CheckoutDirectory(postID uint) interfaces.Filesystem {
 	// try to open repository if it exists.
 	// we ignore the error to be flexible: if the repo already exists check it out, if not thats also ok.
-	filesystem.CurrentRepository, _ = filesystem.CheckoutRepository()
+	repo, _ := filesystem.CheckoutRepository()
+
+	return &Filesystem{
+		CurrentDirPath:       filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), "repository"),
+		CurrentQuartoDirPath: filepath.Join(filesystem.CurrentDirPath, filesystem.quartoDirectoryName),
+		CurrentZipFilePath:   filepath.Join(filesystem.CurrentDirPath, filesystem.zipName),
+		CurrentRenderDirPath: filepath.Join(filesystem.CurrentDirPath, "render"),
+		CurrentRepository:    repo,
+	}
 }
 
 func (filesystem *Filesystem) SaveZipFile(c *gin.Context, file *multipart.FileHeader) error {

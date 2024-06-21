@@ -18,7 +18,7 @@ type Filesystem interface {
 	// CurrentQuartoDirPath = <cwd>/vfs/<postID>/quarto_project
 	// CurrentZipFilePath = <cwd>/vfs/<postID>/quarto_project.zip
 	// CurrentRenderDirPath = <cwd>/vfs/<postID>/render/<some_html_file>
-	CheckoutDirectory(postID uint)
+	CheckoutDirectory(postID uint) Filesystem
 
 	// LockDirectory locks the directory associated with the post.
 	// It returns a lock, which must be unlocked after changes are done.
