@@ -135,7 +135,7 @@ func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileH
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
 
-		return err
+		return fmt.Errorf("failed to checkout master branch: %w", err)
 	}
 
 	// clean directory to remove all files
@@ -144,7 +144,7 @@ func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileH
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
 
-		return err
+		return fmt.Errorf("failed to clean dir: %w", err)
 	}
 
 	// save zipped project
@@ -167,7 +167,7 @@ func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileH
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
 
-		return err
+		return fmt.Errorf("failed to commit zip file: %w", err)
 	}
 
 	// Set render status pending

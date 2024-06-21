@@ -72,11 +72,12 @@ func (filesystem *Filesystem) CheckoutDirectory(postID uint) interfaces.Filesyst
 	// try to open repository if it exists.
 	// we ignore the error to be flexible: if the repo already exists check it out, if not thats also ok.
 	repo, _ := filesystem.CheckoutRepository()
+	dirPath := filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), "repository")
 
 	return &Filesystem{
-		CurrentDirPath:       filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), "repository"),
-		CurrentQuartoDirPath: filepath.Join(filesystem.CurrentDirPath, filesystem.quartoDirectoryName),
-		CurrentZipFilePath:   filepath.Join(filesystem.CurrentDirPath, filesystem.zipName),
+		CurrentDirPath:       dirPath,
+		CurrentQuartoDirPath: filepath.Join(dirPath, filesystem.quartoDirectoryName),
+		CurrentZipFilePath:   filepath.Join(dirPath, filesystem.zipName),
 		CurrentRenderDirPath: filepath.Join(filesystem.CurrentDirPath, "render"),
 		CurrentRepository:    repo,
 	}
