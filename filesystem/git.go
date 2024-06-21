@@ -2,6 +2,7 @@ package filesystem
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 
@@ -203,6 +204,7 @@ func (filesystem *Filesystem) CheckoutBranch(branchName string) error {
 
 	// get worktree
 	w, err := filesystem.CurrentRepository.Worktree()
+	log.Printf("Filesystem Root: %s", w.Filesystem.Root())
 
 	if err != nil {
 		return fmt.Errorf("failed to open worktree: %w", err)
@@ -216,7 +218,7 @@ func (filesystem *Filesystem) CheckoutBranch(branchName string) error {
 	// git checkout <branchName>
 	branchCoOpts := git.CheckoutOptions{
 		Branch: plumbing.NewBranchReferenceName(branchName),
-		Force:  false,
+		Force:  true,
 	}
 
 	if err := w.Checkout(&branchCoOpts); err != nil {
