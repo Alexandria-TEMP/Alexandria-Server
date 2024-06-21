@@ -106,12 +106,6 @@ definitions:
         example: Post Title
         type: string
     type: object
-  forms.PostFilterForm:
-    properties:
-      includeProjectPosts:
-        example: true
-        type: boolean
-    type: object
   forms.ProjectPostCreationForm:
     properties:
       anonymous:
@@ -886,6 +880,12 @@ paths:
             items:
               type: integer
             type: array
+        "204":
+          description: No Content
+          schema:
+            items:
+              type: integer
+            type: array
         "400":
           description: Bad Request
           schema:
@@ -1474,12 +1474,6 @@ paths:
         Returns all post IDs that meet the requirements in the form
         Endpoint is offset-paginated
       parameters:
-      - description: Post filter form
-        in: body
-        name: form
-        required: true
-        schema:
-          $ref: '#/definitions/forms.PostFilterForm'
       - description: page query
         in: query
         name: page
@@ -2166,6 +2160,12 @@ paths:
             type: array
         "202":
           description: Accepted
+          schema:
+            items:
+              type: integer
+            type: array
+        "204":
+          description: No Content
           schema:
             items:
               type: integer

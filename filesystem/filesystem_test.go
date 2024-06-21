@@ -349,6 +349,7 @@ func TestLockDirectory(t *testing.T) {
 	// Set paths
 	CurrentFilesystem.CurrentDirPath = filepath.Join(cwd, "vfs")
 	lockFilePath := filepath.Join(cwd, "vfs", "0", "alexandria.lock")
+	_ = os.Mkdir(CurrentFilesystem.CurrentDirPath, fs.ModePerm)
 
 	// Create vfs dir
 	_ = os.Mkdir(CurrentFilesystem.CurrentDirPath, fs.ModePerm)

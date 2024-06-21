@@ -25,38 +25,37 @@ type RenderService struct {
 	BranchService         interfaces.BranchService
 }
 
-func (renderService *RenderService) GetRenderFile(branchID uint) (string, *flock.Flock, error, error) {
-	var filePath string
-
+//nolint:gocritic // we need all three types of return errors to be granular
+func (renderService *RenderService) GetRenderFile(branchID uint) (filePath string, lock *flock.Flock, err202 error, err204 error, err404 error) {
 	// get branch
 	branch, err := renderService.BranchRepository.GetByID(branchID)
 
 	if err != nil {
-		return filePath, nil, nil, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
+		return filePath, nil, nil, nil, fmt.Errorf("failed to find branch with id %v: %w", branchID, err)
 	}
 
 	// get project post
 	projectPost, err := renderService.BranchService.GetBranchProjectPost(branch)
 
 	if err != nil {
-		return filePath, nil, nil, fmt.Errorf("failed to find project post with id %v: %w", branch.ProjectPostID, err)
+		return filePath, nil, nil, nil, fmt.Errorf("failed to find project post with id %v: %w", branch.ProjectPostID, err)
 	}
 
 	// if render is pending return 202
 	if branch.RenderStatus == models.Pending {
-		return filePath, nil, fmt.Errorf("render is still pending"), nil
+		return filePath, nil, fmt.Errorf("render is still pending"), nil, nil
 	}
 
 	// if render is failed return 404
 	if branch.RenderStatus == models.Failure {
-		return filePath, nil, nil, fmt.Errorf("render has failed")
+		return filePath, nil, nil, fmt.Errorf("render has failed"), nil
 	}
 
 	// lock directory
 	// unlock upon error or after controller has read file
-	lock, err := renderService.Filesystem.LockDirectory(projectPost.PostID)
+	lock, err = renderService.Filesystem.LockDirectory(projectPost.PostID)
 	if err != nil {
-		return filePath, nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
+		return filePath, nil, nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
 
 	// select repository of the parent post
@@ -68,7 +67,7 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, *flock
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
 
-		return filePath, nil, nil, fmt.Errorf("failed to find this git branch, with name %v: %w", branchID, err)
+		return filePath, nil, nil, nil, fmt.Errorf("failed to find this git branch, with name %v: %w", branchID, err)
 	}
 
 	// verify render exists. if it doesn't set render status to failed
@@ -81,40 +80,39 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (string, *flock
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
 
-		return filePath, nil, nil, fmt.Errorf("render has failed: %w", err)
+		return filePath, nil, nil, nil, fmt.Errorf("render has failed: %w", err)
 	}
 
 	// set filepath to absolute path to render file
 	filePath = filepath.Join(renderService.Filesystem.GetCurrentRenderDirPath(), fileName)
 
-	return filePath, lock, nil, nil
+	return filePath, lock, nil, nil, nil
 }
 
-func (renderService *RenderService) GetMainRenderFile(postID uint) (string, *flock.Flock, error, error) {
-	var filePath string
-
+//nolint:gocritic // we need all three types of return errors to be granular
+func (renderService *RenderService) GetMainRenderFile(postID uint) (filePath string, lock *flock.Flock, err202 error, err204 error, err404 error) {
 	// get post
 	post, err := renderService.PostRepository.GetByID(postID)
 
 	if err != nil {
-		return filePath, nil, nil, fmt.Errorf("failed to find post with id %v: %w", postID, err)
+		return filePath, nil, nil, nil, fmt.Errorf("failed to find post with id %v: %w", postID, err)
 	}
 
 	// if render is pending return 202
 	if post.RenderStatus == models.Pending {
-		return filePath, nil, fmt.Errorf("render is still pending"), nil
+		return filePath, nil, fmt.Errorf("render is still pending"), nil, nil
 	}
 
 	// if render is failed return 404
 	if post.RenderStatus == models.Failure {
-		return filePath, nil, nil, fmt.Errorf("render has failed")
+		return filePath, nil, nil, fmt.Errorf("render has failed"), nil
 	}
 
 	// lock directory
 	// unlock upon error or after controller has read file
-	lock, err := renderService.Filesystem.LockDirectory(postID)
+	lock, err = renderService.Filesystem.LockDirectory(postID)
 	if err != nil {
-		return filePath, nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", postID, err)
+		return filePath, nil, nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", postID, err)
 	}
 
 	// select repository of the post
@@ -126,7 +124,7 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (string, *flo
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
 
-		return filePath, nil, nil, fmt.Errorf("failed to find master: %w", err)
+		return filePath, nil, nil, nil, fmt.Errorf("failed to find master: %w", err)
 	}
 
 	// verify render exists. if it doesn't set render status to failed
@@ -139,13 +137,13 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (string, *flo
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
 
-		return filePath, nil, nil, fmt.Errorf("render has failed: %w", err)
+		return filePath, nil, nil, nil, fmt.Errorf("render has failed: %w", err)
 	}
 
 	// set filepath to absolute path to render file
 	filePath = filepath.Join(renderService.Filesystem.GetCurrentRenderDirPath(), fileName)
 
-	return filePath, lock, nil, nil
+	return filePath, lock, nil, nil, nil
 }
 
 func (renderService *RenderService) RenderPost(post *models.Post, lock *flock.Flock) {

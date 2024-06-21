@@ -525,7 +525,7 @@ func TestGetBranchCollaborator404(t *testing.T) {
 func TestGetRender200(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("../utils/test_files/good_repository_setup/render/1234.html", lock, nil, nil)
+	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("../utils/test_files/good_repository_setup/render/1234.html", lock, nil, nil, nil)
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/1/render", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -540,7 +540,7 @@ func TestGetRender200(t *testing.T) {
 func TestGetRender202(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("", nil, errors.New("pending"), nil)
+	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("", nil, errors.New("pending"), nil, nil)
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/1/render", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)
@@ -548,6 +548,19 @@ func TestGetRender202(t *testing.T) {
 	defer responseRecorder.Result().Body.Close()
 
 	assert.Equal(t, http.StatusAccepted, responseRecorder.Result().StatusCode)
+}
+
+func TestGetRender204(t *testing.T) {
+	beforeEachBranch(t)
+
+	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("", nil, nil, errors.New("failed"), nil)
+
+	req, _ := http.NewRequest("GET", "/api/v2/branches/1/render", http.NoBody)
+	router.ServeHTTP(responseRecorder, req)
+
+	defer responseRecorder.Result().Body.Close()
+
+	assert.Equal(t, http.StatusNoContent, responseRecorder.Result().StatusCode)
 }
 
 func TestGetRender400(t *testing.T) {
@@ -564,7 +577,7 @@ func TestGetRender400(t *testing.T) {
 func TestGetRender404(t *testing.T) {
 	beforeEachBranch(t)
 
-	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("", nil, nil, errors.New("render not found"))
+	mockRenderService.EXPECT().GetRenderFile(uint(1)).Return("", nil, nil, nil, errors.New("render not found"))
 
 	req, _ := http.NewRequest("GET", "/api/v2/branches/1/render", http.NoBody)
 	router.ServeHTTP(responseRecorder, req)

@@ -280,6 +280,7 @@ func (postController *PostController) UploadPost(c *gin.Context) {
 // @Produce		text/html
 // @Success 	200		{object}	[]byte
 // @Success		202		{object}	[]byte
+// @Success		204		{object}	[]byte
 // @Failure		400		{object} 	utils.HTTPError
 // @Failure		404		{object} 	utils.HTTPError
 // @Router 		/posts/{postID}/render	[get]
@@ -295,11 +296,18 @@ func (postController *PostController) GetMainRender(c *gin.Context) {
 	}
 
 	// get render filepath
-	filePath, lock, err202, err404 := postController.RenderService.GetMainRenderFile(uint(postID))
+	filePath, lock, err202, err204, err404 := postController.RenderService.GetMainRenderFile(uint(postID))
 
 	// if render is pending return 202 accepted
 	if err202 != nil {
-		c.String(http.StatusAccepted, "text/plain", []byte("pending"))
+		c.String(http.StatusAccepted, "text/plain", []byte(err202.Error()))
+
+		return
+	}
+
+	// if render is pending return 204 no content
+	if err204 != nil {
+		c.String(http.StatusNoContent, "text/plain", []byte(err204.Error()))
 
 		return
 	}

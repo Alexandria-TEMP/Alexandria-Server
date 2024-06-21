@@ -52,7 +52,7 @@ func TestFilterPostsGoodWeather(t *testing.T) {
 	postID2 := uint(15)
 
 	// Setup mocks
-	mockPostService.EXPECT().Filter(page, size, filterForm).Return([]uint{postID1, postID2}, nil).Times(1)
+	mockPostService.EXPECT().Filter(page, size).Return([]uint{postID1, postID2}, nil).Times(1)
 
 	// Marshal form
 	body, err := json.Marshal(filterForm)
@@ -98,7 +98,7 @@ func TestFilterPostsDatabaseQueryFailed(t *testing.T) {
 	size := 10
 
 	// Setup mocks
-	mockPostService.EXPECT().Filter(page, size, filterForm).Return(nil, fmt.Errorf("oh no")).Times(1)
+	mockPostService.EXPECT().Filter(page, size).Return(nil, fmt.Errorf("oh no")).Times(1)
 
 	// Marshal form
 	body, err := json.Marshal(filterForm)
@@ -118,40 +118,4 @@ func TestFilterPostsDatabaseQueryFailed(t *testing.T) {
 
 	// Check status
 	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Result().StatusCode)
-}
-
-func TestFilterPostsFormBadlyFormatted(t *testing.T) {
-	setupFilterController(t)
-	t.Cleanup(teardownFilterController)
-
-	// Setup data
-	type BadPostFilterForm struct {
-		IncludeProjectPosts string
-	}
-
-	filterForm := BadPostFilterForm{
-		IncludeProjectPosts: "ooga",
-	}
-
-	page := 1
-	size := 10
-
-	// Marshal form
-	body, err := json.Marshal(filterForm)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Construct request
-	req, err := http.NewRequest("GET", fmt.Sprintf("/api/v2/filter/posts?page=%d&size=%d", page, size), bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Send request
-	router.ServeHTTP(responseRecorder, req)
-	defer responseRecorder.Result().Body.Close()
-
-	// Check status
-	assert.Equal(t, http.StatusBadRequest, responseRecorder.Result().StatusCode)
 }

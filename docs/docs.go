@@ -604,6 +604,15 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -1251,15 +1260,6 @@ const docTemplate = `{
                 ],
                 "summary": "Filters all posts",
                 "parameters": [
-                    {
-                        "description": "Post filter form",
-                        "name": "form",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/forms.PostFilterForm"
-                        }
-                    },
                     {
                         "type": "integer",
                         "description": "page query",
@@ -2491,6 +2491,15 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
@@ -3473,15 +3482,6 @@ const docTemplate = `{
                 "title": {
                     "type": "string",
                     "example": "Post Title"
-                }
-            }
-        },
-        "forms.PostFilterForm": {
-            "type": "object",
-            "properties": {
-                "includeProjectPosts": {
-                    "type": "boolean",
-                    "example": true
                 }
             }
         },

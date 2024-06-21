@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/forms"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 )
 
@@ -21,7 +20,6 @@ type FilterController struct {
 // @Description Endpoint is offset-paginated
 // @Tags 		filtering
 // @Accept  	json
-// @Param		form	body		forms.PostFilterForm	true	"Post filter form"
 // @Param 		page	query		uint					false	"page query"
 // @Param		size	query		uint					false	"page size"
 // @Produce		json
@@ -31,25 +29,10 @@ type FilterController struct {
 // @Failure		500		{object} 	utils.HTTPError
 // @Router 		/filter/posts		[get]
 func (filterController *FilterController) FilterPosts(c *gin.Context) {
-	var postFilterForm forms.PostFilterForm
-
-	err := c.BindJSON(&postFilterForm)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("failed to bind form JSON: %v", err.Error())})
-
-		return
-	}
-
-	if !postFilterForm.IsValid() {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to validate form"})
-
-		return
-	}
-
 	page := c.GetInt("page")
 	size := c.GetInt("size")
 
-	postIDs, err := filterController.PostService.Filter(page, size, postFilterForm)
+	postIDs, err := filterController.PostService.Filter(page, size)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("filtering posts failed: %v", err.Error())})
 
