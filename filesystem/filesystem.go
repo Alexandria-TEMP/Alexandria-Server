@@ -26,6 +26,8 @@ type Filesystem struct {
 	CurrentRepository    *git.Repository
 }
 
+type Manager struct{}
+
 func (filesystem *Filesystem) GetCurrentDirPath() string {
 	return filesystem.CurrentDirPath
 }
@@ -42,20 +44,20 @@ func (filesystem *Filesystem) GetCurrentRenderDirPath() string {
 	return filesystem.CurrentRenderDirPath
 }
 
-func (filesystem *Filesystem) SetCurrentDirPath(path string) {
-	filesystem.CurrentDirPath = path
+func (filesystem *Filesystem) SetCurrentDirPath(newPath string) {
+	filesystem.CurrentDirPath = newPath
 }
 
-func (filesystem *Filesystem) SetCurrentQuartoDirPath(path string) {
-	filesystem.CurrentDirPath = path
+func (filesystem *Filesystem) SetCurrentQuartoDirPath(newPath string) {
+	filesystem.CurrentQuartoDirPath = newPath
 }
 
-func (filesystem *Filesystem) SetCurrentZipFilePath(path string) {
-	filesystem.CurrentDirPath = path
+func (filesystem *Filesystem) SetCurrentZipFilePath(newPath string) {
+	filesystem.CurrentZipFilePath = newPath
 }
 
-func (filesystem *Filesystem) SetCurrentRenderDirPath(path string) {
-	filesystem.CurrentDirPath = path
+func (filesystem *Filesystem) SetCurrentRenderDirPath(newPath string) {
+	filesystem.CurrentRenderDirPath = newPath
 }
 
 func InitializeFilesystem() {
@@ -64,27 +66,6 @@ func InitializeFilesystem() {
 	if os.Mkdir(filepath.Join(cwd, "vfs"), fs.ModePerm) != nil {
 		panic("FAILED TO INITIALIZE VFS")
 	}
-}
-
-func CheckoutDirectory(postID uint) interfaces.Filesystem {
-	// get filepath to lock file
-	cwd, _ := os.Getwd()
-	rootDir := filepath.Join(cwd, "vfs")
-	dirPath := filepath.Join(rootDir, strconv.FormatUint(uint64(postID), 10), "repository")
-
-	directoryFilesystem := &Filesystem{
-		CurrentDirPath:       dirPath,
-		CurrentQuartoDirPath: filepath.Join(dirPath, "quarto_project"),
-		CurrentZipFilePath:   filepath.Join(dirPath, "quarto_project.zip"),
-		CurrentRenderDirPath: filepath.Join(dirPath, "render"),
-	}
-
-	// try to open repository if it exists.
-	// we ignore the error to be flexible: if the repo already exists check it out, if not thats also ok.
-	repo, _ := directoryFilesystem.CheckoutRepository()
-	directoryFilesystem.CurrentRepository = repo
-
-	return directoryFilesystem
 }
 
 func (filesystem *Filesystem) SaveZipFile(c *gin.Context, file *multipart.FileHeader) error {
@@ -140,17 +121,6 @@ func (filesystem *Filesystem) Unzip() error {
 
 		dstFile.Close()
 		fileInArchive.Close()
-	}
-
-	return nil
-}
-
-// RemoveRepository entirely removes a repository
-func (filesystem *Filesystem) DeleteRepository() error {
-	err := os.RemoveAll(filesystem.CurrentDirPath)
-
-	if err != nil {
-		return err
 	}
 
 	return nil
@@ -215,7 +185,28 @@ func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
 	return fileTree, nil
 }
 
-func LockDirectory(postID uint) (*flock.Flock, error) {
+func (fms Manager) CheckoutDirectory(postID uint) interfaces.Filesystem {
+	// get filepath to lock file
+	cwd, _ := os.Getwd()
+	rootDir := filepath.Join(cwd, "vfs")
+	dirPath := filepath.Join(rootDir, strconv.FormatUint(uint64(postID), 10), "repository")
+
+	directoryFilesystem := &Filesystem{
+		CurrentDirPath:       dirPath,
+		CurrentQuartoDirPath: filepath.Join(dirPath, "quarto_project"),
+		CurrentZipFilePath:   filepath.Join(dirPath, "quarto_project.zip"),
+		CurrentRenderDirPath: filepath.Join(dirPath, "render"),
+	}
+
+	// try to open repository if it exists.
+	// we ignore the error to be flexible: if the repo already exists check it out, if not thats also ok.
+	repo, _ := directoryFilesystem.CheckoutRepository()
+	directoryFilesystem.CurrentRepository = repo
+
+	return directoryFilesystem
+}
+
+func (fms Manager) LockDirectory(postID uint) (*flock.Flock, error) {
 	// get filepath to lock file
 	cwd, _ := os.Getwd()
 	lockDirPath := filepath.Join(cwd, "vfs", strconv.FormatUint(uint64(postID), 10))

@@ -72,6 +72,7 @@ func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
 }
 
 func initServiceEnv(repositoryEnv *RepositoryEnv, secret string) ServiceEnv {
+	filesystemManager := filesystem.Manager{}
 	tagService := &services.TagService{
 		TagRepository: repositoryEnv.scientificFieldTagRepository,
 	}
@@ -79,6 +80,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, secret string) ServiceEnv {
 		BranchRepository:      repositoryEnv.branchRepository,
 		PostRepository:        repositoryEnv.postRepository,
 		ProjectPostRepository: repositoryEnv.projectPostRepository,
+		FileManager:           filesystemManager,
 		BranchService:         nil, // Circular dependency filled in later...
 	}
 	postCollaboratorService := &services.PostCollaboratorService{
@@ -95,6 +97,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, secret string) ServiceEnv {
 		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
 		MemberRepository:                      repositoryEnv.memberRepository,
 		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
+		FileManager:                           filesystemManager,
 		PostCollaboratorService:               postCollaboratorService,
 		RenderService:                         renderService,
 		TagService:                            tagService,
@@ -113,6 +116,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, secret string) ServiceEnv {
 		DiscussionRepository:                  repositoryEnv.discussionRepository,
 		MemberRepository:                      repositoryEnv.memberRepository,
 		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
+		FileManager:                           filesystemManager,
 		RenderService:                         renderService,
 		BranchCollaboratorService:             branchCollaboratorService,
 		PostCollaboratorService:               postCollaboratorService,
@@ -124,6 +128,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, secret string) ServiceEnv {
 		ClosedBranchRepository:                repositoryEnv.closedBranchRepository,
 		PostRepository:                        repositoryEnv.postRepository,
 		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
+		FileManager:                           filesystemManager,
 		PostCollaboratorService:               postCollaboratorService,
 		BranchCollaboratorService:             branchCollaboratorService,
 		BranchService:                         branchService,

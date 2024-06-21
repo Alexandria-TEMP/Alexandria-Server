@@ -10,8 +10,7 @@ import (
 
 	"github.com/gofrs/flock"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
-	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
-	filesystemInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
+	fsInterfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/services/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
@@ -22,7 +21,9 @@ type RenderService struct {
 	BranchRepository      database.ModelRepositoryInterface[*models.Branch]
 	PostRepository        database.ModelRepositoryInterface[*models.Post]
 	ProjectPostRepository database.ModelRepositoryInterface[*models.ProjectPost]
-	BranchService         interfaces.BranchService
+	FileManager           fsInterfaces.FilesystemManagerInterface
+
+	BranchService interfaces.BranchService
 }
 
 //nolint:gocritic // we need all three types of return errors to be granular
@@ -53,13 +54,13 @@ func (renderService *RenderService) GetRenderFile(branchID uint) (filePath strin
 
 	// lock directory
 	// unlock upon error or after controller has read file
-	lock, err = filesystem.LockDirectory(projectPost.PostID)
+	lock, err = renderService.FileManager.LockDirectory(projectPost.PostID)
 	if err != nil {
 		return filePath, nil, nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", projectPost.PostID, err)
 	}
 
 	// select repository of the parent post
-	directoryFilesystem := filesystem.CheckoutDirectory(projectPost.PostID)
+	directoryFilesystem := renderService.FileManager.CheckoutDirectory(projectPost.PostID)
 
 	// checkout specified branch
 	if err := directoryFilesystem.CheckoutBranch(fmt.Sprintf("%v", branchID)); err != nil {
@@ -110,13 +111,13 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (filePath str
 
 	// lock directory
 	// unlock upon error or after controller has read file
-	lock, err = filesystem.LockDirectory(postID)
+	lock, err = renderService.FileManager.LockDirectory(postID)
 	if err != nil {
 		return filePath, nil, nil, nil, fmt.Errorf("failed to acquire lock for directory %v: %w", postID, err)
 	}
 
 	// select repository of the post
-	directoryFilesystem := filesystem.CheckoutDirectory(postID)
+	directoryFilesystem := renderService.FileManager.CheckoutDirectory(postID)
 
 	// checkout master
 	if err := directoryFilesystem.CheckoutBranch("master"); err != nil {
@@ -146,7 +147,7 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (filePath str
 	return filePath, lock, nil, nil, nil
 }
 
-func (renderService *RenderService) RenderPost(post *models.Post, lock *flock.Flock, directoryFilesystem filesystemInterfaces.Filesystem) {
+func (renderService *RenderService) RenderPost(post *models.Post, lock *flock.Flock, directoryFilesystem fsInterfaces.Filesystem) {
 	// defer unlocking repo
 	defer func() {
 		if err := lock.Unlock(); err != nil {
@@ -227,7 +228,7 @@ func (renderService *RenderService) RenderPost(post *models.Post, lock *flock.Fl
 	}
 }
 
-func (renderService *RenderService) RenderBranch(branch *models.Branch, lock *flock.Flock, directoryFilesystem filesystemInterfaces.Filesystem) {
+func (renderService *RenderService) RenderBranch(branch *models.Branch, lock *flock.Flock, directoryFilesystem fsInterfaces.Filesystem) {
 	// defer unlocking the repository
 	defer func() {
 		if err := lock.Unlock(); err != nil {
@@ -317,7 +318,7 @@ func (renderService *RenderService) RenderBranch(branch *models.Branch, lock *fl
 // IsValidProject validates that the files are a valid default quarto project
 // They mus have a _quarto.yml or _quarto.yaml file.
 // They must be of default quarto project type.
-func (renderService *RenderService) isValidProject(directoryFilesystem filesystemInterfaces.Filesystem) bool {
+func (renderService *RenderService) isValidProject(directoryFilesystem fsInterfaces.Filesystem) bool {
 	// If there is no yml file to cofigure the project it is invalid
 	ymlPath := filepath.Join(directoryFilesystem.GetCurrentQuartoDirPath(), "_quarto.yml")
 	yamlPath := filepath.Join(directoryFilesystem.GetCurrentQuartoDirPath(), "_quarto.yaml")
@@ -340,7 +341,7 @@ func (renderService *RenderService) isValidProject(directoryFilesystem filesyste
 
 // InstallRenderDependencies first checks if a renv.lock file is present and if so gets all dependencies.
 // Next it ensures packages necessary for quarto are there.
-func (renderService *RenderService) installRenderDependencies(directoryFilesystem filesystemInterfaces.Filesystem) error {
+func (renderService *RenderService) installRenderDependencies(directoryFilesystem fsInterfaces.Filesystem) error {
 	// Check if renv.lock exists and if so get dependencies
 	rLockPath := filepath.Join(directoryFilesystem.GetCurrentQuartoDirPath(), "renv.lock")
 	if utils.FileExists(rLockPath) {
@@ -378,7 +379,7 @@ func (renderService *RenderService) installRenderDependencies(directoryFilesyste
 	return nil
 }
 
-func (renderService *RenderService) setProjectConfig(directoryFilesystem filesystemInterfaces.Filesystem) error {
+func (renderService *RenderService) setProjectConfig(directoryFilesystem fsInterfaces.Filesystem) error {
 	// Find config file
 	yamlFilepath := filepath.Join(directoryFilesystem.GetCurrentQuartoDirPath(), "_quarto.yaml")
 	ymlFilepath := filepath.Join(directoryFilesystem.GetCurrentQuartoDirPath(), "_quarto.yml")
@@ -421,7 +422,7 @@ func (renderService *RenderService) setProjectConfig(directoryFilesystem filesys
 
 // RunRender renders the current project files.
 // It first tries to get all dependencies and then renders to html.
-func (renderService *RenderService) runRender(directoryFilesystem filesystemInterfaces.Filesystem) error {
+func (renderService *RenderService) runRender(directoryFilesystem fsInterfaces.Filesystem) error {
 	// Run render command
 	cmd := exec.Command("quarto", "render", directoryFilesystem.GetCurrentQuartoDirPath(),
 		"--output-dir", directoryFilesystem.GetCurrentRenderDirPath(),
@@ -444,13 +445,13 @@ func (renderService *RenderService) runRender(directoryFilesystem filesystemInte
 	return nil
 }
 
-func (renderService *RenderService) failBranch(branch *models.Branch, directoryFilesystem filesystemInterfaces.Filesystem) {
+func (renderService *RenderService) failBranch(branch *models.Branch, directoryFilesystem fsInterfaces.Filesystem) {
 	branch.RenderStatus = models.Failure
 	_, _ = renderService.BranchRepository.Update(branch)
 	_ = directoryFilesystem.Reset()
 }
 
-func (renderService *RenderService) failPost(post *models.Post, directoryFilesystem filesystemInterfaces.Filesystem) {
+func (renderService *RenderService) failPost(post *models.Post, directoryFilesystem fsInterfaces.Filesystem) {
 	post.RenderStatus = models.Failure
 	_, _ = renderService.PostRepository.Update(post)
 	_ = directoryFilesystem.Reset()

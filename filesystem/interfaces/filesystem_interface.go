@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/gofrs/flock"
 )
 
 //go:generate mockgen -package=mocks -source=./filesystem_interface.go -destination=../../mocks/filesystem_mock.go
@@ -28,9 +29,6 @@ type Filesystem interface {
 
 	// CheckoutRepository checkout git repository if there is one at CurrentDirPath
 	CheckoutRepository() (*git.Repository, error)
-
-	// DeleteRepository delete entire repository and directory at CurrentDirPath
-	DeleteRepository() error
 
 	// CreateBranch create a new branch off of master's last commit
 	CreateBranch(branchName string) error
@@ -76,4 +74,9 @@ type Filesystem interface {
 	SetCurrentQuartoDirPath(string)
 	SetCurrentZipFilePath(string)
 	SetCurrentRenderDirPath(string)
+}
+
+type FilesystemManagerInterface interface {
+	LockDirectory(postID uint) (*flock.Flock, error)
+	CheckoutDirectory(postID uint) Filesystem
 }

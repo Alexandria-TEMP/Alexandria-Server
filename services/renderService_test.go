@@ -32,13 +32,14 @@ func beforeEachRender(t *testing.T) {
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
 	mockBranchService = mocks.NewMockBranchService(mockCtrl)
 	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
+	mockFilesystemManager = mocks.NewMockFilesystemManagerInterface(mockCtrl)
 
 	// Create render service
 	renderService = RenderService{
 		BranchRepository:      mockBranchRepository,
 		PostRepository:        mockPostRepository,
 		ProjectPostRepository: mockProjectPostRepository,
-		Filesystem:            mockFilesystem,
+		FileManager:           mockFilesystemManager,
 		BranchService:         mockBranchService,
 	}
 }
@@ -142,6 +143,7 @@ func TestRenderExistsFailed(t *testing.T) {
 	mockFilesystem.EXPECT().Unzip().Return(nil).Times(1)
 	mockFilesystem.EXPECT().RenderExists().Return("", fmt.Errorf("oh no")).Times(1)
 	mockBranchRepository.EXPECT().Update(failedBranch).Return(failedBranch, nil).Times(1)
+	mockFilesystem.EXPECT().Reset()
 
 	renderService.RenderBranch(pendingBranch, lock, mockFilesystem)
 	assert.False(t, lock.Locked())
@@ -194,8 +196,8 @@ func TestGetRenderFileSuccess(t *testing.T) {
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(successBranch, nil).Times(1)
 	mockBranchService.EXPECT().GetBranchProjectPost(successBranch).Return(projectPost, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
-	mockFilesystem.EXPECT().LockDirectory(projectPost.PostID).Return(lock, nil)
-	mockFilesystem.EXPECT().CheckoutDirectory(uint(100)).Times(1)
+	mockFilesystemManager.EXPECT().LockDirectory(projectPost.PostID).Return(lock, nil)
+	mockFilesystemManager.EXPECT().CheckoutDirectory(uint(100)).Return(mockFilesystem)
 	mockFilesystem.EXPECT().CheckoutBranch("0").Return(nil).Times(1)
 	mockFilesystem.EXPECT().RenderExists().Return("", nil).Times(1)
 	mockFilesystem.EXPECT().GetCurrentRenderDirPath().Return(renderFilePath)
@@ -292,8 +294,8 @@ func TestGetRenderFileNoGitBranch(t *testing.T) {
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(successBranch, nil).Times(1)
 	mockBranchService.EXPECT().GetBranchProjectPost(successBranch).Return(projectPost, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
-	mockFilesystem.EXPECT().LockDirectory(projectPost.PostID).Return(lock, nil)
-	mockFilesystem.EXPECT().CheckoutDirectory(uint(100)).Times(1)
+	mockFilesystemManager.EXPECT().LockDirectory(projectPost.PostID).Return(lock, nil)
+	mockFilesystemManager.EXPECT().CheckoutDirectory(uint(100)).Return(mockFilesystem)
 	mockFilesystem.EXPECT().CheckoutBranch("0").Return(errors.New("failed")).Times(1)
 
 	_, _, err202, err204, err404 := renderService.GetRenderFile(successBranch.ID)
@@ -317,8 +319,8 @@ func TestGetRenderDoesntExist(t *testing.T) {
 	mockBranchRepository.EXPECT().GetByID(uint(0)).Return(successBranch, nil).Times(1)
 	mockBranchService.EXPECT().GetBranchProjectPost(successBranch).Return(projectPost, nil)
 	mockProjectPostRepository.EXPECT().GetByID(uint(99)).Return(projectPost, nil).Times(1)
-	mockFilesystem.EXPECT().LockDirectory(projectPost.PostID).Return(lock, nil)
-	mockFilesystem.EXPECT().CheckoutDirectory(uint(100)).Times(1)
+	mockFilesystemManager.EXPECT().LockDirectory(projectPost.PostID).Return(lock, nil)
+	mockFilesystemManager.EXPECT().CheckoutDirectory(uint(100)).Return(mockFilesystem)
 	mockFilesystem.EXPECT().CheckoutBranch("0").Return(nil).Times(1)
 	mockFilesystem.EXPECT().RenderExists().Return("", fmt.Errorf("oh no")).Times(1)
 	mockBranchRepository.EXPECT().Update(successBranch).Return(successBranch, nil)
@@ -345,8 +347,8 @@ func TestGetMainRenderFileGoodWeather(t *testing.T) {
 
 	// Setup mocks
 	mockPostRepository.EXPECT().GetByID(postID).Return(post, nil)
-	mockFilesystem.EXPECT().LockDirectory(uint(10)).Return(lock, nil)
-	mockFilesystem.EXPECT().CheckoutDirectory(postID)
+	mockFilesystemManager.EXPECT().LockDirectory(uint(10)).Return(lock, nil)
+	mockFilesystemManager.EXPECT().CheckoutDirectory(postID).Return(mockFilesystem)
 
 	// Checking out master branch will succeed
 	mockFilesystem.EXPECT().CheckoutBranch("master").Return(nil)
