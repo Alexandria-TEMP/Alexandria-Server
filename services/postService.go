@@ -180,7 +180,7 @@ func (postService *PostService) UploadPost(c *gin.Context, file *multipart.FileH
 		return fmt.Errorf("failed to update post entity: %w", err)
 	}
 
-	go postService.RenderService.RenderPost(post, lock)
+	go postService.RenderService.RenderPost(post, lock, directoryFilesystem)
 
 	return nil
 }

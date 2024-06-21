@@ -146,15 +146,13 @@ func (renderService *RenderService) GetMainRenderFile(postID uint) (filePath str
 	return filePath, lock, nil, nil, nil
 }
 
-func (renderService *RenderService) RenderPost(post *models.Post, lock *flock.Flock) {
+func (renderService *RenderService) RenderPost(post *models.Post, lock *flock.Flock, directoryFilesystem filesystemInterfaces.Filesystem) {
 	// defer unlocking repo
 	defer func() {
 		if err := lock.Unlock(); err != nil {
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
 	}()
-
-	directoryFilesystem := renderService.Filesystem.CheckoutDirectory(post.ID)
 
 	// Checkout master
 	if err := directoryFilesystem.CheckoutBranch("master"); err != nil {
@@ -229,23 +227,13 @@ func (renderService *RenderService) RenderPost(post *models.Post, lock *flock.Fl
 	}
 }
 
-func (renderService *RenderService) RenderBranch(branch *models.Branch, lock *flock.Flock) {
+func (renderService *RenderService) RenderBranch(branch *models.Branch, lock *flock.Flock, directoryFilesystem filesystemInterfaces.Filesystem) {
 	// defer unlocking the repository
 	defer func() {
 		if err := lock.Unlock(); err != nil {
 			log.Printf("Failed to unlock %s", lock.Path())
 		}
 	}()
-
-	projectPost, err := renderService.ProjectPostRepository.GetByID(*branch.ProjectPostID)
-	if err != nil {
-		renderService.failBranch(branch, nil)
-		log.Printf("BRANCH RENDER ERROR: failed to get project post: %s", err)
-
-		return
-	}
-
-	directoryFilesystem := renderService.Filesystem.CheckoutDirectory(projectPost.PostID)
 
 	// Checkout the branch
 	if err := directoryFilesystem.CheckoutBranch(fmt.Sprintf("%v", branch.ID)); err != nil {

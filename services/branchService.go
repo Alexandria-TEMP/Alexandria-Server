@@ -523,7 +523,7 @@ func (branchService *BranchService) UploadProject(c *gin.Context, file *multipar
 		return fmt.Errorf("failed to update branch entity: %w", err)
 	}
 
-	go branchService.RenderService.RenderBranch(branch, lock)
+	go branchService.RenderService.RenderBranch(branch, lock, directoryFilesystem)
 
 	return nil
 }
