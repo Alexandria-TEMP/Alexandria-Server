@@ -94,7 +94,7 @@ func testRenderSuccessTemplate(t *testing.T, dirName string) {
 	mockFilesystem.EXPECT().CreateCommit().Return(nil).Times(1)
 	mockBranchRepository.EXPECT().Update(successBranch).Return(successBranch, nil).Times(1)
 
-	renderService.RenderBranch(pendingBranch, lock)
+	renderService.RenderBranch(pendingBranch, lock, mockFilesystem)
 
 	_, err := os.Stat(renderDirPath)
 	assert.Nil(t, err)
@@ -115,7 +115,7 @@ func TestRenderUnzipFailed(t *testing.T) {
 	mockBranchRepository.EXPECT().Update(failedBranch).Return(failedBranch, nil).Times(1)
 	mockFilesystem.EXPECT().Reset()
 
-	renderService.RenderBranch(pendingBranch, lock)
+	renderService.RenderBranch(pendingBranch, lock, mockFilesystem)
 
 	_, err := os.Stat(renderDirPath)
 	assert.NotNil(t, err)
@@ -143,7 +143,7 @@ func TestRenderExistsFailed(t *testing.T) {
 	mockFilesystem.EXPECT().RenderExists().Return("", fmt.Errorf("oh no")).Times(1)
 	mockBranchRepository.EXPECT().Update(failedBranch).Return(failedBranch, nil).Times(1)
 
-	renderService.RenderBranch(pendingBranch, lock)
+	renderService.RenderBranch(pendingBranch, lock, mockFilesystem)
 	assert.False(t, lock.Locked())
 }
 
@@ -155,7 +155,7 @@ func TestIsValidProjectNoYamlorYml(t *testing.T) {
 
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(dirPath).Times(2)
 
-	assert.False(t, renderService.IsValidProject())
+	assert.False(t, renderService.isValidProject(mockFilesystem))
 }
 
 func TestIsValidProjectNotDefaultType(t *testing.T) {
@@ -166,7 +166,7 @@ func TestIsValidProjectNotDefaultType(t *testing.T) {
 
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(dirPath).Times(2)
 
-	assert.False(t, renderService.IsValidProject())
+	assert.False(t, renderService.isValidProject(mockFilesystem))
 }
 
 func TestIsValidProjectWithYaml(t *testing.T) {
@@ -177,7 +177,7 @@ func TestIsValidProjectWithYaml(t *testing.T) {
 
 	mockFilesystem.EXPECT().GetCurrentQuartoDirPath().Return(dirPath).Times(2)
 
-	assert.True(t, renderService.IsValidProject())
+	assert.True(t, renderService.isValidProject(mockFilesystem))
 }
 
 func TestGetRenderFileSuccess(t *testing.T) {

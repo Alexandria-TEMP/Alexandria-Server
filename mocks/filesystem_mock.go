@@ -17,6 +17,7 @@ import (
 	git "github.com/go-git/go-git/v5"
 	plumbing "github.com/go-git/go-git/v5/plumbing"
 	flock "github.com/gofrs/flock"
+	interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -58,9 +59,11 @@ func (mr *MockFilesystemMockRecorder) CheckoutBranch(branchName any) *gomock.Cal
 }
 
 // CheckoutDirectory mocks base method.
-func (m *MockFilesystem) CheckoutDirectory(postID uint) {
+func (m *MockFilesystem) CheckoutDirectory(postID uint) interfaces.Filesystem {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "CheckoutDirectory", postID)
+	ret := m.ctrl.Call(m, "CheckoutDirectory", postID)
+	ret0, _ := ret[0].(interfaces.Filesystem)
+	return ret0
 }
 
 // CheckoutDirectory indicates an expected call of CheckoutDirectory.

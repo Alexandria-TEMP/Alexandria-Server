@@ -73,4 +73,8 @@ type Filesystem interface {
 	GetCurrentQuartoDirPath() string
 	GetCurrentZipFilePath() string
 	GetCurrentRenderDirPath() string
+	SetCurrentDirPath(string)
+	SetCurrentQuartoDirPath(string)
+	SetCurrentZipFilePath(string)
+	SetCurrentRenderDirPath(string)
 }

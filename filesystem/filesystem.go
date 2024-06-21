@@ -29,19 +29,15 @@ type Filesystem struct {
 	CurrentRepository    *git.Repository
 }
 
-var (
-	cwd, _                     = os.Getwd()
-	defaultRootPath            = filepath.Clean(filepath.Join(cwd, "vfs"))
-	defaultZipName             = "quarto_project.zip"
-	defaultQuartoDirectoryName = "quarto_project"
-)
-
 // NewFilesystem initializes a new filesystem by setting the root to the current working directory and assigning default values.
 func NewFilesystem() *Filesystem {
+	cwd, _ := os.Getwd()
+	defaultRootPath := filepath.Clean(filepath.Join(cwd, "vfs"))
+
 	filesystem := &Filesystem{
 		rootPath:            defaultRootPath,
-		zipName:             defaultZipName,
-		quartoDirectoryName: defaultQuartoDirectoryName,
+		zipName:             "quarto_project.zip",
+		quartoDirectoryName: "quarto_project",
 	}
 
 	err := os.MkdirAll(filesystem.rootPath, os.ModePerm)
@@ -68,19 +64,38 @@ func (filesystem *Filesystem) GetCurrentRenderDirPath() string {
 	return filesystem.CurrentRenderDirPath
 }
 
+func (filesystem *Filesystem) SetCurrentDirPath(path string) {
+	filesystem.CurrentDirPath = path
+}
+
+func (filesystem *Filesystem) SetCurrentQuartoDirPath(path string) {
+	filesystem.CurrentDirPath = path
+}
+
+func (filesystem *Filesystem) SetCurrentZipFilePath(path string) {
+	filesystem.CurrentDirPath = path
+}
+
+func (filesystem *Filesystem) SetCurrentRenderDirPath(path string) {
+	filesystem.CurrentDirPath = path
+}
+
 func (filesystem *Filesystem) CheckoutDirectory(postID uint) interfaces.Filesystem {
-	// try to open repository if it exists.
-	// we ignore the error to be flexible: if the repo already exists check it out, if not thats also ok.
-	repo, _ := filesystem.CheckoutRepository()
 	dirPath := filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), "repository")
 
-	return &Filesystem{
+	directoryFilesystem := &Filesystem{
 		CurrentDirPath:       dirPath,
 		CurrentQuartoDirPath: filepath.Join(dirPath, filesystem.quartoDirectoryName),
 		CurrentZipFilePath:   filepath.Join(dirPath, filesystem.zipName),
-		CurrentRenderDirPath: filepath.Join(filesystem.CurrentDirPath, "render"),
-		CurrentRepository:    repo,
+		CurrentRenderDirPath: filepath.Join(dirPath, "render"),
 	}
+
+	// try to open repository if it exists.
+	// we ignore the error to be flexible: if the repo already exists check it out, if not thats also ok.
+	repo, _ := filesystem.CheckoutRepository()
+	directoryFilesystem.CurrentRepository = repo
+
+	return directoryFilesystem
 }
 
 func (filesystem *Filesystem) SaveZipFile(c *gin.Context, file *multipart.FileHeader) error {

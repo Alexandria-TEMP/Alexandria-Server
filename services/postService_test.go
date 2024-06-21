@@ -301,13 +301,13 @@ func TestUploadPostSuccess(t *testing.T) {
 
 	mockPostRepository.EXPECT().GetByID(uint(10)).Return(post, nil)
 	mockFilesystem.EXPECT().LockDirectory(uint(10)).Return(lock, nil)
-	mockFilesystem.EXPECT().CheckoutDirectory(uint(10))
+	mockFilesystem.EXPECT().CheckoutDirectory(uint(10)).Return(mockFilesystem)
 	mockFilesystem.EXPECT().CheckoutBranch("master").Return(nil)
 	mockFilesystem.EXPECT().CleanDir().Return(nil)
 	mockFilesystem.EXPECT().SaveZipFile(gomock.Any(), file).Return(nil)
 	mockFilesystem.EXPECT().CreateCommit()
 	mockPostRepository.EXPECT().Update(pendingPost).Return(pendingPost, nil)
-	mockRenderService.EXPECT().RenderPost(post, lock)
+	mockRenderService.EXPECT().RenderPost(post, lock, mockFilesystem)
 
 	err := postService.UploadPost(nil, file, 10)
 	assert.Nil(t, err)
