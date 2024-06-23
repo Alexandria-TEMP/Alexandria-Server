@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	cp "github.com/otiai10/copy"
 
@@ -34,7 +35,9 @@ func (filesystem *Filesystem) CreateRepository() error {
 	}
 
 	// create initial files
-	err = cp.Copy("/app/utils/template_repo", filesystem.CurrentDirPath)
+	cwd, _ := os.Getwd()
+	templateRepoPath := filepath.Join(cwd, "..", "utils", "template_repo")
+	err = cp.Copy(templateRepoPath, filesystem.CurrentDirPath)
 
 	if err != nil {
 		return fmt.Errorf("failed to copy over default repository: %w", err)
