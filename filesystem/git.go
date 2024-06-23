@@ -37,6 +37,7 @@ func (filesystem *Filesystem) CreateRepository() error {
 
 	// create initial files
 	cwd, _ := os.Getwd()
+
 	var templateRepoPath string
 
 	if strings.Split(cwd, "/")[len(strings.Split(cwd, "/"))-1] == "filesystem" {
