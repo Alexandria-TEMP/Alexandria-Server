@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 
 	cp "github.com/otiai10/copy"
 
@@ -34,7 +36,17 @@ func (filesystem *Filesystem) CreateRepository() error {
 	}
 
 	// create initial files
-	err = cp.Copy("/app/utils/template_repo", filesystem.CurrentDirPath)
+	cwd, _ := os.Getwd()
+
+	var templateRepoPath string
+
+	if strings.Split(cwd, "/")[len(strings.Split(cwd, "/"))-1] == "filesystem" {
+		templateRepoPath = filepath.Join(cwd, "template_repo")
+	} else {
+		templateRepoPath = filepath.Join(cwd, "filesystem", "template_repo")
+	}
+
+	err = cp.Copy(templateRepoPath, filesystem.CurrentDirPath)
 
 	if err != nil {
 		return fmt.Errorf("failed to copy over default repository: %w", err)
@@ -216,7 +228,7 @@ func (filesystem *Filesystem) CheckoutBranch(branchName string) error {
 	// git checkout <branchName>
 	branchCoOpts := git.CheckoutOptions{
 		Branch: plumbing.NewBranchReferenceName(branchName),
-		Force:  false,
+		Force:  true,
 	}
 
 	if err := w.Checkout(&branchCoOpts); err != nil {

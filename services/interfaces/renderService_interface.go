@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"github.com/gofrs/flock"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 )
 
@@ -20,9 +21,9 @@ type RenderService interface {
 
 	// RenderBranch first unzips a zipped project, validates it, configures it to render well, renders it, and checks it rendered well.
 	// We are handed a locked lock from the previous step in the render pipeline. It must be unlocked after rendering.
-	RenderBranch(*models.Branch, *flock.Flock)
+	RenderBranch(*models.Branch, *flock.Flock, interfaces.Filesystem)
 
 	// RenderPost first unzips a zipped project,validates it, configures it to render well, renders it, and checks it rendered well.
 	// We are handed a locked lock from the previous step in the render pipeline. It must be unlocked after rendering.
-	RenderPost(*models.Post, *flock.Flock)
+	RenderPost(*models.Post, *flock.Flock, interfaces.Filesystem)
 }

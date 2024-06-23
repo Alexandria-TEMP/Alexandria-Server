@@ -38,6 +38,7 @@ func projectPostServiceSetup(t *testing.T) {
 	mockScientificFieldTagContainerRepository = mocks.NewMockModelRepositoryInterface[*models.ScientificFieldTagContainer](mockCtrl)
 	mockPostRepository = mocks.NewMockModelRepositoryInterface[*models.Post](mockCtrl)
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
+	mockFilesystemManager = mocks.NewMockFilesystemManagerInterface(mockCtrl)
 
 	mockPostCollaboratorService = mocks.NewMockPostCollaboratorService(mockCtrl)
 	mockBranchCollaboratorService = mocks.NewMockBranchCollaboratorService(mockCtrl)
@@ -51,7 +52,7 @@ func projectPostServiceSetup(t *testing.T) {
 		ProjectPostRepository:                 mockProjectPostRepository,
 		MemberRepository:                      mockMemberRepository,
 		ScientificFieldTagContainerRepository: mockScientificFieldTagContainerRepository,
-		Filesystem:                            mockFilesystem,
+		FileManager:                           mockFilesystemManager,
 		PostCollaboratorService:               mockPostCollaboratorService,
 		BranchCollaboratorService:             mockBranchCollaboratorService,
 		BranchService:                         mockBranchService,
@@ -105,8 +106,8 @@ func TestCreateProjectPostGoodWeather(t *testing.T) {
 	}, nil).Times(1)
 
 	mockProjectPostRepository.EXPECT().Create(gomock.Any()).Return(nil).Times(1)
-	mockFilesystem.EXPECT().LockDirectory(uint(0)).Return(lock, nil)
-	mockFilesystem.EXPECT().CheckoutDirectory(uint(0))
+	mockFilesystemManager.EXPECT().LockDirectory(uint(0)).Return(lock, nil)
+	mockFilesystemManager.EXPECT().CheckoutDirectory(uint(0)).Return(mockFilesystem)
 	mockFilesystem.EXPECT().CreateRepository().Return(nil)
 	mockFilesystem.EXPECT().CreateBranch("0").Return(nil)
 	mockTagService.EXPECT().GetTagsFromIDs([]uint{}).Return([]*models.ScientificFieldTag{}, nil)

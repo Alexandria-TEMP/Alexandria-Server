@@ -17,12 +17,11 @@ var (
 	branchService BranchService
 	memberService MemberService
 
-	mockRenderService                      *mocks.MockRenderService
-	mockPostCollaboratorService            *mocks.MockPostCollaboratorService
-	mockBranchCollaboratorService          *mocks.MockBranchCollaboratorService
-	mockBranchService                      *mocks.MockBranchService
-	mockTagService                         *mocks.MockTagService
-	mockScientificFieldTagContainerService *mocks.MockScientificFieldTagContainerService
+	mockRenderService             *mocks.MockRenderService
+	mockPostCollaboratorService   *mocks.MockPostCollaboratorService
+	mockBranchCollaboratorService *mocks.MockBranchCollaboratorService
+	mockBranchService             *mocks.MockBranchService
+	mockTagService                *mocks.MockTagService
 
 	mockBranchRepository                      *mocks.MockModelRepositoryInterface[*models.Branch]
 	mockClosedBranchRepository                *mocks.MockModelRepositoryInterface[*models.ClosedBranch]
@@ -36,6 +35,7 @@ var (
 	mockMemberRepository                      *mocks.MockModelRepositoryInterface[*models.Member]
 	mockScientificFieldTagRepository          *mocks.MockModelRepositoryInterface[*models.ScientificFieldTag]
 	mockScientificFieldTagContainerRepository *mocks.MockModelRepositoryInterface[*models.ScientificFieldTagContainer]
+	mockFilesystemManager                     *mocks.MockFilesystemManagerInterface
 
 	mockFilesystem *mocks.MockFilesystem
 

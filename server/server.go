@@ -71,7 +71,8 @@ func initRepositoryEnv(db *gorm.DB) *RepositoryEnv {
 	}
 }
 
-func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, secret string) ServiceEnv {
+func initServiceEnv(repositoryEnv *RepositoryEnv, secret string) ServiceEnv {
+	filesystemManager := filesystem.Manager{}
 	tagService := &services.TagService{
 		TagRepository: repositoryEnv.scientificFieldTagRepository,
 	}
@@ -79,7 +80,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, sec
 		BranchRepository:      repositoryEnv.branchRepository,
 		PostRepository:        repositoryEnv.postRepository,
 		ProjectPostRepository: repositoryEnv.projectPostRepository,
-		Filesystem:            fs,
+		FileManager:           filesystemManager,
 		BranchService:         nil, // Circular dependency filled in later...
 	}
 	postCollaboratorService := &services.PostCollaboratorService{
@@ -96,7 +97,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, sec
 		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
 		MemberRepository:                      repositoryEnv.memberRepository,
 		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
-		Filesystem:                            fs,
+		FileManager:                           filesystemManager,
 		PostCollaboratorService:               postCollaboratorService,
 		RenderService:                         renderService,
 		TagService:                            tagService,
@@ -117,13 +118,12 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, sec
 		DiscussionContainerRepository:      repositoryEnv.discussionContainerRepository,
 		DiscussionRepository:               repositoryEnv.discussionRepository,
 		MemberRepository:                   repositoryEnv.memberRepository,
-		Filesystem:                         fs,
-		ScientificFieldTagRepository:       repositoryEnv.scientificFieldTagRepository,
+		ScientificFieldTagContainerService: scientificFieldTagContainerService,
+		FileManager:                        filesystemManager,
 		RenderService:                      renderService,
 		BranchCollaboratorService:          branchCollaboratorService,
 		PostCollaboratorService:            postCollaboratorService,
 		TagService:                         tagService,
-		ScientificFieldTagContainerService: scientificFieldTagContainerService,
 	}
 	projectPostService := &services.ProjectPostService{
 		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
@@ -131,7 +131,7 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, fs *filesystem.Filesystem, sec
 		ClosedBranchRepository:                repositoryEnv.closedBranchRepository,
 		PostRepository:                        repositoryEnv.postRepository,
 		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
-		Filesystem:                            renderService.Filesystem,
+		FileManager:                           filesystemManager,
 		PostCollaboratorService:               postCollaboratorService,
 		BranchCollaboratorService:             branchCollaboratorService,
 		BranchService:                         branchService,
@@ -211,20 +211,23 @@ func loadSecret() (string, error) {
 }
 
 func Init() {
+	// VFS
+	filesystem.InitializeFilesystem()
+
+	// DB
 	db, err := database.InitializeDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fs := filesystem.NewFilesystem()
-
+	// HASHING
 	secret, err := loadSecret()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	repositoryEnv := initRepositoryEnv(db)
-	serviceEnv := initServiceEnv(repositoryEnv, fs, secret)
+	serviceEnv := initServiceEnv(repositoryEnv, secret)
 	controllerEnv := initControllerEnv(&serviceEnv)
 
 	router := SetUpRouter(&controllerEnv, secret)

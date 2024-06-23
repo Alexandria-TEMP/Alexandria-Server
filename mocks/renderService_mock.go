@@ -13,6 +13,7 @@ import (
 	reflect "reflect"
 
 	flock "github.com/gofrs/flock"
+	interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	models "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/models"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -77,25 +78,25 @@ func (mr *MockRenderServiceMockRecorder) GetRenderFile(branchID any) *gomock.Cal
 }
 
 // RenderBranch mocks base method.
-func (m *MockRenderService) RenderBranch(arg0 *models.Branch, arg1 *flock.Flock) {
+func (m *MockRenderService) RenderBranch(arg0 *models.Branch, arg1 *flock.Flock, arg2 interfaces.Filesystem) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "RenderBranch", arg0, arg1)
+	m.ctrl.Call(m, "RenderBranch", arg0, arg1, arg2)
 }
 
 // RenderBranch indicates an expected call of RenderBranch.
-func (mr *MockRenderServiceMockRecorder) RenderBranch(arg0, arg1 any) *gomock.Call {
+func (mr *MockRenderServiceMockRecorder) RenderBranch(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenderBranch", reflect.TypeOf((*MockRenderService)(nil).RenderBranch), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenderBranch", reflect.TypeOf((*MockRenderService)(nil).RenderBranch), arg0, arg1, arg2)
 }
 
 // RenderPost mocks base method.
-func (m *MockRenderService) RenderPost(arg0 *models.Post, arg1 *flock.Flock) {
+func (m *MockRenderService) RenderPost(arg0 *models.Post, arg1 *flock.Flock, arg2 interfaces.Filesystem) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "RenderPost", arg0, arg1)
+	m.ctrl.Call(m, "RenderPost", arg0, arg1, arg2)
 }
 
 // RenderPost indicates an expected call of RenderPost.
-func (mr *MockRenderServiceMockRecorder) RenderPost(arg0, arg1 any) *gomock.Call {
+func (mr *MockRenderServiceMockRecorder) RenderPost(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenderPost", reflect.TypeOf((*MockRenderService)(nil).RenderPost), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RenderPost", reflect.TypeOf((*MockRenderService)(nil).RenderPost), arg0, arg1, arg2)
 }

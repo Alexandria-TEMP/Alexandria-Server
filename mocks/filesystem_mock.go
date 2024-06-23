@@ -17,6 +17,7 @@ import (
 	git "github.com/go-git/go-git/v5"
 	plumbing "github.com/go-git/go-git/v5/plumbing"
 	flock "github.com/gofrs/flock"
+	interfaces "gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -55,18 +56,6 @@ func (m *MockFilesystem) CheckoutBranch(branchName string) error {
 func (mr *MockFilesystemMockRecorder) CheckoutBranch(branchName any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckoutBranch", reflect.TypeOf((*MockFilesystem)(nil).CheckoutBranch), branchName)
-}
-
-// CheckoutDirectory mocks base method.
-func (m *MockFilesystem) CheckoutDirectory(postID uint) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "CheckoutDirectory", postID)
-}
-
-// CheckoutDirectory indicates an expected call of CheckoutDirectory.
-func (mr *MockFilesystemMockRecorder) CheckoutDirectory(postID any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckoutDirectory", reflect.TypeOf((*MockFilesystem)(nil).CheckoutDirectory), postID)
 }
 
 // CheckoutRepository mocks base method.
@@ -152,20 +141,6 @@ func (m *MockFilesystem) DeleteBranch(branchName string) error {
 func (mr *MockFilesystemMockRecorder) DeleteBranch(branchName any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBranch", reflect.TypeOf((*MockFilesystem)(nil).DeleteBranch), branchName)
-}
-
-// DeleteRepository mocks base method.
-func (m *MockFilesystem) DeleteRepository() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteRepository")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeleteRepository indicates an expected call of DeleteRepository.
-func (mr *MockFilesystemMockRecorder) DeleteRepository() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRepository", reflect.TypeOf((*MockFilesystem)(nil).DeleteRepository))
 }
 
 // GetCurrentDirPath mocks base method.
@@ -254,21 +229,6 @@ func (mr *MockFilesystemMockRecorder) GetLastCommit(branchName any) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastCommit", reflect.TypeOf((*MockFilesystem)(nil).GetLastCommit), branchName)
 }
 
-// LockDirectory mocks base method.
-func (m *MockFilesystem) LockDirectory(postID uint) (*flock.Flock, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LockDirectory", postID)
-	ret0, _ := ret[0].(*flock.Flock)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// LockDirectory indicates an expected call of LockDirectory.
-func (mr *MockFilesystemMockRecorder) LockDirectory(postID any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LockDirectory", reflect.TypeOf((*MockFilesystem)(nil).LockDirectory), postID)
-}
-
 // Merge mocks base method.
 func (m *MockFilesystem) Merge(toMerge, mergeInto string) error {
 	m.ctrl.T.Helper()
@@ -326,6 +286,54 @@ func (mr *MockFilesystemMockRecorder) SaveZipFile(c, file any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveZipFile", reflect.TypeOf((*MockFilesystem)(nil).SaveZipFile), c, file)
 }
 
+// SetCurrentDirPath mocks base method.
+func (m *MockFilesystem) SetCurrentDirPath(arg0 string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetCurrentDirPath", arg0)
+}
+
+// SetCurrentDirPath indicates an expected call of SetCurrentDirPath.
+func (mr *MockFilesystemMockRecorder) SetCurrentDirPath(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetCurrentDirPath", reflect.TypeOf((*MockFilesystem)(nil).SetCurrentDirPath), arg0)
+}
+
+// SetCurrentQuartoDirPath mocks base method.
+func (m *MockFilesystem) SetCurrentQuartoDirPath(arg0 string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetCurrentQuartoDirPath", arg0)
+}
+
+// SetCurrentQuartoDirPath indicates an expected call of SetCurrentQuartoDirPath.
+func (mr *MockFilesystemMockRecorder) SetCurrentQuartoDirPath(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetCurrentQuartoDirPath", reflect.TypeOf((*MockFilesystem)(nil).SetCurrentQuartoDirPath), arg0)
+}
+
+// SetCurrentRenderDirPath mocks base method.
+func (m *MockFilesystem) SetCurrentRenderDirPath(arg0 string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetCurrentRenderDirPath", arg0)
+}
+
+// SetCurrentRenderDirPath indicates an expected call of SetCurrentRenderDirPath.
+func (mr *MockFilesystemMockRecorder) SetCurrentRenderDirPath(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetCurrentRenderDirPath", reflect.TypeOf((*MockFilesystem)(nil).SetCurrentRenderDirPath), arg0)
+}
+
+// SetCurrentZipFilePath mocks base method.
+func (m *MockFilesystem) SetCurrentZipFilePath(arg0 string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetCurrentZipFilePath", arg0)
+}
+
+// SetCurrentZipFilePath indicates an expected call of SetCurrentZipFilePath.
+func (mr *MockFilesystemMockRecorder) SetCurrentZipFilePath(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetCurrentZipFilePath", reflect.TypeOf((*MockFilesystem)(nil).SetCurrentZipFilePath), arg0)
+}
+
 // Unzip mocks base method.
 func (m *MockFilesystem) Unzip() error {
 	m.ctrl.T.Helper()
@@ -338,4 +346,56 @@ func (m *MockFilesystem) Unzip() error {
 func (mr *MockFilesystemMockRecorder) Unzip() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unzip", reflect.TypeOf((*MockFilesystem)(nil).Unzip))
+}
+
+// MockFilesystemManagerInterface is a mock of FilesystemManagerInterface interface.
+type MockFilesystemManagerInterface struct {
+	ctrl     *gomock.Controller
+	recorder *MockFilesystemManagerInterfaceMockRecorder
+}
+
+// MockFilesystemManagerInterfaceMockRecorder is the mock recorder for MockFilesystemManagerInterface.
+type MockFilesystemManagerInterfaceMockRecorder struct {
+	mock *MockFilesystemManagerInterface
+}
+
+// NewMockFilesystemManagerInterface creates a new mock instance.
+func NewMockFilesystemManagerInterface(ctrl *gomock.Controller) *MockFilesystemManagerInterface {
+	mock := &MockFilesystemManagerInterface{ctrl: ctrl}
+	mock.recorder = &MockFilesystemManagerInterfaceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockFilesystemManagerInterface) EXPECT() *MockFilesystemManagerInterfaceMockRecorder {
+	return m.recorder
+}
+
+// CheckoutDirectory mocks base method.
+func (m *MockFilesystemManagerInterface) CheckoutDirectory(postID uint) interfaces.Filesystem {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckoutDirectory", postID)
+	ret0, _ := ret[0].(interfaces.Filesystem)
+	return ret0
+}
+
+// CheckoutDirectory indicates an expected call of CheckoutDirectory.
+func (mr *MockFilesystemManagerInterfaceMockRecorder) CheckoutDirectory(postID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckoutDirectory", reflect.TypeOf((*MockFilesystemManagerInterface)(nil).CheckoutDirectory), postID)
+}
+
+// LockDirectory mocks base method.
+func (m *MockFilesystemManagerInterface) LockDirectory(postID uint) (*flock.Flock, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LockDirectory", postID)
+	ret0, _ := ret[0].(*flock.Flock)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LockDirectory indicates an expected call of LockDirectory.
+func (mr *MockFilesystemManagerInterfaceMockRecorder) LockDirectory(postID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LockDirectory", reflect.TypeOf((*MockFilesystemManagerInterface)(nil).LockDirectory), postID)
 }

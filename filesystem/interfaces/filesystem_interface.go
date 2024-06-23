@@ -18,20 +18,17 @@ type Filesystem interface {
 	// CurrentQuartoDirPath = <cwd>/vfs/<postID>/quarto_project
 	// CurrentZipFilePath = <cwd>/vfs/<postID>/quarto_project.zip
 	// CurrentRenderDirPath = <cwd>/vfs/<postID>/render/<some_html_file>
-	CheckoutDirectory(postID uint)
+	// CheckoutDirectory(postID uint) Filesystem
 
 	// LockDirectory locks the directory associated with the post.
 	// It returns a lock, which must be unlocked after changes are done.
-	LockDirectory(postID uint) (*flock.Flock, error)
+	// LockDirectory(postID uint) (*flock.Flock, error)
 
 	// CreateRepository create git repository at CurrentDirPath
 	CreateRepository() error
 
 	// CheckoutRepository checkout git repository if there is one at CurrentDirPath
 	CheckoutRepository() (*git.Repository, error)
-
-	// DeleteRepository delete entire repository and directory at CurrentDirPath
-	DeleteRepository() error
 
 	// CreateBranch create a new branch off of master's last commit
 	CreateBranch(branchName string) error
@@ -73,4 +70,13 @@ type Filesystem interface {
 	GetCurrentQuartoDirPath() string
 	GetCurrentZipFilePath() string
 	GetCurrentRenderDirPath() string
+	SetCurrentDirPath(string)
+	SetCurrentQuartoDirPath(string)
+	SetCurrentZipFilePath(string)
+	SetCurrentRenderDirPath(string)
+}
+
+type FilesystemManagerInterface interface {
+	LockDirectory(postID uint) (*flock.Flock, error)
+	CheckoutDirectory(postID uint) Filesystem
 }

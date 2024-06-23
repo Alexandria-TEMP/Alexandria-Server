@@ -14,18 +14,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-git/go-git/v5"
 	"github.com/stretchr/testify/assert"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/utils"
 )
 
 var (
-	CurrentFilesystem Filesystem
+	CurrentFilesystem interfaces.Filesystem
 	cwdTest           string
 )
 
 func TestMain(m *testing.M) {
 	cwdTest, _ = os.Getwd()
-
-	CurrentFilesystem = *NewFilesystem()
 
 	os.Exit(m.Run())
 }
@@ -36,20 +35,42 @@ func cleanup(t *testing.T) {
 	os.RemoveAll(filepath.Join(cwdTest, "vfs"))
 }
 
-func TestInitsystem(t *testing.T) {
+func beforeEach(t *testing.T) {
+	t.Helper()
+
+	// Set current dir
+	_ = os.Mkdir(filepath.Join(cwdTest, "vfs"), fs.ModePerm)
+	CurrentFilesystem = Manager{}.CheckoutDirectory(1)
+}
+
+func TestCheckoutWithoutRepo(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
 	}
 
+	beforeEach(t)
+
 	defer cleanup(t)
 
-	CurrentFilesystem.CheckoutDirectory(1)
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository"), CurrentFilesystem.GetCurrentDirPath())
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository", "quarto_project"), CurrentFilesystem.GetCurrentQuartoDirPath())
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository", "render"), CurrentFilesystem.GetCurrentRenderDirPath())
+	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository", "quarto_project.zip"), CurrentFilesystem.GetCurrentZipFilePath())
+}
 
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository"), CurrentFilesystem.CurrentDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository", "quarto_project"), CurrentFilesystem.CurrentQuartoDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository", "render"), CurrentFilesystem.CurrentRenderDirPath)
-	assert.Equal(t, filepath.Join(cwdTest, "vfs", "1", "repository", "quarto_project.zip"), CurrentFilesystem.CurrentZipFilePath)
-	assert.Nil(t, CurrentFilesystem.CurrentRepository)
+func TestInit(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
+	beforeEach(t)
+
+	defer cleanup(t)
+
+	cleanup(t)
+	InitializeFilesystem()
+
+	assert.True(t, utils.FileExists(filepath.Join(cwdTest, "vfs")))
 }
 
 func TestGit(t *testing.T) {
@@ -57,10 +78,9 @@ func TestGit(t *testing.T) {
 		t.SkipNow()
 	}
 
-	defer cleanup(t)
+	beforeEach(t)
 
-	// Set current dir
-	CurrentFilesystem.CheckoutDirectory(1)
+	defer cleanup(t)
 
 	// Create repo
 	assert.Nil(t, CurrentFilesystem.CreateRepository())
@@ -123,18 +143,14 @@ func TestGit(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, ref, ref2)
 	assert.False(t, utils.FileExists(mistakeFilePath))
-
-	// Delete repo and verify it worked
-	assert.Nil(t, CurrentFilesystem.DeleteRepository())
-
-	_, err = CurrentFilesystem.CheckoutRepository()
-	assert.NotNil(t, err)
 }
 
 func TestGitOperationsWithoutRepo(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
 	}
+
+	beforeEach(t)
 
 	defer cleanup(t)
 
@@ -163,10 +179,9 @@ func TestCheckoutNonexistantBranch(t *testing.T) {
 		t.SkipNow()
 	}
 
-	defer cleanup(t)
+	beforeEach(t)
 
-	// Set current dir
-	CurrentFilesystem.CheckoutDirectory(99)
+	defer cleanup(t)
 
 	// Create repo
 	assert.Nil(t, CurrentFilesystem.CreateRepository())
@@ -190,7 +205,7 @@ func TestGitOperationsOnBareRepo(t *testing.T) {
 	assert.Nil(t, err)
 
 	// checkout bare repo
-	CurrentFilesystem.CheckoutDirectory(1)
+	CurrentFilesystem = Manager{}.CheckoutDirectory(1)
 
 	// Create branch with bare repo
 	assert.NotNil(t, CurrentFilesystem.CreateBranch("master"))
@@ -217,23 +232,23 @@ func TestFileHandling(t *testing.T) {
 		t.SkipNow()
 	}
 
+	beforeEach(t)
+
 	defer cleanup(t)
 
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	file, _ := CreateMultipartFileHeader("../utils/test_files/file_handling_test.zip")
 
-	CurrentFilesystem.CheckoutDirectory(1)
-
 	// Test saving fileheader
 	err := CurrentFilesystem.SaveZipFile(c, file)
 	assert.Nil(t, err)
-	assert.True(t, utils.FileExists(CurrentFilesystem.CurrentZipFilePath))
+	assert.True(t, utils.FileExists(CurrentFilesystem.GetCurrentZipFilePath()))
 
 	// Test unzipping succeeds and that contents are correct
 	err = CurrentFilesystem.Unzip()
 	assert.Nil(t, err)
 
-	projectFilePath := filepath.Join(CurrentFilesystem.CurrentQuartoDirPath, "1234.txt")
+	projectFilePath := filepath.Join(CurrentFilesystem.GetCurrentQuartoDirPath(), "1234.txt")
 	f, err := os.Open(projectFilePath)
 	assert.Nil(t, err)
 
@@ -243,11 +258,6 @@ func TestFileHandling(t *testing.T) {
 	line, err := Readln(reader)
 	assert.Nil(t, err)
 	assert.Equal(t, "5678", line)
-
-	// Test removing version repository
-	err = CurrentFilesystem.DeleteRepository()
-	assert.Nil(t, err)
-	assert.False(t, utils.FileExists(CurrentFilesystem.CurrentDirPath))
 }
 
 func TestUnzipDoesntExist(t *testing.T) {
@@ -255,17 +265,17 @@ func TestUnzipDoesntExist(t *testing.T) {
 		t.SkipNow()
 	}
 
+	beforeEach(t)
+
 	defer cleanup(t)
 
 	c, _ := gin.CreateTestContext(httptest.NewRecorder())
 	file, _ := CreateMultipartFileHeader("../utils/test_files/bad_zip")
 
-	CurrentFilesystem.CheckoutDirectory(1)
-
 	// Test saving fileheader
 	err := CurrentFilesystem.SaveZipFile(c, file)
 	assert.Nil(t, err)
-	assert.True(t, utils.FileExists(CurrentFilesystem.CurrentZipFilePath))
+	assert.True(t, utils.FileExists(CurrentFilesystem.GetCurrentZipFilePath()))
 
 	// Test unzipping succeeds and that contents are correct
 	err = CurrentFilesystem.Unzip()
@@ -277,7 +287,11 @@ func TestRenderExistsSuccess(t *testing.T) {
 		t.SkipNow()
 	}
 
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup", "render")
+	beforeEach(t)
+
+	defer cleanup(t)
+
+	CurrentFilesystem.SetCurrentRenderDirPath(filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup", "render"))
 
 	name, err := CurrentFilesystem.RenderExists()
 	assert.Nil(t, err)
@@ -289,7 +303,11 @@ func TestRenderExistsNoFile(t *testing.T) {
 		t.SkipNow()
 	}
 
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup", "badpath")
+	beforeEach(t)
+
+	defer cleanup(t)
+
+	CurrentFilesystem.SetCurrentRenderDirPath(filepath.Join(cwdTest, "..", "utils", "test_files", "good_repository_setup", "badpath"))
 
 	_, err := CurrentFilesystem.RenderExists()
 	assert.NotNil(t, err)
@@ -300,7 +318,11 @@ func TestRenderExistsMultipleFiles(t *testing.T) {
 		t.SkipNow()
 	}
 
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_1")
+	beforeEach(t)
+
+	defer cleanup(t)
+
+	CurrentFilesystem.SetCurrentRenderDirPath(filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_1"))
 
 	_, err := CurrentFilesystem.RenderExists()
 	assert.NotNil(t, err)
@@ -311,7 +333,11 @@ func TestRenderExistsMultipleNotHtml(t *testing.T) {
 		t.SkipNow()
 	}
 
-	CurrentFilesystem.CurrentRenderDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_2")
+	beforeEach(t)
+
+	defer cleanup(t)
+
+	CurrentFilesystem.SetCurrentRenderDirPath(filepath.Join(cwdTest, "..", "utils", "test_files", "bad_repository_setup_2"))
 
 	_, err := CurrentFilesystem.RenderExists()
 	assert.NotNil(t, err)
@@ -322,9 +348,11 @@ func TestGetFileTreeSuccess(t *testing.T) {
 		t.SkipNow()
 	}
 
+	beforeEach(t)
+
 	defer cleanup(t)
 
-	CurrentFilesystem.CurrentQuartoDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "file_tree")
+	CurrentFilesystem.SetCurrentQuartoDirPath(filepath.Join(cwdTest, "..", "utils", "test_files", "file_tree"))
 
 	files, err := CurrentFilesystem.GetFileTree()
 
@@ -338,7 +366,11 @@ func TestGetFileTreeFailure(t *testing.T) {
 		t.SkipNow()
 	}
 
-	CurrentFilesystem.CurrentQuartoDirPath = filepath.Join(cwdTest, "..", "utils", "test_files", "file_tree", "doesntexist")
+	beforeEach(t)
+
+	defer cleanup(t)
+
+	CurrentFilesystem.SetCurrentQuartoDirPath(filepath.Join(cwdTest, "..", "utils", "test_files", "file_tree", "doesntexist"))
 
 	_, err := CurrentFilesystem.GetFileTree()
 
@@ -346,23 +378,28 @@ func TestGetFileTreeFailure(t *testing.T) {
 }
 
 func TestLockDirectory(t *testing.T) {
-	// Set paths
-	CurrentFilesystem.CurrentDirPath = filepath.Join(cwd, "vfs")
-	lockFilePath := filepath.Join(cwd, "vfs", "0", "alexandria.lock")
-	_ = os.Mkdir(CurrentFilesystem.CurrentDirPath, fs.ModePerm)
+	if testing.Short() {
+		t.SkipNow()
+	}
 
-	// Create vfs dir
-	_ = os.Mkdir(CurrentFilesystem.CurrentDirPath, fs.ModePerm)
+	beforeEach(t)
 
-	// Lock post 0
-	lock, err := CurrentFilesystem.LockDirectory(0)
+	defer cleanup(t)
+
+	// Set path
+	assert.Nil(t, CurrentFilesystem.CreateRepository())
+
+	lockFilePath := filepath.Join(cwdTest, "vfs", "1", "alexandria.lock")
+
+	// Lock post 1
+	lock, err := Manager{}.LockDirectory(1)
 	assert.Nil(t, err)
 
 	assert.True(t, lock.Locked())
 	assert.Equal(t, lockFilePath, lock.Path())
 
 	// Cleanup
-	os.RemoveAll(CurrentFilesystem.CurrentDirPath)
+	os.RemoveAll(CurrentFilesystem.GetCurrentDirPath())
 }
 
 // Readln returns a single line (without the ending \n)

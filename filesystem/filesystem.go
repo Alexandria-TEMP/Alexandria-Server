@@ -15,12 +15,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-git/go-git/v5"
 	"github.com/gofrs/flock"
+	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem/interfaces"
 )
 
 type Filesystem struct {
-	rootPath             string
-	zipName              string
-	quartoDirectoryName  string
 	CurrentDirPath       string
 	CurrentQuartoDirPath string
 	CurrentZipFilePath   string
@@ -28,28 +26,7 @@ type Filesystem struct {
 	CurrentRepository    *git.Repository
 }
 
-var (
-	cwd, _                     = os.Getwd()
-	defaultRootPath            = filepath.Clean(filepath.Join(cwd, "vfs"))
-	defaultZipName             = "quarto_project.zip"
-	defaultQuartoDirectoryName = "quarto_project"
-)
-
-// NewFilesystem initializes a new filesystem by setting the root to the current working directory and assigning default values.
-func NewFilesystem() *Filesystem {
-	filesystem := &Filesystem{
-		rootPath:            defaultRootPath,
-		zipName:             defaultZipName,
-		quartoDirectoryName: defaultQuartoDirectoryName,
-	}
-
-	err := os.MkdirAll(filesystem.rootPath, os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-
-	return filesystem
-}
+type Manager struct{}
 
 func (filesystem *Filesystem) GetCurrentDirPath() string {
 	return filesystem.CurrentDirPath
@@ -67,15 +44,26 @@ func (filesystem *Filesystem) GetCurrentRenderDirPath() string {
 	return filesystem.CurrentRenderDirPath
 }
 
-func (filesystem *Filesystem) CheckoutDirectory(postID uint) {
-	filesystem.CurrentDirPath = filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), "repository")
-	filesystem.CurrentQuartoDirPath = filepath.Join(filesystem.CurrentDirPath, filesystem.quartoDirectoryName)
-	filesystem.CurrentZipFilePath = filepath.Join(filesystem.CurrentDirPath, filesystem.zipName)
-	filesystem.CurrentRenderDirPath = filepath.Join(filesystem.CurrentDirPath, "render")
+func (filesystem *Filesystem) SetCurrentDirPath(newPath string) {
+	filesystem.CurrentDirPath = newPath
+}
 
-	// try to open repository if it exists.
-	// we ignore the error to be flexible: if the repo already exists check it out, if not thats also ok.
-	filesystem.CurrentRepository, _ = filesystem.CheckoutRepository()
+func (filesystem *Filesystem) SetCurrentQuartoDirPath(newPath string) {
+	filesystem.CurrentQuartoDirPath = newPath
+}
+
+func (filesystem *Filesystem) SetCurrentZipFilePath(newPath string) {
+	filesystem.CurrentZipFilePath = newPath
+}
+
+func (filesystem *Filesystem) SetCurrentRenderDirPath(newPath string) {
+	filesystem.CurrentRenderDirPath = newPath
+}
+
+func InitializeFilesystem() {
+	cwd, _ := os.Getwd()
+
+	_ = os.Mkdir(filepath.Join(cwd, "vfs"), fs.ModePerm)
 }
 
 func (filesystem *Filesystem) SaveZipFile(c *gin.Context, file *multipart.FileHeader) error {
@@ -131,17 +119,6 @@ func (filesystem *Filesystem) Unzip() error {
 
 		dstFile.Close()
 		fileInArchive.Close()
-	}
-
-	return nil
-}
-
-// RemoveRepository entirely removes a repository
-func (filesystem *Filesystem) DeleteRepository() error {
-	err := os.RemoveAll(filesystem.CurrentDirPath)
-
-	if err != nil {
-		return err
 	}
 
 	return nil
@@ -206,10 +183,32 @@ func (filesystem *Filesystem) GetFileTree() (map[string]int64, error) {
 	return fileTree, nil
 }
 
-func (filesystem *Filesystem) LockDirectory(postID uint) (*flock.Flock, error) {
+func (fms Manager) CheckoutDirectory(postID uint) interfaces.Filesystem {
 	// get filepath to lock file
-	lockDirPath := filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10))
-	lockFilePath := filepath.Join(filesystem.rootPath, strconv.FormatUint(uint64(postID), 10), "alexandria.lock")
+	cwd, _ := os.Getwd()
+	rootDir := filepath.Join(cwd, "vfs")
+	dirPath := filepath.Join(rootDir, strconv.FormatUint(uint64(postID), 10), "repository")
+
+	directoryFilesystem := &Filesystem{
+		CurrentDirPath:       dirPath,
+		CurrentQuartoDirPath: filepath.Join(dirPath, "quarto_project"),
+		CurrentZipFilePath:   filepath.Join(dirPath, "quarto_project.zip"),
+		CurrentRenderDirPath: filepath.Join(dirPath, "render"),
+	}
+
+	// try to open repository if it exists.
+	// we ignore the error to be flexible: if the repo already exists check it out, if not thats also ok.
+	repo, _ := directoryFilesystem.CheckoutRepository()
+	directoryFilesystem.CurrentRepository = repo
+
+	return directoryFilesystem
+}
+
+func (fms Manager) LockDirectory(postID uint) (*flock.Flock, error) {
+	// get filepath to lock file
+	cwd, _ := os.Getwd()
+	lockDirPath := filepath.Join(cwd, "vfs", strconv.FormatUint(uint64(postID), 10))
+	lockFilePath := filepath.Join(cwd, "vfs", strconv.FormatUint(uint64(postID), 10), "alexandria.lock")
 
 	// check if the directory to lock exists
 	if _, err := os.Stat(lockDirPath); errors.Is(err, os.ErrNotExist) {

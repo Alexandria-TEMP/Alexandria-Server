@@ -38,7 +38,6 @@ test_reports:
     - go test ./... -short -coverprofile=coverage.out -covermode count
     - go get github.com/boumenot/gocover-cobertura@v1.2.0
     - go run github.com/boumenot/gocover-cobertura < coverage.out > coverage.xml 
-    
     - go get gotest.tools/gotestsum@v1.12.0
     - go run gotest.tools/gotestsum --junitfile junit.xml --format testname -- -short
     
@@ -58,6 +57,14 @@ test_reports:
   stage: test
   coverage: '/coverage: \d+.\d+% of statements/'
   script: go test $(go list ./... | grep $PKG) -cover -short
+
+test_pkg_filesystem:
+  script :
+    - git config --global user.name "Alexandria Bot"
+    - git config --global user.email "todo@todo.todo" 
+  extends: .package_tests
+  variables:
+    PKG: filesystem
 
 test_pkg_controllers:
   extends: .package_tests
