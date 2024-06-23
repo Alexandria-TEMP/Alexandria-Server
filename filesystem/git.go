@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	cp "github.com/otiai10/copy"
 
@@ -36,7 +37,14 @@ func (filesystem *Filesystem) CreateRepository() error {
 
 	// create initial files
 	cwd, _ := os.Getwd()
-	templateRepoPath := filepath.Join(cwd, "..", "utils", "template_repo")
+	var templateRepoPath string
+
+	if strings.Split(cwd, "/")[len(strings.Split(cwd, "/"))-1] == "filesystem" {
+		templateRepoPath = filepath.Join(cwd, "template_repo")
+	} else {
+		templateRepoPath = filepath.Join(cwd, "filesystem", "template_repo")
+	}
+
 	err = cp.Copy(templateRepoPath, filesystem.CurrentDirPath)
 
 	if err != nil {
