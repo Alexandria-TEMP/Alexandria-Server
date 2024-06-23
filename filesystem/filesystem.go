@@ -63,9 +63,7 @@ func (filesystem *Filesystem) SetCurrentRenderDirPath(newPath string) {
 func InitializeFilesystem() {
 	cwd, _ := os.Getwd()
 
-	if os.Mkdir(filepath.Join(cwd, "vfs"), fs.ModePerm) != nil {
-		panic("FAILED TO INITIALIZE VFS")
-	}
+	_ = os.Mkdir(filepath.Join(cwd, "vfs"), fs.ModePerm)
 }
 
 func (filesystem *Filesystem) SaveZipFile(c *gin.Context, file *multipart.FileHeader) error {
