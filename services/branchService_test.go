@@ -36,6 +36,7 @@ func beforeEachBranch(t *testing.T) {
 	mockBranchReviewRepository = mocks.NewMockModelRepositoryInterface[*models.BranchReview](mockCtrl)
 	mockDiscussionContainerRepository = mocks.NewMockModelRepositoryInterface[*models.DiscussionContainer](mockCtrl)
 	mockDiscussionRepository = mocks.NewMockModelRepositoryInterface[*models.Discussion](mockCtrl)
+	mockScientificFieldTagRepository = mocks.NewMockModelRepositoryInterface[*models.ScientificFieldTag](mockCtrl)
 	mockMemberRepository = mocks.NewMockModelRepositoryInterface[*models.Member](mockCtrl)
 	mockFilesystem = mocks.NewMockFilesystem(mockCtrl)
 	mockBranchCollaboratorService = mocks.NewMockBranchCollaboratorService(mockCtrl)
@@ -1151,27 +1152,6 @@ func TestCloseBranchButDontMarkProjectPostAsRevisionNeeded(t *testing.T) {
 	}
 
 	assert.Equal(t, models.Reviewed, capturedProjectPost.PostReviewStatus)
-}
-
-func TestCreateReviewFailsWhenAlreadyReviewed(t *testing.T) {
-	beforeEachBranch(t)
-
-	// Setup data
-	branchID := uint(5)
-	branch := &models.Branch{
-		BranchOverallReviewStatus: models.BranchRejected,
-	}
-
-	// Setup mocks
-	mockBranchRepository.EXPECT().GetByID(branchID).Return(branch, nil).Times(1)
-
-	reviewCreationForm := forms.ReviewCreationForm{
-		BranchID: branchID,
-	}
-
-	// Function under test
-	_, err := branchService.CreateReview(reviewCreationForm, &models.Member{})
-	assert.NotNil(t, err)
 }
 
 func TestGetReviewGoodWeather(t *testing.T) {

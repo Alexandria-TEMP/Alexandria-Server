@@ -59,6 +59,11 @@ test_reports:
   coverage: '/coverage: \d+.\d+% of statements/'
   script: go test $(go list ./... | grep $PKG) -cover -short
 
+test_pkg_filesystem:
+  extends: .package_tests
+  variables:
+    PKG: filesystem
+
 test_pkg_controllers:
   extends: .package_tests
   variables:

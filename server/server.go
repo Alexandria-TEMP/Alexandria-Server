@@ -106,21 +106,24 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, secret string) ServiceEnv {
 		Secret:           secret,
 		MemberRepository: repositoryEnv.memberRepository,
 	}
+	scientificFieldTagContainerService := &services.ScientificFieldTagContainerService{
+		ContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
+	}
 	branchService := &services.BranchService{
-		BranchRepository:                      repositoryEnv.branchRepository,
-		ClosedBranchRepository:                repositoryEnv.closedBranchRepository,
-		PostRepository:                        repositoryEnv.postRepository,
-		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
-		ReviewRepository:                      repositoryEnv.reviewRepository,
-		DiscussionContainerRepository:         repositoryEnv.discussionContainerRepository,
-		DiscussionRepository:                  repositoryEnv.discussionRepository,
-		MemberRepository:                      repositoryEnv.memberRepository,
-		ScientificFieldTagContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
-		FileManager:                           filesystemManager,
-		RenderService:                         renderService,
-		BranchCollaboratorService:             branchCollaboratorService,
-		PostCollaboratorService:               postCollaboratorService,
-		TagService:                            tagService,
+		BranchRepository:                   repositoryEnv.branchRepository,
+		ClosedBranchRepository:             repositoryEnv.closedBranchRepository,
+		PostRepository:                     repositoryEnv.postRepository,
+		ProjectPostRepository:              repositoryEnv.projectPostRepository,
+		ReviewRepository:                   repositoryEnv.reviewRepository,
+		DiscussionContainerRepository:      repositoryEnv.discussionContainerRepository,
+		DiscussionRepository:               repositoryEnv.discussionRepository,
+		MemberRepository:                   repositoryEnv.memberRepository,
+		ScientificFieldTagContainerService: scientificFieldTagContainerService,
+		FileManager:                        filesystemManager,
+		RenderService:                      renderService,
+		BranchCollaboratorService:          branchCollaboratorService,
+		PostCollaboratorService:            postCollaboratorService,
+		TagService:                         tagService,
 	}
 	projectPostService := &services.ProjectPostService{
 		ProjectPostRepository:                 repositoryEnv.projectPostRepository,
@@ -141,9 +144,6 @@ func initServiceEnv(repositoryEnv *RepositoryEnv, secret string) ServiceEnv {
 	}
 	discussionContainerService := &services.DiscussionContainerService{
 		DiscussionContainerRepository: repositoryEnv.discussionContainerRepository,
-	}
-	scientificFieldTagContainerService := &services.ScientificFieldTagContainerService{
-		ContainerRepository: repositoryEnv.scientificFieldTagContainerRepository,
 	}
 	renderService.BranchService = branchService // added afterwards since both require eachother
 
