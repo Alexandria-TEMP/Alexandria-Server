@@ -378,6 +378,10 @@ func TestGetFileTreeFailure(t *testing.T) {
 }
 
 func TestLockDirectory(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+
 	beforeEach(t)
 
 	defer cleanup(t)
