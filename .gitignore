@@ -1,6 +1,5 @@
 # devcontainer extension
 .devcontainer/
-.github/
 
 # Editors Setting
 .vscode/
