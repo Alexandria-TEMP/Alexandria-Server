@@ -3,8 +3,8 @@ package server
 import (
 	"fmt"
 	"log"
+	"os"
 
-	"github.com/joho/godotenv"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/controllers"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/database"
 	"gitlab.ewi.tudelft.nl/cse2000-software-project/2023-2024/cluster-v/17b/alexandria-backend/filesystem"
@@ -202,12 +202,14 @@ func initControllerEnv(serviceEnv *ServiceEnv) ControllerEnv {
 }
 
 func loadSecret() (string, error) {
-	envFile, err := godotenv.Read(".env")
-	if err != nil {
-		return "", fmt.Errorf("failed to read .env file: %w", err)
+	value, found := os.LookupEnv("SECRET")
+
+	if !found {
+		var zero string
+		return zero, fmt.Errorf("environment variable 'SECRET' not present in environment")
 	}
 
-	return envFile["SECRET"], nil
+	return value, nil
 }
 
 func Init() {
