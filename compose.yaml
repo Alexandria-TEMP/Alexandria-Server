@@ -22,6 +22,7 @@ services:
       - MARIADB_DATABASE=${MARIADB_DATABASE}
       - MARIADB_USER=${MARIADB_USER}
       - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - SECRET=${SECRET}
     depends_on:
       database:
         condition: service_healthy
