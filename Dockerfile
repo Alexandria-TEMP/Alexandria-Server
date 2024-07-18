@@ -1,5 +1,7 @@
-FROM janneskelso/go-with-quarto:alpha as build
+FROM docker.io/janneskelso/go-with-quarto:alpha as build
  
+ENV GIN_MODE=release
+
 ARG GOPKG
 ARG GOBIN
 
